@@ -11,6 +11,7 @@ under interview pressure."
 | Series landing page | [`index.html`](./index.html) | [/](https://dsa-in-48.vercel.app/) · [Pages](https://rajkaria.github.io/dsa-in-48/) |
 | DSA in 48 | [`dsa.html`](./dsa.html) | [/dsa](https://dsa-in-48.vercel.app/dsa) · [Pages](https://rajkaria.github.io/dsa-in-48/dsa.html) |
 | System Design in 48 | [`system-design.html`](./system-design.html) | [/system-design](https://dsa-in-48.vercel.app/system-design) · [Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
+| Behavioral in 48 | [`behavioral.html`](./behavioral.html) | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 
 `index.html` used to be the DSA course; it became the landing page in Aug 2026 and the
 course moved to `dsa.html`. Old bookmarks to `/` now land on the hub, one click from the
@@ -40,10 +41,11 @@ pages' footers and the README.
 - **Design tokens** live in `:root`; every translucent overlay is mixed from a single
   `--tint` RGB triple, so light/dark flips with one variable. Text on the accent marker
   uses `--on-mark` (always dark) and text on `--ink` fills uses `--on-ink`.
-- **Accent per course:** DSA = yellow `#FFD60A`, System Design = teal `#2DD4BF`. A new
-  course gets a new accent and swaps `--mark`/`--mark-deep`/`--mark-soft`.
-- **localStorage is namespaced per course** (`dsa48:*`, `sd48:*`, and `in48:theme` for the
-  landing page) so progress and theme never collide. Keys: `<ns>:progress`,
+- **Accent per course:** DSA = yellow `#FFD60A`, System Design = teal `#2DD4BF`,
+  Behavioral = violet `#A78BFA`. A new course gets a new accent and swaps
+  `--mark`/`--mark-deep`/`--mark-soft`.
+- **localStorage is namespaced per course** (`dsa48:*`, `sd48:*`, `bh48:*`, and
+  `in48:theme` for the landing page) so progress and theme never collide. Keys: `<ns>:progress`,
   `<ns>:collapsed`, `<ns>:theme`. An anti-FOUC bootstrap in `<head>` sets `data-theme`
   before first paint. Theme is deliberately *not* shared across pages.
 - **The landing page is accent-neutral.** It keeps yellow as the page `--mark` and gives

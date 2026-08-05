@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behavioral in 48 — the senior interview, cracked in a weekend</title>
+<meta name="description" content="A two-day behavioral & leadership interview crash course for experienced full-stack engineers targeting senior roles at US product companies. Turn seven years of shipping into stories that land.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Behavioral in 48 — the senior interview, cracked in a weekend">
+<meta property="og:description" content="A two-day behavioral & leadership interview crash course for experienced full-stack engineers targeting senior roles at US product companies. Turn seven years of shipping into stories that land.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Behavioral in 48 — the senior interview, cracked in a weekend">
+<meta name="twitter:description" content="A two-day behavioral & leadership interview crash course for experienced full-stack engineers targeting senior roles at US product companies. Turn seven years of shipping into stories that land.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23A78BFA'%3EBH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#A78BFA;
+  --mark-deep:#7C3AED;
+  --mark-soft:rgba(167,139,250,.16);
+  --on-mark:#141B22;
+  --on-ink:#A78BFA;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#C4B5FD;
+  --mark-soft:rgba(167,139,250,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#C4B5FD;
+  --mark-soft:rgba(167,139,250,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(167,139,250,0) 0%, rgba(167,139,250,.95) 6%, rgba(167,139,250,.8) 94%, rgba(167,139,250,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(167,139,250,0) 0%, rgba(167,139,250,.95) 5%, rgba(167,139,250,.78) 95%, rgba(167,139,250,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(167,139,250,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(232,190,0,.5);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(167,139,250,0) 0%, rgba(167,139,250,.9) 6%, rgba(167,139,250,.7) 94%, rgba(167,139,250,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('bh48:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">Behavioral <em>in 48</em></div>
+      <div class="brand-sub">the senior loop · leadership</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Day 1 topics">
+    <h4>// day 1 — build your material</h4>
+    <a class="side-link" href="#level"><span>What "Senior" Means</span><span class="t">60m</span></a>
+    <a class="side-link" href="#bank"><span>The Story Bank</span><span class="t">90m</span></a>
+    <a class="side-link" href="#star"><span>STAR, Upgraded</span><span class="t">60m</span></a>
+    <a class="side-link" href="#pitch"><span>Tell Me About Yourself</span><span class="t">60m</span></a>
+    <a class="side-link" href="#people"><span>Leadership &amp; People</span><span class="t">90m</span></a>
+    <a class="side-link" href="#failure"><span>Failure &amp; Feedback</span><span class="t">60m</span></a>
+    <a class="side-link" href="#judgment"><span>Tradeoffs &amp; Judgment</span><span class="t">60m</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Day 2 topics">
+    <h4>// day 2 — run the loop</h4>
+    <a class="side-link" href="#decode"><span>Decode the Company</span><span class="t">60m</span></a>
+    <a class="side-link" href="#hm"><span>The Hiring Manager Round</span><span class="t">90m</span></a>
+    <a class="side-link" href="#xfn"><span>Cross-functional Qs</span><span class="t">60m</span></a>
+    <a class="side-link" href="#mock"><span>The Mock Circuit</span><span class="t">90m</span></a>
+    <a class="side-link" href="#ask"><span>Questions You Ask</span><span class="t">60m</span></a>
+    <a class="side-link" href="#offer"><span>Offers &amp; Negotiation</span><span class="t">60m</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// reference</h4>
+    <a class="side-link" href="#playbook"><span>Behavioral Playbook</span></a>
+    <a class="side-link" href="#patterns"><span>Question Matcher</span></a>
+    <a class="side-link" href="#qbank"><span>Senior Question Bank</span></a>
+    <a class="side-link" href="#skip"><span>Safe to Skip</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Series">
+    <h4>// in this series</h4>
+    <a class="side-link" href="./dsa.html"><span>DSA in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./system-design.html"><span>System Design in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./index.html"><span>All courses</span><span class="t">↑</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>day 1 drills</span><span id="p1-count">0/19</span></div>
+      <div class="pbar"><i id="p1-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>day 2 drills</span><span id="p2-count">0/17</span></div>
+      <div class="pbar"><i id="p2-bar"></i></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+    <button class="reset-btn" id="reset-progress" type="button">reset progress</button>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="eyebrow">// a 48-hour syllabus <b>for engineers with years of real work and zero packaged stories</b></p>
+  <h1>The senior loop, <span class="hl hl-anim" data-d="0">cracked</span> in one <span class="hl hl-anim" data-d="1">weekend</span>.</h1>
+  <p class="lede">Past five years of experience, the interview that decides your offer isn't the coding round — it's the one where a stranger asks <b>"tell me about a time…"</b> and you have fifteen seconds to pick the right story from years of shipping. Most strong engineers walk in with zero prepared material and improvise. That's the whole gap.</p>
+  <p class="lede">These two days turn your actual track record — the team you led, the migration you drove, the outage you owned — into <b>a dozen tight, quantified stories</b> and the judgment to deploy the right one, calibrated for <b>senior roles at US product companies</b>. Especially if you're punching a level above your title: seniority here is argued with evidence, not years.</p>
+  <div class="hero-meta">
+    <span><b>13</b> topics</span>
+    <span><b>36</b> drills</span>
+    <span><b>~8.5h</b> per day</span>
+    <span><b>0</b> canned answers</span>
+  </div>
+  <a class="btn" href="#howto">Start Day 1 <span class="arrow">↓</span></a>
+
+  <div class="xlate-wrap">
+    <p class="xlate-head">Proof you're not starting from zero — you've lived these already:</p>
+    <div class="xlate">
+      <div class="x-item reveal" data-d="0"><span class="x-from">the outage you owned end to end</span><span class="x-arrow">→</span><span class="x-to">Failure story</span></div>
+      <div class="x-item reveal" data-d="1"><span class="x-from">the sprint you re-scoped mid-flight</span><span class="x-arrow">→</span><span class="x-to">Prioritization story</span></div>
+      <div class="x-item reveal" data-d="2"><span class="x-from">the junior you unblocked weekly</span><span class="x-arrow">→</span><span class="x-to">Mentorship story</span></div>
+      <div class="x-item reveal" data-d="3"><span class="x-from">the PM you talked out of a bad deadline</span><span class="x-arrow">→</span><span class="x-to">Influence story</span></div>
+      <div class="x-item reveal" data-d="4"><span class="x-from">the migration nobody asked you to lead</span><span class="x-arrow">→</span><span class="x-to">Ownership story</span></div>
+      <div class="x-item reveal" data-d="5"><span class="x-from">the code review that got heated</span><span class="x-arrow">→</span><span class="x-to">Conflict story</span></div>
+      <div class="x-item reveal" data-d="6"><span class="x-from">the metric you moved and measured</span><span class="x-arrow">→</span><span class="x-to">Impact story</span></div>
+      <div class="x-item reveal" data-d="7"><span class="x-from">the postmortem doc you wrote at 2am</span><span class="x-arrow">→</span><span class="x-to">Growth story</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- HOW TO -->
+<section class="section" id="howto">
+  <p class="section-eyebrow">// ground rules</p>
+  <h2>How to run these two days</h2>
+  <p class="sub">Day 1 you write; day 2 you speak. Every topic ends with drills that produce a real artifact — a story, a script, a list — that you'll reuse in every interview for years. Do them in a doc you keep.</p>
+  <div class="rules">
+    <div class="rule">
+      <h5>01 · write, then say it out loud</h5>
+      <p>A story that exists only in your head will collapse under pressure. <b>Write every story, then record yourself telling it</b> — the phone voice memo is the whole gym.</p>
+    </div>
+    <div class="rule">
+      <h5>02 · numbers or it didn't happen</h5>
+      <p>"Improved performance" is noise; <b>"cut LCP 20–30% for 5M quarterly users"</b> is signal. Dig up the real numbers this weekend while you can still find them.</p>
+    </div>
+    <div class="rule">
+      <h5>03 · two minutes, hard stop</h5>
+      <p>Every story gets told in <b>90–120 seconds</b>, then you stop and let them dig. Rambling is the #1 senior-candidate failure mode. The timer is non-negotiable.</p>
+    </div>
+    <div class="rule">
+      <h5>04 · "I", not "we"</h5>
+      <p>Credit the team in one sentence, then narrate <b>your decisions, your actions, your judgment</b>. Interviewers can only hire the person in the room.</p>
+    </div>
+    <div class="rule">
+      <h5>05 · only have one day?</h5>
+      <p>Do the <a href="#bank">story bank</a>, <a href="#star">STAR</a>, <a href="#pitch">tell-me-about-yourself</a>, and <a href="#people">leadership stories</a>. That's the material <b>~80% of behavioral questions</b> draw from.</p>
+    </div>
+    <div class="rule">
+      <h5>06 · the night before</h5>
+      <p>Nothing new. Re-read your story bank once, re-record your 90-second pitch, check the <a href="#patterns">question matcher</a>, sleep. Freshness beats coverage.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 1 ================= -->
+<header class="day-head" id="d1">
+  <p class="eyebrow">// day 1 · ~8.5 hours <b>everything you'll ever say, written down once</b></p>
+  <h2>Build your material</h2>
+  <p class="day-sub">First calibrate what "senior" actually means so you aim your stories at the right altitude. Then mine your history into a story bank, compress each story into the two-minute STAR shape, and draft the three answer families every loop opens with.</p>
+  <div class="sched">
+    <div class="sched-row"><span class="st">09:00</span><span class="sn"><a href="#level">What "senior" means in a US loop</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">10:00</span><span class="sn"><a href="#bank">The story bank</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">11:30</span><span class="sn"><a href="#star">STAR, upgraded</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">12:30</span><span class="sn">lunch — actually walk away</span><span class="sd">45 min</span></div>
+    <div class="sched-row"><span class="st">13:15</span><span class="sn"><a href="#pitch">"Tell me about yourself" + the resume walkthrough</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">14:15</span><span class="sn"><a href="#people">Leadership &amp; people stories</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">15:45</span><span class="sn"><a href="#failure">Failure, mistakes &amp; feedback</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">16:45</span><span class="sn"><a href="#judgment">Tradeoffs &amp; engineering judgment</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">17:45</span><span class="sn">done — record your two best stories as voice memos, close the laptop</span><span class="sd">—</span></div>
+  </div>
+</header>
+
+<!-- LEVEL -->
+<section class="topic" id="level">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 09:00 · 60 min</span><span class="chip">aim before you fire</span></div>
+      <h3>What "senior" means in a US loop</h3>
+      <p class="tagline">You're not being graded on years — you're being graded against a leveling rubric you've never seen. Learn the rubric first and every story you write today aims at it.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You already operate at a level: you run sprint planning, own releases, unblock teammates, and answer for outcomes — you've just never had to <b>label those behaviors in rubric language</b>. This hour attaches the labels.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>Nearly every US product company grades on the same three axes: <b>scope</b> (how big a problem you own), <b>autonomy</b> (how much direction you need), and <b>influence</b> (whose work gets better because of you).</li>
+        <li><b>Mid-level:</b> owns tasks, needs a defined problem. <b>Senior:</b> owns a problem end to end, defines the solution, lifts others. <b>Staff:</b> owns a problem space across teams. Interviewers listen for which one your stories describe.</li>
+        <li>The trap when punching above your title: telling task-level stories about leadership-level work. <b>"I implemented X" is mid; "I noticed X was costing us Y, drove the fix across two teams, and it saved Z" is senior</b> — often about the same work.</li>
+        <li>Years don't argue your level; <b>altitude does</b>. Five years leading releases, mentoring, and owning quality beats ten years of ticket-taking, but only if you narrate it at the right altitude.</li>
+        <li>Every interviewer files a written verdict against this rubric within minutes of the call ending. Your job is to <b>hand them the evidence pre-sorted</b>.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">altitude-check.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">Same project, three altitudes. Spot the difference:
+
+MID    "I was asked to improve our test coverage, so I added
+        SonarQube rules and wrote tests until we hit the target."
+
+SENIOR "Release regressions kept burning us. I made quality my
+        problem: raised coverage 25%, cut critical issues 30%,
+        and changed the definition-of-done so it stayed fixed."
+
+STAFF  "Three teams had the same regression pattern. I got
+        agreement on a shared quality bar, rolled it out org-wide,
+        and regressions dropped across every team, not just mine."
+
+The work is similar. The OWNERSHIP OF THE PROBLEM is the level.</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"walk me through a project you're proud of"</span><span class="then">they're mapping your scope axis</span></li>
+        <li><span class="cue">"what would your manager say about you?"</span><span class="then">autonomy check — do you need direction?</span></li>
+        <li><span class="cue">"how do you help teammates grow?"</span><span class="then">influence check — senior gate, answer with names-level specifics</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills — into the doc you'll keep all weekend</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-level-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your last two years as three bullets per axis: scope, autonomy, influence</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-level-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Take one "I implemented X" bullet from your resume and rewrite it at senior altitude</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY BANK -->
+<section class="topic" id="bank">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 10:00 · 90 min</span><span class="chip">the single highest-leverage hour</span></div>
+      <h3>The story bank</h3>
+      <p class="tagline">Ten stories cover ninety percent of every behavioral question ever asked. Mine them once, this morning, and you'll never improvise under pressure again.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>This is <b>indexing</b>. Right now your experience is a full-collection scan — every question triggers a linear search through years of memory, live, while someone watches. The story bank is the index you build once so every lookup is O(1).</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>Walk your history <b>job by job, project by project</b>, and list moments — not achievements, <i>moments</i>: the day the release broke, the argument about the rewrite, the intern who couldn't ship, the deadline that moved.</li>
+        <li>From the list, pick <b>~10 stories</b> that together cover the big eight categories: <b>leadership · conflict · failure · ambiguity · influence · delivery under pressure · mentoring · initiative</b>. One story can cover 2–3 categories from different angles — that's expected and good.</li>
+        <li>For each story capture five fields: <b>situation (1 line) · your role · 2–3 decisions YOU made · outcome with a number · what you'd do differently</b>. The last field is where senior candidates separate — juniors defend, seniors reflect.</li>
+        <li>Recency matters: at 7 years in, interviewers want <b>mostly last-2-3-years material</b>. One early-career story is fine; five is a red flag that you plateaued.</li>
+        <li>Spread stories across employers. All ten from one job reads as one-note; a story from a side project you own end to end (product decisions, users, iteration) is <b>gold for product companies</b> — it proves product sense no feature ticket can.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">story-bank-template.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown"># Story: The flaky-release quarter
+covers: leadership, initiative, delivery        # categories
+when:   2023–24, as team lead                   # recency check
+
+SITUATION  Regressions kept escaping to prod; every release
+           was a fire drill. Team of 5, fleet-safety product,
+           2,000+ corporate customers.
+MY ROLE    Team lead — quality was officially "everyone's job",
+           which meant nobody's.
+DECISIONS  1. Made coverage visible: SonarQube gate in CI.
+           2. Refused to ship two releases until criticals hit 0.
+           3. Re-planned sprints to include refactoring debt.
+OUTCOME    Coverage +25%, critical issues −30%, releases boring.
+LEARNED    Should have gotten team buy-in BEFORE adding the
+           gate — first two weeks it was "the lead's rules",
+           not "our bar". Rolled it back, re-proposed it in
+           retro, and it stuck.</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"tell me about a time you…"</span><span class="then">index lookup — pick from the bank, never improvise</span></li>
+        <li><span class="cue">"do you have another example?"</span><span class="then">they're testing depth — this is why you need ~10, not 4</span></li>
+        <li><span class="cue">"something more recent?"</span><span class="then">recency check — lead with last-2-years stories by default</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills — this IS the weekend's main artifact</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-bank-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Brain-dump 20+ moments from your last three roles — no filtering, 25 minutes</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-bank-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Pick 10, fill the five-field template for each, mark which categories each covers</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-bank-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Audit the grid: any of the big eight categories with zero stories? Mine until covered</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STAR -->
+<section class="topic" id="star">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 11:30 · 60 min</span><span class="chip">the delivery format</span></div>
+      <h3>STAR, upgraded</h3>
+      <p class="tagline">Situation, Task, Action, Result — plus the two additions that mark a senior: a number in the Result and a Reflection after it. Two minutes, then stop talking.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>STAR is a <b>PR description</b>: context, what changed and why, the measured result — written so a reviewer with zero context can follow. You've written hundreds. Now do it out loud, in two minutes.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Situation — 20 seconds max.</b> One sentence of context, one of stakes. The classic failure is spending a minute on backstory nobody needs.</li>
+        <li><b>Task — one sentence.</b> What YOU were on the hook for. This is where "we" quietly erases you; keep it first person.</li>
+        <li><b>Action — the heart, ~60 seconds.</b> Not what happened: what you <i>decided</i>, what you <i>considered and rejected</i>, and why. Decisions are the senior signal; activity is filler.</li>
+        <li><b>Result — with a number.</b> Percentage, time saved, users affected, revenue, incidents avoided. If you truly have no metric, use scale ("2,000+ fleets") or a before/after contrast.</li>
+        <li><b>+ Reflection — one sentence.</b> "In hindsight I'd have done X sooner." Unprompted reflection reads as confidence, not weakness — and it preempts the "what would you do differently?" follow-up.</li>
+        <li>Then <b>stop</b>. Silence invites the follow-up, and follow-ups are where you win: they mean the interviewer is engaged and steering toward what they need.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">two-minute-arc.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">0:00  SITUATION   "Our consumer platform served 5M users a
+                   quarter, and the frontend was a monolith —
+                   every team's release blocked every other's."
+0:20  TASK        "As senior frontend, I owned unblocking it."
+0:30  ACTION      "I proposed micro-frontends. Considered a
+                   simple code-split first — rejected it because
+                   the real cost was team coupling, not bundle
+                   size. Rolled out one module as a pilot,
+                   measured, then migrated the rest…"
+1:30  RESULT      "Performance improved 20–30%, and teams
+                   shipped independently for the first time."
+1:45  REFLECTION  "I'd introduce the shared component library
+                   FIRST next time — we duplicated UI for two
+                   sprints before Storybook caught up."
+2:00  — stop. Let them dig.</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">interviewer starts typing mid-answer</span><span class="then">good sign — they're logging evidence; keep the pace</span></li>
+        <li><span class="cue">"so what was the outcome?"</span><span class="then">you buried the Result — restructure, lead with it next story</span></li>
+        <li><span class="cue">"what was YOUR part?"</span><span class="then">too much "we" — rewind and narrate your decisions</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills — phone timer, voice memo, no notes</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-star-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Tell your best story in exactly 2 minutes, recorded. Listen back. Cringe. Repeat once</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-star-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Count your "we"s in the recording; retell with "I" for every decision that was yours</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-star-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write the one-sentence Reflection for all 10 bank stories — the senior signature move</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PITCH -->
+<section class="topic" id="pitch">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 13:15 · 60 min</span><span class="chip">asked in every single round</span></div>
+      <h3>"Tell me about yourself" + the resume walkthrough</h3>
+      <p class="tagline">The only question you are guaranteed to get, in every round, by every interviewer. Ninety seconds, arc-shaped, ending at why you're in this specific room.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's a <b>README</b>: what this project is, what problems it solves, why it exists — not the commit log. Nobody reads a README that starts "in 2015 I enrolled in…". Start at what it does <i>now</i>, gesture at how it got here, end at where it's going.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>Shape: <b>now → how → why here</b>. Who you are today (one line with your strongest credential), the 2–3 beats that built it (not every job — beats), and why this company/role is the logical next step. 90 seconds.</li>
+        <li>Lead with your <b>headline</b>, not your history: "I'm a team lead who's spent seven years on high-traffic web products — currently leading five engineers on fleet-safety software used by 2,000+ fleets" beats any chronology.</li>
+        <li><b>Every resume bullet is a deposition.</b> If it says "improved performance 20–30%", you will be asked how it was measured, what the baseline was, and what you tried that didn't work. Tonight, annotate your own resume with those answers.</li>
+        <li>Career-gap / job-hop / short-stint questions get <b>one calm factual sentence</b>, forward-looking, zero apology — then bridge back to the work. Rehearse yours specifically; improvised versions ramble.</li>
+        <li>Have a <b>10-second version</b> too ("seven years full-stack, lead a team of five, deep in React and Node") for recruiter screens and loop intros — you'll use it five times per company.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">ninety-second-pitch.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">NOW    "I'm a technical team lead with 7 years building
+        high-traffic web apps — right now I lead a team of 5
+        shipping fleet-safety products for 2,000+ corporate
+        fleets: sprint planning, code quality, releases."
+
+HOW    "I got here through the frontend: at a consumer company
+        serving 5M quarterly users I drove a micro-frontend
+        migration that cut load times ~25%. Before that, four
+        years shipping internal platforms for 100K+ employees.
+        On the side I run a product of my own — a poker
+        accounting app with 1,000+ weekly actives — where I own
+        everything from product calls to the Postgres schema."
+
+WHY    "I'm looking for a senior role at a product company
+        where the engineering bar is high and I can own a
+        problem end to end — which is exactly why this team."
+
+— 85 seconds. Every clause is a hook they can pull.</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"walk me through your resume"</span><span class="then">same answer, chronological order — beats, not jobs</span></li>
+        <li><span class="cue">"why are you leaving?"</span><span class="then">one sentence, forward-looking, never negative about current employer</span></li>
+        <li><span class="cue">"why the US? / why this company?"</span><span class="then">specific product/scale/engineering-culture reason — never "bigger market"</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-pitch-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write and record your 90-second pitch; trim until it lands under 1:45 comfortably</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-pitch-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Annotate every quantified resume bullet with: how measured, baseline, what failed first</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-pitch-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Script your one-sentence answer for the awkward question you're dreading (gap/hop/title)</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PEOPLE -->
+<section class="topic" id="people">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 14:15 · 90 min</span><span class="chip">the senior gate</span></div>
+      <h3>Leadership &amp; people stories</h3>
+      <p class="tagline">Conflict, underperformers, mentoring, influence without authority. These questions ARE the senior interview — technical rounds decide if you pass; these decide your level.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>If you've led even a small team you have all of these stories: the heated code review, the engineer who kept missing sprint commitments, the designer you won over, the junior whose PRs went from red to green under your reviews. You've just never <b>filed them as evidence</b>.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea — what each question is really measuring</p>
+      <ul>
+        <li><b>Conflict</b> ("disagreed with a colleague/manager"): can you disagree <i>productively</i>? The winning shape: steel-man their view → bring data → commit fully to whatever's decided, even when it's not your way. A story where you turned out wrong and said so is <i>stronger</i> than one where you won.</li>
+        <li><b>Underperformer:</b> do you act or avoid? Show: noticed early → diagnosed privately (skill? clarity? life?) → concrete support with expectations → outcome either way. "I hoped it would improve" is the failing answer.</li>
+        <li><b>Mentoring:</b> the senior gate. Name a real person (role, not name), what you actually did — pairing cadence, review style, stretch tasks — and where they ended up. Generic "I always help juniors" scores zero.</li>
+        <li><b>Influence without authority:</b> the staff signal. How did you move people who don't report to you — other teams, PMs, skeptical architects? Levers: data, prototypes, allies, and making the right thing the easy thing.</li>
+        <li><b>Delegation &amp; letting go</b> (for lead roles): show you delegate outcomes, not tasks — and that you resisted grabbing the keyboard when it was slower to teach.</li>
+        <li>Never trash anyone in these stories. The other party is always <b>reasonable-but-differently-incentivized</b>; you look senior exactly to the degree they don't look stupid.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">conflict-story-shape.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">Q: "Tell me about a time you disagreed with a decision."
+
+WEAK   "My PM wanted to ship without tests. I pushed back and
+        we shipped with tests."          # villain PM, no depth
+
+STRONG "Our PM wanted to cut the testing window to hit a
+        customer date — reasonable, the customer was at risk.
+        I quantified the other side: our last two rushed
+        releases each cost ~3 days of hotfixes. I proposed a
+        middle path — ship the two low-risk modules on the
+        date, hold the payments module one sprint. PM took it
+        to the customer, who preferred it. Since then we scope
+        release risk per-module by default. What I took away:
+        deadlines are negotiable when you price the risk in
+        THEIR currency — days and customer trust, not test
+        coverage percentages."</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"tell me about a difficult teammate"</span><span class="then">conflict story — they're watching how you talk about the person</span></li>
+        <li><span class="cue">"how do you handle disagreement with your manager?"</span><span class="then">disagree-and-commit shape, with a real example ready</span></li>
+        <li><span class="cue">"how did you grow your team?"</span><span class="then">mentoring evidence, specific human, measurable arc</span></li>
+        <li><span class="cue">"how do you get buy-in?"</span><span class="then">influence levers: data, pilot, allies — pick your best story</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-people-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your conflict story where the other side stays reasonable throughout</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-people-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your mentoring story: one real person, what you did, where they are now</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-people-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your influence-without-authority story — cross-team or cross-function</span></label><span class="diff h">DEEP</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-people-4"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Record the conflict story at 2 minutes; verify the other party sounds reasonable</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAILURE -->
+<section class="topic" id="failure">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 15:45 · 60 min</span><span class="chip">where honesty wins</span></div>
+      <h3>Failure, mistakes &amp; feedback</h3>
+      <p class="tagline">"Tell me about a failure" is not a trap — it's a maturity check. The only wrong answers are a fake failure, a blamed teammate, or nothing learned.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's a <b>blameless postmortem</b>, spoken. You've written these: what happened, the timeline, contributing causes, what we changed so it can't recur. Same document, first person, two minutes.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>Pick a <b>real failure with real cost</b> — a production incident you caused, a technical bet that didn't pay off, a deadline you blew. "I work too hard" and its cousins actively lose points at senior level.</li>
+        <li>But scope it: a failure <b>you owned and survived</b>, not a catastrophe that defines you. The story arc is competence → mistake → recovery → system change.</li>
+        <li>The senior tell is the last beat: <b>what changed structurally</b>. "I'm more careful now" is junior; "we added a canary stage and I now require rollback plans in every design doc" is senior.</li>
+        <li><b>Feedback questions</b> ("hardest feedback you've received?") follow the same shape: real feedback that stung, taken seriously, with visible behavior change. Have one about your <i>leadership</i> style — at lead level, that's what they'll probe.</li>
+        <li>Deliver it <b>matter-of-factly</b>. Rehearsed calm about your failures reads as someone who's processed them; visible squirming reads as someone who hasn't.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">failure-answer.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">"Early as a lead, I pushed a refactor of our auth flow and
+ rolled it to all tenants at once — I was confident because
+ staging was green. A tenant with a legacy SSO config got
+ locked out for four hours; their whole fleet ops team was
+ down. I owned the call with the customer, we rolled back,
+ and I wrote the postmortem naming my decision as the cause.
+
+ What changed: tenant-by-tenant rollout became our default
+ for anything touching auth, and 'staging is green' stopped
+ counting as evidence for config-dependent paths — we built
+ a config-matrix test instead.
+
+ It reset how I think about confidence: staging tells you
+ your code works; only production tells you your ASSUMPTIONS
+ work."</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"biggest mistake?" / "a project that failed?"</span><span class="then">postmortem story — cost, ownership, structural fix</span></li>
+        <li><span class="cue">"hardest feedback you've received?"</span><span class="then">real sting + visible change; have the leadership-style one ready</span></li>
+        <li><span class="cue">"what's your biggest weakness?"</span><span class="then">real, current, managed — name the mitigation system you use</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-fail-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your failure story with all four beats — competence, mistake, recovery, system change</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-fail-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write the feedback story about your leadership style + your honest current weakness with its mitigation</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- JUDGMENT -->
+<section class="topic" id="judgment">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 16:45 · 60 min</span><span class="chip">engineering maturity</span></div>
+      <h3>Tradeoffs &amp; engineering judgment</h3>
+      <p class="tagline">Tech debt vs features, deadlines vs quality, build vs buy, when NOT to refactor. These questions test whether you think like an owner or an artist.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Every sprint planning you've run is a tradeoff answer: you weighed debt against features against a date and shipped something defensible. You've also made the call from both sides — as the lead protecting quality <i>and</i> as the product owner of your own app cutting scope to ship. That dual view is exactly what they're probing.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>The universal senior answer shape: <b>"it depends, and here's the framework I use"</b> — then a real example where you applied it. Never a dogma ("always test everything"), never a shrug ("whatever the business wants").</li>
+        <li><b>Tech debt:</b> frame it in product terms — debt is fine when it's a conscious loan with a payback trigger ("we hardcoded the config; the trigger to fix it is the third customer who needs it different"). Uncontrolled interest is what you refuse.</li>
+        <li><b>Quality vs deadline:</b> price the risk in business currency (hotfix days, churn, trust), offer a scoped middle path, and let the owner of the outcome make the informed call. You're not the quality police; you're the risk quantifier.</li>
+        <li><b>Perfect vs shipped:</b> have one story where you shipped something imperfect <i>on purpose</i> and it was right, and one where you held the line and it was right. Judgment is knowing which is which.</li>
+        <li><b>Ambiguity questions</b> ("vague requirements, what do you do?"): show your loop — prototype, shrink the unknown, timebox, decide with 70% information. Waiting for certainty is the mid-level answer.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">tradeoff-frame.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">Q: "How do you decide when tech debt is worth paying down?"
+
+FRAME  "Debt has an interest rate. I look at what it costs
+        per sprint — bug rate, onboarding time, how often it
+        blocks a feature. Debt with near-zero interest can sit
+        forever; debt we pay interest on every sprint gets a
+        line in planning like any feature."
+
+STORY  "On my current team, our test suite was the debt: 40
+        minutes, flaky, so people merged around it. I costed
+        it — roughly a day per engineer per week — which made
+        the argument for me. Two sprints of investment cut it
+        to 12 minutes, and merge-arounds stopped."
+
+BOTH SIDES  "On my own product I run the other direction —
+        I ship with known debt constantly, because with 1,000
+        users the interest is near zero. Context sets the rate."</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"how do you balance speed and quality?"</span><span class="then">framework + one story from each side</span></li>
+        <li><span class="cue">"a time you had incomplete requirements"</span><span class="then">ambiguity loop: prototype, timebox, decide at 70%</span></li>
+        <li><span class="cue">"would you rewrite or refactor?"</span><span class="then">the boring answer (incremental) with the one exception you'd rewrite</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-judg-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your shipped-imperfect-on-purpose story and your held-the-line story</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="bh-judg-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Answer "how do you prioritize tech debt?" out loud with your framework + costed example</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 2 ================= -->
+<header class="day-head" id="d2">
+  <p class="eyebrow">// day 2 · ~8.5 hours <b>same stories, aimed at real companies</b></p>
+  <h2>Run the loop</h2>
+  <p class="day-sub">Day 1 built the material; day 2 aims it. Learn how each company grades, survive the rounds that aren't STAR-shaped — hiring manager, cross-functional — pressure-test everything in a mock circuit, then handle the part nobody practices: the offer.</p>
+  <div class="sched">
+    <div class="sched-row"><span class="st">09:00</span><span class="sn"><a href="#decode">Decode the company</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">10:00</span><span class="sn"><a href="#hm">The hiring manager round</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">11:30</span><span class="sn"><a href="#xfn">Cross-functional &amp; stakeholder questions</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">12:30</span><span class="sn">lunch — actually walk away</span><span class="sd">45 min</span></div>
+    <div class="sched-row"><span class="st">13:15</span><span class="sn"><a href="#mock">The mock circuit</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">14:45</span><span class="sn"><a href="#ask">Questions you ask</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">15:45</span><span class="sn"><a href="#offer">Offers &amp; negotiation</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">16:45</span><span class="sn">done — one full loop simulated, story bank battle-tested</span><span class="sd">—</span></div>
+  </div>
+</header>
+
+<!-- DECODE -->
+<section class="topic" id="decode">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 09:00 · 60 min</span><span class="chip">same stories, different rubric</span></div>
+      <h3>Decode the company</h3>
+      <p class="tagline">Amazon grades against 16 named principles. Meta probes speed and impact. Startups probe scrappiness. Same story bank — you just change which beat you emphasize.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's <b>responsive design</b>: one component, media queries per viewport. Your conflict story renders differently at Amazon (which principle did you defend?) than at a 40-person startup (how fast did you move on?) — same DOM, different breakpoints.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Amazon</b> is the extreme case: every behavioral question maps to a named Leadership Principle (Ownership, Bias for Action, Dive Deep, Deliver Results, Earn Trust…). Read all 16 the night before; tag each bank story with the 2–3 LPs it evidences. They will ask "tell me about a time you disagreed and committed" <i>using those words</i>.</li>
+        <li><b>Meta-style</b> loops weight impact and speed: emphasize the metric beat and the shipped-fast beat of your stories. <b>Google-style</b> weight collaboration and general cognitive ability: emphasize the how-you-thought beat.</li>
+        <li><b>Startups and scale-ups</b> probe range and self-direction: your side project is the trump card — you've been PM, engineer, and support desk for the same product. Big companies probe depth and process instead: lean on the release discipline and quality-gate stories.</li>
+        <li>Research ritual per company, 30 minutes: the product (use it), the engineering blog (skim 3 posts), the values page (note the exact words), recent news (funding, launches, layoffs). Then <b>re-tag your ten stories against their vocabulary</b>.</li>
+        <li>US norms worth knowing: interviewers are trained to probe with <b>follow-ups, not new questions</b> — expect "why?", "what would you do differently?", "what did your manager think?" three layers deep. That's standard, not skepticism.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">story-retagging.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">Story: "flaky-release quarter"        # one story, three loops
+
+AMAZON   lead with OWNERSHIP + INSIST ON HIGHEST STANDARDS
+         "quality was officially everyone's job — which meant
+          nobody's. I made it mine."
+
+META     lead with IMPACT + MOVE FAST
+         "shipped the CI gate in week one, measured by week
+          three: criticals down 30%."
+
+STARTUP  lead with SCRAPPINESS + NO-PROCESS PROBLEM SOLVING
+         "no QA team, no budget — so the pipeline became the
+          QA team."
+
+Same events. Same numbers. Different first sentence.</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">question quotes a company value verbatim</span><span class="then">they're scoring that value — mirror the vocabulary in your answer</span></li>
+        <li><span class="cue">"tell me about a time you disagreed and committed"</span><span class="then">Amazon LP — your conflict story, ending on full commitment</span></li>
+        <li><span class="cue">third "why?" in a row</span><span class="then">normal US-style dive-deep — welcome it, don't get defensive</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-decode-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Tag all 10 bank stories with the Amazon LPs they evidence (aim ≥2 stories per major LP)</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-decode-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Run the 30-minute research ritual on one company you're actually applying to</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HM -->
+<section class="topic" id="hm">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 10:00 · 90 min</span><span class="chip">the decision-maker</span></div>
+      <h3>The hiring manager round</h3>
+      <p class="tagline">The HM isn't grading your STAR form — they're deciding whether to stake their own reputation on you. Different stakes, different preparation.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've been on the other side of this table: when you interviewed candidates for your own team you weren't scoring answers, you were asking <b>"do I want this person in my standup, and can I give them the hairy project?"</b> The HM round is that, pointed at you.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>The HM is answering four private questions: <b>can you do the job, will you need managing, will you make the team better, will you stay</b>. Every answer you give should quietly feed one of the four.</li>
+        <li>"Why us / why this role" needs a <b>specific, checkable answer</b> — their product, their scale problem, something from their eng blog. Generic ambition ("growth opportunities") reads as "any company would do".</li>
+        <li>"Why are you leaving?" — one sentence, true, forward-looking: <i>"I've built the team and the quality bar; the next problems I want are at a scale my current company doesn't have."</i> Never badmouth; the HM mentally replaces your current employer with themselves.</li>
+        <li><b>IC vs lead ambiguity</b> — at 7 years with lead experience you'll be asked "do you want to manage or build?" Have a genuine answer with a throughline (e.g., "senior IC who leads through technical direction and mentoring — I lead because it ships better software, not to climb the management track"). Wobbling here kills offers.</li>
+        <li>Logistics questions — <b>visa sponsorship, timezone overlap, relocation, notice period</b> — get crisp, factual, unapologetic answers. Know your exact status and dates before the call; hedging on logistics spooks HMs more than the facts ever do.</li>
+        <li>The HM round is a <b>two-way conversation</b> — interrupting the script with a smart question about their roadmap mid-round is a feature, not a risk.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">hm-answers.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">"Why this company?"
+  weak    "I've always admired the brand and want to grow."
+  strong  "Two reasons. Your fleet product runs into the exact
+           problem I've spent two years on — multi-tenant
+           quality at enterprise scale — and your eng blog's
+           post on release trains matches how I already run my
+           team. I'd be productive in week one."
+
+"Manage or build?"
+  strong  "Lead-flavored senior IC. I've led a team of five for
+           two years and I like owning direction, reviews, and
+           mentoring — but my leverage comes from being in the
+           code. I'm not chasing a people-management title; I'm
+           chasing harder problems with a team around them."
+
+"Where do you see yourself in 5 years?"
+  strong  "Owning a problem space, not just a codebase —
+           staff-level scope. Whether that has 'manager' in the
+           title matters less to me than the scope itself."</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"what are you looking for in your next role?"</span><span class="then">describe THIS role's actual shape — you did the research</span></li>
+        <li><span class="cue">"any concerns about the role?"</span><span class="then">honest small concern + how you'd resolve it; "none" reads unserious</span></li>
+        <li><span class="cue">"when could you start?" / "what's your status?"</span><span class="then">exact facts, dates, no hedging — logistics confidence is trust</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-hm-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your specific "why us" for two real target companies — checkable details only</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-hm-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Settle your manage-vs-build answer in writing; say it until it sounds decided</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-hm-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your logistics one-pager: visa status, notice period, timezone plan, start date</span></label><span class="diff e">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- XFN -->
+<section class="topic" id="xfn">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 11:30 · 60 min</span><span class="chip">product companies' favorite</span></div>
+      <h3>Cross-functional &amp; stakeholder questions</h3>
+      <p class="tagline">Product companies live and die on eng–PM–design collaboration, so they interview for it explicitly. Your job: sound like an engineer PMs fight to work with.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've owned sprint planning and stakeholder management, and on your own product you <b>are</b> the PM. You know both sides of "can we just add one small thing?" — that's the entire competency they're interviewing for.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>The competency has a name: <b>productive pushback</b>. Not "engineers estimate, PMs decide", not "I do what product says" — a peer who engages with the <i>why</i> behind requests and negotiates scope in outcome language.</li>
+        <li>"PM asks for something you think is wrong": first <b>understand the goal behind the ask</b> — half the time there's a cheaper path to the same outcome, and proposing it is the best possible answer to this question.</li>
+        <li>"Non-technical stakeholder and a technical constraint": show you translate — <i>"I don't say the API is rate-limited; I say the vendor lets us check 100 prices a minute, so a full refresh takes an hour — here are the two ways around it and what each costs."</i></li>
+        <li>"Deadline is impossible": never a flat no — <b>options with prices</b>: date with less scope, scope with a later date, both with more risk spelled out. You bring the menu; they pick.</li>
+        <li>Have one story where <b>product context changed YOUR technical call</b> — it proves you listen in both directions, which is rarer than pushing back.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">pushback-script.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">PM: "Can we add real-time collaborative editing this sprint?"
+
+reflex     "No, that's months of work."        # true, useless
+
+productive "What's driving it — is this the enterprise deal?
+            [listens] OK. Real-time co-editing is a quarter of
+            work — CRDTs, presence, conflict UI. But if the
+            deal needs 'two people don't overwrite each other',
+            I can ship optimistic locking with a 'Priya is
+            editing' banner in a week. Covers the demo, buys us
+            time to decide if we ever need the full thing."
+
+Goal understood → cheaper path → priced options → their call.</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"tell me about working with a difficult PM"</span><span class="then">the PM stays reasonable; the process was the problem</span></li>
+        <li><span class="cue">"how do you explain technical debt to non-engineers?"</span><span class="then">translation skill — money, time, and risk language</span></li>
+        <li><span class="cue">"a time product pushed back on YOU"</span><span class="then">your context-changed-my-call story</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-xfn-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your productive-pushback story: goal understood → cheaper path → shipped</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-xfn-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain a real technical constraint from your work in pure business language, out loud, 60 seconds</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MOCK -->
+<section class="topic" id="mock">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 13:15 · 90 min</span><span class="chip">the dress rehearsal</span></div>
+      <h3>The mock circuit</h3>
+      <p class="tagline">Twelve questions, out loud, on a timer, in interview order. This is where written stories become spoken ones — the gap between the two is bigger than you think.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>This is your <b>staging environment</b>. You'd never ship code whose only test was "it compiles" — a story whose only test is "I wrote it down" is exactly that. Deploy to staging first: same questions, same timer, no audience.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the circuit — 45s think-cap, 2min answer-cap, recorded</p>
+      <ul>
+        <li><b>Round 1 — the openers (15 min):</b> tell me about yourself · walk me through your resume · why are you leaving · why us.</li>
+        <li><b>Round 2 — the core eight (45 min):</b> a project you're proud of · a conflict with a colleague · a failure · an impossible deadline · a time you mentored someone · a disagreement with your manager · a time you influenced without authority · your biggest technical mistake.</li>
+        <li><b>Round 3 — the curveballs (20 min):</b> what would your team say is your weakness · a time you changed your mind under new data · the accomplishment you're most proud of and why that one · what do you do when you disagree with a decision that's final.</li>
+        <li>Listen back at 1.5×. Grade each answer on four checks: <b>under 2:15? · has a number? · "I" for decisions? · lands on a point?</b> Redo every answer that fails two checks.</li>
+        <li>If you can recruit a human (friend, partner, former colleague) for round 2, do — a face changes everything. Otherwise the recorder is honest enough.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">scorecard.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">Answer scorecard — redo anything failing 2+ checks:
+
+  [ ] TIME     under 2:15 (rambling = the #1 senior killer)
+  [ ] NUMBER   at least one real metric or scale marker
+  [ ] AGENCY   "I decided/proposed/refused" ≥ 3 times
+  [ ] LANDING  final sentence is a point, not a fade-out
+
+Common listen-back diagnoses:
+  40s of backstory        → cut Situation to two sentences
+  "we" every clause       → re-narrate your decisions
+  answer ends mid-air     → script the last sentence only
+  same story 3× in a row  → widen the bank, re-tag coverage</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills — the circuit itself</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-mock-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Round 1 — the four openers, recorded and graded</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-mock-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Round 2 — the core eight, recorded and graded</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-mock-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Round 3 — the four curveballs, recorded and graded</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-mock-4"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Redo every answer that failed 2+ scorecard checks</span></label><span class="diff h">DEEP</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-mock-5"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Book one real mock with a human before your first onsite (friend or paid platform)</span></label><span class="diff h">DEEP</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ASK -->
+<section class="topic" id="ask">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 14:45 · 60 min</span><span class="chip">you're interviewing them too</span></div>
+      <h3>Questions you ask</h3>
+      <p class="tagline">"Any questions for me?" is scored. Good questions signal seniority harder than most answers — and they're also how you dodge a bad team before it's your problem.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's <b>due diligence on a codebase you're about to inherit</b>. You wouldn't join a repo without reading the CI setup, the open issues, and the last few postmortems. These questions are exactly that, asked politely of humans.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>Match the question to the audience. <b>Peer engineer:</b> "walk me through your deploy — commit to production" (the answer tells you everything about eng maturity). <b>Manager:</b> "how do you decide what the team works on?" and "when did someone on the team last get promoted, and what did that take?". <b>Skip-level:</b> "what does this team need to look like in a year?"</li>
+        <li>The two highest-signal questions anywhere: <b>"what does success look like for this role in 6 months?"</b> (vague answer = vague role) and <b>"what's the hardest thing about working here?"</b> (watch whether they're honest).</li>
+        <li>For senior roles, ask about <b>scope and level explicitly</b>: "what's the gap between senior and staff here, and where does this role sit?" It shows you think in leveling terms — and protects you from a down-leveled offer.</li>
+        <li>Red flags to listen for: nobody can name the last promotion · "we're like a family" · deploys are scary events · every answer about process is "we're figuring it out" (fine at 10 people, alarming at 500).</li>
+        <li>Never ask things the website answers, and keep comp for the recruiter — the loop is for the work, the offer call is for the money.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">by-audience.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">PEER      "What happens between git push and production?"
+          "What's the last thing that paged someone at night?"
+
+MANAGER   "How does work reach the team — who says no to what?"
+          "Story of the last person you promoted?"
+
+HM/SKIP   "What breaks first if the team doubles?"
+          "What made the last senior hire succeed or struggle?"
+
+ANYONE    "What does success look like in 6 months?"
+          "What's the hardest part of working here, honestly?"
+
+CLOSE     "Anything about my background giving you pause that
+           I can speak to now?"     # recovers borderline votes</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-ask-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your personal top-3 questions per audience: peer, manager, skip-level</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-ask-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your 3 personal red flags — the answers that would make you decline</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFER -->
+<section class="topic" id="offer">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 15:45 · 60 min</span><span class="chip">the most expensive hour to skip</span></div>
+      <h3>Offers &amp; negotiation</h3>
+      <p class="tagline">The last conversation of the loop routinely moves compensation 10–20%. It's also the one nobody rehearses. One hour now is worth more per minute than anything else this weekend.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's a <b>vendor contract negotiation</b>, and you've watched those: nobody accepts the first quote, line items move independently, and the side with alternatives wins. You are the vendor. Your alternatives are other loops — which is why you run several at once.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>US offer anatomy:</b> base + equity (RSUs at public cos, options at startups, usually 4-year vest with a 1-year cliff) + bonus + sign-on. Total comp, not base, is the number that matters — and equity is often the most negotiable line.</li>
+        <li><b>Never give the first number.</b> "What are your expectations?" → <i>"I'm focused on fit; I trust you to make a competitive offer for the level — what's the range for this role?"</i> US companies increasingly must publish ranges; ask for theirs.</li>
+        <li>Calibrate on <b>levels.fyi</b> for the company, level, and location (remote-from-India offers for US companies have their own bands — research yours specifically). Walking in blind is how down-leveled offers get accepted.</li>
+        <li><b>Level is the biggest lever.</b> A senior-vs-mid decision moves comp more than any negotiation — if the offer comes in a level low, that's the thing to challenge, with your leveling evidence from day 1, before haggling dollars.</li>
+        <li>Negotiate <b>once, specifically, warmly</b>: "I'm excited, I want to sign. The equity is below what I'm seeing for this level — if you can get the grant to X, I'll sign this week." Competing offers are leverage stated as facts, never threats.</li>
+        <li>Everything is negotiable-ish: sign-on (easiest), equity, start date, title/level. Base moves least at big cos. Get the final offer <b>in writing</b> before resigning anything.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">recruiter-scripts.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">"What's your current compensation?"
+   "I'd rather anchor on the value of this role than my
+    current package — what's the band for this level?"
+    # several US states ban the question anyway
+
+"What are you expecting?"
+   "If the offer is competitive for senior at your company
+    I'll be easy to close. What range did you have in mind?"
+
+Offer arrives:
+   "Thank you — I'm genuinely excited. Give me a few days to
+    review."          # NEVER accept on the call. Always warm.
+
+The counter (once, everything at once):
+   "I want to make this work. Two things: the level — my
+    scope for two years has been [evidence], which maps to
+    senior — and the equity, which sits below the data I'm
+    seeing. If we can close those, I'm ready to sign."</code></pre>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"we need your current CTC to proceed"</span><span class="then">deflect to role band — give a target, not a history</span></li>
+        <li><span class="cue">"this offer expires Friday"</span><span class="then">pressure tactic — politely ask for the time you need; real offers survive a week</span></li>
+        <li><span class="cue">offer titled a level below the loop you interviewed at</span><span class="then">challenge level first, dollars second</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-offer-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Research your target level + location band on levels.fyi for 3 target companies; write the numbers down</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-offer-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Say the expectations-deflection and the counter script out loud until they're boring</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="bh-offer-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write your walk-away number and your sign-this-week number before any offer exists</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REFERENCE ================= -->
+
+<!-- PLAYBOOK -->
+<section class="section" id="playbook">
+  <p class="section-eyebrow">// reference · the meta-game</p>
+  <h2>The behavioral playbook</h2>
+  <p class="sub">The moves that apply to every question, every company, every round.</p>
+  <div class="steps" style="margin-top:26px">
+    <div class="step">
+      <h5>01 · pause before answering</h5>
+      <p>Three seconds of "good question — let me pick the right example" reads as thoughtful, and buys your index lookup. Blurting reads as rehearsed or panicked; the pause is a senior move.</p>
+    </div>
+    <div class="step">
+      <h5>02 · answer the question asked</h5>
+      <p>If they ask about conflict, don't tell your proudest-project story with a conflict garnish. Interviewers need evidence <b>for their specific rubric box</b> — off-target answers score zero no matter how good.</p>
+    </div>
+    <div class="step">
+      <h5>03 · it's fine to ask for a beat</h5>
+      <p>"Can I take ten seconds to think of the best example?" is completely acceptable, twice per interview. So is "can I swap to a better example?" mid-answer — recovery reads better than commitment to a bad story.</p>
+    </div>
+    <div class="step">
+      <h5>04 · follow-ups are the interview</h5>
+      <p>The prepared story opens the door; the three "why?"s behind it are the actual evaluation. You can't rehearse those — which is exactly why they must be TRUE stories about decisions you really made.</p>
+    </div>
+    <div class="step">
+      <h5>05 · one hour before every loop</h5>
+      <p>Re-read the story bank (10 min), re-read their values page (5 min), re-record the pitch once (5 min), then stop. Over-rehearsing the morning-of makes you sound like a press release.</p>
+    </div>
+    <div class="step">
+      <h5>06 · after every real interview</h5>
+      <p>Five minutes: which questions came up? Which story did you reach for and lack? Add it to the bank. Your bank compounds across loops — by loop three you're unshakeable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUESTION MATCHER -->
+<section class="section" id="patterns">
+  <p class="section-eyebrow">// reference · 10-second lookup</p>
+  <h2>Question matcher</h2>
+  <p class="sub">Hear the phrase on the left, reach for the move on the right.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>when the question says…</th><th>they're testing</th><th>reach for</th></tr></thead>
+    <tbody>
+      <tr><td>"tell me about yourself"</td><td>communication + focus</td><td class="mono">90-second pitch: now → how → why here</td></tr>
+      <tr><td>"a project you're proud of"</td><td>scope + your actual level</td><td class="mono">biggest-scope story, senior altitude, metric ending</td></tr>
+      <tr><td>"a time you disagreed…"</td><td>conflict maturity</td><td class="mono">steel-man → data → commit; other side stays reasonable</td></tr>
+      <tr><td>"a failure / mistake"</td><td>ownership + growth</td><td class="mono">postmortem arc: cost → recovery → structural change</td></tr>
+      <tr><td>"tight deadline / pressure"</td><td>prioritization under stress</td><td class="mono">scope-cut story: options priced, owner chose</td></tr>
+      <tr><td>"mentored / grew someone"</td><td>the senior gate</td><td class="mono">one real person, concrete actions, their arc</td></tr>
+      <tr><td>"influenced / got buy-in"</td><td>staff signal</td><td class="mono">data + pilot + allies, across a team boundary</td></tr>
+      <tr><td>"ambiguous requirements"</td><td>autonomy</td><td class="mono">prototype → timebox → decide at 70%</td></tr>
+      <tr><td>"difficult stakeholder / PM"</td><td>collaboration</td><td class="mono">goal-behind-the-ask → cheaper path → menu of options</td></tr>
+      <tr><td>"disagree and commit"</td><td>Amazon LP (verbatim)</td><td class="mono">conflict story ending in full, visible commitment</td></tr>
+      <tr><td>"weakness / hardest feedback"</td><td>self-awareness</td><td class="mono">real + current + the mitigation system you run</td></tr>
+      <tr><td>"why us / why leaving / why US"</td><td>flight risk + motivation</td><td class="mono">specific, checkable, forward-looking, one sentence each</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- QUESTION BANK -->
+<section class="section" id="qbank">
+  <p class="section-eyebrow">// reference · what actually gets asked</p>
+  <h2>The senior question bank</h2>
+  <p class="sub">Forty questions that cover, near-verbatim, what senior loops at US product companies ask. If your ten stories can answer these, you're done preparing. The ★ set is the minimum — every loop asks some form of those.</p>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// openers &amp; motivation</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td>★ Tell me about yourself. / Walk me through your resume.</td></tr>
+        <tr><td>★ Why are you looking to leave your current role?</td></tr>
+        <tr><td>★ Why this company? Why this role?</td></tr>
+        <tr><td>Why a US product company — and how do you see timezone/location working?</td></tr>
+        <tr><td>Where do you want to be in five years — management or deep IC?</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// leadership &amp; people — the level-setters</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td>★ Tell me about a time you had a conflict with a teammate. How did it resolve?</td></tr>
+        <tr><td>★ Tell me about a time you disagreed with your manager (or a decision above you).</td></tr>
+        <tr><td>★ How have you helped someone on your team grow? Be specific.</td></tr>
+        <tr><td>Tell me about managing an underperformer — what did you actually do?</td></tr>
+        <tr><td>How did you convince another team (or a skeptic) to adopt your approach?</td></tr>
+        <tr><td>As a lead, how do you decide what to delegate versus do yourself?</td></tr>
+        <tr><td>Tell me about a time you had to deliver hard news — to your team, or to a customer.</td></tr>
+        <tr><td>What would your team say is the best and worst thing about working with you?</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// failure, growth &amp; self-awareness</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td>★ Tell me about your biggest professional failure.</td></tr>
+        <tr><td>★ Tell me about a technical decision you got wrong. How did you find out?</td></tr>
+        <tr><td>What's the hardest feedback you've ever received?</td></tr>
+        <tr><td>Tell me about a time you changed your mind because of new information.</td></tr>
+        <tr><td>What's your biggest weakness — really?</td></tr>
+        <tr><td>What are you doing right now to get better at your job?</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// delivery, tradeoffs &amp; judgment</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td>★ Tell me about a project you're most proud of. What was YOUR contribution?</td></tr>
+        <tr><td>★ Tell me about delivering under an aggressive deadline. What gave?</td></tr>
+        <tr><td>How do you decide when technical debt is worth paying down?</td></tr>
+        <tr><td>Tell me about a time you shipped something you knew was imperfect. Right call?</td></tr>
+        <tr><td>Requirements were vague or missing — what did you do?</td></tr>
+        <tr><td>Tell me about the most complex technical problem you've solved.</td></tr>
+        <tr><td>How do you keep quality up while moving fast? Example.</td></tr>
+        <tr><td>Build vs buy: walk me through a real decision you made.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// cross-functional &amp; product sense</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td>★ Tell me about pushing back on a product decision. What happened?</td></tr>
+        <tr><td>A PM asks for something you think is technically wrong — walk me through your next hour.</td></tr>
+        <tr><td>How do you explain technical risk to non-technical stakeholders? Example.</td></tr>
+        <tr><td>Tell me about a time product context changed your technical approach.</td></tr>
+        <tr><td>How do you decide what NOT to build?</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// the ones specific to your shape of career</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td>You've been a lead — why are you interviewing for a senior IC role? (or vice versa)</td></tr>
+        <tr><td>Your experience is at [domestic/services/smaller] companies — how does it translate here?</td></tr>
+        <tr><td>You run a side project — how do you balance it with work, and what has it taught you?</td></tr>
+        <tr><td>You've used both React and Angular — how do you pick, and what do you reach for now?</td></tr>
+        <tr><td>This role is a step up in scope — what makes you ready for it? <i>(the punching-above question: answer with the day-1 leveling evidence, not enthusiasm)</i></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- SAFE TO SKIP -->
+<section class="section" id="skip">
+  <p class="section-eyebrow">// reference · scope control</p>
+  <h2>Safe to skip (this weekend)</h2>
+  <p class="sub">Real topics, honestly deprioritized. Know the one-liner; spend the hours on the story bank instead.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Brain teasers &amp; estimation puzzles</b> ("how many golf balls fit in a bus") — effectively extinct at product companies. If one appears, narrate assumptions calmly; the answer never mattered.</li>
+      <li><b>Company-specific trivia</b> — nobody expects you to recite their org chart. The 30-minute research ritual is the whole requirement.</li>
+      <li><b>Hypothetical "what would you do" scenarios</b> — they get graded with the same rubric as real stories, and your real stories are stronger. Bridge: "here's what I actually did in a similar situation…"</li>
+      <li><b>Personality-test prep</b> (Hogan, Caliper, etc.) — some companies use them; they're explicitly designed to resist prep. Answer honestly and spend the evening on your pitch instead.</li>
+      <li><b>Memorizing 100 questions</b> — the bank above covers the space. Ten deep stories beat a hundred shallow answers; every question is a routing problem, not a recall problem.</li>
+      <li><b>Salary-negotiation game theory rabbit holes</b> — the scripts in <a href="#offer">offers</a> cover 95% of real situations. The remaining 5% is "get a competing offer", which is a pipeline problem, not a script problem.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Writing is not rehearsing.</b> Record yourself, listen back, redo. Do the two days, then one voice-memo story per day until the onsite.</p>
+  <p>pairs with: <a href="./dsa.html">DSA in 48</a> · <a href="./system-design.html">System Design in 48</a><br>part of the <a href="./index.html">in-48 series</a> · works offline, no build<br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>good luck — you've been doing the job for years. Now say so.</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var K_PROGRESS = 'bh48:progress';
+  var K_COLLAPSED = 'bh48:collapsed';
+  var K_THEME = 'bh48:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    // syntax highlighting (deferred CDN script has already run at this point)
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- collapse toggles (persisted) ---------- */
+    var collapsed = load(K_COLLAPSED, []);
+    if (!Array.isArray(collapsed)) collapsed = [];
+    $('.topic').forEach(function (topic) {
+      if (collapsed.indexOf(topic.id) !== -1) {
+        topic.classList.add('collapsed');
+        var b = topic.querySelector('.toggle');
+        if (b) { b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', 'Expand section'); }
+      }
+    });
+    $('.toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var topic = btn.closest('.topic');
+        var isCollapsed = topic.classList.toggle('collapsed');
+        btn.setAttribute('aria-expanded', String(!isCollapsed));
+        btn.setAttribute('aria-label', isCollapsed ? 'Expand section' : 'Collapse section');
+        var i = collapsed.indexOf(topic.id);
+        if (isCollapsed && i === -1) collapsed.push(topic.id);
+        if (!isCollapsed && i !== -1) collapsed.splice(i, 1);
+        save(K_COLLAPSED, collapsed);
+      });
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- problem progress (persisted) ---------- */
+    var boxes = $('.prob input[type="checkbox"]');
+    var progress = load(K_PROGRESS, {});
+    if (!progress || typeof progress !== 'object') progress = {};
+    boxes.forEach(function (b) { if (progress[b.getAttribute('data-key')]) b.checked = true; });
+
+    function updateProgress() {
+      [1, 2].forEach(function (d) {
+        var group = boxes.filter(function (b) { return b.getAttribute('data-day') === String(d); });
+        var doneCount = group.filter(function (b) { return b.checked; }).length;
+        var countEl = document.getElementById('p' + d + '-count');
+        var barEl = document.getElementById('p' + d + '-bar');
+        if (countEl) countEl.textContent = doneCount + '/' + group.length;
+        if (barEl) barEl.style.width = (group.length ? (doneCount / group.length) * 100 : 0) + '%';
+      });
+    }
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        var key = b.getAttribute('data-key');
+        if (b.checked) progress[key] = 1; else delete progress[key];
+        save(K_PROGRESS, progress);
+        updateProgress();
+      });
+    });
+    updateProgress();
+
+    var resetBtn = document.getElementById('reset-progress');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!window.confirm('Clear all solved-problem checkmarks?')) return;
+        boxes.forEach(function (b) { b.checked = false; });
+        progress = {};
+        save(K_PROGRESS, progress);
+        updateProgress();
+      });
+    }
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+
+    /* ---------- print: expand everything, then put it back ---------- */
+    var printState = null;
+    window.addEventListener('beforeprint', function () {
+      printState = {
+        topics: $('.topic.collapsed'),
+        quizzes: $('.quiz:not([open])')
+      };
+      printState.topics.forEach(function (t) { t.classList.remove('collapsed'); });
+      printState.quizzes.forEach(function (q) { q.open = true; });
+    });
+    window.addEventListener('afterprint', function () {
+      if (!printState) return;
+      printState.topics.forEach(function (t) { t.classList.add('collapsed'); });
+      printState.quizzes.forEach(function (q) { q.open = false; });
+      printState = null;
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

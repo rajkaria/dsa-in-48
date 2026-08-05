@@ -11,6 +11,7 @@ routes you to whichever course you need (and to every future one).
 |---|---|---|
 | **DSA in 48** | 13 data-structure & algorithm topics, 48 link-verified LeetCode problems, interview playbook, pattern matcher | [/dsa](https://dsa-in-48.vercel.app/dsa) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/dsa.html) |
 | **System Design in 48** | 12 system-design topics, 32 whiteboard drills, the 6-step interview framework, 3 classic designs (URL shortener · feed · chat) | [/system-design](https://dsa-in-48.vercel.app/system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
+| **Behavioral in 48** | 13 behavioral & leadership topics for senior loops at US product companies — story bank, STAR+, hiring-manager round, 40-question senior bank, negotiation | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 
 ---
 
@@ -51,7 +52,8 @@ Single self-contained files — just open them:
 open index.html
 ```
 
-`index.html` is the landing page; `dsa.html` and `system-design.html` are the courses.
+`index.html` is the landing page; `dsa.html`, `system-design.html`, and `behavioral.html`
+are the courses.
 
 Or serve the folder:
 

@@ -206,6 +206,7 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 }
 .x-item.dsa{--acc-soft:rgba(255,214,10,.16)}
 .x-item.sd{--acc-soft:rgba(45,212,191,.16)}
+.x-item.bh{--acc-soft:rgba(167,139,250,.18)}
 
 /* ---------- course cards ---------- */
 .courses{display:flex;flex-direction:column;gap:22px;margin-top:32px}
@@ -225,11 +226,14 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .course:hover{border-color:rgba(var(--tint),.28);transform:translateY(-2px);box-shadow:0 10px 30px rgba(var(--tint),.07)}
 .course.dsa{--acc:#FFD60A;--acc-deep:#E8BE00;--acc-soft:rgba(255,214,10,.16)}
 .course.sd{--acc:#2DD4BF;--acc-deep:#14A99A;--acc-soft:rgba(45,212,191,.15)}
+.course.bh{--acc:#A78BFA;--acc-deep:#7C3AED;--acc-soft:rgba(167,139,250,.18)}
 :root[data-theme="dark"] .course.dsa{--acc-deep:#F5CB1E;--acc-soft:rgba(255,214,10,.13)}
 :root[data-theme="dark"] .course.sd{--acc-deep:#5EEAD4;--acc-soft:rgba(45,212,191,.13)}
+:root[data-theme="dark"] .course.bh{--acc-deep:#C4B5FD;--acc-soft:rgba(167,139,250,.15)}
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]) .course.dsa{--acc-deep:#F5CB1E;--acc-soft:rgba(255,214,10,.13)}
   :root:not([data-theme="light"]) .course.sd{--acc-deep:#5EEAD4;--acc-soft:rgba(45,212,191,.13)}
+  :root:not([data-theme="light"]) .course.bh{--acc-deep:#C4B5FD;--acc-soft:rgba(167,139,250,.15)}
 }
 .course-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .course-num{
@@ -405,10 +409,10 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
   <p class="lede">Every course here is <b>one self-contained page</b> and <b>two days long</b>. No signup, no video, no build step — open it Saturday morning, work through it, walk into the interview Monday.</p>
   <p class="lede">The premise never changes: you've shipped production systems for years, so you already <b>use</b> this material daily. These syllabi just attach the interview vocabulary to instincts you already have.</p>
   <div class="hero-meta">
-    <span><b>2</b> courses</span>
-    <span><b>25</b> topics</span>
-    <span><b>80</b> problems &amp; drills</span>
-    <span><b>~34h</b> total</span>
+    <span><b>3</b> courses</span>
+    <span><b>38</b> topics</span>
+    <span><b>116</b> problems &amp; drills</span>
+    <span><b>~51h</b> total</span>
     <span><b>$0</b> · MIT</span>
   </div>
   <div class="hero-cta">
@@ -427,6 +431,8 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
       <div class="x-item sd reveal" data-d="5"><span class="x-from">a MongoDB replica set</span><span class="x-arrow">→</span><span class="x-to">Replication</span><span class="x-tag">design</span></div>
       <div class="x-item dsa reveal" data-d="6"><span class="x-from">node_modules dependencies</span><span class="x-arrow">→</span><span class="x-to">Graph</span><span class="x-tag">dsa</span></div>
       <div class="x-item sd reveal" data-d="7"><span class="x-from">BullMQ running email jobs</span><span class="x-arrow">→</span><span class="x-to">Message Queue</span><span class="x-tag">design</span></div>
+      <div class="x-item bh reveal" data-d="8"><span class="x-from">the outage you owned end to end</span><span class="x-arrow">→</span><span class="x-to">Failure Story</span><span class="x-tag">behavioral</span></div>
+      <div class="x-item bh reveal" data-d="9"><span class="x-from">the junior you unblocked weekly</span><span class="x-arrow">→</span><span class="x-to">Mentorship Story</span><span class="x-tag">behavioral</span></div>
     </div>
   </div>
 </header>
@@ -434,8 +440,8 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
 <!-- ======================= COURSES ======================= -->
 <section class="section" id="courses">
   <p class="section-eyebrow">// the series</p>
-  <h2>Two courses. Two weekends.</h2>
-  <p class="sub">Each one stands alone — same format, same promise, different half of the interview loop. Progress and theme save in your browser, per course, and nothing is ever sent anywhere.</p>
+  <h2>Three courses. Three weekends.</h2>
+  <p class="sub">Each one stands alone — same format, same promise, a different round of the interview loop: the coding round, the design round, and the round that actually sets your level. Progress and theme save in your browser, per course, and nothing is ever sent anywhere.</p>
 
   <div class="courses">
 
@@ -548,15 +554,70 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
       </div>
     </article>
 
-    <!-- ---------- NEXT ---------- -->
-    <article class="course next reveal" data-d="2">
+    <!-- ---------- BEHAVIORAL ---------- -->
+    <article class="course bh reveal" data-d="2">
       <div class="course-top">
         <div>
-          <p class="course-num">// course 03</p>
+          <p class="course-num">// course 03 · the round that sets your level</p>
+          <h3>Behavioral in 48</h3>
+        </div>
+        <span class="course-badge">new</span>
+      </div>
+      <p class="tagline">The senior loop at US product companies is decided in the room where they ask <b>"tell me about a time…"</b>. Thirteen topics that turn years of real shipping into <b>ten tight, quantified stories</b> — plus the hiring-manager round, a 40-question senior bank, and the negotiation hour nobody rehearses. Built for engineers punching a level above their title.</p>
+      <div class="course-stats">
+        <span><b>13</b> topics</span>
+        <span><b>36</b> drills</span>
+        <span><b>~8.5h</b> per day</span>
+        <span><b>0</b> canned answers</span>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-col">
+          <h6>// day 1 — build your material</h6>
+          <div class="chips">
+            <span class="chip">What "Senior" Means</span>
+            <span class="chip">The Story Bank</span>
+            <span class="chip">STAR, Upgraded</span>
+            <span class="chip">Tell Me About Yourself</span>
+            <span class="chip">Leadership &amp; People</span>
+            <span class="chip">Failure &amp; Feedback</span>
+            <span class="chip">Tradeoffs &amp; Judgment</span>
+          </div>
+        </div>
+        <div class="topic-col">
+          <h6>// day 2 — run the loop</h6>
+          <div class="chips">
+            <span class="chip">Decode the Company</span>
+            <span class="chip">Hiring Manager Round</span>
+            <span class="chip">Cross-functional Qs</span>
+            <span class="chip">The Mock Circuit</span>
+            <span class="chip">Questions You Ask</span>
+            <span class="chip">Offers &amp; Negotiation</span>
+            <span class="chip ref">+ playbook · question matcher · senior question bank</span>
+          </div>
+        </div>
+      </div>
+      <div class="course-actions">
+        <a class="btn" href="./behavioral.html">Start Behavioral in 48 <span class="arrow">→</span></a>
+        <div class="deep-links">
+          <a href="./behavioral.html#howto">ground rules</a>
+          <a href="./behavioral.html#bank">story bank</a>
+          <a href="./behavioral.html#mock">mock circuit</a>
+          <a href="./behavioral.html#patterns">question matcher</a>
+          <a href="./behavioral.html#qbank">question bank</a>
+          <a href="./behavioral.html#offer">negotiation</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ---------- NEXT ---------- -->
+    <article class="course next reveal" data-d="3">
+      <div class="course-top">
+        <div>
+          <p class="course-num">// course 04</p>
           <h3>The next one lands here</h3>
         </div>
       </div>
-      <p class="tagline">Same shape every time: one file, two days, every concept mapped to something you've already shipped. When a third syllabus ships it shows up on this page and in the sidebar of both courses — no newsletter required. Got a subject you'd sit down for a weekend to learn? <b>Open an issue.</b></p>
+      <p class="tagline">Same shape every time: one file, two days, every concept mapped to something you've already shipped. When a new syllabus ships it shows up on this page and in the sidebar of every course — no newsletter required. Got a subject you'd sit down for a weekend to learn? <b>Open an issue.</b></p>
       <div class="course-actions">
         <a class="btn-ghost" href="https://github.com/rajkaria/dsa-in-48/issues" target="_blank" rel="noopener noreferrer">Nominate a subject →</a>
       </div>
@@ -569,12 +630,13 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
 <section class="section" id="which">
   <p class="section-eyebrow">// scope control</p>
   <h2>Which one first?</h2>
-  <p class="sub">Depends entirely on what's on your calendar. If both rounds are coming, do DSA first — it's the one you can fail on a technicality, and its vocabulary shows up again in the design course.</p>
+  <p class="sub">Depends entirely on what's on your calendar. If the whole loop is coming, do DSA first — it's the one you can fail on a technicality — and save Behavioral for the weekend before the onsite, when your stories will still be fresh.</p>
   <div class="tbl-wrap"><table class="tbl">
     <thead><tr><th>your situation</th><th>start with</th><th>why</th></tr></thead>
     <tbody>
-      <tr><td>Onsite loop next week, both rounds</td><td class="mono"><b>DSA</b>, then Design</td><td>The coding round is pass/fail on details; design is graded on discussion, which you can partly wing from experience.</td></tr>
-      <tr><td>Senior / staff loop</td><td class="mono"><b>Design</b>, then DSA</td><td>The design round carries the level decision. DSA still gets asked — it just weighs less.</td></tr>
+      <tr><td>Onsite loop next week, all rounds</td><td class="mono"><b>DSA</b>, then Design, then Behavioral</td><td>The coding round is pass/fail on details; design is graded on discussion; behavioral polishes fastest, so it goes last.</td></tr>
+      <tr><td>Senior / staff loop at a US product company</td><td class="mono"><b>Behavioral</b>, then Design</td><td>Past five years of experience, the behavioral and design rounds carry the level decision. DSA still gets asked — it just weighs less.</td></tr>
+      <tr><td>Applying a level above your current title</td><td class="mono"><b>Behavioral</b> day 1 first</td><td>Punching above is argued with evidence, not years — the leveling + story-bank material is exactly that case.</td></tr>
       <tr><td>Screening call on Monday</td><td class="mono"><b>DSA</b> day 1 only</td><td>Hash maps, two pointers, sliding window, trees, binary search ≈ 70% of what's actually asked.</td></tr>
       <tr><td>You've never drawn an architecture diagram out loud</td><td class="mono"><b>Design</b></td><td>The gap there is talking, not knowing. Day 1 fixes it in an afternoon.</td></tr>
       <tr><td>No interview scheduled, just leveling up</td><td class="mono">Either — one per month</td><td>Both are built for re-reading. The reference sections are the part you'll come back to.</td></tr>
@@ -621,7 +683,7 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
 <!-- ======================= FOOTER ======================= -->
 <footer class="footer">
   <p><b>Reading is not practicing.</b> Type every snippet, draw every diagram, narrate out loud. Do the two days, then a little every day until the onsite.</p>
-  <p><a href="./dsa.html">DSA in 48</a> · <a href="./system-design.html">System Design in 48</a><br>
+  <p><a href="./dsa.html">DSA in 48</a> · <a href="./system-design.html">System Design in 48</a> · <a href="./behavioral.html">Behavioral in 48</a><br>
   <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
   <b>good luck — you've been ready longer than you think.</b></p>
 </footer>
