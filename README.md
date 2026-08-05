@@ -1,90 +1,78 @@
-# DSA in 48
+# in 48 — weekend crash syllabi for working engineers
 
-**A two-day data structures & algorithms crash syllabus for working full-stack JavaScript engineers.**
+**Two-day interview-prep courses for full-stack JavaScript engineers.** Each course is one
+self-contained HTML file: no build, no dependencies to install, no CS degree assumed. Open
+it, work through it, walk into the interview.
 
-One HTML file. No build, no dependencies to install, no CS degree assumed. Open it, work through it, walk into the interview.
-
-📄 **[Read it here →](https://rajkaria.github.io/dsa-in-48/)**
+| course | what it covers | read it |
+|---|---|---|
+| **DSA in 48** | 13 data-structure & algorithm topics, 48 link-verified LeetCode problems, interview playbook, pattern matcher | [dsa-in-48.vercel.app](https://dsa-in-48.vercel.app/) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/) |
+| **System Design in 48** | 12 system-design topics, 32 whiteboard drills, the 6-step interview framework, 3 classic designs (URL shortener · feed · chat) | [dsa-in-48.vercel.app/system-design](https://dsa-in-48.vercel.app/system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
 
 ---
 
 ## Who this is for
 
-You've shipped production systems for years. You already *use* every structure in this
-course — you've just never had to *name it under pressure*. This syllabus attaches
-interview vocabulary and patterns to instincts you already have.
+You've shipped production systems for years. You already *use* every structure and *operate*
+every component in these courses — you've just never had to *name them under pressure*.
+Both syllabi attach interview vocabulary and patterns to instincts you already have:
 
-Every concept is mapped to something you've already deployed:
+| you ship this daily | DSA calls it | you deploy this daily | system design calls it |
+|---|---|---|---|
+| the call stack in DevTools | Stack | nginx in front of PM2 workers | Load Balancer |
+| `{}` and `new Map()` | Hash Map | Redis holding sessions | Cache |
+| the DOM · component tree | Tree | a MongoDB replica set | Replication |
+| `node_modules` dependencies | Graph | BullMQ email jobs | Message Queue |
+| `useMemo` · a Redis cache | Dynamic Programming | socket.io + Redis adapter | Pub/Sub |
 
-| you ship this daily | it's called |
-|---|---|
-| the call stack in DevTools | Stack |
-| the event loop's task queue | Queue |
-| `{}` and `new Map()` | Hash Map |
-| the DOM · your component tree | Tree |
-| the Express middleware chain | Linked List |
-| `node_modules` dependencies | Graph |
-| a MongoDB index (B-tree) | Binary Search |
-| `useMemo` · a Redis cache | Dynamic Programming |
+## The format
 
-## What's inside
+Both courses share the same structure — a timed two-day schedule (~8.5h/day) where every
+topic is a block of:
 
-- **13 timed topics** across two ~8.5-hour days, each with a plain-English idea, a
-  JavaScript snippet worth memorizing, trigger phrases that reveal the pattern, and a
-  short problem set.
-- **48 curated LeetCode problems**, every one linked and difficulty-tagged, ordered
-  easy-first so each easy installs the template and each medium makes it stick.
-- **The interview playbook** — the seven-step script to run in the room, plus the
-  JavaScript-specific gotchas (`.sort()` lies, there's no built-in heap) that are free
-  points when you name them.
-- **A pattern matcher** — the 10-second index from "the problem says X" to "start with Y",
-  plus complexity cheat tables for every structure and algorithm.
-- **A "safe to skip" list**, so you spend the 48 hours on what actually gets asked.
+1. a plain-English **idea** with the MERN mapping ("you already know this"),
+2. one **snippet or diagram** worth internalizing,
+3. **trigger phrases** — "when the problem says X, reach for Y",
+4. a short **drill set** with checkboxes (progress + theme persist in `localStorage`;
+   nothing is sent anywhere).
 
-**Day 1 — foundations:** Big O · arrays & two pointers · sliding window · hash maps & sets ·
-stacks & queues · linked lists · recursion
+Plus reference sections: an interview playbook, a 10-second pattern/component index,
+complexity & latency cheat tables, and an honest "safe to skip" list. Both pages tell you
+which subset to do if you only have one day.
 
-**Day 2 — branches:** binary search · trees (BFS & DFS) · heaps · graphs · backtracking ·
-dynamic programming
+## Running locally
 
-## How to use it
-
-1. Open the page and follow the schedule. The clock is the point — depth comes from
-   repetition later, not from this weekend.
-2. **Retype every snippet.** Reading code is not learning code. Run it, then rewrite it
-   from memory.
-3. **The 25-minute rule.** Stuck past 25 minutes? Read the solution, close it, re-code it
-   blind. This weekend you're studying patterns, not grinding.
-4. **Check off problems as you go.** Progress and theme are saved in your browser
-   (`localStorage`) — nothing is sent anywhere.
-
-Only have one day? The page tells you which five topics cover ~70% of what gets asked.
-
-## Running it locally
-
-It's a single self-contained file — just open it:
+Single self-contained files — just open them:
 
 ```bash
 open index.html
 ```
 
-Or serve it, if you prefer a real origin:
+Or serve the folder:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Fonts and syntax highlighting load from CDNs (with subresource integrity); the page
-degrades gracefully to system fonts and unhighlighted code when offline.
+Fonts and syntax highlighting load from CDNs (with subresource integrity); pages degrade
+gracefully to system fonts when offline.
+
+## Deploys
+
+- **Vercel** — auto-deploys from `main` (config in `vercel.json`, clean URLs so
+  `/system-design` works without the `.html`).
+- **GitHub Pages** — serves the same files from `main` at
+  [rajkaria.github.io/dsa-in-48](https://rajkaria.github.io/dsa-in-48/).
 
 ## Contributing
 
-Corrections, better analogies, and swapped-in problems are welcome — open an issue or a
-PR. Two house rules:
+Corrections, better analogies, and swapped-in problems/drills are welcome — open an issue
+or a PR. House rules:
 
-- **Keep it one file.** No build step, no framework, no dependencies.
-- **Keep it honest.** Every claim about complexity should be correct, and every problem
-  link should point at a real, currently-live LeetCode problem.
+- **Keep each course one file.** No build step, no framework, no dependencies.
+- **Keep it honest.** Complexity claims must be correct; every LeetCode link must point at
+  a real, currently-live problem; every capacity number should survive a back-of-envelope
+  check.
 
 ## License
 

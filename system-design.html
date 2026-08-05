@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Design in 48 — a crash syllabus for MERN engineers</title>
+<meta name="description" content="A two-day system design crash course for full-stack JavaScript engineers. Zero theory assumed — every component mapped to something you've already deployed.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="System Design in 48 — a crash syllabus for MERN engineers">
+<meta property="og:description" content="A two-day system design crash course for full-stack JavaScript engineers. Zero theory assumed — every component mapped to something you've already deployed.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="System Design in 48 — a crash syllabus for MERN engineers">
+<meta name="twitter:description" content="A two-day system design crash course for full-stack JavaScript engineers. Zero theory assumed — every component mapped to something you've already deployed.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%232DD4BF'%3ESD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#2DD4BF;
+  --mark-deep:#0D9488;
+  --mark-soft:rgba(45,212,191,.16);
+  --on-mark:#141B22;
+  --on-ink:#2DD4BF;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#3BE8CE;
+  --mark-soft:rgba(45,212,191,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#3BE8CE;
+  --mark-soft:rgba(45,212,191,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(45,212,191,0) 0%, rgba(45,212,191,.95) 6%, rgba(45,212,191,.8) 94%, rgba(45,212,191,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(45,212,191,0) 0%, rgba(45,212,191,.95) 5%, rgba(45,212,191,.78) 95%, rgba(45,212,191,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(45,212,191,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(232,190,0,.5);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(45,212,191,0) 0%, rgba(45,212,191,.9) 6%, rgba(45,212,191,.7) 94%, rgba(45,212,191,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('sd48:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">Design <em>in 48</em></div>
+      <div class="brand-sub">system design · javascript</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Day 1 topics">
+    <h4>// day 1 — building blocks</h4>
+    <a class="side-link" href="#numbers"><span>Numbers &amp; Estimation</span><span class="t">60m</span></a>
+    <a class="side-link" href="#journey"><span>A Request's Journey</span><span class="t">90m</span></a>
+    <a class="side-link" href="#data"><span>Databases</span><span class="t">90m</span></a>
+    <a class="side-link" href="#cache"><span>Caching</span><span class="t">60m</span></a>
+    <a class="side-link" href="#scale"><span>Scaling &amp; Sharding</span><span class="t">90m</span></a>
+    <a class="side-link" href="#async"><span>Queues &amp; Async</span><span class="t">60m</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Day 2 topics">
+    <h4>// day 2 — the interview</h4>
+    <a class="side-link" href="#framework"><span>The Framework</span><span class="t">60m</span></a>
+    <a class="side-link" href="#tradeoffs"><span>CAP &amp; Tradeoffs</span><span class="t">60m</span></a>
+    <a class="side-link" href="#apis"><span>APIs · Rate Limits · Idempotency</span><span class="t">60m</span></a>
+    <a class="side-link" href="#urlshort"><span>Classic: URL Shortener</span><span class="t">60m</span></a>
+    <a class="side-link" href="#feed"><span>Classic: News Feed</span><span class="t">90m</span></a>
+    <a class="side-link" href="#chat"><span>Classic: Chat</span><span class="t">90m</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// reference</h4>
+    <a class="side-link" href="#playbook"><span>Interview Playbook</span></a>
+    <a class="side-link" href="#patterns"><span>Component Picker</span></a>
+    <a class="side-link" href="#skip"><span>Safe to Skip</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Series">
+    <h4>// in this series</h4>
+    <a class="side-link" href="./index.html"><span>DSA in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>day 1 drills</span><span id="p1-count">0/18</span></div>
+      <div class="pbar"><i id="p1-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>day 2 drills</span><span id="p2-count">0/14</span></div>
+      <div class="pbar"><i id="p2-bar"></i></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+    <button class="reset-btn" id="reset-progress" type="button">reset progress</button>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="eyebrow">// a 48-hour syllabus <b>for full-stack JS engineers with zero formal system design</b></p>
+  <h1>System design, <span class="hl hl-anim" data-d="0">cracked</span> in one <span class="hl hl-anim" data-d="1">weekend</span>.</h1>
+  <p class="lede">Here's the secret nobody tells you: <b>you already operate a distributed system</b>. A browser, a CDN, an Express app, a MongoDB replica set, maybe a Redis — that's the diagram. These two days teach you to draw what you've deployed, size it out loud, and defend the tradeoffs.</p>
+  <p class="lede">No theory prerequisites. Every component is mapped to something in your MERN stack, and every classic design is built from parts you've already used.</p>
+  <div class="hero-meta">
+    <span><b>12</b> topics</span>
+    <span><b>32</b> design drills</span>
+    <span><b>~8.5h</b> per day</span>
+    <span><b>0</b> math beyond powers of ten</span>
+  </div>
+  <a class="btn" href="#howto">Start Day 1 <span class="arrow">↓</span></a>
+
+  <div class="xlate-wrap">
+    <p class="xlate-head">Proof you're not starting from zero — you've deployed these:</p>
+    <div class="xlate">
+      <div class="x-item reveal" data-d="0"><span class="x-from">nginx in front of two PM2 workers</span><span class="x-arrow">→</span><span class="x-to">Load Balancer</span></div>
+      <div class="x-item reveal" data-d="1"><span class="x-from">Cloudflare / Vercel serving your bundle</span><span class="x-arrow">→</span><span class="x-to">CDN</span></div>
+      <div class="x-item reveal" data-d="2"><span class="x-from">a MongoDB replica set</span><span class="x-arrow">→</span><span class="x-to">Replication</span></div>
+      <div class="x-item reveal" data-d="3"><span class="x-from">Redis holding sessions</span><span class="x-arrow">→</span><span class="x-to">Cache</span></div>
+      <div class="x-item reveal" data-d="4"><span class="x-from">BullMQ sending welcome emails</span><span class="x-arrow">→</span><span class="x-to">Message Queue</span></div>
+      <div class="x-item reveal" data-d="5"><span class="x-from">socket.io rooms + Redis adapter</span><span class="x-arrow">→</span><span class="x-to">Pub/Sub</span></div>
+      <div class="x-item reveal" data-d="6"><span class="x-from">Mongo's shard key docs you skimmed</span><span class="x-arrow">→</span><span class="x-to">Partitioning</span></div>
+      <div class="x-item reveal" data-d="7"><span class="x-from">JWT so any server can auth</span><span class="x-arrow">→</span><span class="x-to">Stateless Service</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- HOW TO -->
+<section class="section" id="howto">
+  <p class="section-eyebrow">// ground rules</p>
+  <h2>How to run these two days</h2>
+  <p class="sub">Each topic is a timed block: a 5-minute idea, one snippet or diagram to internalize, and drills you do <b>on paper, out loud</b>. System design is graded on how you think — so the practice is talking and drawing, not typing.</p>
+  <div class="rules">
+    <div class="rule">
+      <h5>01 · draw everything</h5>
+      <p>Boxes and arrows on paper for <b>every single drill</b>. The interview is a whiteboard; the muscle you're building is drawing while talking. Reading diagrams is not drawing diagrams.</p>
+    </div>
+    <div class="rule">
+      <h5>02 · numbers before boxes</h5>
+      <p>Never draw a component until you've said the scale out loud. <b>"10M DAU → ~100 RPS average"</b> takes 20 seconds and decides half the design.</p>
+    </div>
+    <div class="rule">
+      <h5>03 · say the tradeoff</h5>
+      <p>Every component you add costs something. The sentence interviewers wait for is <b>"I'm choosing X, which buys me A but costs me B."</b> Practice it from hour one.</p>
+    </div>
+    <div class="rule">
+      <h5>04 · the 25-minute rule</h5>
+      <p>Stuck on a drill past 25 minutes? Look up a reference design, understand it, close it, <b>re-draw it blind</b>. This weekend you're studying patterns, not inventing them.</p>
+    </div>
+    <div class="rule">
+      <h5>05 · only have one day?</h5>
+      <p>Do <a href="#numbers">numbers</a>, <a href="#cache">caching</a>, <a href="#data">databases</a>, <a href="#framework">the framework</a>, and <a href="#urlshort">the URL shortener</a>. That's <b>the spine of every answer</b> — the rest is elaboration.</p>
+    </div>
+    <div class="rule">
+      <h5>06 · the night before</h5>
+      <p>Nothing new. Re-draw the <a href="#urlshort">URL shortener</a> and the <a href="#feed">feed</a> from memory, re-read the <a href="#patterns">component picker</a>, sleep. Recall beats coverage on the day.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 1 ================= -->
+<header class="day-head" id="d1">
+  <p class="eyebrow">// day 1 · ~8.5 hours <b>the parts every system is made of</b></p>
+  <h2>Foundations &amp; building blocks</h2>
+  <p class="day-sub">The estimation habit first — it steers everything else. Then the five components that appear in every design on Earth: the entry path (LB/CDN), the database, the cache, the scale-out moves, and the queue.</p>
+  <div class="sched">
+    <div class="sched-row"><span class="st">09:00</span><span class="sn"><a href="#numbers">Numbers &amp; back-of-envelope</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">10:00</span><span class="sn"><a href="#journey">A request's journey: DNS → CDN → LB → app</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">11:30</span><span class="sn"><a href="#data">Databases: indexes, replication, SQL vs NoSQL</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row break"><span class="st">13:00</span><span class="sn">lunch — actually walk away</span><span class="sd">45 min</span></div>
+    <div class="sched-row"><span class="st">13:45</span><span class="sn"><a href="#cache">Caching</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">14:45</span><span class="sn"><a href="#scale">Scaling &amp; sharding</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">16:15</span><span class="sn"><a href="#async">Queues &amp; async work</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">17:15</span><span class="sn">done — re-draw today's two hardest drills from memory, close the laptop</span><span class="sd">—</span></div>
+  </div>
+</header>
+
+<!-- NUMBERS -->
+<section class="topic" id="numbers">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 09:00 · 60 min</span><span class="chip">the habit that steers everything</span></div>
+      <h3>Numbers &amp; back-of-envelope estimation</h3>
+      <p class="tagline">Every design decision downstream — cache or not, shard or not, queue or not — is decided by numbers you can compute in 30 seconds. Round aggressively; nobody wants precision.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've eyeballed a DevTools waterfall and thought "that request is slow" — that's the latency ladder. You've sized a database plan against row counts — that's capacity math. Interviews just want it <b>out loud, with round numbers</b>.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>The one conversion that matters:</b> a day is ~86,400 seconds — round to <b>10⁵</b>. So <b>1M requests/day ≈ 12 RPS</b>. Say this in every interview; most "huge" numbers collapse into small ones.</li>
+        <li><b>Peak ≠ average.</b> Multiply average RPS by <b>2–5×</b> for peak. Design for peak, state the multiplier.</li>
+        <li><b>Storage math is multiplication:</b> items/day × size/item × days. Keep every number to one significant digit — <i>the point is the exponent, not the digits</i>.</li>
+        <li><b>Read/write ratio</b> is the first question to ask of any system. 100:1 read-heavy (feeds, catalogs) → caching wins. Write-heavy (metrics, chat) → queues and partitioning win.</li>
+        <li>Know the <b>latency ladder</b> (table in <a href="#patterns">reference</a>): memory ~100ns, SSD ~100µs, same-region network ~1ms, cross-continent ~100ms. Every design trick is just moving work up the ladder.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">back-of-envelope.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// The only math you need. Do it OUT LOUD, round hard.
+const SECONDS_PER_DAY = 100_000;      // really 86,400 — round it
+
+// "10M requests a day" — sounds scary, isn't:
+const avgRps  = 10_000_000 / SECONDS_PER_DAY;   // ≈ 100 RPS
+const peakRps = avgRps * 3;                     // ≈ 300 RPS — one good server
+
+// "10M posts/day at ~1 KB each" — storage:
+// 10M × 1 KB = 10 GB/day  →  ×365 ≈ 3.6 TB/year. A single disk. Relax.
+
+// The exponent is the answer. 10× more users = new design conversation.</code></pre>
+    </div>
+    <div>
+      <p class="mini-label">// warm-up — answer out loud, then check</p>
+      <details class="quiz"><summary>1M DAU, each making 20 requests/day. Average RPS?</summary><p class="ans"><b>20M / 10⁵ = ~200 RPS.</b> Peak ~600. One beefy box could survive; a small LB pool is comfortable.</p></details>
+      <details class="quiz"><summary>100M photos/day at 2 MB. Storage per day? Per year?</summary><p class="ans"><b>200 TB/day, ~70 PB/year.</b> The exponent says: object storage + CDN, never a database.</p></details>
+      <details class="quiz"><summary>Which is bigger: 1 memory read or 1 same-region network hop?</summary><p class="ans">The network hop, by <b>~10,000×</b> (100ns vs ~1ms). That gap is why caching in-process or in Redis beats "just query the DB again".</p></details>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills — paper + timer, say every number out loud</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-numbers-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Estimate RPS + storage/year for a 10M-DAU Twitter clone (tweets only)</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-numbers-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">WhatsApp ships ~100B messages/day at ~100 bytes — messages/sec + storage/year</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-numbers-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">YouTube gets ~500 hours of video/minute (~1 GB per hour after encoding) — storage/day</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section class="topic" id="journey">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 10:00 · 90 min</span><span class="chip big-o">the left half of every diagram</span></div>
+      <h3>A request's journey: DNS → CDN → LB → app</h3>
+      <p class="tagline">Everything between the user's thumb and your Express route. Learn this path once and the left half of every whiteboard diagram draws itself.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Deploying to Vercel gave you all of it invisibly: DNS on their nameservers, a CDN at the edge, TLS termination, and a fleet of stateless functions behind a router. The interview version is just <b>drawing what Vercel hid from you</b>.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>The path, in order:</b> DNS resolves the name → TLS handshake → <b>CDN</b> serves static &amp; cached content from a nearby edge → <b>load balancer</b> spreads the rest across app servers → your handler runs. Draw it left-to-right, always.</li>
+        <li><b>CDN rule:</b> anything that's the same for many users (JS bundles, images, public API responses) belongs on the edge. It's the single biggest latency win because it beats the speed of light — by moving bytes closer.</li>
+        <li><b>Load balancer:</b> spreads traffic (round-robin / least-connections), health-checks instances, and hides deploys. L4 balances TCP; L7 reads HTTP and can route by path. Saying "L7 so I can route /api and /ws differently" is a senior line.</li>
+        <li><b>The prerequisite is statelessness:</b> the LB can only send a request anywhere if <i>any server can handle it</i> — so sessions live in Redis or a JWT, uploads in object storage, never on an instance's disk. This one habit is what makes horizontal scaling possible.</li>
+        <li>Two of anything behind an LB also buys you <b>availability</b> — deploys and crashes stop being outages.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">nginx.conf</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext"># The load balancer you may have already configured without the title
+upstream app {
+  least_conn;               # send each request to the least-busy instance
+  server 10.0.0.1:3000;     # instances are STATELESS —
+  server 10.0.0.2:3000;     # any of them can take any request
+}
+server {
+  listen 443 ssl http2;                 # TLS terminates here
+  location /static/ { expires 30d; }    # ...but really: put a CDN in front
+  location /        { proxy_pass http://app; }
+}</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"users all over the world", "assets load slowly"</span><span class="then">CDN at the edge</span></li>
+        <li><span class="cue">"one server can't keep up", "zero-downtime deploys"</span><span class="then">LB + 2+ stateless instances</span></li>
+        <li><span class="cue">"users get logged out when we scale"</span><span class="then">externalize sessions (Redis / JWT)</span></li>
+        <li><span class="cue">"route /api and websockets differently"</span><span class="then">L7 load balancer</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-journey-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Sketch the full path of GET https://app.com/api/me — from address bar to JSON</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-journey-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Your single VPS is at 100% CPU — draw the 3-step scale-out (and what breaks at each step)</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-journey-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Sydney users see 300ms API latency from your EU-only deploy — fix it two different ways</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DATABASES -->
+<section class="topic" id="data">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 11:30 · 90 min</span><span class="chip big-o">indexed read O(log n) · scan O(n)</span></div>
+      <h3>Databases: indexes, replication, SQL vs NoSQL</h3>
+      <p class="tagline">The database is the bottleneck in ~every design, because it's the part that remembers. Three levers: index it, replicate it, and (last) shard it.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've run <code>.explain()</code> on a slow Mongo query and seen <code>COLLSCAN</code>, added an index, and watched it drop from seconds to milliseconds. And a Mongo replica set — primary takes writes, secondaries serve reads — <b>is</b> leader-follower replication. You've operated this chapter.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Indexes</b> are B-trees (binary search's production cousin — same halving idea). Reads go O(n) → O(log n); the cost is <b>slower writes and more RAM</b> per index. Index what you query, nothing else.</li>
+        <li><b>Replication:</b> one leader takes writes, followers copy the log and serve reads. Buys read throughput + a hot standby. The catch is <b>replication lag</b> — a follower can be seconds behind, so a user might not see their own write. Name that; it's the classic follow-up.</li>
+        <li><b>SQL vs NoSQL, honestly:</b> relational buys you joins, transactions, and constraints; document stores buy flexible schema and easy horizontal scale. The senior answer: <b>"either works here — what matters is the access patterns"</b> — then pick one and justify it.</li>
+        <li><b>Transactions:</b> "these writes succeed or fail together." Money, inventory, bookings → you want them (SQL's home turf). Likes and view counts → you don't.</li>
+        <li>Order of operations when the DB is slow: <b>index → cache → replicas → shard</b>. Jumping straight to sharding is the classic junior tell.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">indexes.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// You have met this in production:
+db.orders.find({ userId }).explain()
+// "COLLSCAN"  → reads EVERY document. O(n). Fine at 1k rows, an outage at 100M.
+
+db.orders.createIndex({ userId: 1, createdAt: -1 })
+// "IXSCAN" → walks a B-tree. O(log n). Compound index serves
+// "orders for user, newest first" in one shot.
+
+// The trade: every index slows every write and eats RAM.
+// Rule: indexes mirror your queries — never speculate.</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"this query got slow as the table grew"</span><span class="then">missing index — check the plan</span></li>
+        <li><span class="cue">"reads vastly outnumber writes"</span><span class="then">read replicas (+ cache first)</span></li>
+        <li><span class="cue">"user doesn't see their own update"</span><span class="then">replication lag — read-your-writes</span></li>
+        <li><span class="cue">"payments / bookings / inventory"</span><span class="then">transactions → SQL comfort zone</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-data-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Given 3 real queries on orders(userId, status, createdAt), pick the minimal index set</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-data-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Add read replicas to a read-heavy app — then explain what replication lag breaks, and one fix</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-data-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">SQL or NoSQL for: a bank ledger, a product catalog, chat messages — justify each in one sentence</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CACHING -->
+<section class="topic" id="cache">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 13:45 · 60 min</span><span class="chip big-o">~1ms hit vs ~30ms DB read</span></div>
+      <h3>Caching</h3>
+      <p class="tagline">The highest-ROI component in system design, exactly like hash maps were in DSA — and it's the same trade: spend memory, skip repeated work.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p><code>useMemo</code>, <code>Cache-Control</code> headers, Redis in front of a slow query — you've cached at three layers already. The interview version adds two questions you must always answer: <b>when does it expire, and how does it get invalidated?</b></p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Cache-aside is the only pattern you need:</b> read cache → miss → read DB → write cache with a TTL. On updates: write the DB, then <b>delete</b> the key (recompute on next read — don't try to patch cached values in place).</li>
+        <li><b>Always say the TTL out loud.</b> "Cached for 5 minutes" is a product decision disguised as an infra decision — it states how stale you're willing to be.</li>
+        <li><b>What to cache:</b> read-heavy + rarely-changing + expensive to compute. Profile pages, product listings, rendered feeds. Never cache what must be exact (balances, stock counts).</li>
+        <li><b>Thundering herd:</b> a hot key expires and 10k requests hit the DB at once. Fixes: per-key lock ("one flight refills, the rest wait"), staggered TTLs, or serving stale while refreshing. Naming this unprompted is a strong-signal moment.</li>
+        <li>Eviction: memory fills → something must go → <b>LRU</b> by default. (You built exactly this in <a href="./index.html#lists">DSA — LRU Cache</a>. It was Redis all along.)</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">cache-aside.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// Cache-aside — the pattern behind every "we added Redis" war story
+async function getProduct(id) {
+  const hit = await redis.get(`product:${id}`);
+  if (hit) return JSON.parse(hit);                       // ~1 ms
+
+  const product = await db.products.findById(id);        // ~30 ms
+  await redis.set(`product:${id}`, JSON.stringify(product),
+    'EX', 300 + Math.floor(Math.random() * 60));         // TTL + jitter
+  return product;
+}
+
+// On update: write DB, then DELETE the key. Next read refills it.
+async function updateProduct(id, patch) {
+  await db.products.updateOne({ _id: id }, { $set: patch });
+  await redis.del(`product:${id}`);
+}</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"same data requested over and over"</span><span class="then">cache-aside + TTL</span></li>
+        <li><span class="cue">"DB melts when the cache restarts"</span><span class="then">thundering herd — lock / stale-while-refresh</span></li>
+        <li><span class="cue">"users see stale data — how stale is OK?"</span><span class="then">the TTL conversation</span></li>
+        <li><span class="cue">"memory is full — what do we drop?"</span><span class="then">LRU eviction</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-cache-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Add caching to GET /product/:id — state the TTL, the invalidation, and what you'd never cache</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-cache-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">A deploy flushes Redis and 10k RPS lands on the DB — walk through preventing the stampede</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-cache-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design keys + invalidation for a paginated, filterable product list (the hard mode of caching)</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCALING -->
+<section class="topic" id="scale">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 14:45 · 90 min</span><span class="chip big-o">the shard key decides everything</span></div>
+      <h3>Scaling &amp; sharding</h3>
+      <p class="tagline">The escalation ladder for "more traffic than one machine can take" — and the last rung, splitting the data itself, where the only real decision is the key.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>PM2 cluster mode fanning your Express app across CPU cores is horizontal scaling in miniature — same app, many copies, work spread between them. Sharding applies the identical idea to the <b>data</b> instead of the compute.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Scale vertically first.</b> A bigger box is boring, cheap, and has zero new failure modes. Saying "I'd scale up before scaling out" is a <i>senior</i> move, not a cop-out — modern single machines handle enormous load.</li>
+        <li><b>Horizontal = clones behind an LB</b> — works only because the app tier is stateless (day-1 morning). App servers scale trivially; <b>the database is what's hard</b>, which is why the ladder is: index → cache → replicas → shard.</li>
+        <li><b>Sharding:</b> split rows across machines by a key — <code>hash(userId) % N</code> spreads evenly. Each shard is smaller, faster, and independently scalable. Costs: no cross-shard joins/transactions, and resharding pain.</li>
+        <li><b>The shard key is the whole decision.</b> Good: high-cardinality, evenly-accessed (userId). Bad: low-cardinality or skewed (country, date) — one shard gets the traffic. The follow-up is always the <b>hot key</b>: one celebrity's data melting one shard. Answer: cache the hot entity, or split it further.</li>
+        <li><b>Consistent hashing</b>, one sentence: keys and nodes hash onto a ring, each key belongs to the next node clockwise — so adding a node moves only <b>~1/N of keys</b> instead of nearly all of them under naive <code>% N</code>.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">sharding.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// Sharding = deciding which machine OWNS a row. The key decides everything.
+
+shard = hash(userId) % N       // even spread — but going N=4 → 5
+                               // remaps ~ALL keys. Migration nightmare.
+
+// Consistent hashing: nodes + keys hash onto a ring;
+// a key belongs to the next node clockwise.
+// Add a node → only ~1/N of keys move. This is the whole trick.
+
+// GOOD shard key: userId    (high cardinality, even traffic)
+// BAD  shard key: country   (5 shards do 90% of the work)
+// BAD  shard key: createdAt (ALL writes hammer today's shard)</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"traffic doubled" (compute-bound)</span><span class="then">clones behind the LB — easy case</span></li>
+        <li><span class="cue">"table won't fit / writes overwhelm one DB"</span><span class="then">shard — and defend the key</span></li>
+        <li><span class="cue">"one user/tenant melts a shard"</span><span class="then">hot key — cache it, split it</span></li>
+        <li><span class="cue">"adding a cache/DB node reshuffles everything"</span><span class="then">consistent hashing</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-scale-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Take a session-based Express app stateless — list every piece of state and where it moves</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-scale-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Shard a 2B-row messages table — pick the key, then attack your own choice with the hot-key case</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-scale-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Grow a cache cluster 4 → 5 nodes: compare keys moved under % N vs consistent hashing</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ASYNC -->
+<section class="topic" id="async">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 16:15 · 60 min</span><span class="chip big-o">at-least-once ⇒ idempotent</span></div>
+      <h3>Queues &amp; async work</h3>
+      <p class="tagline">A queue is a buffer between "accepted" and "done". It absorbs spikes, survives crashes, and lets you answer the user before the slow work happens.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>If you've pushed a BullMQ job for a welcome email instead of awaiting nodemailer in the request handler, you've made the exact architectural move this chapter is about — and the event loop's task queue has been teaching you the mental model all along.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>When to reach for a queue</b> — any of: the work is slow (video encode, email), the traffic is spiky (flash sale), or the downstream is fragile (third-party API). Producer enqueues, responds immediately; workers chew through at their own pace.</li>
+        <li><b>The contract is at-least-once.</b> A worker can crash after doing the work but before acking — the queue redelivers. Therefore <b>every job must be safe to run twice</b>: idempotency keys, upserts, "already processed?" checks. This is the #1 follow-up question.</li>
+        <li><b>Queue vs pub/sub:</b> a queue gives each job to <i>one</i> worker (work distribution); pub/sub gives each event to <i>every</i> subscriber (fan-out of notifications). Kafka-style streams = pub/sub with replayable history — one sentence is enough.</li>
+        <li><b>Dead-letter queue:</b> after N failed retries a job goes to the DLQ for humans. Mentioning it says "I've operated this", loudly.</li>
+        <li><b>Backpressure:</b> queue depth growing = consumers can't keep up. Monitor depth, scale workers on it, and shed or reject load before the queue eats all your memory.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">queue.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// Respond NOW, work later
+app.post('/signup', async (req, res) => {
+  const user = await db.users.create(req.body);
+  await queue.add('welcome-email', { userId: user.id },
+    { jobId: `welcome:${user.id}` });   // same jobId = enqueued once, ever
+  res.status(201).json(user);           // user is gone before the email exists
+});
+
+// Worker — written to be safe to run TWICE (at-least-once delivery)
+worker.process('welcome-email', async (job) => {
+  const user = await db.users.findById(job.data.userId);
+  if (user.welcomeSentAt) return;       // redelivered? no-op.
+  await sendEmail(user.email, 'welcome');
+  await db.users.update(user.id, { welcomeSentAt: new Date() });
+});</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"don't make the user wait for X"</span><span class="then">queue + worker</span></li>
+        <li><span class="cue">"traffic spikes 50×, downstream can't"</span><span class="then">queue as shock absorber</span></li>
+        <li><span class="cue">"we charged / emailed them twice"</span><span class="then">idempotency key</span></li>
+        <li><span class="cue">"several services care about one event"</span><span class="then">pub/sub, not a queue</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-async-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Move image-resizing out of the upload request path — draw before/after, list what improved</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-async-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">A payment webhook arrives twice (it will) — make the handler provably idempotent</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="sd-async-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Black Friday: orders spike 50×, the DB handles 5× — keep accepting orders without losing any</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 2 ================= -->
+<header class="day-head" id="d2">
+  <p class="eyebrow">// day 2 · ~9 hours <b>assembling the parts under a clock</b></p>
+  <h2>The interview &amp; the classics</h2>
+  <p class="day-sub">The script that structures a 45-minute interview, the tradeoff vocabulary that makes you sound senior, and then the three classic designs — each one assembled live from yesterday's parts. The classics repeat in disguise: master three, and you've seen most of what gets asked.</p>
+  <div class="sched">
+    <div class="sched-row"><span class="st">09:00</span><span class="sn"><a href="#framework">The interview framework</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">10:00</span><span class="sn"><a href="#tradeoffs">CAP, consistency &amp; availability</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">11:00</span><span class="sn"><a href="#apis">APIs, rate limiting &amp; idempotency</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">12:00</span><span class="sn">lunch — no screens</span><span class="sd">45 min</span></div>
+    <div class="sched-row"><span class="st">12:45</span><span class="sn"><a href="#urlshort">Classic: URL shortener</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">13:45</span><span class="sn"><a href="#feed">Classic: news feed</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">15:15</span><span class="sn"><a href="#chat">Classic: chat</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">16:45</span><span class="sn"><a href="#playbook">The interview playbook</a></span><span class="sd">45 min</span></div>
+    <div class="sched-row break"><span class="st">17:30</span><span class="sn">done — mock yourself: pick an app you use daily, 35-min timer, design it out loud</span><span class="sd">—</span></div>
+  </div>
+</header>
+
+<!-- FRAMEWORK -->
+<section class="topic" id="framework">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 09:00 · 60 min</span><span class="chip">the answer's skeleton</span></div>
+      <h3>The interview framework</h3>
+      <p class="tagline">A system design interview is 45 unstructured minutes — unless you bring the structure. This six-step script is the structure. It works for literally every prompt.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's the same discipline as a good sprint kickoff: agree scope before touching anything, size the work, define the interfaces, then build. You run this meeting at work — now run it solo, at a whiteboard, in 45 minutes.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>You drive.</b> The single biggest failure mode is waiting to be led. Announce the plan in the first 30 seconds: "I'll clarify requirements, do quick numbers, sketch the API, draw the high level, then we deep-dive wherever you like."</li>
+        <li><b>Scope ruthlessly.</b> "Design WhatsApp" means <i>three features</i>: 1:1 messages, delivery status, online presence. Say what you're cutting ("no calls, no stories") — cutting scope <b>earns</b> points.</li>
+        <li><b>Draw the boring baseline fast:</b> client → LB → stateless app tier → cache → DB, queue hanging off the side. It's 80% of every answer. Spend your brilliance on the deep dive, not on rediscovering this shape.</li>
+        <li><b>Deep-dive where they point.</b> When the interviewer nudges ("what about the feed for celebrities?") — that's the graded section. Follow the nudge, always.</li>
+        <li><b>Checkpoint out loud</b> every ~10 minutes: "That's the write path; want me to do the read path or dig into storage?" It reads as collaboration, and it is.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-script.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext">1. REQUIREMENTS  (5 min)   functional: the top 3 features, cut the rest
+                           non-functional: scale, latency, consistency needs
+2. NUMBERS       (3 min)   DAU → RPS → storage → read/write ratio
+3. API + DATA    (5 min)   core endpoints + core entities. Sketch, don't gold-plate
+4. HIGH LEVEL    (10 min)  client → LB → app → cache → db  (+ queue if async work)
+5. DEEP DIVE     (15 min)  the hard part — theirs if they point, yours if not
+6. WRAP          (5 min)   bottlenecks, single points of failure, what you'd do next</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"design X" with zero constraints given</span><span class="then">step 1 — YOU set the constraints</span></li>
+        <li><span class="cue">interviewer asks "how big is that?"</span><span class="then">you skipped step 2 — recover now</span></li>
+        <li><span class="cue">a nudge toward any component</span><span class="then">the deep dive just started</span></li>
+        <li><span class="cue">"anything you'd improve?"</span><span class="then">step 6 — bottlenecks + SPOFs</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-framework-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Run steps 1–2 only for "design Spotify" — 8-minute timer, out loud, requirements + numbers</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-framework-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Full six-step run for "design Pastebin" — 35-minute timer, paper, no references</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRADEOFFS -->
+<section class="topic" id="tradeoffs">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 10:00 · 60 min</span><span class="chip big-o">99.9% = 8.7h down/year</span></div>
+      <h3>CAP, consistency &amp; availability</h3>
+      <p class="tagline">The vocabulary of tradeoffs. You don't need the theory — you need to sort any feature into "must be correct" vs "must be up", and know what each costs.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've seen a like count jump backwards on refresh and thought nothing of it — but you'd file a P0 if a checkout charged twice. Congratulations: you already sort features into eventual vs strong consistency. This chapter just names the sort.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>CAP without mysticism:</b> when the network between replicas breaks (it will), you choose per-system: <b>CP</b> — refuse some requests, stay correct; or <b>AP</b> — answer everyone, possibly stale. It's not "pick 2 of 3"; it's "what breaks first when a partition happens".</li>
+        <li><b>Strong consistency</b> = every read sees the latest write (banking, inventory, seat booking). <b>Eventual</b> = replicas converge in seconds (likes, follower counts, feeds). Most products are eventual almost everywhere — say so, feature by feature.</li>
+        <li><b>Read-your-writes</b> is the special case users actually notice: after <i>I</i> post, <i>I</i> must see it — everyone else can wait. Cheap fix: read the author's own data from the leader (or their cache), everything else from replicas.</li>
+        <li><b>Availability math:</b> 99.9% ≈ 8.7 hours down/year; 99.99% ≈ 52 minutes. Each nine roughly means "another instance of everything, in another failure domain" — redundancy, health checks, automatic failover. Nines are bought, not declared.</li>
+        <li>The audit ritual for step 6: point at each box and ask <b>"what happens when this dies?"</b> One LB, one DB leader, one queue broker — each is a single point of failure until it has a partner.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">cap.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext">Network partitions WILL happen. When one does, each system chooses:
+
+  CP  — refuse some requests, never be wrong     bank balance, seat #14C
+  AP  — answer everyone, maybe slightly stale    like counts, feeds, DNS
+
+The interview move: sort each FEATURE, not the whole product.
+  checkout      → CP  (refuse > double-charge)
+  product page  → AP  (stale price for 5s beats a blank page)
+
+Nines:  99.9% = 8.7 h/yr down   99.99% = 52 min/yr   each nine ≈ 10× effort</code></pre>
+    </div>
+    <div>
+      <p class="mini-label">// warm-up — CP or AP? decide, then check</p>
+      <details class="quiz"><summary>A bank transfer between two accounts</summary><p class="ans"><b>CP.</b> Refusing the transfer during a partition is annoying; letting balances disagree is a headline. Transactions, leader-only writes.</p></details>
+      <details class="quiz"><summary>The retweet counter on a viral post</summary><p class="ans"><b>AP.</b> Nobody can verify 1.2M vs 1.200003M. Serve stale, converge later, never block reads on it.</p></details>
+      <details class="quiz"><summary>Booking the last seat on a flight</summary><p class="ans"><b>CP</b> at the moment of purchase (two people cannot both get seat 14C) — even though browsing seats can be AP. Same product, different features, different choices — that's the whole skill.</p></details>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-tradeoffs-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Label CP or AP, with one sentence each: bank transfer · like count · seat booking · DNS · a shopping cart</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-tradeoffs-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Take your Pastebin design from this morning and remove every single point of failure — box by box</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- APIS -->
+<section class="topic" id="apis">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 11:00 · 60 min</span><span class="chip big-o">cursor &gt; offset · token bucket</span></div>
+      <h3>APIs, rate limiting &amp; idempotency</h3>
+      <p class="tagline">Your home turf, upgraded with the three details interviewers actually probe: pagination that scales, limits that protect, and writes that are safe to retry.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've designed REST APIs for years, and if you've used <code>express-rate-limit</code> or retried a Stripe call with an <code>Idempotency-Key</code> header, you've consumed both of today's patterns. Now you get to produce them.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Cursor pagination beats offset</b> and interviewers love hearing why: <code>OFFSET 100000</code> makes the DB walk 100k rows to throw them away, and rows shifting between requests makes pages skip or repeat. A cursor ("everything after id X / time T") is O(log n) with an index and stable under inserts.</li>
+        <li><b>Rate limiting = token bucket:</b> a bucket per user refills at R tokens/sec up to burst B; each request spends one; empty bucket → 429. Distributed version: the bucket lives in Redis so all API servers share it.</li>
+        <li><b>Idempotency:</b> networks retry, users double-click. The client sends an <code>Idempotency-Key</code>; the server stores the result under it and replays the stored response on repeats. <b>Every payment discussion must include this.</b></li>
+        <li><b>Auth in one line:</b> JWTs make auth stateless (any server verifies the signature — perfect behind an LB) at the cost of awkward revocation; sessions in Redis revoke instantly at the cost of a lookup. Naming that trade is the point, not picking a winner.</li>
+        <li>Webhooks — flip side of APIs: you're the caller now. Sign the payload, retry with backoff, and expect the receiver to see duplicates (their idempotency problem now).</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">token-bucket.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// Token bucket — THE rate limiter. Refill R/sec, burst up to B.
+const R = 2, B = 10;
+const buckets = new Map();   // in prod: Redis, keyed rl:{userId}
+
+function allow(userId) {
+  const now = Date.now();
+  const b = buckets.get(userId) ?? { tokens: B, last: now };
+  b.tokens = Math.min(B, b.tokens + ((now - b.last) / 1000) * R);
+  b.last = now;
+  if (b.tokens &lt; 1) { buckets.set(userId, b); return false; }  // → 429
+  b.tokens -= 1;
+  buckets.set(userId, b);
+  return true;
+}
+// Why bucket over a fixed window: it allows honest bursts
+// and can't be gamed at the window boundary.</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"page 10,000 is slow", "items skip between pages"</span><span class="then">cursor pagination</span></li>
+        <li><span class="cue">"one client hammers the API"</span><span class="then">token bucket in Redis</span></li>
+        <li><span class="cue">"double-click bought two subscriptions"</span><span class="then">idempotency keys</span></li>
+        <li><span class="cue">"auth across 20 stateless servers"</span><span class="then">JWT — and name the revocation cost</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-apis-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design GET /feed pagination — write both the offset and cursor versions, then argue for the cursor</span></label><span class="diff e">WARM</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-apis-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Add end-to-end idempotency to POST /payments — key format, storage, TTL, and the replay path</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-apis-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Enforce 100 req/min per user across 10 API servers — where does the bucket live, and what if Redis dies?</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- URL SHORTENER -->
+<section class="topic" id="urlshort">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 12:45 · 60 min</span><span class="chip">classic #1 — the Two Sum of system design</span></div>
+      <h3>Classic: URL shortener</h3>
+      <p class="tagline">The most-asked design on Earth because it's small enough to finish and deep enough to grade. Learn it cold — it's also the template every "simple" design follows.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>It's a CRUD app with one POST and one very hot GET — an Express route, a Mongo lookup, a redirect. Every skill from Day 1 slots in: numbers say read-heavy, so cache; the ID design is the only genuinely new thought.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the walkthrough — say it in this order</p>
+      <ul>
+        <li><b>Requirements + numbers:</b> shorten + redirect (cut: auth, custom domains). Say the ratio: reads dwarf writes ~100:1 — <i>that one sentence drives the whole design</i>. 100M new links/month ≈ 40 writes/sec; redirects maybe 4k reads/sec.</li>
+        <li><b>The ID is the design:</b> 7 chars of base62 ≈ 3.5 trillion combinations. Generate from an auto-increment counter → base62-encode. Counter is a SPOF? Hand out <b>ranges</b> to each server (server A gets 1–1M, B gets 1M–2M) — no coordination per request.</li>
+        <li><b>Storage:</b> one table: <code>code → longUrl, createdAt</code>. 500B × billions = single-digit TB — one primary + replicas is plenty. If pushed: shard by hash(code).</li>
+        <li><b>The read path is the product:</b> redirect must be fast → cache-aside on hot codes (Zipf: a tiny fraction of links get almost all clicks). <b>302 not 301</b> — 301 lets browsers cache the redirect forever and your analytics go blind. Interviewers ask this exact thing.</li>
+        <li><b>Analytics without slowing redirects:</b> fire a click event onto a queue, aggregate async. The redirect path never waits for the write.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">base62.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// 62^7 ≈ 3.5 trillion — 7 chars is enough forever
+const ALPHA = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function encode(n) {
+  let s = '';
+  while (n > 0) { s = ALPHA[n % 62] + s; n = Math.floor(n / 62); }
+  return s || '0';
+}
+encode(125_500_299_003);  // "29zoWFK" — your short code
+
+// GET /:code  →  cache hit? redirect 302.
+//             →  miss? DB lookup, fill cache, redirect 302.
+//             →  publish {code, ts, ua} to the analytics queue. Never await it.</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// the follow-ups they will ask</p>
+      <ul>
+        <li><span class="cue">"why not hash the URL to make the code?"</span><span class="then">collisions + same-URL dupes — counter wins</span></li>
+        <li><span class="cue">"301 or 302?"</span><span class="then">302 — keep seeing the clicks</span></li>
+        <li><span class="cue">"a link goes viral — 100k RPS on one code"</span><span class="then">it's one cache key — hot but tiny</span></li>
+        <li><span class="cue">"expired / deleted links?"</span><span class="then">TTL column + lazy delete on read</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-urlshort-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design bit.ly start to finish — 25-minute timer, full six-step script, out loud</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-urlshort-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Add per-link click analytics (total + by day) without adding latency to redirects</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEED -->
+<section class="topic" id="feed">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 13:45 · 90 min</span><span class="chip">classic #2 — the fan-out problem</span></div>
+      <h3>Classic: news feed</h3>
+      <p class="tagline">"Design Twitter/Instagram." One real question hides inside: when someone posts, who does the work — the writer, or every reader? That decision is the interview.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Precompute-vs-compute-on-request is a call you've made before: SSG vs SSR. Fan-out on write <b>is</b> static generation (build the feed ahead of time); fan-out on read <b>is</b> server rendering (assemble on request). Same instinct, new noun.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Fan-out on write (push):</b> when Alice posts, push the post id into a cached feed list for each follower. Posting costs O(followers); <b>reading is one Redis read</b> — perfect for read-heavy social apps.</li>
+        <li><b>The celebrity problem:</b> 100M followers × one tweet = 100M writes. Fan-out on write dies exactly here — and every interviewer steers you into it on purpose.</li>
+        <li><b>The hybrid</b> (the expected answer): normal users fan out on write; celebrities don't — their posts are <b>merged in at read time</b> from a small "celebrity posts" cache. Reads do a k-way merge of (my precomputed feed) + (posts from the few celebrities I follow) — the exact merge-k-sorted-lists pattern from <a href="./index.html#heaps">DSA heaps</a>.</li>
+        <li><b>Feed storage:</b> a capped list of post <i>ids</i> per user in Redis (ids only — hydrate post bodies from a post cache). A few hundred ids × 8 bytes × millions of users fits in memory fine — say the math.</li>
+        <li><b>Do the fan-out on a queue</b> — posting must return in ms; pushing to a million follower lists happens in workers. A feed being seconds stale is invisible (AP, eventual — yesterday's vocabulary).</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">fanout.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// Fan-out on write — runs in queue workers, not in the POST handler
+async function fanOut(post) {
+  if (await isCelebrity(post.authorId)) return;   // celebrities skip fan-out
+
+  const followers = await getFollowerIds(post.authorId);
+  for (const chunk of chunks(followers, 1000)) {
+    await Promise.all(chunk.map(f =>
+      redis.lpush(`feed:${f}`, post.id)           // feed = capped list of IDs
+        .then(() => redis.ltrim(`feed:${f}`, 0, 799))));
+  }
+}
+
+// Read path: one list read + merge in celebrity posts + hydrate
+// GET /feed  →  ids = LRANGE feed:{me}  +  recent posts of followed celebrities
+//            →  k-way merge by timestamp → MGET post bodies → return</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// the follow-ups they will ask</p>
+      <ul>
+        <li><span class="cue">"what happens when a celebrity posts?"</span><span class="then">the hybrid — merge at read</span></li>
+        <li><span class="cue">"how fresh must the feed be?"</span><span class="then">eventual — seconds stale is fine</span></li>
+        <li><span class="cue">"user follows someone new — old posts?"</span><span class="then">backfill at read, don't rewrite history</span></li>
+        <li><span class="cue">"ranking, not chronological?"</span><span class="then">same plumbing — score at merge time</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-feed-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design the Twitter home timeline with the hybrid fan-out — 35-minute timer, full script</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-feed-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design unread notification counts for 100M users (the badge number) — where does the count live?</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section class="topic" id="chat">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 15:15 · 90 min</span><span class="chip">classic #3 — real-time + state</span></div>
+      <h3>Classic: chat</h3>
+      <p class="tagline">"Design WhatsApp." The twist vs everything so far: servers hold live connections, which means state, which means routing messages to the right box.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>If you've run socket.io with the Redis adapter, you have <b>built this system</b>: sockets pinned to instances, pub/sub carrying events between them, rooms as channels. The interview version just adds persistence and delivery guarantees.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>WebSockets, not polling</b> — chat needs server-push. A socket is a long-lived TCP connection pinned to one server, so the chat tier is <b>stateful</b>: the design problem is "which server holds Bob's socket?"</li>
+        <li><b>The shape:</b> chat servers hold sockets; a <b>session registry</b> (Redis: userId → serverId) tracks who's where; servers talk to each other over <b>pub/sub</b>. A → server-1 → publish to Bob's channel → server-7 (holding Bob's socket) → B.</li>
+        <li><b>Persist first, then deliver.</b> Write the message to the DB before pushing it — sockets drop; the DB is the source of truth. Offline? No socket anywhere → push notification + deliver on reconnect from the store.</li>
+        <li><b>Delivery states</b> = ✓ sent (server persisted) ✓✓ delivered (device acked) ✓✓ blue (read receipt). Each tick is just an ack event flowing back the same path. Message <b>ordering</b>: per-conversation sequence numbers — global ordering doesn't exist and nobody needs it.</li>
+        <li><b>Group chat</b> = fan-out again (yesterday's pattern, smaller): one message → lookup members → route to each member's server. <b>Presence</b> ("online 2m ago") = heartbeats updating a TTL'd Redis key — don't broadcast every flicker; batch it.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">chat-topology.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext">phone A ──ws── chat-server-1 ──┐
+                               ├── pub/sub bus ──── chat-server-7 ──ws── phone B
+   1. A sends {convoId, text}  │
+   2. persist to DB (seq, ts)  │        registry (Redis):
+   3. publish to convo channel ┘        userId → which server holds the socket
+
+B offline?  no socket registered → push notification (APNs/FCM)
+            on reconnect: pull everything after last-seen seq from the DB</code></pre>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// the follow-ups they will ask</p>
+      <ul>
+        <li><span class="cue">"how does a message cross servers?"</span><span class="then">registry + pub/sub between them</span></li>
+        <li><span class="cue">"phone dies mid-send?"</span><span class="then">persist-first + resend by seq on reconnect</span></li>
+        <li><span class="cue">"how do read receipts work?"</span><span class="then">acks flowing the reverse path</span></li>
+        <li><span class="cue">"1M-member group?"</span><span class="then">that's a broadcast/feed, not a chat — say so</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-chat-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design WhatsApp 1:1 with sent/delivered/read states — 35-minute timer, full script</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-chat-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Add presence ("online / last seen 2m ago") for 50M concurrent users without melting anything</span></label><span class="diff h">STRETCH</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="sd-chat-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Add typing indicators — then explain why they need none of the reliability machinery messages do</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYBOOK -->
+<section class="section" id="playbook">
+  <p class="section-eyebrow">// reference · run this script in every interview</p>
+  <h2>The interview playbook</h2>
+  <p class="sub">The meta-algorithm for the room. System design grades judgment, not memory — a modest design defended with clear tradeoffs beats an exotic one you can't justify.</p>
+  <div class="steps">
+    <div class="step"><div><h5>Scope ruthlessly</h5><p>Restate the prompt as three features and say what you're cutting. "I'll do messages, delivery states, and presence — no group calls." Cutting scope is a skill being graded, not a dodge.</p></div></div>
+    <div class="step"><div><h5>Numbers before boxes</h5><p>DAU → RPS → storage → read/write ratio, rounded hard, out loud. Ninety seconds that decide cache-vs-not, shard-vs-not, queue-vs-not.</p></div></div>
+    <div class="step"><div><h5>API + data model, briefly</h5><p>Core endpoints and core entities on the board. It forces clear thinking and gives the interviewer hooks to steer with. Don't gold-plate it.</p></div></div>
+    <div class="step"><div><h5>Draw the boring baseline</h5><p>Client → LB → stateless app tier → cache → DB, queue off the side. Every system starts here; drawing it fast signals fluency and buys deep-dive time.</p></div></div>
+    <div class="step"><div><h5>Scale by bottleneck, not buzzword</h5><p>Point at the component that breaks first at your numbers and fix that. "At 4k reads/sec the DB is the bottleneck, so…" — never add Kafka because it sounds impressive.</p></div></div>
+    <div class="step"><div><h5>Go deep where they point</h5><p>The interviewer's nudge marks the graded section. Follow it even if you'd planned otherwise — depth on their topic beats breadth on yours.</p></div></div>
+    <div class="step"><div><h5>Close with failure modes</h5><p>Walk the diagram asking "what dies, and what happens?" Then name what you'd do next with more time. This is the strongest possible ending — never make them ask.</p></div></div>
+  </div>
+
+  <div style="margin-top:40px">
+    <p class="mini-label">// sentences that earn points — each one, said naturally, is a signal</p>
+    <div class="rules">
+      <div class="rule"><h5>"that's a read-heavy workload"</h5><p>Names the ratio before choosing components. The single fastest way to sound like you've done this before.</p></div>
+      <div class="rule"><h5>"this is a single point of failure"</h5><p>Say it about your own diagram, unprompted — then fix it. Self-critique reads as seniority.</p></div>
+      <div class="rule"><h5>"the cache needs an invalidation story"</h5><p>Anyone can add Redis. Naming TTL + invalidation before being asked is what separates the answer.</p></div>
+      <div class="rule"><h5>"at-least-once, so this must be idempotent"</h5><p>The queue sentence. It preempts the #1 follow-up and shows you've been paged for the alternative.</p></div>
+      <div class="rule"><h5>"I'd scale up before scaling out"</h5><p>Vertical first is the experienced move. Distributed systems are a cost you pay, not a badge you earn.</p></div>
+      <div class="rule"><h5>"the shard key decides everything"</h5><p>If sharding comes up, this sentence + a hot-key example is the whole conversation.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PATTERNS -->
+<section class="section" id="patterns">
+  <p class="section-eyebrow">// reference · the 10-second index</p>
+  <h2>Component picker</h2>
+  <p class="sub">When a phrase on the left shows up in the prompt (or in your own requirements list), reach for the component on the right — and say the mapping out loud before you draw it.</p>
+  <div class="tbl-wrap" style="margin-top:26px"><table class="tbl">
+    <thead><tr><th>when the requirement says…</th><th>reach for</th><th>drilled in</th></tr></thead>
+    <tbody>
+      <tr><td>"users worldwide", "static assets slow"</td><td class="mono">CDN</td><td class="mono"><a href="#journey">journey</a></td></tr>
+      <tr><td>"one server can't handle it", "no-downtime deploys"</td><td class="mono">LB + stateless instances</td><td class="mono"><a href="#journey">journey</a></td></tr>
+      <tr><td>"same data read over and over"</td><td class="mono">cache-aside + TTL</td><td class="mono"><a href="#cache">cache</a></td></tr>
+      <tr><td>"reads vastly outnumber writes"</td><td class="mono">cache, then read replicas</td><td class="mono"><a href="#data">data</a></td></tr>
+      <tr><td>"query slow as the table grows"</td><td class="mono">index (check the plan first)</td><td class="mono"><a href="#data">data</a></td></tr>
+      <tr><td>"data won't fit / writes overwhelm one DB"</td><td class="mono">sharding — defend the key</td><td class="mono"><a href="#scale">scale</a></td></tr>
+      <tr><td>"don't make the user wait for slow work"</td><td class="mono">queue + workers</td><td class="mono"><a href="#async">async</a></td></tr>
+      <tr><td>"spiky traffic", "protect a fragile downstream"</td><td class="mono">queue + rate limiter</td><td class="mono"><a href="#async">async</a>·<a href="#apis">apis</a></td></tr>
+      <tr><td>"retries might double-charge"</td><td class="mono">idempotency keys</td><td class="mono"><a href="#apis">apis</a></td></tr>
+      <tr><td>"instant updates in the browser"</td><td class="mono">WebSockets + pub/sub</td><td class="mono"><a href="#chat">chat</a></td></tr>
+      <tr><td>"followers see new posts"</td><td class="mono">fan-out on write + celebrity hybrid</td><td class="mono"><a href="#feed">feed</a></td></tr>
+      <tr><td>"images / video / files"</td><td class="mono">object storage + CDN — never the DB</td><td class="mono"><a href="#journey">journey</a></td></tr>
+      <tr><td>"must be exactly right" vs "must be fast"</td><td class="mono">CP vs AP — sort per feature</td><td class="mono"><a href="#tradeoffs">tradeoffs</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <div style="margin-top:34px">
+    <p class="mini-label">// the latency ladder — rounded, memorize the exponents</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>operation</th><th>time</th><th>remember</th></tr></thead>
+      <tbody>
+        <tr><td>read from memory</td><td class="mono">~100 ns</td><td>the baseline — effectively free</td></tr>
+        <tr><td>SSD random read</td><td class="mono">~100 µs</td><td>1,000× memory</td></tr>
+        <tr><td>same-region network hop (Redis GET)</td><td class="mono">~0.5–1 ms</td><td>10,000× memory — why N+1 queries kill</td></tr>
+        <tr><td>indexed DB read</td><td class="mono">~1–10 ms</td><td>fine; a handful per request adds up</td></tr>
+        <tr><td>DB read without an index</td><td class="mono">10 ms – 10 s</td><td>grows with the table — the silent killer</td></tr>
+        <tr><td>cross-continent round trip</td><td class="mono">~100–150 ms</td><td>physics — only a CDN/edge beats it</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// capacity cheats — enough to estimate anything</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>fact</th><th>use it for</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">1M requests/day ≈ 12 RPS</td><td>collapsing scary numbers (day ≈ 10⁵ seconds)</td></tr>
+        <tr><td class="mono">peak ≈ 2–5× average</td><td>sizing for the worst hour, not the average one</td></tr>
+        <tr><td class="mono">1B rows × 1 KB = 1 TB</td><td>"does this fit on one machine?" (usually: yes)</td></tr>
+        <tr><td class="mono">one good server ≈ thousands of RPS</td><td>resisting premature distribution</td></tr>
+        <tr><td class="mono">Redis ≈ 100k+ ops/sec/node</td><td>why the cache is almost never the bottleneck</td></tr>
+        <tr><td class="mono">99.9% = 8.7 h/yr · 99.99% = 52 min/yr</td><td>pricing a nine before promising it</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- SAFE TO SKIP -->
+<section class="section" id="skip">
+  <p class="section-eyebrow">// reference · scope control</p>
+  <h2>Safe to skip (this weekend)</h2>
+  <p class="sub">Real topics, wrong weekend. Know the name and one honest sentence each — enough to stay composed and redirect if one appears.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Consensus protocols (Paxos, Raft)</b> — "they keep replicas agreed on who's leader; I'd use a battle-tested store (etcd/ZooKeeper) rather than implement one."</li>
+      <li><b>Dynamo internals</b> (vector clocks, Merkle trees, gossip, hinted handoff) — the machinery inside AP databases. Name-drop only if asked how Cassandra works.</li>
+      <li><b>Kafka internals</b> (partitions, ISR, consumer rebalancing) — "a distributed, replayable append-only log" is the whole sentence you need.</li>
+      <li><b>Kubernetes internals</b> — "schedules containers across machines and restarts what dies." Interviewers want your architecture, not your YAML.</li>
+      <li><b>Geo-distributed writes / multi-leader conflicts</b> — CRDTs, last-write-wins. Genuinely hard; punt gracefully: "single write region first, multi-region reads via replicas."</li>
+      <li><b>Exotic estimation</b> — memorizing beyond the latency ladder. Six numbers and confident rounding beat a memorized table every time.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Reading is not designing.</b> Draw every drill on paper, talk while you draw, run the timers. Do the two days, then one 35-minute mock a day until the onsite.</p>
+  <p>part of the <a href="./index.html">in-48 series</a> · <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br><b>good luck — you've been running this system all along.</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var K_PROGRESS = 'sd48:progress';
+  var K_COLLAPSED = 'sd48:collapsed';
+  var K_THEME = 'sd48:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    // syntax highlighting (deferred CDN script has already run at this point)
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- collapse toggles (persisted) ---------- */
+    var collapsed = load(K_COLLAPSED, []);
+    if (!Array.isArray(collapsed)) collapsed = [];
+    $('.topic').forEach(function (topic) {
+      if (collapsed.indexOf(topic.id) !== -1) {
+        topic.classList.add('collapsed');
+        var b = topic.querySelector('.toggle');
+        if (b) { b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', 'Expand section'); }
+      }
+    });
+    $('.toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var topic = btn.closest('.topic');
+        var isCollapsed = topic.classList.toggle('collapsed');
+        btn.setAttribute('aria-expanded', String(!isCollapsed));
+        btn.setAttribute('aria-label', isCollapsed ? 'Expand section' : 'Collapse section');
+        var i = collapsed.indexOf(topic.id);
+        if (isCollapsed && i === -1) collapsed.push(topic.id);
+        if (!isCollapsed && i !== -1) collapsed.splice(i, 1);
+        save(K_COLLAPSED, collapsed);
+      });
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- problem progress (persisted) ---------- */
+    var boxes = $('.prob input[type="checkbox"]');
+    var progress = load(K_PROGRESS, {});
+    if (!progress || typeof progress !== 'object') progress = {};
+    boxes.forEach(function (b) { if (progress[b.getAttribute('data-key')]) b.checked = true; });
+
+    function updateProgress() {
+      [1, 2].forEach(function (d) {
+        var group = boxes.filter(function (b) { return b.getAttribute('data-day') === String(d); });
+        var doneCount = group.filter(function (b) { return b.checked; }).length;
+        var countEl = document.getElementById('p' + d + '-count');
+        var barEl = document.getElementById('p' + d + '-bar');
+        if (countEl) countEl.textContent = doneCount + '/' + group.length;
+        if (barEl) barEl.style.width = (group.length ? (doneCount / group.length) * 100 : 0) + '%';
+      });
+    }
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        var key = b.getAttribute('data-key');
+        if (b.checked) progress[key] = 1; else delete progress[key];
+        save(K_PROGRESS, progress);
+        updateProgress();
+      });
+    });
+    updateProgress();
+
+    var resetBtn = document.getElementById('reset-progress');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!window.confirm('Clear all solved-problem checkmarks?')) return;
+        boxes.forEach(function (b) { b.checked = false; });
+        progress = {};
+        save(K_PROGRESS, progress);
+        updateProgress();
+      });
+    }
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+
+    /* ---------- print: expand everything, then put it back ---------- */
+    var printState = null;
+    window.addEventListener('beforeprint', function () {
+      printState = {
+        topics: $('.topic.collapsed'),
+        quizzes: $('.quiz:not([open])')
+      };
+      printState.topics.forEach(function (t) { t.classList.remove('collapsed'); });
+      printState.quizzes.forEach(function (q) { q.open = true; });
+    });
+    window.addEventListener('afterprint', function () {
+      if (!printState) return;
+      printState.topics.forEach(function (t) { t.classList.add('collapsed'); });
+      printState.quizzes.forEach(function (q) { q.open = false; });
+      printState = null;
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
