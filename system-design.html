@@ -587,7 +587,8 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <nav class="side-group" aria-label="Series">
     <h4>// in this series</h4>
-    <a class="side-link" href="./index.html"><span>DSA in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./dsa.html"><span>DSA in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./index.html"><span>All courses</span><span class="t">↑</span></a>
   </nav>
 
   <div class="progress-wrap">
@@ -876,7 +877,7 @@ db.orders.createIndex({ userId: 1, createdAt: -1 })
         <li><b>Always say the TTL out loud.</b> "Cached for 5 minutes" is a product decision disguised as an infra decision — it states how stale you're willing to be.</li>
         <li><b>What to cache:</b> read-heavy + rarely-changing + expensive to compute. Profile pages, product listings, rendered feeds. Never cache what must be exact (balances, stock counts).</li>
         <li><b>Thundering herd:</b> a hot key expires and 10k requests hit the DB at once. Fixes: per-key lock ("one flight refills, the rest wait"), staggered TTLs, or serving stale while refreshing. Naming this unprompted is a strong-signal moment.</li>
-        <li>Eviction: memory fills → something must go → <b>LRU</b> by default. (You built exactly this in <a href="./index.html#lists">DSA — LRU Cache</a>. It was Redis all along.)</li>
+        <li>Eviction: memory fills → something must go → <b>LRU</b> by default. (You built exactly this in <a href="./dsa.html#lists">DSA — LRU Cache</a>. It was Redis all along.)</li>
       </ul>
     </div>
     <div class="code">
@@ -1297,7 +1298,7 @@ encode(125_500_299_003);  // "29zoWFK" — your short code
       <ul>
         <li><b>Fan-out on write (push):</b> when Alice posts, push the post id into a cached feed list for each follower. Posting costs O(followers); <b>reading is one Redis read</b> — perfect for read-heavy social apps.</li>
         <li><b>The celebrity problem:</b> 100M followers × one tweet = 100M writes. Fan-out on write dies exactly here — and every interviewer steers you into it on purpose.</li>
-        <li><b>The hybrid</b> (the expected answer): normal users fan out on write; celebrities don't — their posts are <b>merged in at read time</b> from a small "celebrity posts" cache. Reads do a k-way merge of (my precomputed feed) + (posts from the few celebrities I follow) — the exact merge-k-sorted-lists pattern from <a href="./index.html#heaps">DSA heaps</a>.</li>
+        <li><b>The hybrid</b> (the expected answer): normal users fan out on write; celebrities don't — their posts are <b>merged in at read time</b> from a small "celebrity posts" cache. Reads do a k-way merge of (my precomputed feed) + (posts from the few celebrities I follow) — the exact merge-k-sorted-lists pattern from <a href="./dsa.html#heaps">DSA heaps</a>.</li>
         <li><b>Feed storage:</b> a capped list of post <i>ids</i> per user in Redis (ids only — hydrate post bodies from a post cache). A few hundred ids × 8 bytes × millions of users fits in memory fine — say the math.</li>
         <li><b>Do the fan-out on a queue</b> — posting must return in ms; pushing to a million follower lists happens in workers. A feed being seconds stale is invisible (AP, eventual — yesterday's vocabulary).</li>
       </ul>

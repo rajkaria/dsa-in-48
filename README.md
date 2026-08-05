@@ -4,10 +4,13 @@
 self-contained HTML file: no build, no dependencies to install, no CS degree assumed. Open
 it, work through it, walk into the interview.
 
+**Start here:** [dsa-in-48.vercel.app](https://dsa-in-48.vercel.app/) — the series landing page, which
+routes you to whichever course you need (and to every future one).
+
 | course | what it covers | read it |
 |---|---|---|
-| **DSA in 48** | 13 data-structure & algorithm topics, 48 link-verified LeetCode problems, interview playbook, pattern matcher | [dsa-in-48.vercel.app](https://dsa-in-48.vercel.app/) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/) |
-| **System Design in 48** | 12 system-design topics, 32 whiteboard drills, the 6-step interview framework, 3 classic designs (URL shortener · feed · chat) | [dsa-in-48.vercel.app/system-design](https://dsa-in-48.vercel.app/system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
+| **DSA in 48** | 13 data-structure & algorithm topics, 48 link-verified LeetCode problems, interview playbook, pattern matcher | [/dsa](https://dsa-in-48.vercel.app/dsa) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/dsa.html) |
+| **System Design in 48** | 12 system-design topics, 32 whiteboard drills, the 6-step interview framework, 3 classic designs (URL shortener · feed · chat) | [/system-design](https://dsa-in-48.vercel.app/system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
 
 ---
 
@@ -48,6 +51,8 @@ Single self-contained files — just open them:
 open index.html
 ```
 
+`index.html` is the landing page; `dsa.html` and `system-design.html` are the courses.
+
 Or serve the folder:
 
 ```bash
@@ -59,8 +64,8 @@ gracefully to system fonts when offline.
 
 ## Deploys
 
-- **Vercel** — auto-deploys from `main` (config in `vercel.json`, clean URLs so
-  `/system-design` works without the `.html`).
+- **Vercel** — config in `vercel.json`, clean URLs so `/dsa` and `/system-design` work
+  without the `.html`.
 - **GitHub Pages** — serves the same files from `main` at
   [rajkaria.github.io/dsa-in-48](https://rajkaria.github.io/dsa-in-48/).
 
