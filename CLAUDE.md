@@ -41,6 +41,7 @@ pages' footers and the README.
 | doc | covers |
 |---|---|
 | [`docs/context/fullstack-course.md`](./docs/context/fullstack-course.md) | Full-Stack in 48 (`fullstack.html`) + its landing-page wiring — state, decisions, next steps |
+| [`docs/context/learn-track.md`](./docs/context/learn-track.md) | The Learn track (`learn/`), Frontend SD in 48, verify harness, module templates — state, conventions, deploy status |
 
 ## Hard rules
 
