@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL &amp; Data — Learn track · in 48</title>
+<meta name="description" content="SQL from zero with predict-the-result quizzes, data modeling without dogma, joins that finally click, indexes and EXPLAIN, transactions and isolation, the N+1 story, and scaling — with a runnable join simulator. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PostgreSQL &amp; Data — Learn track · in 48">
+<meta property="og:description" content="SQL from zero with predict-the-result quizzes, data modeling without dogma, joins that finally click, indexes and EXPLAIN, transactions and isolation, the N+1 story, and scaling — with a runnable join simulator. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PostgreSQL &amp; Data — Learn track · in 48">
+<meta name="twitter:description" content="SQL from zero with predict-the-result quizzes, data modeling without dogma, joins that finally click, indexes and EXPLAIN, transactions and isolation, the N+1 story, and scaling — with a runnable join simulator. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23818CF8'%3EPG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#818CF8;
+  --mark-deep:#4F46E5;
+  --mark-soft:rgba(129,140,248,.16);
+  --on-mark:#141B22;
+  --on-ink:#818CF8;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#A5B4FC;
+  --mark-soft:rgba(129,140,248,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#A5B4FC;
+  --mark-soft:rgba(129,140,248,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(129,140,248,0) 0%, rgba(129,140,248,.95) 6%, rgba(129,140,248,.8) 94%, rgba(129,140,248,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(129,140,248,0) 0%, rgba(129,140,248,.95) 5%, rgba(129,140,248,.78) 95%, rgba(129,140,248,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(129,140,248,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(129,140,248,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(129,140,248,0) 0%, rgba(129,140,248,.9) 6%, rgba(129,140,248,.7) 94%, rgba(129,140,248,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· postgres</em></div>
+      <div class="brand-sub">module 09 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#sql"><span><i class="dot" data-for="sql"></i> SQL From Zero</span></a>
+    <a class="side-link" href="#modeling"><span><i class="dot" data-for="modeling"></i> Modeling Data</span></a>
+    <a class="side-link" href="#joins"><span><i class="dot" data-for="joins"></i> Joins, Finally Clear</span></a>
+    <a class="side-link" href="#indexes"><span><i class="dot" data-for="indexes"></i> Indexes &amp; EXPLAIN</span></a>
+    <a class="side-link" href="#transactions"><span><i class="dot" data-for="transactions"></i> Transactions</span></a>
+    <a class="side-link" href="#nplus1"><span><i class="dot" data-for="nplus1"></i> The N+1 Story</span></a>
+    <a class="side-link" href="#scale"><span><i class="dot" data-for="scale"></i> Scaling Postgres</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./node-backend.html"><span>Node &amp; Backend</span><span class="t">←</span></a>
+    <a class="side-link" href="../fullstack.html"><span>Full-Stack in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 09 <b>the system of record, understood</b></p>
+  <h1>Postgres, from <span class="hl hl-anim" data-d="0">SELECT</span> to <span class="hl hl-anim" data-d="1">scale</span>.</h1>
+  <p class="lede">The database is where your app's truth lives — and where its slowest queries hide. This module goes SQL-from-zero to production judgment: modeling without dogma, joins you can finally <i>see</i> (there's a runnable join engine on this page), why indexes turn seconds into milliseconds, what transactions actually promise, and the N+1 that every ORM quietly manufactures.</p>
+  <p class="lede">Everything runs here — including a tiny in-page SQL engine over the cat café's tables, so you can watch each concept execute. Prerequisite: none. This one truly starts at zero. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what's a table?"</span>
+    <span class="level-chip i">middle: joins &amp; indexes, visible</span>
+    <span class="level-chip a">ends at: isolation levels &amp; scaling</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>7</b> quiz questions</span>
+    <span><b>5</b> runnable panels</span>
+    <span><b>~4h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#sql">Start at SELECT <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · SQL -->
+<section class="lesson" id="sql">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>SQL from zero — describe the result, not the steps</h3>
+      <p class="lvl">beginner → the reading order that makes queries obvious</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A table is a spreadsheet with rules: named, typed columns; one row per fact. SQL is <b>declarative</b> — you describe the result you want and the database plans how to get it. The unlock for reading any query is knowing the <b>execution order</b>, which is NOT the writing order: <code>FROM</code> (get the table) → <code>WHERE</code> (filter rows) → <code>GROUP BY</code> (bundle them) → <code>HAVING</code> (filter bundles) → <code>SELECT</code> (pick columns) → <code>ORDER BY</code> → <code>LIMIT</code>. Read in that order and every confusing query straightens out — including why you can't use a SELECT alias inside WHERE.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">first-queries.sql.js — run it (in-page engine)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// the café's cats table — and a tiny engine that runs real clauses
+const cats = [
+  { id: 1, name: 'Mochi',   age: 4, breed: 'tabby',   visits: 31 },
+  { id: 2, name: 'Biscuit', age: 7, breed: 'persian', visits: 12 },
+  { id: 3, name: 'Clawdia', age: 2, breed: 'tabby',   visits: 44 },
+  { id: 4, name: 'Tuft',    age: 5, breed: 'maine',   visits: 8  },
+  { id: 5, name: 'Ziggy',   age: 1, breed: 'tabby',   visits: 27 },
+];
+const q = (rows) =&gt; ({
+  where(f)   { return q(rows.filter(f)); },                 // WHERE
+  orderBy(k, dir = 'asc') {
+    return q([...rows].sort((a, b) =&gt;
+      dir === 'asc' ? a[k] - b[k] : b[k] - a[k])); },       // ORDER BY
+  limit(n)   { return q(rows.slice(0, n)); },               // LIMIT
+  select(...cols) {                                          // SELECT
+    return rows.map(r =&gt; Object.fromEntries(cols.map(c =&gt; [c, r[c]]))); },
+  groupBy(k, aggs) {                                         // GROUP BY
+    const groups = new Map();
+    rows.forEach(r =&gt; (groups.get(r[k]) ?? groups.set(r[k], []).get(r[k])).push(r));
+    return [...groups].map(([key, rs]) =&gt; ({ [k]: key,
+      ...Object.fromEntries(Object.entries(aggs).map(([name, f]) =&gt; [name, f(rs)])) }));
+  },
+});
+
+// SELECT name, visits FROM cats WHERE age > 2 ORDER BY visits DESC LIMIT 2
+console.log(q(cats).where(c =&gt; c.age &gt; 2).orderBy('visits', 'desc')
+  .limit(2).select('name', 'visits'));
+
+// SELECT breed, COUNT(*), AVG(age) FROM cats GROUP BY breed
+console.log(q(cats).groupBy('breed', {
+  count: rs =&gt; rs.length,
+  avgAge: rs =&gt; +(rs.reduce((s, r) =&gt; s + r.age, 0) / rs.length).toFixed(1),
+}));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">each method IS its clause — the pipeline is the execution order</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-sql-1">
+      <p class="mcq-tag">// quiz — predict the result</p>
+      <p class="mcq-q"><code>SELECT breed, COUNT(*) FROM cats WHERE age &gt; 1 GROUP BY breed HAVING COUNT(*) &gt; 1;</code> — with the table above, what comes back?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">All four breeds with their counts</button>
+        <button class="mcq-opt" type="button" data-ok>One row: tabby, 2 — WHERE drops Ziggy (age 1) first, then only tabby's group (Mochi + Clawdia) survives HAVING</button>
+        <button class="mcq-opt" type="button">tabby 3 — HAVING can't see the WHERE filter</button>
+        <button class="mcq-opt" type="button">Error — you can't use COUNT in HAVING</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> execution order: WHERE filters ROWS before grouping (Ziggy the 1-year-old tabby is gone), GROUP BY bundles what's left (tabby×2, persian×1, maine×1), HAVING filters GROUPS (only tabby ≥ 2). "WHERE is for rows, HAVING is for groups" — the one-liner that answers a whole category of screen questions.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>NULL is "unknown", not zero or empty: <code>NULL = NULL</code> is NULL (not true!), so it's <code>IS NULL</code>, and aggregate functions skip NULLs. Three-valued logic bites everyone once.</li>
+        <li><code>COUNT(*)</code> counts rows; <code>COUNT(col)</code> counts non-null values; <code>COUNT(DISTINCT col)</code> counts distinct — a favorite rapid-fire triplet.</li>
+        <li>Window functions in one sentence for now: aggregates that DON'T collapse rows (<code>ROW_NUMBER() OVER (PARTITION BY …)</code>) — the "latest order per user" tool; the drills live in <a href="../fullstack.html#sql">Full-Stack in 48 · PostgreSQL</a>.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · MODELING -->
+<section class="lesson" id="modeling">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Modeling data — each fact lives in exactly one place</h3>
+      <p class="lvl">beginner → keys, relationships, and pragmatic normalization</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Modeling is deciding what your tables ARE. The compass: <b>every fact stored once, referenced everywhere else.</b> A cat's name lives in <code>cats</code>; the adoption references <code>cat_id</code> — never a copied name that can drift. That's normalization's entire spirit; the numbered normal forms are just increasingly formal ways of saying it.</p>
+    <p>Relationships come in three shapes, and picking the shape IS the modeling: <b>one-to-many</b> (a cat has many vet visits → <code>visits.cat_id</code> foreign key), <b>many-to-many</b> (cats ↔ adopters both sides can have many → a <b>junction table</b> <code>adoptions(cat_id, adopter_id, date)</code> — which conveniently also holds facts about the relationship itself), <b>one-to-one</b> (rare; usually a column, split only for security or width). Foreign keys aren't decoration — the database <i>enforces</i> them: no adoption of cat 999 that doesn't exist, no deleting a cat that has records (unless you chose CASCADE deliberately).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The shelter once wrote each cat's name on every form she ever touched. Mochi got renamed ("Mochi II, Destroyer of Couches") and <b>eleven forms disagreed about who she was</b>. New policy: every cat has ONE card in ONE drawer (her row); every form cites her card number (foreign key). Rename her once, every form is instantly right — because none of them ever held her name, just her number.</p>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">schema.sql — the adoption center, modeled</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-sql">CREATE TABLE cats (
+  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name       text NOT NULL,
+  breed      text,
+  born_on    date,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE adopters (
+  id    bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email text NOT NULL UNIQUE,          -- the referee from node-backend §07!
+  name  text NOT NULL
+);
+
+-- many-to-many, with facts ABOUT the relationship on the junction row
+CREATE TABLE adoptions (
+  cat_id     bigint NOT NULL REFERENCES cats(id),
+  adopter_id bigint NOT NULL REFERENCES adopters(id),
+  adopted_on date NOT NULL DEFAULT CURRENT_DATE,
+  fee_paise  integer NOT NULL CHECK (fee_paise &gt;= 0),  -- money = integers!
+  PRIMARY KEY (cat_id, adopter_id)
+);
+
+-- one-to-many: visits point at their cat
+CREATE TABLE vet_visits (
+  id      bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  cat_id  bigint NOT NULL REFERENCES cats(id) ON DELETE CASCADE,
+  note    text,
+  at      timestamptz NOT NULL DEFAULT now()
+);</code></pre>
+    </div>
+    <div class="mcq" data-qid="pg-model-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Orders show the price at purchase time. Product prices change. Where does the order's price live?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">In products only — join to get it; storing twice violates normalization</button>
+        <button class="mcq-opt" type="button" data-ok>COPIED onto the order row — the order records a historical fact ("what was paid"), not a reference to a living value. Deliberate denormalization because the truths are different</button>
+        <button class="mcq-opt" type="button">In a price-history table joined by date range</button>
+        <button class="mcq-opt" type="button">Recompute from an audit log when needed</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "each fact once" — but <i>the price today</i> and <i>the price you paid</i> are two different facts. Joining to the live price silently rewrites history the day marketing runs a sale. Price-history tables (option 3) are legitimate for analytics but overkill for the receipt. Knowing WHEN copying is correct — snapshot facts vs living references — is the modeling judgment interviews actually probe, way more than reciting normal forms.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Money in integer minor units (paise/cents) or <code>numeric</code> — never float (JS Fundamentals' 0.1+0.2 lives in databases too). Timestamps as <code>timestamptz</code>, stored UTC.</li>
+        <li>UUIDv7 externally / bigint internally is the modern id calibration (the fullstack course's Q&A has the full trade).</li>
+        <li>jsonb is Postgres's escape hatch for genuinely-flexible attributes — "columns for what you query and constrain, jsonb for the ragged edge" is the balanced take.</li>
+        <li>CHECK constraints and NOT NULL are free tests running on every write, forever — model rules into the schema, not just the app.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · JOINS -->
+<section class="lesson" id="joins">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Joins, finally clear — run the engine yourself</h3>
+      <p class="lvl">the concept everyone half-knows, made visible</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A join answers "for each row here, which rows there belong to it?" — reuniting the facts that normalization filed in separate drawers. <b>INNER JOIN</b>: only rows with a match on both sides. <b>LEFT JOIN</b>: every left row, matched or not — unmatched ones carry NULLs on the right side (and <code>WHERE right.id IS NULL</code> finds the loners: "cats never adopted" — the anti-join idiom). <b>RIGHT</b> is LEFT mirrored; <b>FULL</b> keeps both sides' loners.</p>
+    <p>Below, a join engine you can read in one breath — nested loops, exactly how databases <i>conceptually</i> start (they upgrade to hash joins when the tables grow: build a Map on the small table, probe with the big one — the DSA cubby wall, again).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">join-engine.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const cats = [
+  { id: 1, name: 'Mochi' }, { id: 2, name: 'Biscuit' },
+  { id: 3, name: 'Clawdia' }, { id: 4, name: 'Tuft' },
+];
+const adoptions = [
+  { cat_id: 1, adopter: 'Prachi', on: '2026-07-01' },
+  { cat_id: 3, adopter: 'Raj',    on: '2026-07-15' },
+  { cat_id: 1, adopter: 'Amy',    on: '2026-08-01' },  // Mochi, twice? scandal
+];
+
+function innerJoin(left, right, match) {
+  const out = [];
+  for (const l of left)
+    for (const r of right)              // nested loop join, honestly
+      if (match(l, r)) out.push({ ...l, ...r });
+  return out;
+}
+function leftJoin(left, right, match) {
+  const out = [];
+  for (const l of left) {
+    const matches = right.filter(r =&gt; match(l, r));
+    if (matches.length) matches.forEach(r =&gt; out.push({ ...l, ...r }));
+    else out.push({ ...l, adopter: null, on: null });   // kept, with NULLs
+  }
+  return out;
+}
+
+const on = (c, a) =&gt; c.id === a.cat_id;
+console.log('INNER (adopted cats only):');
+console.table ? console.log(innerJoin(cats, adoptions, on)) : null;
+console.log('LEFT (every cat, adopted or not):');
+console.log(leftJoin(cats, adoptions, on));
+console.log('anti-join — never adopted:',
+  leftJoin(cats, adoptions, on).filter(r =&gt; r.adopter === null).map(r =&gt; r.name));
+// note Mochi appears TWICE in the joins — one output row per match.
+// that row multiplication is also why joining then COUNTing needs care.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch Biscuit &amp; Tuft survive only the LEFT join — as NULL rows</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-join-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"List every cat with their adoption count, including never-adopted cats as 0" — which query shape?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">INNER JOIN + COUNT + GROUP BY — the unmatched get 0 automatically</button>
+        <button class="mcq-opt" type="button" data-ok>LEFT JOIN adoptions, GROUP BY cat, <code>COUNT(adoptions.cat_id)</code> — counting the RIGHT side's column so NULL rows count as 0, not 1</button>
+        <button class="mcq-opt" type="button">Two queries merged in JS — SQL can't express this</button>
+        <button class="mcq-opt" type="button">FULL OUTER JOIN with COALESCE on every column</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two traps in one question. INNER drops never-adopted cats entirely (no row, not zero). And after LEFT JOIN, <code>COUNT(*)</code> counts the NULL row as 1 — you must count a right-side column (<code>COUNT(a.cat_id)</code>), because COUNT(col) skips NULLs (§01's triplet paying off). This exact query — with this exact bug — appears in real screens constantly.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Join algorithms in a sentence each: nested loop (small × indexed), hash join (big × big equality), merge join (both pre-sorted). You never pick — the planner does — but naming them explains EXPLAIN output.</li>
+        <li>Row multiplication discipline: joining one-to-many then aggregating the "one" side's numbers double-counts — aggregate in a subquery/CTE first, then join. War-story material.</li>
+        <li>Self-joins (employees → managers) and the N-versus-1 shape of every "…with their latest X" query (window function or lateral join) — recognize, don't fear.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 4 · INDEXES -->
+<section class="lesson" id="indexes">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Indexes &amp; EXPLAIN — seconds into milliseconds</h3>
+      <p class="lvl">the highest-leverage performance skill in your stack</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Without an index, <code>WHERE email = ?</code> reads <b>every row</b> — a sequential scan, O(n) with disk I/O. An index is a <b>B-tree</b> (the BST from the DSA track, widened so each node fills a disk page — hundreds of keys per node, so a billion rows is ~4 hops) mapping column values → row locations. The same structure is why an index also accelerates <code>ORDER BY</code>, range scans, and (for a <b>composite index</b> on <code>(a, b)</code>) any query filtering on <code>a</code> or <code>a AND b</code> — but not <code>b</code> alone: it's a phone book sorted by last-then-first name, useless for finding all Rajs.</p>
+    <p>The price: every write updates every index on the table, and each one consumes cache. So: index your foreign keys and real query patterns; don't collect them. And the tool that ends guessing: <b><code>EXPLAIN ANALYZE</code></b> — it prints the plan (Seq Scan vs Index Scan, join algorithm, row estimates vs reality) and actual timings. The ritual: reproduce → EXPLAIN → look for Seq Scans on big tables and estimate-vs-actual gaps → index or rewrite → EXPLAIN again.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">index-vs-scan.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// feel the difference an index makes — 200k row "table"
+const N = 200_000;
+const emails = Array.from({ length: N }, (_, i) =&gt; `cat${i}@cafe.example`);
+const rows = emails.map((email, i) =&gt; ({ id: i, email, visits: i % 50 }));
+
+// sequential scan: check every row
+let t0 = performance.now();
+let found;
+for (const r of rows) if (r.email === 'cat173456@cafe.example') { found = r; break; }
+const scanMs = (performance.now() - t0).toFixed(2);
+
+// "CREATE INDEX ... ON (email)" — build the lookup structure once
+t0 = performance.now();
+const emailIndex = new Map(rows.map(r =&gt; [r.email, r]));   // stand-in for the B-tree
+const buildMs = (performance.now() - t0).toFixed(1);
+
+// indexed lookups: no scanning
+t0 = performance.now();
+for (let i = 0; i &lt; 1_000; i++) emailIndex.get('cat173456@cafe.example');
+const lookupMs = ((performance.now() - t0) / 1000).toFixed(4);
+
+console.log(`seq scan, one lookup:  ${scanMs}ms`);
+console.log(`build index once:      ${buildMs}ms   ← the write-side cost, paid upfront`);
+console.log(`indexed, per lookup:   ${lookupMs}ms  (×1000 runs)`);
+console.log('\\nEXPLAIN would say:  Seq Scan on cats  →  Index Scan using cats_email_idx');
+console.log('same idea at DB scale: milliseconds vs full-table disk reads');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the ratio is the lesson — and the build cost is the honest tax</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-idx-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">There's an index on <code>created_at</code>, but <code>WHERE DATE(created_at) = '2026-08-01'</code> still seq-scans. Why, and the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Date columns can't be indexed — use a text column</button>
+        <button class="mcq-opt" type="button" data-ok>Wrapping the column in a function hides it from the index — rewrite as a range (<code>created_at &gt;= '2026-08-01' AND &lt; '2026-08-02'</code>) or create an expression index on DATE(created_at)</button>
+        <button class="mcq-opt" type="button">The index needs REINDEX after enough writes</button>
+        <button class="mcq-opt" type="button">Postgres never uses indexes for equality on timestamps</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the B-tree is sorted by <code>created_at</code> — not by <code>DATE(created_at)</code>; the planner can't use an ordering it doesn't have, so any function/cast/concatenation on the indexed column ("non-sargable" predicates) forces a scan. The range rewrite is the everyday fix; expression indexes exist for the cases you can't rewrite. Spotting function-wrapped columns in slow queries is a genuinely bankable production skill.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Composite index order rule: equality columns first, then the range/sort column — <code>(status, created_at)</code> serves "open orders, newest first" perfectly.</li>
+        <li>Covering indexes (INCLUDE) let index-only scans skip the table entirely; partial indexes (<code>WHERE status = 'active'</code>) index just the hot slice — two power tools, one line each.</li>
+        <li>"Estimates way off from actuals in EXPLAIN → run ANALYZE (stale statistics)" — the DBA one-liner that sounds like ops experience because it is.</li>
+        <li>The drills: <a href="../fullstack.html#dbperf">Full-Stack in 48 · indexes &amp; N+1</a> has the rapid-fire versions of this whole section.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · TRANSACTIONS -->
+<section class="lesson" id="transactions">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Transactions — all of it or none of it</h3>
+      <p class="lvl">advanced → ACID, isolation levels, and the race you've already shipped</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A transaction wraps several statements into one <b>atomic</b> unit: <code>BEGIN … COMMIT</code>, and if anything fails, <code>ROLLBACK</code> — the fee is charged AND the adoption recorded, or neither. That's the A in ACID (with Consistency = constraints hold, Isolation = concurrent transactions don't trample, Durability = committed means on-disk).</p>
+    <p>Isolation is where interviews go: two transactions run at once — what can each see? <b>Read Committed</b> (Postgres default): you see only committed data, but two reads in one transaction can see different worlds (another commit landed between). <b>Repeatable Read</b>: your transaction sees one frozen snapshot. <b>Serializable</b>: as if transactions ran one at a time — Postgres aborts one on conflict, and <b>your code retries it</b>. The practical classic though is the <b>lost update</b>: two requests read balance 100, both add 10, both write 110 — one update vanished. Fixes: atomic writes (<code>SET balance = balance + 10</code> — let the DB do the math), <code>SELECT … FOR UPDATE</code> row locks, or optimistic version columns.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The treat jar holds 100. Two volunteers <b>both peek</b> (100), both compute "plus ten is 110", both write <b>110</b> on the label. Twenty treats went in; the label says ten did. Nobody was careless — the <i>read-think-write</i> shape itself is the bug. Fix one: don't peek — tell the jar "add ten yourself" (atomic update). Fix two: hold the jar while you work (row lock). Fix three: write "…if the label still says 100" (optimistic version check) and redo if not.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">lost-update.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// simulate the race: read-modify-write vs atomic
+const sleep = (ms) =&gt; new Promise(r =&gt; setTimeout(r, ms));
+
+async function raceWith(strategy) {
+  let balance = 100;                      // the treat jar
+  const addTen = async () =&gt; {
+    if (strategy === 'read-think-write') {
+      const seen = balance;               // both volunteers peek…
+      await sleep(50);                    // …think…
+      balance = seen + 10;                // …write. one update dies
+    } else {
+      await sleep(50);
+      balance = balance + 10;             // atomic at write time:
+    }                                     // read+add as ONE step (no stale copy)
+  };
+  await Promise.all([addTen(), addTen()]);
+  return balance;
+}
+console.log('read-think-write:', await raceWith('read-think-write'),
+            '← twenty went in, label says ten');
+console.log('atomic update:   ', await raceWith('atomic'),
+            '← SET balance = balance + 10');
+
+// the SQL, for your hands:
+// UPDATE jars SET treats = treats + 10 WHERE id = 1;        -- atomic
+// SELECT * FROM jars WHERE id = 1 FOR UPDATE;               -- pessimistic
+// UPDATE jars SET treats = 110, version = 2
+//   WHERE id = 1 AND version = 1;                          -- optimistic</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">110 vs 120 — the lost update, reproduced in 15 lines</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-tx-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Adopting the LAST adoptable cat: two requests arrive together, both must not succeed. Which fix is wrong?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>SELECT … FOR UPDATE</code> the cat row, check status, update — second transaction waits, sees 'adopted', fails cleanly</button>
+        <button class="mcq-opt" type="button"><code>UPDATE cats SET status='adopted' WHERE id=$1 AND status='adoptable'</code> — check rowcount; 0 rows = lost the race</button>
+        <button class="mcq-opt" type="button" data-ok>Check status in JS first, and only call UPDATE if it was 'adoptable' — the app-side guard prevents the double adoption</button>
+        <button class="mcq-opt" type="button">Serializable isolation + retry-on-abort around the whole operation</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> option 3 is the read-think-write shape with extra steps — both requests read 'adoptable' before either writes; the JS check changes nothing (same bug as the JS uniqueness pre-check in node-backend §07). The conditional UPDATE (option 2) is the elegant lock-free answer — the WHERE clause makes check-and-set one atomic statement, and the rowcount tells you who won. All three DB-side options work; the app-side guard alone never does. "The database is the only referee" — twice now, and it'll come up again.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Postgres is MVCC: readers don't block writers (each sees a snapshot) — that's WHY Read Committed behaves as it does, and why long transactions bloat tables (old versions can't be vacuumed).</li>
+        <li>Keep transactions short and never hold one across a network call to a third party — the deadlock/latency multiplier hiding in "just wrap it all".</li>
+        <li>Deadlocks: two transactions locking rows in opposite orders; Postgres detects and kills one — the fix is consistent lock ordering. One sentence, big credit.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · N+1 -->
+<section class="lesson" id="nplus1">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>The N+1 story — death by a thousand tiny queries</h3>
+      <p class="lvl">intermediate → the bug every ORM manufactures by default</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The shape: fetch 50 cats (1 query), then loop rendering each cat's adopter — and the ORM lazily fires <b>one query per cat</b> (N more). 51 round trips where 1–2 would do; page latency = N × (query time + network hop). It hides because each query is fast and the code reads innocently — <code>cat.adopter.name</code> looks like a property, costs a network call.</p>
+    <p>Fixes, in the order to say them: <b>JOIN</b> it in one query when shapes align; <b>batch</b> with <code>WHERE id IN (…)</code> then stitch in memory (two queries total — how DataLoader and every ORM's eager-loading work); and in your ORM, the explicit include/populate/eager syntax that turns lazy N+1 into batched loading. Detection: query logging in dev ("one page = 51 queries" jumps out), APM per-endpoint query counts in prod.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">fifty-one-queries.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a fake DB where every query costs a 5ms round trip
+let queryCount = 0;
+const db = {
+  async cats() { queryCount++; await new Promise(r =&gt; setTimeout(r, 5));
+    return Array.from({ length: 50 }, (_, i) =&gt; ({ id: i, adopterId: i % 7 })); },
+  async adopterById(id) { queryCount++; await new Promise(r =&gt; setTimeout(r, 5));
+    return { id, name: 'adopter-' + id }; },
+  async adoptersByIds(ids) { queryCount++; await new Promise(r =&gt; setTimeout(r, 5));
+    return ids.map(id =&gt; ({ id, name: 'adopter-' + id })); },
+};
+
+// the N+1 — innocent-looking loop
+queryCount = 0;
+let t0 = performance.now();
+const cats = await db.cats();
+for (const cat of cats) {
+  cat.adopter = await db.adopterById(cat.adopterId);   // ← one per cat!
+}
+console.log(`lazy loop:  ${queryCount} queries, ${(performance.now() - t0).toFixed(0)}ms`);
+
+// the batch fix — two queries, stitch in memory
+queryCount = 0;
+t0 = performance.now();
+const cats2 = await db.cats();
+const ids = [...new Set(cats2.map(c =&gt; c.adopterId))];
+const adopters = await db.adoptersByIds(ids);           // WHERE id IN (…)
+const byId = new Map(adopters.map(a =&gt; [a.id, a]));     // the cubby wall!
+cats2.forEach(c =&gt; c.adopter = byId.get(c.adopterId));
+console.log(`batched:    ${queryCount} queries, ${(performance.now() - t0).toFixed(0)}ms`);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">51 queries vs 2 — and the Map stitch is DSA Foundations again</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-n1-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">When is the JOIN fix WORSE than the two-query batch fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Never — one query always beats two</button>
+        <button class="mcq-opt" type="button" data-ok>When the parent rows are wide and each has many children — the join duplicates every parent's columns onto every child row, bloating the transfer; two slim queries + a Map stitch move less data</button>
+        <button class="mcq-opt" type="button">When the tables live in the same database</button>
+        <button class="mcq-opt" type="button">When there's no foreign key between them</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> join output = rows multiplied (§03's warning): 50 cats × 20 visits each with the cat's full row repeated 20 times = a megabyte of redundancy for kilobytes of facts. ORMs often choose two queries for exactly this reason. "Fewest round trips, least redundant data — those trade off and I'd measure" is the complete answer. Also worth one breath: sometimes the TRUE fix is neither — the page didn't need adopters at all (fetch what you render).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>GraphQL industrializes N+1 (every resolver a query) — DataLoader batches per-tick with exactly the Map-stitch above. Naming that link joins two interview worlds.</li>
+        <li>N+1's cousin: SELECT * on wide tables when you render three columns — projection is free bandwidth.</li>
+        <li>"We added query-count assertions to tests for hot endpoints" is the flex sentence — regression-proofing, not just fixing.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · SCALE -->
+<section class="lesson" id="scale">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Scaling Postgres — the ladder before the exotic</h3>
+      <p class="lvl">advanced → pooling, replicas, partitions, and honest limits</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Postgres scales further than the internet's mythology suggests — but in a specific order. <b>Rung 1 — connection pooling:</b> each Postgres connection is a process; hundreds of serverless functions opening their own = collapse. A pool (app-side, or PgBouncer in front) multiplexes; this is the first thing that breaks in modern deployments and the first thing to say. <b>Rung 2 — query work:</b> indexes, EXPLAIN, killing N+1 (you now own all three). <b>Rung 3 — caching</b> reads that tolerate staleness (Redis, the systems course's cache-aside). <b>Rung 4 — read replicas:</b> writes to the primary, reads fan out over async copies — with <b>replication lag</b> as the price: read-your-own-writes needs the primary (or you show a user their post "missing" right after posting).</p>
+    <p><b>Rung 5 — partitioning:</b> one logical table split by time/tenant into physical chunks — queries touching one partition fly, old partitions drop instantly (the events-table answer). <b>Rung 6 — sharding:</b> different rows on different <i>servers</i> — real horizontal write scaling, real pain (cross-shard joins and transactions stop being free). The honest close interviews love: "most products never need rung 6; and workloads that do often also want a different tool for that slice — analytics to a warehouse, ephemeral state to Redis — while Postgres stays the system of record."</p>
+    <div class="mcq" data-qid="pg-scale-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">After adding read replicas, users report: "I updated my profile and the page still shows the old name." Diagnosis and fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Browser cache — add cache-busting headers</button>
+        <button class="mcq-opt" type="button" data-ok>Replication lag: the read after the write hit a replica that hadn't caught up. Route read-your-own-writes to the primary (or pin the user to the primary briefly after writes)</button>
+        <button class="mcq-opt" type="button">The UPDATE is still in an uncommitted transaction</button>
+        <button class="mcq-opt" type="button">Replicas need their own indexes rebuilt</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> async replication means replicas trail by milliseconds-to-seconds — usually invisible, EXCEPT in the write-then-immediately-read-it-back flow, which is exactly what "save profile → show profile" is. The pattern has a name (read-your-writes consistency) and standard fixes: primary reads for the writing user for N seconds, sticky sessions, or returning the written data in the write response so no read happens at all. This is the #1 replica gotcha in both interviews and production.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Pool sizing sanity: connections ≈ cores × small-multiple, not thousands — "more connections" past saturation makes Postgres slower, not faster.</li>
+        <li>Migrations at scale: expand-and-contract (add nullable → backfill in batches → switch reads → drop later), never a table-locking ALTER at noon. The fullstack course drills the recital version.</li>
+        <li>The "when NOT Postgres" list, calibrated: genuine document-scale-out, cache/ephemeral (Redis), search ranking (Elastic), billions-of-rows analytics (columnar) — "Postgres by default, exceptions by evidence".</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any backend or SQL screen. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>SQL</td><td>Read in execution order — FROM → WHERE → GROUP → HAVING → SELECT → ORDER → LIMIT; WHERE filters rows, HAVING filters groups.</td></tr>
+      <tr><td class="mono">02</td><td>modeling</td><td>Every living fact once, referenced by key; snapshot facts (order price) are deliberately copied.</td></tr>
+      <tr><td class="mono">03</td><td>joins</td><td>INNER keeps matches, LEFT keeps everyone (NULLs for loners); COUNT the right side's column after a LEFT join.</td></tr>
+      <tr><td class="mono">04</td><td>indexes</td><td>A B-tree per query pattern: reads fly, writes pay; functions on the column blind the index; EXPLAIN ends the guessing.</td></tr>
+      <tr><td class="mono">05</td><td>transactions</td><td>All or nothing; read-think-write is the race — atomic updates, FOR UPDATE, or version checks. The DB is the only referee.</td></tr>
+      <tr><td class="mono">06</td><td>N+1</td><td>1 + one-per-row queries; JOIN or batch + Map-stitch; watch the query count, not the query speed.</td></tr>
+      <tr><td class="mono">07</td><td>scale</td><td>Pool → tune → cache → replicas (mind read-your-writes) → partition → shard last, if ever.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">Database questions decide backend loops — they separate "used an ORM" from "understood the machine".</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"Why is this query slow?"</b> — the §04 ritual verbatim: reproduce, EXPLAIN ANALYZE, hunt Seq Scans and estimate gaps, index or rewrite, re-measure. Never guess first.</li>
+      <li><b>"Two users click buy on the last item"</b> — §05's conditional UPDATE (atomic check-and-set) with the rowcount check; mention FOR UPDATE and optimistic versions as the alternatives. </li>
+      <li><b>"Your page makes 51 queries"</b> — name N+1 before they do; batch + stitch; the DataLoader connection if GraphQL comes up.</li>
+      <li>Rapid-fire drills: <a href="../fullstack.html#sql">Full-Stack in 48 · PostgreSQL core</a> and <a href="../fullstack.html#dbperf">· indexes &amp; N+1</a>. The system-design module (next shelf) picks up caching and replicas at architecture scale.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run the join engine. Reproduce the lost update. Count the queries.</b> Databases reward the engineer who has watched the failure happen on purpose.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>one card per cat, one drawer per card. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'postgres-databases';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

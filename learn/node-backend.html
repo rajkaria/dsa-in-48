@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Node &amp; Backend — Learn track · in 48</title>
+<meta name="description" content="How Node actually runs your code: the server-side event loop, streams and backpressure, Express middleware from scratch, REST design, auth decided properly, error handling, and testing — runnable simulations throughout. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Node &amp; Backend — Learn track · in 48">
+<meta property="og:description" content="How Node actually runs your code: the server-side event loop, streams and backpressure, Express middleware from scratch, REST design, auth decided properly, error handling, and testing — runnable simulations throughout. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Node &amp; Backend — Learn track · in 48">
+<meta name="twitter:description" content="How Node actually runs your code: the server-side event loop, streams and backpressure, Express middleware from scratch, REST design, auth decided properly, error handling, and testing — runnable simulations throughout. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%234ADE80'%3ENB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#4ADE80;
+  --mark-deep:#16A34A;
+  --mark-soft:rgba(74,222,128,.16);
+  --on-mark:#141B22;
+  --on-ink:#4ADE80;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#86EFAC;
+  --mark-soft:rgba(74,222,128,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#86EFAC;
+  --mark-soft:rgba(74,222,128,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(74,222,128,0) 0%, rgba(74,222,128,.95) 6%, rgba(74,222,128,.8) 94%, rgba(74,222,128,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(74,222,128,0) 0%, rgba(74,222,128,.95) 5%, rgba(74,222,128,.78) 95%, rgba(74,222,128,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(74,222,128,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(74,222,128,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(74,222,128,0) 0%, rgba(74,222,128,.9) 6%, rgba(74,222,128,.7) 94%, rgba(74,222,128,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· node &amp; backend</em></div>
+      <div class="brand-sub">module 08 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#runtime"><span><i class="dot" data-for="runtime"></i> How Node Runs Code</span></a>
+    <a class="side-link" href="#streams"><span><i class="dot" data-for="streams"></i> Streams &amp; Backpressure</span></a>
+    <a class="side-link" href="#express"><span><i class="dot" data-for="express"></i> Express, From Scratch</span></a>
+    <a class="side-link" href="#rest"><span><i class="dot" data-for="rest"></i> REST API Design</span></a>
+    <a class="side-link" href="#auth"><span><i class="dot" data-for="auth"></i> Auth, Decided</span></a>
+    <a class="side-link" href="#robust"><span><i class="dot" data-for="robust"></i> Errors &amp; Validation</span></a>
+    <a class="side-link" href="#ship"><span><i class="dot" data-for="ship"></i> Testing &amp; Shipping</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./js-async.html"><span>Async JS</span><span class="t">←</span></a>
+    <a class="side-link" href="../fullstack.html"><span>Full-Stack in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 08 <b>the other side of your fetch calls</b></p>
+  <h1>Node, from the <span class="hl hl-anim" data-d="0">engine</span> <span class="hl hl-anim" data-d="1">room</span>.</h1>
+  <p class="lede">You've written Express routes for years. This module is about what's <b>underneath</b> them: why one blocked event loop takes down every user at once, what backpressure actually protects you from, what <code>app.use</code> really builds, and how the auth decision should actually be made. Each idea runs on this page as a simulation you can watch.</p>
+  <p class="lede">Prerequisite: <a href="./js-async.html">Async JS</a> — the event loop moves server-side here, where the stakes change from "janky page" to "every request stalls". The cats have opened a delivery kitchen. It's going about as well as you'd expect. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what IS Node?"</span>
+    <span class="level-chip i">middle: middleware from scratch</span>
+    <span class="level-chip a">ends at: auth &amp; production judgment</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>7</b> quiz questions</span>
+    <span><b>5</b> runnable simulations</span>
+    <span><b>~4h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#runtime">Into the engine room <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · RUNTIME -->
+<section class="lesson" id="runtime">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>How Node runs your code — one loop, all the users</h3>
+      <p class="lvl">beginner → why blocking is a server-wide event</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Node = <b>V8</b> (Chrome's JS engine) + <b>libuv</b> (a C library doing async I/O and a small thread pool) + APIs binding them. Your JS still runs on <b>one thread with an event loop</b> — the same machine from Async JS — but now that loop serves <i>every connected user</i>. A request arrives → your handler runs → it awaits the DB → the loop serves other requests → the DB answers → your handler resumes.</p>
+    <p>The consequence that defines Node backend engineering: <b>one CPU-heavy handler freezes everyone.</b> A 2-second synchronous loop in one route = every other request waits 2 seconds. I/O concurrency is nearly free; CPU work is the thing you architect around (worker threads, job queues, or chunking).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The cat café's delivery kitchen has <b>one chef</b> (the loop) and many <b>appliances</b> (libuv: ovens, fryers — the I/O). Orders fly because the chef never watches an oven — set it, move on, plate when it dings. But if one order requires the chef to <b>hand-whisk for two minutes</b> (CPU work), every order in the kitchen stalls — not just the whisky one. The fix is never "whisk faster": hire a whisking assistant (worker thread) or send it to the prep kitchen (job queue).</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">one-chef.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a tiny server simulation: 4 requests arrive together
+const t0 = Date.now();
+const at = () =&gt; String(Date.now() - t0).padStart(4) + 'ms';
+const io = (ms) =&gt; new Promise(r =&gt; setTimeout(r, ms));   // oven work
+
+async function goodHandler(id) {
+  await io(300);                       // DB query — chef moves on
+  console.log(at(), `req ${id} done (I/O path)`);
+}
+
+function badHandler(id) {
+  const end = Date.now() + 300;        // hand-whisking: CPU on the loop
+  while (Date.now() &lt; end) {}
+  console.log(at(), `req ${id} done (CPU path)`);
+}
+
+console.log('--- 4 concurrent I/O requests (300ms each) ---');
+await Promise.all([1, 2, 3, 4].map(goodHandler));
+console.log(at(), '→ all four finished together: ~300ms total');
+
+console.log('--- 4 "concurrent" CPU requests (300ms each) ---');
+const t1 = Date.now();
+[5, 6, 7, 8].forEach(badHandler);
+console.log(at(), `→ serialized: ~${Date.now() - t1}ms — everyone waited`);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">300ms vs 1200ms — the entire Node performance model in two numbers</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-rt-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your API's p99 latency spikes across ALL endpoints every day at noon. One endpoint generates PDF reports on demand. Connection?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Coincidence — unrelated endpoints can't affect each other</button>
+        <button class="mcq-opt" type="button" data-ok>PDF generation is CPU work on the shared event loop — while it renders, every request on that process waits. Move it to a worker thread or job queue</button>
+        <button class="mcq-opt" type="button">The database pool is exhausted at noon</button>
+        <button class="mcq-opt" type="button">Node garbage collection runs on a noon schedule</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "all endpoints slow together" is the event-loop-blocked signature (pool exhaustion would hit DB-touching routes specifically). PDF/image/crypto/big-JSON work on the loop taxes everyone. Fixes in order: offload to a queue with a worker service, worker_threads for in-process, or at minimum chunk with setImmediate. Bonus vocabulary: "event loop lag" is the metric that catches this (<code>monitorEventLoopDelay</code>).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>libuv's thread pool (default 4) handles fs, DNS, and crypto — "Node is single-threaded" needs that asterisk, and knowing UV_THREADPOOL_SIZE exists is a nice flourish.</li>
+        <li>One process = one loop = one core. Scaling to a whole machine = cluster mode / PM2 (N processes behind one port); scaling further = more machines behind a load balancer — stateless-ness (section 05) is what makes that painless.</li>
+        <li>Why Node at all: I/O-bound APIs with huge concurrency on modest hardware, one language across the stack. When not: heavy CPU per request — say both halves.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · STREAMS -->
+<section class="lesson" id="streams">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Streams &amp; backpressure — process the river, don't drink it</h3>
+      <p class="lvl">intermediate → the memory model that saves your RAM</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Reading a 2GB CSV with <code>readFile</code> puts 2GB in RAM before you touch byte one. A <b>stream</b> hands you the file in chunks (~64KB) as they arrive — memory stays flat regardless of file size, and the first chunk is processed before the last is even read. Files, HTTP bodies, DB cursors, S3 uploads — all the big data paths in Node are streams; <code>.pipe()</code> (or <code>pipeline()</code>) snaps them together.</p>
+    <p><b>Backpressure</b> is the flow control that makes piping safe: when a slow consumer (client on 3G) can't keep up with a fast producer (SSD read), the pipe signals the producer to <b>pause</b> until the consumer drains. Without it, chunks pile up in memory and you've reinvented readFile with extra steps. <code>pipeline()</code> handles it — and error propagation — automatically, which is why it's the modern answer over bare .pipe.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">the-river.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// simulate: 12-chunk file, slow consumer, buffer watched live
+async function withBackpressure() {
+  let buffered = 0, peak = 0;
+  for (let chunk = 1; chunk &lt;= 12; chunk++) {
+    buffered++;                                   // producer reads a chunk
+    peak = Math.max(peak, buffered);
+    await new Promise(r =&gt; setTimeout(r, 40));    // consumer drains it
+    buffered--;                                   // …before the next read
+  }
+  return peak;
+}
+async function withoutBackpressure() {
+  let buffered = 0, peak = 0;
+  const drains = [];
+  for (let chunk = 1; chunk &lt;= 12; chunk++) {
+    buffered++;                                   // producer sprints ahead
+    peak = Math.max(peak, buffered);
+    drains.push(new Promise(r =&gt; setTimeout(() =&gt; { buffered--; r(); }, 40 * chunk)));
+  }
+  await Promise.all(drains);
+  return peak;
+}
+console.log('peak buffer WITH backpressure:   ', await withBackpressure(), 'chunk');
+console.log('peak buffer WITHOUT backpressure:', await withoutBackpressure(), 'chunks');
+console.log('now imagine chunks are 64KB and the file is 2GB…');
+
+// the real-world shape (Node):
+// await pipeline(
+//   fs.createReadStream('big.csv'),
+//   csvParser(),                    // transform stream
+//   uploadTo(s3),                   // writable
+// );  ← backpressure + error handling, handled</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">1 chunk vs 12 chunks in memory — backpressure is the difference</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-str-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The "export all orders as CSV" endpoint OOMs the server on big accounts. The streaming fix, end to end?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Raise the container's memory limit and add pagination to the UI</button>
+        <button class="mcq-opt" type="button" data-ok>Stream the whole path: DB cursor (batches of rows) → CSV transform → res, with backpressure pausing the cursor when the client is slow — flat memory at any export size</button>
+        <button class="mcq-opt" type="button">Build the CSV in a temp file first, then send it</button>
+        <button class="mcq-opt" type="button">JSON.stringify with a replacer to reduce size</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the OOM chain is "SELECT * into an array → stringify → res.send" — three full copies in RAM. Cursor + transform + response streams process a few hundred rows at a time; a slow downloader slows the <i>DB read</i> down (backpressure reaching all the way back), which is exactly what you want. The temp file dodges RAM but doubles latency and adds disk churn — mention it as the fallback, not the answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Four stream types in one breath: Readable (source), Writable (sink), Transform (both — gzip, parsers), Duplex (socket). HTTP req is Readable, res is Writable — Express is streams wearing a friendly face.</li>
+        <li><code>pipeline()</code> over <code>.pipe()</code>: propagates errors and cleans up on failure — bare pipe chains leak file descriptors when a middle stream errors. This detail reads as production scar tissue.</li>
+        <li>Web Streams (the WHATWG kind) are converging with Node streams — <code>Readable.toWeb()</code> bridges them; fetch bodies and RSC streaming use the web flavor.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · EXPRESS -->
+<section class="lesson" id="express">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Express, from scratch — the middleware machine</h3>
+      <p class="lvl">intermediate → app.use, demystified in 20 lines</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Express is a small idea executed well: a request flows through a <b>chain of functions</b> — each gets <code>(req, res, next)</code>, does its bit (parse, log, authenticate, authorize), and either passes control on with <code>next()</code>, or <b>ends the chain</b> by responding. Routes are just middleware with a path filter. That's the entire framework — and building it in 20 lines makes every Express behavior obvious forever.</p>
+    <p>Two behaviors people learn by pain instead: <b>order matters</b> (auth before routes, error handler last — the chain runs top to bottom), and <b>forgetting <code>next()</code> hangs the request</b> (nobody ends the chain, the client waits forever).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">express-in-20-lines.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a faithful miniature of Express's core
+function createApp() {
+  const chain = [];
+  return {
+    use(fn) { chain.push(fn); },
+    async handle(req) {
+      const res = { sent: null,
+        send(body) { this.sent = body; return this; } };
+      let i = 0;
+      const next = async (err) =&gt; {
+        if (err) { res.send({ status: 500, error: err.message }); return; }
+        const fn = chain[i++];
+        if (fn) await fn(req, res, next);
+      };
+      await next();
+      return res.sent ?? { status: 404, error: 'no one answered' };
+    },
+  };
+}
+
+const app = createApp();
+app.use(async (req, res, next) =&gt; {           // logger
+  console.log('→', req.method, req.path);
+  await next();
+});
+app.use(async (req, res, next) =&gt; {           // auth gate
+  if (!req.headers.token) return res.send({ status: 401, error: 'who are you?' });
+  req.user = 'mochi';                          // enrich req, pass on
+  await next();
+});
+app.use(async (req, res, next) =&gt; {           // the route
+  if (req.path !== '/treats') return next();   // not mine — pass
+  res.send({ status: 200, treats: ['tuna'], for: req.user });
+});
+
+console.log(await app.handle({ method: 'GET', path: '/treats', headers: {} }));
+console.log(await app.handle({ method: 'GET', path: '/treats', headers: { token: 'meow' } }));
+console.log(await app.handle({ method: 'GET', path: '/naps', headers: { token: 'meow' } }));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">401 without a token, 200 with, 404 for unclaimed paths — the chain at work</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-ex-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In Express 4, an async route handler throws. What happens, and what's the discipline?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Express catches it and returns 500 — same as sync errors</button>
+        <button class="mcq-opt" type="button" data-ok>The rejection escapes Express entirely (unhandled rejection; request hangs) — wrap handlers to forward errors to next(), use Express 5, or a wrapper like asyncHandler</button>
+        <button class="mcq-opt" type="button">The client gets a 404 because the route never matched</button>
+        <button class="mcq-opt" type="button">Node retries the request once automatically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Express 4 predates promises — it only catches synchronous throws; an async throw is just a rejected promise it never awaits. The pattern: <code>const wrap = fn =&gt; (req, res, next) =&gt; fn(req, res, next).catch(next)</code> around every async handler (Express 5 finally does this natively). Knowing WHICH major version fixed it is exactly the kind of precision screens fish for.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The error middleware's four-argument signature <code>(err, req, res, next)</code> is how Express recognizes it — and it goes LAST. One centralized error handler > try/catch confetti.</li>
+        <li>Layered structure to say out loud: routes (HTTP concerns) → services (business logic, framework-free) → data access. Testable without HTTP, swappable without rewrites.</li>
+        <li>Fastify/Hono/NestJS in one line each: faster serialization / edge-portable / enterprise DI structure — "Express's model transfers to all of them" is the calming close.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 4 · REST -->
+<section class="lesson" id="rest">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>REST API design — a contract, not a vibe</h3>
+      <p class="lvl">intermediate → resources, verbs, and the decisions that age well</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>REST's discipline in one line: <b>URLs name things (nouns), methods act on them (verbs), status codes report honestly.</b> <code>GET /cats/42</code> reads, <code>POST /cats</code> creates (201 + Location), <code>PATCH /cats/42</code> partially updates, <code>DELETE</code> deletes (204). Collections are plural; nesting expresses ownership one level deep (<code>/cats/42/vaccinations</code>) and then stops — deep nesting handcuffs you later.</p>
+    <p>The parts that separate a professional API: <b>consistent error envelope</b> (code + message + details, same shape everywhere), <b>cursor pagination</b> (you know why from DSA — offsets shift under writes), <b>idempotency</b> (GET/PUT/DELETE naturally; POST via idempotency keys — the double-click double-charge killer), and <b>versioning you can live with</b> (/v1 path pragmatism; additive changes don't need a bump, removals do).</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-contract.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext">the adoption-center API, designed out loud:
+
+GET    /v1/cats?status=adoptable&amp;cursor=eyJpZCI6OTh9&amp;limit=20
+       → 200 { items: [...], nextCursor: "…" }        (stable under writes)
+POST   /v1/cats            → 201 + Location: /v1/cats/43
+       Idempotency-Key: 7f3a…                          (retry-safe create)
+GET    /v1/cats/43         → 200 | 404
+PATCH  /v1/cats/43         → 200 { …updated cat }      (partial update)
+DELETE /v1/cats/43         → 204                       (repeatable: still 204/404)
+POST   /v1/cats/43/adoptions → the "verb as sub-resource" trick
+                               for actions that aren't CRUD
+
+errors, ONE shape everywhere:
+  422 { error: { code: "VALIDATION", message: "name is required",
+                 details: [{ field: "name", rule: "required" }],
+                 requestId: "r-8823" } }
+
+status honesty cheat-line:
+  200 ok · 201 created · 204 no-body · 400 malformed · 401 who?
+  403 no. · 404 nothing here · 409 conflict · 422 invalid · 429 slow down
+  500 our bug · 503 overloaded</code></pre>
+    </div>
+    <div class="mcq" data-qid="nb-rest-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"Adopt a cat" doesn't fit CRUD — it changes cat status, creates a record, notifies staff. How do you model it RESTfully?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>GET /cats/42/adopt</code> — simple and cacheable</button>
+        <button class="mcq-opt" type="button" data-ok><code>POST /cats/42/adoptions</code> — the action becomes a created resource; you get a record with an id, natural idempotency-key support, and a place for adoption data to live</button>
+        <button class="mcq-opt" type="button"><code>PATCH /cats/42 { status: "adopted" }</code> — it's just a status change</button>
+        <button class="mcq-opt" type="button">Abandon REST — actions need RPC (<code>POST /adoptCat</code>)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "model the action as the noun it produces" keeps REST's benefits (a GET-able adoption record, clean auditing) for real workflows. GET mutating is the cardinal sin (crawlers adopt cats). Bare PATCH loses the event's identity — who adopted, when, the paperwork. And full RPC is premature surrender; though naming that some APIs do use <code>:verb</code> suffixes (Google style) shows range. This question is beloved because it tests design taste, not memorized verbs.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>PUT vs PATCH precisely: PUT replaces the whole resource (idempotent by definition); PATCH applies a partial change. Saying "PUT is what makes retries trivially safe" links it to resilience.</li>
+        <li>Rate limiting headers (429 + Retry-After), request ids in every error (support can trace), and sunset headers for deprecation — three small marks of an API run by adults.</li>
+        <li>The REST-vs-GraphQL calibration lives in <a href="../fullstack.html#api">Full-Stack in 48 · API design</a> — one sentence here: REST for service-to-service and cacheability; GraphQL when many client shapes query many services.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · AUTH -->
+<section class="lesson" id="auth">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Auth, decided — sessions, JWTs, and the hybrid everyone ships</h3>
+      <p class="lvl">the interview classic, resolved properly</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Sessions:</b> login → server stores a session record (Redis) → browser holds an opaque id in an httpOnly cookie → every request looks the session up. Revocation is trivial (delete the record); the cost is that lookup on every request and shared session storage across servers. <b>JWTs:</b> login → server <i>signs</i> a token containing the claims → client sends it back → server verifies the signature, no lookup. Stateless and cheap to check — but <b>you can't un-sign a token</b>: revocation before expiry needs a denylist… which is state again.</p>
+    <p>The judgment, stated like a senior: <b>short-lived access token (5–15 min) + rotating refresh token, both in httpOnly SameSite cookies for browsers.</b> The access token gives you stateless verification on every request; the refresh flow gives you a revocation point (refresh tokens live server-side, can be killed); the cookies keep XSS's hands off everything. Passwords, when you store them: bcrypt/argon2, never anything reversible — that part is settled law.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">sign-verify.js — run it (a real HMAC-JWT, minus the base64url pedantry)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// JWTs aren't magic: header.payload.signature, signed not encrypted
+const SECRET = 'cafe-secret-keep-in-env';
+
+async function hmac(data) {
+  const key = await crypto.subtle.importKey('raw',
+    new TextEncoder().encode(SECRET),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key,
+    new TextEncoder().encode(data));
+  return btoa(String.fromCharCode(...new Uint8Array(sig))).slice(0, 16) + '…';
+}
+
+async function sign(payload) {
+  const body = btoa(JSON.stringify(payload));
+  return body + '.' + await hmac(body);
+}
+async function verify(token) {
+  const [body, sig] = token.split('.');
+  if (await hmac(body) !== sig) return { valid: false, reason: 'TAMPERED' };
+  const claims = JSON.parse(atob(body));
+  if (claims.exp &lt; Date.now()) return { valid: false, reason: 'EXPIRED' };
+  return { valid: true, claims };
+}
+
+const token = await sign({ sub: 'mochi', role: 'cat', exp: Date.now() + 60_000 });
+console.log('token:', token);
+console.log('verify ok:', await verify(token));
+
+// the attack: change role to 'admin' without the secret
+const [body] = token.split('.');
+const evil = btoa(JSON.stringify({ ...JSON.parse(atob(body)), role: 'admin' }));
+console.log('tampered:', await verify(evil + '.' + token.split('.')[1]));
+// payload is READABLE by anyone (it's just base64!) — never put
+// secrets in a JWT. the signature only proves nobody CHANGED it.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">tampering caught by the signature — and note the payload was never secret</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-auth-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A user reports their account hacked. With pure stateless JWTs (1-hour expiry, no refresh infrastructure), what's your ugly truth?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Rotate the signing secret — their token dies instantly</button>
+        <button class="mcq-opt" type="button" data-ok>You can't revoke just their token — it's valid until expiry. Rotating the secret logs out EVERY user. This scenario is exactly why short expiries + server-side refresh tokens (a revocation point) exist</button>
+        <button class="mcq-opt" type="button">Delete their session from Redis</button>
+        <button class="mcq-opt" type="button">Add the user id to the token blocklist — stateless revocation</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> statelessness cuts both ways — no lookup means no kill switch. Secret rotation is a site-wide logout (sometimes the right emergency move — say so). A blocklist works but is per-request state, surrendering the stateless benefit (option 4 contradicts itself — that's the trap). The architecture answer: keep access tokens too short-lived to matter and put revocation at the refresh boundary. This exact scenario is the strongest way to explain WHY the hybrid design won.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Cookie flags recited like a spell: <code>httpOnly; Secure; SameSite=Lax; Path=/</code> — and CSRF tokens for any cookie-authed mutation (the browser course's security topic tells the attack side).</li>
+        <li>AuthN vs AuthZ in one line — "who are you" vs "what may you do" — then RBAC checks in middleware (<code>requireRole('staff')</code>), resource-level checks in services ("is this YOUR order?").</li>
+        <li>OAuth in interview-size: "we redirect to Google, Google redirects back with a code, we exchange the code server-side for tokens — the user's password never touches us." That sentence is usually the whole requirement.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · ROBUST -->
+<section class="lesson" id="robust">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Errors &amp; validation — the boundary is the law</h3>
+      <p class="lvl">intermediate → trust nothing that crossed the network</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Rule one of backend: <b>validate at the boundary, everything, always.</b> The frontend's validation is UX; yours is security — anyone with curl skips their form. Schema validators (zod/joi) turn "trust nothing" into declarative code: parse the input against a schema, get typed clean data or a structured 422. Validate params, query, body — and <i>outputs</i> to third parties if you're thorough.</p>
+    <p>Rule two: <b>errors are part of the API.</b> Operational errors (bad input, not-found, conflict) get precise statuses and safe messages; programmer errors (undefined is not a function) get a generic 500 — <b>never the stack trace</b> (it leaks internals) — plus a full log entry with a request id linking user report ↔ log line. One error middleware enforces all of it; every route just throws typed errors.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">the-boundary.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a zod-flavored schema validator in 25 lines
+const schema = {
+  name:  { type: 'string', min: 1, max: 40 },
+  age:   { type: 'number', min: 0, max: 38 },     // oldest known cat
+  email: { type: 'string', pattern: /^[^@\s]+@[^@\s]+\.[^@\s]+$/ },
+};
+function validate(input) {
+  const errors = [], clean = {};
+  for (const [field, rule] of Object.entries(schema)) {
+    const v = input[field];
+    if (v === undefined) { errors.push({ field, rule: 'required' }); continue; }
+    if (typeof v !== rule.type) { errors.push({ field, rule: 'type:' + rule.type }); continue; }
+    if (rule.min !== undefined &amp;&amp; (v.length ?? v) &lt; rule.min) errors.push({ field, rule: 'min' });
+    if (rule.max !== undefined &amp;&amp; (v.length ?? v) &gt; rule.max) errors.push({ field, rule: 'max' });
+    if (rule.pattern &amp;&amp; !rule.pattern.test(v)) errors.push({ field, rule: 'format' });
+    clean[field] = v;
+  }
+  return errors.length ? { ok: false, status: 422, errors } : { ok: true, data: clean };
+}
+
+console.log(validate({ name: 'Mochi', age: 4, email: 'mochi@cafe.cat' }));
+console.log(validate({ name: '', age: '4', email: 'not-an-email' }));
+console.log(validate({ name: 'Chonk', age: 900, email: 'c@cafe.cat', role: 'admin' }));
+// note the last one: age rejected AND the sneaky extra `role`
+// field silently dropped — allowlisting beats blocklisting.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">three payloads: clean, mangled, and malicious-extra-field</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-rob-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does the validator DROP the extra <code>role: 'admin'</code> field instead of just ignoring it downstream?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Performance — smaller objects are faster</button>
+        <button class="mcq-opt" type="button" data-ok>Mass-assignment protection: unvalidated fields flowing into <code>User.update(req.body)</code> is how attackers set role/isAdmin/balance — allowlist what you accept, everything else never enters</button>
+        <button class="mcq-opt" type="button">JSON parsers require known fields</button>
+        <button class="mcq-opt" type="button">It's cosmetic — spreading req.body is safe with an ORM</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the classic exploit is POSTing <code>{name: "x", isAdmin: true}</code> at an endpoint that does <code>Model.update(req.body)</code> — GitHub was famously hit via exactly this in 2012. Schema-parse-then-use means the handler only ever touches declared fields. "Parse, don't validate" is the fancy phrase; "allowlist the shape" is the plain one; either wins the point.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Typed error classes (<code>NotFoundError</code>, <code>ConflictError</code>) with statuses, thrown anywhere, mapped in ONE error middleware — "the route never writes res.status(500) by hand".</li>
+        <li>Config = env vars validated at boot (crash early on missing DATABASE_URL, not at 3am on first use) — the 12-factor line plus "fail fast at startup" is a tidy pair.</li>
+        <li>Graceful shutdown: stop accepting, finish in-flight requests, close the pool, exit — SIGTERM handling is what makes deploys invisible; naming it is rare and impressive.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · SHIP -->
+<section class="lesson" id="ship">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Testing &amp; shipping — confidence, then repetition</h3>
+      <p class="lvl">intermediate → the pyramid that fits APIs, and the deploy shape</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The API testing pyramid, practical edition: <b>unit tests</b> for services and pure logic (fast, no HTTP, no DB — the layered structure from §03 pays off here); <b>integration tests</b> hitting real routes with <b>supertest</b> against a test database (the workhorse layer — auth flows, validation, the error envelope); a few <b>end-to-end smoke tests</b> against a deployed environment. Mock at the <i>edges you don't own</i> (Stripe, S3, email) — never mock your own database in integration tests, or you're testing your mocks.</p>
+    <p>The deploy shape, in one breath: Docker image built once in CI (npm ci, not install), promoted through staging to prod; N Node processes (cluster/PM2 or one-per-container with an orchestrator); health checks split into liveness ("process up") and readiness ("DB reachable"); logs as structured JSON to stdout; SIGTERM handled for zero-dropped-request deploys. Where each of those runs on AWS is the aws-cloud module (next on the shelf)'s whole story.</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">integration-test.js — the shape to memorize</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// supertest: real routes, real (test) DB, no network flakiness
+describe('POST /v1/cats', () =&gt; {
+  beforeEach(() =&gt; db.reset());                    // isolation per test
+
+  it('creates a cat and returns 201 + Location', async () =&gt; {
+    const res = await request(app)
+      .post('/v1/cats')
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({ name: 'Mochi', age: 4 })
+      .expect(201);
+    expect(res.headers.location).toMatch(/\/v1\/cats\/\d+/);
+    expect(res.body).toMatchObject({ name: 'Mochi', status: 'adoptable' });
+  });
+
+  it('rejects invalid payloads with the standard envelope', async () =&gt; {
+    const res = await request(app)
+      .post('/v1/cats')
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({ age: 'four' })
+      .expect(422);
+    expect(res.body.error.details).toContainEqual(
+      { field: 'name', rule: 'required' });
+  });
+
+  it('401s without a token — auth is part of the contract', () =&gt;
+    request(app).post('/v1/cats').send({ name: 'X' }).expect(401));
+});
+// what NOT to do: mock the DB layer here. integration tests earn
+// their keep by exercising the real query + constraint behavior.</code></pre>
+    </div>
+    <div class="mcq" data-qid="nb-ship-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your integration tests pass but production 500s on duplicate emails. The tests mocked the DB "for speed". What's the lesson?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Add a unit test for the duplicate-email branch</button>
+        <button class="mcq-opt" type="button" data-ok>The UNIQUE constraint lives in the real database — mocks don't throw constraint violations. Integration tests must run against a real (test) DB; mock only edges you don't own</button>
+        <button class="mcq-opt" type="button">Catch all DB errors and return 200 with an error body</button>
+        <button class="mcq-opt" type="button">Move the uniqueness check into JS before the insert</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the behavior under test WAS the database's (constraint → error → your 409 mapping) — mocking it deleted the test's subject. Option 4 is the bonus trap: a JS pre-check races (two requests both pass the check, one insert still explodes) — the constraint is the only honest referee, catch its violation and map to 409. Testcontainers/dockerized Postgres in CI is the modern "but speed" answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>"Build once, promote the artifact" — the same image tested in staging IS what runs in prod; rebuilding per environment reintroduces drift.</li>
+        <li>npm ci vs install in one line (lockfile-exact, fails on mismatch, deletes node_modules) — CI determinism.</li>
+        <li>The observability trio for APIs: structured logs with request ids, RED metrics (rate/errors/duration) per route, and event-loop-lag — the noon-PDF mystery from §01 is caught by the third.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any backend screen. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>runtime</td><td>One chef, many ovens: I/O concurrency is free, CPU on the loop stalls EVERYONE — offload it.</td></tr>
+      <tr><td class="mono">02</td><td>streams</td><td>Process the river in chunks; backpressure pauses the producer so slow consumers can't flood RAM.</td></tr>
+      <tr><td class="mono">03</td><td>express</td><td>A chain of (req, res, next) functions; order matters; async errors need forwarding (until Express 5).</td></tr>
+      <tr><td class="mono">04</td><td>REST</td><td>Nouns in URLs, verbs in methods, honest statuses, cursor pages, one error envelope, actions as created resources.</td></tr>
+      <tr><td class="mono">05</td><td>auth</td><td>Short-lived access + rotating refresh, both httpOnly — stateless checks with a revocation point.</td></tr>
+      <tr><td class="mono">06</td><td>robustness</td><td>Validate at the boundary (allowlist the shape); typed errors → one middleware; stack traces never leave.</td></tr>
+      <tr><td class="mono">07</td><td>shipping</td><td>Real-DB integration tests, mock only unowned edges; build once, promote; liveness ≠ readiness.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">Backend rounds are judgment rounds — every topic here is a "decide and defend" question.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"Explain the event loop in Node"</b> — tell it server-side: one loop per process serving all users, CPU work is the enemy, and name event-loop lag as the metric. Drill pairs: <a href="../fullstack.html#node">Full-Stack in 48 · Node internals</a>.</li>
+      <li><b>"Sessions or JWT?"</b> — never pick a side first; give the hybrid + the hacked-account story from §05. It converts a trivia question into an architecture answer.</li>
+      <li><b>"Design an endpoint for X"</b> — walk §04's contract: resource naming, status codes, pagination, idempotency, error envelope. Structure beats speed.</li>
+      <li>Next modules: <b>postgres-databases</b> (the other half of every backend question) and <b>aws-cloud</b> (where all of this runs).</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run the simulations, build the 20-line Express, break the JWT.</b> Backends stop being folklore when you've held the small version in your hands.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>one chef, many ovens — never let the chef whisk. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'node-backend';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
