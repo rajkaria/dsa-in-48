@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full-Stack in 48 — React, Node, Postgres &amp; AWS, refreshed in a weekend</title>
+<meta name="description" content="A two-day rapid-fire interview refresher for full-stack JavaScript engineers: JavaScript, React, Node.js, PostgreSQL, and AWS. 150+ real screening questions with answers, cheat tables, and drills — the concepts you use daily, named under pressure.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Full-Stack in 48 — React, Node, Postgres &amp; AWS, refreshed in a weekend">
+<meta property="og:description" content="A two-day rapid-fire interview refresher for full-stack JavaScript engineers: JavaScript, React, Node.js, PostgreSQL, and AWS. 150+ real screening questions with answers, cheat tables, and drills — the concepts you use daily, named under pressure.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Full-Stack in 48 — React, Node, Postgres &amp; AWS, refreshed in a weekend">
+<meta name="twitter:description" content="A two-day rapid-fire interview refresher for full-stack JavaScript engineers: JavaScript, React, Node.js, PostgreSQL, and AWS. 150+ real screening questions with answers, cheat tables, and drills — the concepts you use daily, named under pressure.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23FB923C'%3EFS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#FB923C;
+  --mark-deep:#EA580C;
+  --mark-soft:rgba(251,146,60,.16);
+  --on-mark:#141B22;
+  --on-ink:#FB923C;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FDBA74;
+  --mark-soft:rgba(251,146,60,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FDBA74;
+  --mark-soft:rgba(251,146,60,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,146,60,0) 0%, rgba(251,146,60,.95) 6%, rgba(251,146,60,.8) 94%, rgba(251,146,60,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,146,60,0) 0%, rgba(251,146,60,.95) 5%, rgba(251,146,60,.78) 95%, rgba(251,146,60,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(251,146,60,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(251,146,60,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,146,60,0) 0%, rgba(251,146,60,.9) 6%, rgba(251,146,60,.7) 94%, rgba(251,146,60,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('fs48:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">Full-Stack <em>in 48</em></div>
+      <div class="brand-sub">the tech screen · fundamentals</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Day 1 topics">
+    <h4>// day 1 — the language &amp; the browser</h4>
+    <a class="side-link" href="#jscore"><span>JavaScript Under the Hood</span><span class="t">90m</span></a>
+    <a class="side-link" href="#async"><span>Event Loop &amp; Async</span><span class="t">90m</span></a>
+    <a class="side-link" href="#esnext"><span>Modern JS + TypeScript</span><span class="t">60m</span></a>
+    <a class="side-link" href="#react"><span>React Rendering</span><span class="t">90m</span></a>
+    <a class="side-link" href="#hooks"><span>Hooks, Deeply</span><span class="t">90m</span></a>
+    <a class="side-link" href="#reactscale"><span>React at Scale</span><span class="t">60m</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Day 2 topics">
+    <h4>// day 2 — the server, the data, the cloud</h4>
+    <a class="side-link" href="#node"><span>Node.js Internals</span><span class="t">90m</span></a>
+    <a class="side-link" href="#api"><span>Express &amp; API Design</span><span class="t">90m</span></a>
+    <a class="side-link" href="#sql"><span>PostgreSQL Core</span><span class="t">90m</span></a>
+    <a class="side-link" href="#dbperf"><span>Indexes &amp; N+1</span><span class="t">60m</span></a>
+    <a class="side-link" href="#aws"><span>AWS: The Core Map</span><span class="t">90m</span></a>
+    <a class="side-link" href="#awsops"><span>Scaling &amp; the Bill</span><span class="t">60m</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// reference</h4>
+    <a class="side-link" href="#playbook"><span>Tech-Screen Playbook</span></a>
+    <a class="side-link" href="#patterns"><span>Question Matcher</span></a>
+    <a class="side-link" href="#qbank"><span>Rapid-Fire Bank</span></a>
+    <a class="side-link" href="#cheats"><span>Cheat Tables</span></a>
+    <a class="side-link" href="#skip"><span>Safe to Skip</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Series">
+    <h4>// in this series</h4>
+    <a class="side-link" href="./dsa.html"><span>DSA in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./system-design.html"><span>System Design in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./behavioral.html"><span>Behavioral in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="./index.html"><span>All courses</span><span class="t">↑</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>day 1 drills</span><span id="p1-count">0/18</span></div>
+      <div class="pbar"><i id="p1-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>day 2 drills</span><span id="p2-count">0/18</span></div>
+      <div class="pbar"><i id="p2-bar"></i></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+    <button class="reset-btn" id="reset-progress" type="button">reset progress</button>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="eyebrow">// a 48-hour refresher <b>for engineers who ship this stack daily and blank on the definitions</b></p>
+  <h1>The tech screen, <span class="hl hl-anim" data-d="0">refreshed</span> in one <span class="hl hl-anim" data-d="1">weekend</span>.</h1>
+  <p class="lede">Before any onsite there's a screen where someone asks <b>"explain the event loop"</b>, <b>"why is this query slow"</b>, or <b>"JWT or sessions — and why?"</b>. You use all of it every working day; what fails under pressure is the <b>recall</b>, not the knowledge. That gap is exactly what a weekend can close.</p>
+  <p class="lede">Twelve topics across the stack you actually ship — <b>JavaScript, React, Node.js, PostgreSQL, AWS</b> — each one a tight refresher plus a bank of real screening questions <b>with the answers written out</b>. Read it the weekend before, then re-read the reference sections the night before any interview.</p>
+  <div class="hero-meta">
+    <span><b>12</b> topics</span>
+    <span><b>150+</b> Q&amp;As with answers</span>
+    <span><b>36</b> drills</span>
+    <span><b>~8.5h</b> per day</span>
+  </div>
+  <a class="btn" href="#howto">Start Day 1 <span class="arrow">↓</span></a>
+
+  <div class="xlate-wrap">
+    <p class="xlate-head">Proof you're not starting from zero — you shipped these this week:</p>
+    <div class="xlate">
+      <div class="x-item reveal" data-d="0"><span class="x-from">the search box you debounced</span><span class="x-arrow">→</span><span class="x-to">Closures</span></div>
+      <div class="x-item reveal" data-d="1"><span class="x-from">the spinner race you fixed with await</span><span class="x-arrow">→</span><span class="x-to">Event Loop</span></div>
+      <div class="x-item reveal" data-d="2"><span class="x-from">the list that scrambled on delete</span><span class="x-arrow">→</span><span class="x-to">React Keys</span></div>
+      <div class="x-item reveal" data-d="3"><span class="x-from">the useEffect cleanup you added at 2am</span><span class="x-arrow">→</span><span class="x-to">Stale Closures</span></div>
+      <div class="x-item reveal" data-d="4"><span class="x-from">the CSV export that ate all the RAM</span><span class="x-arrow">→</span><span class="x-to">Node Streams</span></div>
+      <div class="x-item reveal" data-d="5"><span class="x-from">the 401-vs-403 argument in review</span><span class="x-arrow">→</span><span class="x-to">HTTP Semantics</span></div>
+      <div class="x-item reveal" data-d="6"><span class="x-from">the dashboard query you EXPLAINed</span><span class="x-arrow">→</span><span class="x-to">Indexes</span></div>
+      <div class="x-item reveal" data-d="7"><span class="x-from">the uploads bucket + signed links</span><span class="x-arrow">→</span><span class="x-to">S3 &amp; IAM</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- HOW TO -->
+<section class="section" id="howto">
+  <p class="section-eyebrow">// ground rules</p>
+  <h2>How to run these two days</h2>
+  <p class="sub">Every topic is a refresher plus a rapid-fire question set. The questions are the workout: cover the answer, say yours out loud, then reveal and compare. Out loud is non-negotiable — recognizing an answer and producing one are different skills, and the interview only tests the second.</p>
+  <div class="rules">
+    <div class="rule">
+      <h5>01 · answer before you reveal</h5>
+      <p>Every question here hides its answer behind a click. <b>Say your answer aloud first</b>, then reveal. Reading answers feels like progress and trains nothing.</p>
+    </div>
+    <div class="rule">
+      <h5>02 · the shape of a good answer</h5>
+      <p><b>Definition → example from your own work → tradeoff.</b> Three sentences. "A closure is X; I use one in our debounced search; the gotcha is Y." That shape scores in every screen.</p>
+    </div>
+    <div class="rule">
+      <h5>03 · concepts over trivia</h5>
+      <p>Nobody fails a screen for forgetting an argument order. You fail for fuzzy <b>mechanisms</b> — what the event loop does, what an index costs. When in doubt, go one level deeper than the syntax.</p>
+    </div>
+    <div class="rule">
+      <h5>04 · anchor in your real stack</h5>
+      <p>Every answer that ends with "…and in our app we do exactly this in X" is <b>double-weighted evidence</b>: you know the concept and you've operated it. Mine your current project all weekend.</p>
+    </div>
+    <div class="rule">
+      <h5>05 · only have one day?</h5>
+      <p>Do <a href="#jscore">JS core</a>, <a href="#async">async</a>, <a href="#react">React rendering</a>, <a href="#hooks">hooks</a>, and <a href="#sql">PostgreSQL</a>, then read the <a href="#qbank">rapid-fire bank</a>. That's <b>~80% of what screens actually ask</b>.</p>
+    </div>
+    <div class="rule">
+      <h5>06 · the night before</h5>
+      <p>Nothing new. Re-read the <a href="#cheats">cheat tables</a> and the <a href="#qbank">rapid-fire bank</a> once, out loud where you blanked last time, then sleep. This page is built to be re-read in 40 minutes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 1 ================= -->
+<header class="day-head" id="d1">
+  <p class="eyebrow">// day 1 · ~8.5 hours <b>everything that runs in the browser</b></p>
+  <h2>The language &amp; the browser</h2>
+  <p class="day-sub">Morning is pure JavaScript — the machine underneath every framework question. Afternoon is React: how rendering actually works, what hooks really do, and the scale questions that separate "used it" from "understood it".</p>
+  <div class="sched">
+    <div class="sched-row"><span class="st">09:00</span><span class="sn"><a href="#jscore">JavaScript under the hood</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">10:30</span><span class="sn"><a href="#async">The event loop &amp; async</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row break"><span class="st">12:00</span><span class="sn">lunch — actually walk away</span><span class="sd">45 min</span></div>
+    <div class="sched-row"><span class="st">12:45</span><span class="sn"><a href="#esnext">Modern JS + a dash of TypeScript</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">13:45</span><span class="sn"><a href="#react">React: how rendering actually works</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">15:15</span><span class="sn"><a href="#hooks">Hooks, deeply</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">16:45</span><span class="sn"><a href="#reactscale">React at scale: state, context, performance</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">17:45</span><span class="sn">done — re-answer the five questions you missed today, then close the laptop</span><span class="sd">—</span></div>
+  </div>
+</header>
+
+<!-- JS CORE -->
+<section class="topic" id="jscore">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 09:00 · 90 min</span><span class="chip">the questions every screen opens with</span></div>
+      <h3>JavaScript under the hood</h3>
+      <p class="tagline">Closures, scope, <code>this</code>, prototypes, coercion. You use every one of these before your first coffee — this block attaches the vocabulary interviewers listen for.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Every event handler that reads a variable from the component around it is a <b>closure</b>. Every <code>onClick={() =&gt; ...}</code> arrow you write exists because of how <b><code>this</code></b> works. You've debugged <code>undefined is not a function</code> enough times to have earned this vocabulary already.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Types:</b> seven primitives (string, number, bigint, boolean, undefined, symbol, null) plus object. Primitives copy by value; objects copy the <b>reference</b> by value — which is why mutating a "copied" object mutates the original.</li>
+        <li><b>Coercion:</b> <code>==</code> converts operands before comparing; <code>===</code> never does. The safe rule you can say out loud: <b>always <code>===</code></b>, except the idiom <code>x == null</code> to catch both <code>null</code> and <code>undefined</code>.</li>
+        <li><b>Scope &amp; hoisting:</b> <code>var</code> is function-scoped and hoisted as <code>undefined</code>; <code>let</code>/<code>const</code> are block-scoped and hoisted into the <b>temporal dead zone</b> — alive but unusable until their line runs. <code>const</code> freezes the <i>binding</i>, not the object.</li>
+        <li><b>Closures:</b> a function keeps a live reference to the scope it was created in, even after that scope's function has returned. It's how debounce timers, event handlers, and module-private state all work — and it's the #1 asked JS question.</li>
+        <li><b><code>this</code></b> is decided at <b>call time</b>, not write time: <code>obj.fn()</code> → <code>obj</code>; plain <code>fn()</code> → <code>undefined</code> in strict mode; <code>new Fn()</code> → the fresh object; <code>fn.call(x)</code> → <code>x</code>. <b>Arrow functions don't have their own <code>this</code></b> — they capture the enclosing one, which is why they're perfect for callbacks.</li>
+        <li><b>Prototypes:</b> property lookups walk up the prototype chain until they hit <code>null</code>. <code>class</code> is syntax over exactly this — there are no "real" classes, just objects delegating to objects.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">closures-and-this.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// THE closure question: what does this log?
+for (var i = 0; i &lt; 3; i++) {
+  setTimeout(() =&gt; console.log(i));      // 3, 3, 3 — one shared i
+}
+for (let i = 0; i &lt; 3; i++) {
+  setTimeout(() =&gt; console.log(i));      // 0, 1, 2 — fresh i per loop
+}
+
+// closures as private state — say "debounce" and mean it
+function debounce(fn, ms) {
+  let timer;                              // lives on between calls
+  return (...args) =&gt; {
+    clearTimeout(timer);
+    timer = setTimeout(() =&gt; fn(...args), ms);
+  };
+}
+
+// `this` is about the CALL, not the function
+const user = {
+  name: 'Ada',
+  hello() { return `hi ${this.name}`; },
+};
+user.hello();                // 'hi Ada'    — called through user
+const f = user.hello;
+f();                         // this === undefined (strict) — detached!
+f.call(user);                // 'hi Ada'    — this supplied explicitly</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>What's a closure — and where have you used one this week?</summary><p class="ans">A function bundled with the lexical scope it was created in, so it can read/write those variables after the outer function returned. <b>Real answer-ender:</b> "our debounced search input — the timer variable lives in a closure."</p></details>
+      <details class="quiz"><summary><code>==</code> vs <code>===</code>?</summary><p class="ans"><code>==</code> coerces types before comparing (<code>'1' == 1</code> is true), <code>===</code> compares type + value. Use <code>===</code> everywhere; the one respectable <code>==</code> is <code>x == null</code>. Bonus point: <b><code>NaN === NaN</code> is false</b> — use <code>Number.isNaN()</code>.</p></details>
+      <details class="quiz"><summary>What does <code>typeof null</code> return, and why?</summary><p class="ans"><b><code>'object'</code></b> — a bug from the first JS engine, kept forever for backwards compatibility. Check null with <code>x === null</code>, never typeof.</p></details>
+      <details class="quiz"><summary><code>var</code> vs <code>let</code> vs <code>const</code> in three sentences?</summary><p class="ans"><code>var</code>: function-scoped, hoisted as undefined, re-declarable — avoid. <code>let</code>: block-scoped, TDZ before its line, reassignable. <code>const</code>: same but the binding can't be reassigned — <b>the object it points at is still mutable</b>.</p></details>
+      <details class="quiz"><summary>Is JavaScript pass-by-value or pass-by-reference?</summary><p class="ans">Always pass-by-value — but for objects, <b>the value is the reference</b>. So a function can mutate the object you passed, but reassigning its parameter does nothing to your variable.</p></details>
+      <details class="quiz"><summary>Why do arrow functions fix the classic "lost <code>this</code>" bug?</summary><p class="ans">They don't bind their own <code>this</code> — they capture the enclosing scope's, at definition time. So a callback written as an arrow inside a method keeps the instance's <code>this</code>, no <code>.bind(this)</code> needed. Tradeoff: they can't be used as constructors or rebound with call/apply.</p></details>
+      <details class="quiz"><summary>What is prototypal inheritance, in two sentences?</summary><p class="ans">Every object has an internal link to a prototype object; failed property lookups walk up that chain until found or <code>null</code>. <code>class ... extends</code> is sugar that wires exactly these links.</p></details>
+      <details class="quiz"><summary>Shallow copy vs deep copy — and how do you do each?</summary><p class="ans">Shallow (<code>{...obj}</code>, <code>Object.assign</code>) copies one level; nested objects are still shared references. Deep copies everything — modern answer is <b><code>structuredClone(obj)</code></b>; <code>JSON.parse(JSON.stringify())</code> is the old hack that drops functions, dates, undefined.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"what will this code log?" + a loop with setTimeout</span><span class="then">closure over a shared var — trace it aloud</span></li>
+        <li><span class="cue">"explain this to a junior" framing</span><span class="then">they're grading clarity, not depth — use your 3-sentence shape</span></li>
+        <li><span class="cue">"why did this method lose its this?"</span><span class="then">detached call — name the four this rules</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-jscore-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Answer all eight rapid-fire questions out loud before revealing any answer</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-jscore-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write debounce from memory in under 3 minutes, then check it against the panel</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-jscore-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain closures in 60 seconds using an example from your current codebase</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ASYNC -->
+<section class="topic" id="async">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 10:30 · 90 min</span><span class="chip">the single most-asked JS topic</span></div>
+      <h3>The event loop &amp; async</h3>
+      <p class="tagline">"In what order does this log?" is the question that decides JS screens. Ninety minutes here makes the answer mechanical instead of a coin flip.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've felt every rule already: the UI that froze during a heavy <code>.map()</code> (something blocked the loop), the state update that "hadn't happened yet" (it was queued), the two fetches you sped up with <code>Promise.all</code>. This block just names the machinery.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li>JavaScript runs on <b>one thread</b> with an <b>event loop</b>: run a task to completion → drain the <b>microtask queue</b> → maybe render → take the next task. Nothing interrupts running code; long sync work freezes everything.</li>
+        <li><b>Two queues, strict priority.</b> Macrotasks: <code>setTimeout</code>, I/O, clicks. Microtasks: promise callbacks, <code>queueMicrotask</code>. <b>All pending microtasks run after every task</b>, before the next task or timer — that's the entire trick behind ordering questions.</li>
+        <li>A <b>promise</b> is a one-shot state machine: pending → fulfilled or rejected, then frozen. <code>.then</code> always fires asynchronously (as a microtask), even on an already-settled promise.</li>
+        <li><b><code>async/await</code> is promise sugar:</b> an async function returns a promise; <code>await</code> pauses <i>that function</i> (not the thread), parking the rest as a microtask continuation. <code>try/catch</code> around <code>await</code> replaces <code>.catch</code>.</li>
+        <li><b>The combinators:</b> <code>Promise.all</code> — parallel, fail-fast on first rejection. <code>allSettled</code> — waits for every result, never rejects. <code>race</code> — first to settle wins (timeouts). <code>any</code> — first to <i>fulfill</i>. Sequential awaits in a loop are the classic accidental slowdown.</li>
+        <li><code>setTimeout(fn, 0)</code> means "run after the current task + all microtasks, at least 0ms later" — never "now". Browsers also clamp nested timers (~4ms floor).</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">order-of-logs.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// The screen question. Say the order BEFORE reading the answer.
+console.log('A');
+setTimeout(() =&gt; console.log('B'), 0);
+Promise.resolve().then(() =&gt; console.log('C'));
+console.log('D');
+// → A, D, C, B
+//   sync first (A, D), then microtasks (C), then the timer task (B)
+
+// Sequential vs parallel — the perf question hiding inside async
+const a = await getUser(1);          // 300ms
+const b = await getUser(2);          // +300ms  → 600ms total
+const [x, y] = await Promise.all([   // both in flight at once
+  getUser(1),
+  getUser(2),
+]);                                  // → ~300ms total, fail-fast
+
+// Retry with backoff — say this shape, don't memorize syntax
+async function retry(fn, tries = 3, delay = 500) {
+  for (let i = 0; i &lt; tries; i++) {
+    try { return await fn(); }
+    catch (err) {
+      if (i === tries - 1) throw err;
+      await new Promise(r =&gt; setTimeout(r, delay * 2 ** i));
+    }
+  }
+}</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>JS is single-threaded — so how does it handle 100 concurrent requests without freezing?</summary><p class="ans">The slow parts (network, timers, disk) run outside the JS thread — in browser APIs or Node's libuv. JS just registers callbacks and keeps going; the event loop feeds completions back one at a time. Concurrency without threads, as long as your own code never blocks.</p></details>
+      <details class="quiz"><summary>Microtask vs macrotask — and why does the difference matter?</summary><p class="ans">Microtasks (promise callbacks) all run immediately after the current task, before timers or rendering; macrotasks (setTimeout, I/O) each wait for the next loop turn. It decides every "what order does this log" question — and an infinite microtask chain can starve rendering entirely.</p></details>
+      <details class="quiz"><summary>What does <code>await</code> actually do?</summary><p class="ans">Unwraps a promise: suspends <i>this function</i>, schedules the rest of it as a microtask for when the promise settles, and returns control to the caller. The thread never blocks — that's the difference from "waiting".</p></details>
+      <details class="quiz"><summary><code>Promise.all</code> vs <code>Promise.allSettled</code> — when each?</summary><p class="ans"><code>all</code> rejects the moment any promise rejects — right when the results are all-or-nothing (parallel queries for one page). <code>allSettled</code> always resolves with per-item status — right for independent jobs where partial success is fine (sending 50 emails).</p></details>
+      <details class="quiz"><summary>Why is <code>await</code> inside a <code>for</code> loop a code smell — and when is it correct?</summary><p class="ans">It serializes independent requests: n × latency instead of ~1 ×. Fix with <code>Promise.all(items.map(...))</code>. It's <i>correct</i> when order matters or you must limit pressure on a downstream — then say "I'd batch with a concurrency limit".</p></details>
+      <details class="quiz"><summary>How do you time out a fetch?</summary><p class="ans">Two idioms: <code>Promise.race([fetchPromise, rejectAfter(5000)])</code>, or the real-world one — <b><code>AbortController</code></b>, passing its signal to fetch and calling <code>abort()</code> in a timer. AbortController actually cancels the request; race just stops waiting.</p></details>
+      <details class="quiz"><summary>What's an unhandled promise rejection, and how do you prevent them?</summary><p class="ans">A rejected promise with no <code>.catch</code>/<code>try-catch</code> on its chain — crashes modern Node processes. Prevention: every chain ends in a catch, async route handlers are wrapped (or Express 5 / a wrapper forwards to the error middleware), plus a last-resort <code>process.on('unhandledRejection')</code> log.</p></details>
+      <details class="quiz"><summary>Callback → promise: how, and what's the pattern called?</summary><p class="ans">Wrap it: <code>new Promise((resolve, reject) =&gt; legacyFn(args, (err, data) =&gt; err ? reject(err) : resolve(data)))</code> — "promisification"; Node ships <code>util.promisify</code> for exactly this.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"what order does this log?"</span><span class="then">sync → microtasks → macrotasks; narrate the queues</span></li>
+        <li><span class="cue">"the page freezes when…"</span><span class="then">something is blocking the loop — long sync work</span></li>
+        <li><span class="cue">"how would you speed up these three API calls?"</span><span class="then">Promise.all + mention fail-fast tradeoff</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-async-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Predict the log order in the panel, then write your own 6-line ordering puzzle and solve it</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-async-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write retry-with-backoff from memory, then add an AbortController timeout to a fetch</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-async-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain the event loop in 90 seconds, out loud, without saying "um, basically"</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ESNEXT -->
+<section class="topic" id="esnext">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 12:45 · 60 min</span><span class="chip">fluency signals, fast</span></div>
+      <h3>Modern JS + a dash of TypeScript</h3>
+      <p class="tagline">Nobody asks "what is destructuring" anymore — they watch whether you reach for it. This hour is about sounding like you write 2020s JavaScript, plus the four TypeScript questions every JS screen now includes.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Your last PR almost certainly contained <code>const { data } = await res.json()</code>, a spread, an optional chain, and a <code>.map()</code>. The screen version of this topic is just being able to say <b>why</b> those beat the older forms.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Destructuring + spread/rest:</b> pull fields out of objects/arrays in one line; <code>{ ...obj }</code> shallow-merges (later keys win) — the immutably-update idiom React state depends on.</li>
+        <li><b><code>?.</code> and <code>??</code>:</b> optional chaining short-circuits to <code>undefined</code> instead of throwing; nullish coalescing falls back <b>only</b> on <code>null/undefined</code> — unlike <code>||</code>, which also swallows <code>0</code>, <code>''</code>, and <code>false</code>. That difference is a real bug class and a favorite question.</li>
+        <li><b>Array fluency:</b> <code>map</code>/<code>filter</code>/<code>reduce</code> return new arrays (immutability); <code>forEach</code> returns nothing — it's for side effects. Know that <code>sort</code> mutates (use <code>toSorted</code> when fresh).</li>
+        <li><b>ESM vs CommonJS:</b> <code>import/export</code> is static — analyzable at build time, enabling tree-shaking; <code>require</code> is a dynamic function call. Node speaks both; the ecosystem has converged on ESM.</li>
+        <li><b>TypeScript in four beats:</b> it's compile-time only (erased at runtime); <code>interface</code> vs <code>type</code> — interfaces merge/extend and suit object shapes, type aliases do unions and everything else, pick one style and be consistent; <b><code>unknown</code> over <code>any</code></b> — any turns the checker off, unknown forces you to narrow first; generics = type-level function parameters (<code>function first&lt;T&gt;(xs: T[]): T</code>).</li>
+        <li><b>Structural typing:</b> TS compares <i>shapes</i>, not names — any object with the right fields satisfies the interface. That's why it fits JS so naturally.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">modern-idioms.ts</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-typescript">// ?? vs || — the one that shows up in real bugs
+const pageSize = userPrefs.pageSize ?? 20;   // 0 stays 0
+const pageBug  = userPrefs.pageSize || 20;   // 0 becomes 20. Oops.
+
+// immutable update — the React state idiom
+const updated = { ...user, address: { ...user.address, city: 'Pune' } };
+
+// reduce → group-by (the most-asked array exercise)
+const byRole = users.reduce&lt;Record&lt;string, User[]&gt;&gt;((acc, u) =&gt; {
+  (acc[u.role] ??= []).push(u);
+  return acc;
+}, {});
+
+// unknown forces narrowing; any silently gives up
+function parse(json: string): unknown {
+  return JSON.parse(json);
+}
+const data = parse(raw);
+if (typeof data === 'object' &amp;&amp; data !== null &amp;&amp; 'id' in data) {
+  // only now may you touch data.id — that's the point
+}</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary><code>??</code> vs <code>||</code> — when does the difference bite?</summary><p class="ans"><code>||</code> falls back on any falsy value — so <code>0</code>, <code>''</code>, and <code>false</code> get replaced; <code>??</code> only on <code>null/undefined</code>. Classic bite: a page size or toggle legitimately set to 0/false gets silently overwritten by the default.</p></details>
+      <details class="quiz"><summary><code>map</code> vs <code>forEach</code>?</summary><p class="ans"><code>map</code> transforms and returns a new array — use when you want the result; <code>forEach</code> returns undefined — use only for side effects. Saying "map for data, forEach for effects" is the fluency signal.</p></details>
+      <details class="quiz"><summary>What does spreading an object actually do?</summary><p class="ans">A <b>shallow</b> copy: top-level keys are copied, later keys win on conflict, but nested objects are shared references. That's why deep state updates need a spread per level (or Immer).</p></details>
+      <details class="quiz"><summary><code>interface</code> vs <code>type</code> in TypeScript?</summary><p class="ans">Both describe shapes. Interfaces can extend and declaration-merge (good for public/object APIs); type aliases handle unions, intersections, primitives, and mapped types. Honest senior answer: "mostly interchangeable for objects — our lint rule picks one; unions force <code>type</code>."</p></details>
+      <details class="quiz"><summary><code>any</code> vs <code>unknown</code> — why does the distinction matter?</summary><p class="ans"><code>any</code> switches type-checking off and spreads through everything it touches; <code>unknown</code> accepts any value but forbids use until you narrow it (typeof/in/instanceof or a schema like zod). For untrusted input — API responses, JSON.parse — unknown is the professional choice.</p></details>
+      <details class="quiz"><summary>What is a generic, in one sentence + one example?</summary><p class="ans">A type parameter that lets a function/type work over many types while keeping the relationship between input and output — <code>function first&lt;T&gt;(xs: T[]): T</code> returns exactly the element type it was given, no casting.</p></details>
+      <details class="quiz"><summary>Does TypeScript exist at runtime?</summary><p class="ans">No — types are erased at compile time; there's zero runtime validation. That's why API boundaries need a runtime validator (zod/joi) even in a fully typed codebase — a favorite senior follow-up.</p></details>
+      <details class="quiz"><summary>ESM vs CommonJS — one practical difference that matters?</summary><p class="ans">ESM imports are static, so bundlers can tree-shake unused exports and analyze the graph at build time; CommonJS <code>require</code> is a runtime call, so dead code can't be proven dead. Also: ESM has top-level await; CJS doesn't.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"refactor this snippet" with var + callbacks</span><span class="then">const, destructuring, async/await, optional chaining — narrate as you go</span></li>
+        <li><span class="cue">"how would you type this?"</span><span class="then">start with the shape, reach for a generic only when two types must stay linked</span></li>
+        <li><span class="cue">"do you validate API responses?"</span><span class="then">types are erased at runtime — zod/joi at the boundary</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-esnext-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write the reduce group-by from memory — it's the most-asked "quick exercise" on screens</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-esnext-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Say the ?? vs || bug story and the any vs unknown answer out loud, unprompted</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-esnext-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Take 10 lines of old callback-style code (find some) and refactor them aloud, narrating each change</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- REACT -->
+<section class="topic" id="react">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 13:45 · 90 min</span><span class="chip">how rendering actually works</span></div>
+      <h3>React: how rendering actually works</h3>
+      <p class="tagline">You've written React for years — but "walk me through what happens when state changes" is a mechanism question, and mechanisms are exactly what interviews probe. This is that mechanism, end to end.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Every list bug you've fixed by adding a proper <code>key</code>, every form you've wired with <code>value</code> + <code>onChange</code>, every "why did this child re-render" hunt in DevTools — those are the exam. You've done the lab work; today attaches the theory.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>The mental model: UI = f(state).</b> You never mutate the DOM; you change state, and React re-derives what the UI should be. Every React question is this sentence plus detail.</li>
+        <li><b>JSX compiles to function calls</b> that return plain objects — "React elements". A component is a function from props to elements. No magic, no templates.</li>
+        <li><b>Render vs commit:</b> on a state change React re-runs your component (render — pure, cheap, can happen often), diffs the new element tree against the old (<b>reconciliation</b>), then touches the real DOM only where something changed (commit). "Virtual DOM" = the element tree that makes the diff possible.</li>
+        <li><b>Keys give list items identity across renders.</b> With stable keys React matches items by identity; with index keys, deleting item 0 makes every item "become" its neighbor — state and focus land on the wrong rows. That's the whole keys question.</li>
+        <li><b>What triggers a re-render:</b> your own setState, your parent re-rendering (children re-render by default — memo is the opt-out), or a context you consume changing. Props changing is really "parent re-rendered".</li>
+        <li><b>State updates are batched</b> and setState is asynchronous-feeling: reading state right after setting it gives the old value; updates that depend on previous state use the functional form <code>setCount(c =&gt; c + 1)</code>.</li>
+        <li><b>Controlled vs uncontrolled inputs:</b> controlled = React state is the source of truth (<code>value</code> + <code>onChange</code>); uncontrolled = the DOM holds the value and you read it via a ref. Controlled is the default answer; uncontrolled for file inputs and simple/perf-sensitive forms.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">rendering.jsx</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// Batching + functional updates — a favorite "what does this show?"
+function Counter() {
+  const [n, setN] = useState(0);
+  const wrong = () =&gt; { setN(n + 1); setN(n + 1); };      // +1  (same stale n)
+  const right = () =&gt; { setN(c =&gt; c + 1); setN(c =&gt; c + 1); }; // +2
+  return &lt;button onClick={right}&gt;{n}&lt;/button&gt;;
+}
+
+// Keys: identity, not decoration
+{todos.map(t =&gt; &lt;TodoRow key={t.id} todo={t} /&gt;)}   // ✓ stable identity
+{todos.map((t, i) =&gt; &lt;TodoRow key={i} ... /&gt;)}      // ✗ delete #0 and
+                                                     //   every row shifts state
+
+// Controlled input — you own the value
+function Search() {
+  const [q, setQ] = useState('');
+  return &lt;input value={q} onChange={e =&gt; setQ(e.target.value)} /&gt;;
+}</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>What is the virtual DOM, and what problem does it solve?</summary><p class="ans">A lightweight tree of plain objects describing the UI. On each render React diffs new tree vs old and applies only the minimal set of real-DOM mutations — because DOM writes (layout, paint) are the expensive part, not JS. It buys you declarative code at near-imperative cost.</p></details>
+      <details class="quiz"><summary>Walk me through what happens when you call setState.</summary><p class="ans">React schedules a re-render (batching multiple set-calls in the same event), re-runs the component function to get a new element tree, reconciles it against the previous tree, and commits the minimal DOM changes — then runs effects. Render is pure; commit touches the world.</p></details>
+      <details class="quiz"><summary>Why is using the array index as a key a bug, and when is it fine?</summary><p class="ans">Keys are identity. With index keys, inserting/deleting/reordering makes React match the wrong old item to each new position — component state, animations, and focus stick to the index, not the data. Fine only when the list never reorders and items have no state.</p></details>
+      <details class="quiz"><summary>Props vs state?</summary><p class="ans">Props are inputs from the parent — read-only; state is owned and mutated (via setter) by the component itself. If two components need it, lift it to the common parent and pass it down — "lifting state up".</p></details>
+      <details class="quiz"><summary>Controlled vs uncontrolled components?</summary><p class="ans">Controlled: React state drives the input (<code>value</code>+<code>onChange</code>) — validation, formatting, conditional UI all become trivial. Uncontrolled: DOM keeps the value, read it with a ref — less code, fewer renders, required for <code>&lt;input type="file"&gt;</code>.</p></details>
+      <details class="quiz"><summary>Why does my component render twice in development?</summary><p class="ans">StrictMode intentionally double-invokes render (and mount effects) in dev only, to surface impure renders and missing effect cleanup. It's a lint at runtime, not a perf bug — knowing this instantly signals real React experience.</p></details>
+      <details class="quiz"><summary>Can a child update its parent's state?</summary><p class="ans">Only by calling a function the parent passed down as a prop — "state down, events up". That one-way data flow is the answer to half of all React architecture questions.</p></details>
+      <details class="quiz"><summary>What's a fragment and why does it exist?</summary><p class="ans"><code>&lt;&gt;...&lt;/&gt;</code> groups siblings without an extra DOM node — because a component must return one root, and wrapper divs break flex/grid layouts and bloat the tree.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"my list glitches when I remove an item"</span><span class="then">index keys — say identity, propose t.id</span></li>
+        <li><span class="cue">"the input won't let me type"</span><span class="then">controlled input with value but no onChange</span></li>
+        <li><span class="cue">"count only went up by one"</span><span class="then">stale state in the closure — functional update</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-react-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Narrate the full setState → render → reconcile → commit path in under 90 seconds</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-react-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write a controlled form (2 fields + submit) from memory, no autocomplete</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-react-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Tell the index-key bug as a 30-second war story — the day a list scrambled on you</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOOKS -->
+<section class="topic" id="hooks">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 15:15 · 90 min</span><span class="chip">where React interviews are won</span></div>
+      <h3>Hooks, deeply</h3>
+      <p class="tagline">Everyone can use useState. Interviews live one level down: why hooks can't be conditional, what the deps array really means, and the stale-closure bug you've definitely shipped.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>The interval that kept logging a frozen counter value, the effect that fired twice, the lint rule yelling about missing deps — every hook gotcha in this block is a bug you have personally fought. Today you learn to explain them on purpose.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Why the rules of hooks exist:</b> React stores hook state in a list, matched to components <b>by call order</b>. Call a hook inside an <code>if</code> and render #2 reads render #1's slots off by one — that's why hooks live at the top level, unconditionally.</li>
+        <li><b><code>useEffect</code> is for synchronizing with the outside world</b> (network, subscriptions, DOM APIs, timers) — not for reacting to state you could derive during render. It runs <i>after</i> paint. Deps array: none → every render; <code>[]</code> → mount only; <code>[a, b]</code> → whenever a or b change (compared by <code>Object.is</code>).</li>
+        <li><b>Cleanup runs before the next effect and on unmount.</b> Return a function that clears the timer / unsubscribes / aborts the fetch. Most "effect bugs" are missing cleanups.</li>
+        <li><b>Stale closures:</b> an effect's callback captures the state values from the render it was created in. An interval created once (<code>[]</code>) sees the initial state forever — fix with a functional update, correct deps, or a ref.</li>
+        <li><b><code>useMemo</code>/<code>useCallback</code> are about referential equality</b>, not raw speed: they keep the same object/function identity between renders so memoized children and effect deps don't fire spuriously. Wrapping everything in them is cargo cult — measure first.</li>
+        <li><b><code>useRef</code></b> is a mutable box that survives renders and never triggers one. Two jobs: holding DOM nodes, and stashing mutable values (latest callback, interval id) that aren't render data.</li>
+        <li><b>Custom hooks are just functions that call hooks</b> — the reuse mechanism for stateful logic. <code>useDebounce</code>, <code>useLocalStorage</code>, <code>useAuth</code>: name starts with <code>use</code> so the linter can check the rules.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">stale-closure.jsx</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// THE hooks interview question. Why does this count stop at 1?
+function Timer() {
+  const [count, setCount] = useState(0);
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; {
+      setCount(count + 1);      // `count` is frozen at 0 — stale closure
+    }, 1000);
+    return () =&gt; clearInterval(id);   // cleanup: the part they check for
+  }, []);                       // ran once → captured the first render
+  return &lt;h1&gt;{count}&lt;/h1&gt;;     // renders 1 and stays there
+}
+
+// Fix: functional update — no stale read at all
+setCount(c =&gt; c + 1);
+
+// A custom hook is just extraction — nothing magic
+function useDebounce(value, ms) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() =&gt; {
+    const id = setTimeout(() =&gt; setDebounced(value), ms);
+    return () =&gt; clearTimeout(id);
+  }, [value, ms]);
+  return debounced;
+}</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>Why can't you call a hook inside an if statement?</summary><p class="ans">Hook state is stored positionally, by call order per component. A conditional call shifts the order between renders, so every later hook reads the wrong slot. The rule isn't style — it's the storage model.</p></details>
+      <details class="quiz"><summary>useEffect with no deps array vs <code>[]</code> vs <code>[x]</code>?</summary><p class="ans">No array: after every render. <code>[]</code>: after mount only (plus cleanup at unmount). <code>[x]</code>: after renders where <code>x</code> changed by <code>Object.is</code> — which is why unstable object/function deps cause every-render firing.</p></details>
+      <details class="quiz"><summary>What's a stale closure in a hook, concretely?</summary><p class="ans">An effect/callback captures the state of the render that created it; if it runs later (interval, subscription, resolved fetch) it still sees those old values. Fixes: functional updates, listing the value in deps, or reading the latest through a ref.</p></details>
+      <details class="quiz"><summary>useMemo vs useCallback — and when are they actually worth it?</summary><p class="ans"><code>useMemo(fn)</code> caches a computed <i>value</i>; <code>useCallback(fn)</code> caches the <i>function itself</i> (≡ useMemo(() =&gt; fn)). Worth it when the result feeds a memoized child or a deps array, or the computation is provably heavy — otherwise it's overhead and noise.</p></details>
+      <details class="quiz"><summary>When useRef over useState?</summary><p class="ans">When the value must survive renders but changing it shouldn't cause one: DOM handles, interval ids, "latest value" mirrors, previous-props tracking. Rule: render data → state; instance data → ref.</p></details>
+      <details class="quiz"><summary>How do you fetch data on mount, correctly?</summary><p class="ans">Effect with an AbortController: start the fetch, setState on success, and return a cleanup that aborts — so an unmounted or re-run component never sets state from a dead request (the "race on fast navigation" bug). In production apps: React Query/SWR does this plumbing.</p></details>
+      <details class="quiz"><summary>Why did my effect run twice on mount in dev?</summary><p class="ans">StrictMode mounts → unmounts → remounts in development to prove your effect + cleanup pair is safe to re-run. If the double-run breaks something, the cleanup is missing or wrong — that's the signal it exists to send.</p></details>
+      <details class="quiz"><summary>What makes something worth extracting into a custom hook?</summary><p class="ans">Stateful logic used by more than one component (or crowding one): pair of state + effect + cleanup behind one clean return value. It's the hooks answer to "how do you reuse logic without HOCs/render props".</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"the counter sticks at 1" / "logs the old value"</span><span class="then">stale closure — say functional update</span></li>
+        <li><span class="cue">"requests pile up when I type fast"</span><span class="then">missing cleanup — debounce + abort</span></li>
+        <li><span class="cue">"should I wrap this in useMemo?"</span><span class="then">only if identity feeds memo/deps, or it's measured-slow</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-hooks-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write useDebounce from memory, with cleanup, in under 5 minutes</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-hooks-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain the stale-closure interval bug and both fixes, out loud, to a rubber duck</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-hooks-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write a fetch-on-mount effect with AbortController cleanup, no reference</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- REACT AT SCALE -->
+<section class="topic" id="reactscale">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 1 · 16:45 · 60 min</span><span class="chip">the senior-signal questions</span></div>
+      <h3>React at scale: state, context, performance</h3>
+      <p class="tagline">"Where does state live?" and "why is this page slow?" are the questions that separate senior from mid on a React screen. One hour on the decision rules.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've drilled props three levels deep, reached for Context, watched everything re-render, and then pulled in Redux or React Query. That whole arc — and knowing <b>when each step was actually justified</b> — is precisely what this hour rehearses.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Colocate state:</b> keep it in the lowest component that needs it; lift only when siblings must share. Most "state management problems" are state living too high, re-rendering half the app.</li>
+        <li><b>Context is dependency injection, not a state manager:</b> every consumer re-renders when the value changes. Right for slow-moving globals (theme, auth, locale); wrong for hot data. Mitigations: split contexts, memoize the value object.</li>
+        <li><b>Client state vs server state:</b> UI state (modals, inputs) belongs in useState/useReducer or Zustand/Redux Toolkit. Data that lives on the server (users, orders) belongs in <b>React Query / SWR</b> — caching, dedupe, revalidation, retries are their whole job. Mixing the two in one Redux store is the legacy pattern interviewers love to hear you criticize.</li>
+        <li><b>Perf toolkit, in order:</b> measure with React DevTools Profiler → colocate / split components → <code>React.memo</code> on expensive pure children (with stable props!) → virtualize long lists (react-window) → <code>React.lazy</code> + Suspense to code-split routes. Naming the <i>order</i> is the senior move; memo-everything is the junior one.</li>
+        <li><b>CSR vs SSR vs SSG vs ISR:</b> client-render (blank HTML + JS builds the page), server-render per request (fast first paint + SEO), static at build time (fastest, for content), incremental static (static + periodic rebuild). <b>Hydration</b> = attaching listeners to server-sent HTML to make it interactive. Framework answer in 2026: Next.js, with React Server Components sending zero JS for server-only parts.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">where-does-state-live.md</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">The decision ladder — answer any state question by walking it:
+
+1. one component needs it        → useState, right there
+2. two siblings need it          → lift to the common parent
+3. a subtree needs it (theme)    → context (memoized value)
+4. the whole app, hot + complex  → Zustand / Redux Toolkit
+5. it lives on the SERVER        → React Query / SWR
+                                   (cache, dedupe, revalidate)
+
+"Why is the page slow?" — the measured answer:
+profile first → who re-renders? →
+  state too high?      colocate
+  huge pure child?     React.memo + stable props
+  5,000-row list?      virtualize
+  1MB bundle?          lazy-load routes</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>When does React.memo do nothing at all?</summary><p class="ans">When props change identity every render anyway — inline objects, arrays, arrow functions recreated by the parent. memo does a shallow compare; new references defeat it. That's the marriage between memo and useCallback/useMemo.</p></details>
+      <details class="quiz"><summary>Prop drilling — when is it fine, and what are the real fixes?</summary><p class="ans">Two or three levels of explicit props is often the <i>clearest</i> code. Fixes when it hurts: component composition (pass children), context for stable globals, or a store for hot shared state. Jumping straight to a library is the red flag.</p></details>
+      <details class="quiz"><summary>Why put server data in React Query instead of Redux?</summary><p class="ans">Server data has concerns Redux doesn't solve out of the box: caching with staleness, request dedupe, background revalidation, retries, pagination. React Query treats "data on another machine" as its own problem class — Redux stays for genuinely client-owned state.</p></details>
+      <details class="quiz"><summary>What is hydration — and what's a hydration mismatch?</summary><p class="ans">The client runs React over server-rendered HTML, attaching event listeners instead of rebuilding the DOM. A mismatch is when client render ≠ server HTML (dates, random ids, browser-only branches) — React warns and patches, and the fix is making both renders deterministic.</p></details>
+      <details class="quiz"><summary>SSR vs SSG vs ISR — one sentence each?</summary><p class="ans">SSR renders per request (personalized, always fresh, costs a server). SSG renders at build (fastest, cacheable, for content that rarely changes). ISR is SSG that re-renders pages in the background on a timer/on-demand — the middle ground for mostly-static content.</p></details>
+      <details class="quiz"><summary>How would you debug a slow React page, step by step?</summary><p class="ans">React DevTools Profiler to find what re-renders and why → check state placement (colocate) → stabilize prop identities + memo the expensive subtree → virtualize long lists → split the bundle by route. Lead with "measure" — the order is the answer.</p></details>
+      <details class="quiz"><summary>What are React Server Components, in one breath?</summary><p class="ans">Components that run only on the server — they can query the DB directly and ship zero JS to the client; interactive "client components" opt in with <code>'use client'</code>. It moves data-fetching to the server by default — the Next.js App Router model.</p></details>
+      <details class="quiz"><summary>How do you code-split a React app?</summary><p class="ans"><code>React.lazy(() =&gt; import('./Page'))</code> wrapped in <code>&lt;Suspense fallback&gt;</code>, split at route boundaries first — frameworks do it per-route automatically. Goal: first load ships only the code the first screen needs.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"how do you manage state?"</span><span class="then">walk the ladder — colocate → lift → context → store → server-state lib</span></li>
+        <li><span class="cue">"the dashboard re-renders constantly"</span><span class="then">context value identity or state too high — profile first</span></li>
+        <li><span class="cue">"why Next.js?"</span><span class="then">SSR/SSG/ISR per page + RSC = less client JS + file routing</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-reactscale-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Recite the state-decision ladder from memory, then map YOUR app's state onto it aloud</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-reactscale-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Deliver the "debug a slow page" answer in 60 seconds, starting with the word "profile"</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="1" data-key="fs-reactscale-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain hydration + one mismatch you've seen (or construct one) in 45 seconds</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 2 ================= -->
+<header class="day-head" id="d2">
+  <p class="eyebrow">// day 2 · ~8.5 hours <b>everything behind the API and under the bill</b></p>
+  <h2>The server, the data, the cloud</h2>
+  <p class="day-sub">Morning: Node's event loop and the API layer you build on it. Afternoon: PostgreSQL from joins to EXPLAIN, then AWS — first the map of core services, then the scaling-and-cost questions that mark you as someone who has actually run things.</p>
+  <div class="sched">
+    <div class="sched-row"><span class="st">09:00</span><span class="sn"><a href="#node">Node.js internals</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">10:30</span><span class="sn"><a href="#api">Express &amp; API design</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row break"><span class="st">12:00</span><span class="sn">lunch — actually walk away</span><span class="sd">45 min</span></div>
+    <div class="sched-row"><span class="st">12:45</span><span class="sn"><a href="#sql">PostgreSQL: queries, joins, transactions</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">14:15</span><span class="sn"><a href="#dbperf">Indexes, EXPLAIN &amp; the N+1 problem</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row"><span class="st">15:15</span><span class="sn"><a href="#aws">AWS: the core map</a></span><span class="sd">90 min</span></div>
+    <div class="sched-row"><span class="st">16:45</span><span class="sn"><a href="#awsops">Scaling, queues &amp; the bill</a></span><span class="sd">60 min</span></div>
+    <div class="sched-row break"><span class="st">17:45</span><span class="sn">done — run the <a href="#qbank">rapid-fire bank</a> once, cold, and mark what you missed</span><span class="sd">—</span></div>
+  </div>
+</header>
+
+<!-- NODE -->
+<section class="topic" id="node">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 09:00 · 90 min</span><span class="chip">"single-threaded" is a trick question</span></div>
+      <h3>Node.js internals</h3>
+      <p class="tagline">Every Node interview contains "it's single-threaded — so how does it scale?" and one question about something blocking the loop. Both have precise, rehearsable answers.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've run <code>pm2 start -i max</code>, streamed a big file after <code>readFile</code> ate the RAM, and watched one hot endpoint freeze every other request. You've operated all of Node's sharp edges — this block turns each scar into an answer.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Node = V8 + libuv.</b> Your JS runs on one thread; libuv handles async I/O with OS primitives (epoll/kqueue) and keeps a small <b>thread pool</b> (default 4) for fs, crypto, DNS. "Single-threaded" is true of your code, not the process.</li>
+        <li><b>Why it scales for I/O:</b> a waiting request costs almost nothing — no thread per connection. Tens of thousands of concurrent sockets on one process is normal. The corollary: <b>one CPU-heavy request blocks every other request.</b> Node is I/O-bound heaven, CPU-bound hell.</li>
+        <li><b>The loop has phases</b> — timers → pending callbacks → poll (I/O) → check (<code>setImmediate</code>) → close. Between every callback, Node drains <code>process.nextTick</code> then promise microtasks. Interview one-liner: "timers, poll, setImmediate — with nextTick and microtasks squeezed between every step."</li>
+        <li><b>CPU work escape hatches:</b> <code>worker_threads</code> (real threads, shared nothing by default) for compute inside one process; the <b>cluster</b> module / PM2 (one process per core, sharing the port) for scaling requests across cores. Know which is which — it's a favorite pair question.</li>
+        <li><b>Streams process data in chunks</b> with constant memory: readable → transform → writable via <code>.pipe()</code>/<code>pipeline()</code>. <b>Backpressure</b> — the consumer signalling "slow down" so the producer pauses — is handled for you by pipe; naming it is the senior tell. Buffers are the raw-bytes chunks streams carry.</li>
+        <li><b>Process hygiene:</b> config via env vars, crash fast on unknown state, <code>SIGTERM</code> → stop accepting, drain, exit (graceful shutdown). <code>require</code>/ESM imports are cached — a module runs once, which is why "just export an object" is Node's singleton.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">streams-vs-memory.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// The 2GB export, two ways.
+import { createReadStream } from 'node:fs';
+import { pipeline } from 'node:stream/promises';
+
+// ✗ loads the whole file into RAM, then starts sending
+app.get('/export-bad', async (req, res) =&gt; {
+  const all = await fs.readFile('huge.csv');   // 2GB in memory
+  res.send(all);
+});
+
+// ✓ constant memory, backpressure handled by pipeline
+app.get('/export', async (req, res) =&gt; {
+  await pipeline(createReadStream('huge.csv'), res);
+});
+
+// The ordering pair everyone gets asked:
+setTimeout(() =&gt; console.log('timeout'), 0);   // timers phase
+setImmediate(() =&gt; console.log('immediate'));  // check phase
+process.nextTick(() =&gt; console.log('tick'));   // before either
+// → tick first, always. timeout vs immediate: don't guess —
+//   say "nextTick wins; the other two race unless inside I/O,
+//   where setImmediate always beats the 0ms timer."</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>Node is single-threaded — how does it serve 10,000 concurrent users?</summary><p class="ans">Waiting costs nothing: I/O is delegated to the OS via libuv, so each idle connection is just a socket + callback, not a thread. The one thread only runs JS between I/O events. Caveat to volunteer: this dies the moment a request does heavy CPU work on the loop.</p></details>
+      <details class="quiz"><summary>What blocks the event loop, and how do you find it in production?</summary><p class="ans">Long synchronous work: big JSON.parse/stringify, sync fs/crypto calls, giant loops, catastrophic regex. Detect by measuring event-loop lag/utilization (built-in <code>perf_hooks</code>, APM dashboards, clinic.js); fix by chunking, streaming, or moving to worker threads.</p></details>
+      <details class="quiz"><summary>cluster (PM2) vs worker_threads?</summary><p class="ans">Cluster forks whole processes — one per core, sharing the listen port — to scale <i>request throughput</i>; memory is duplicated, crashes are isolated. Worker threads are threads inside one process for <i>CPU-heavy jobs</i> (image resize, parsing), passing data by message. Scale requests with processes; offload compute with threads.</p></details>
+      <details class="quiz"><summary>When do you reach for a stream instead of readFile?</summary><p class="ans">Whenever the data is big or unbounded, or you can start producing output before consuming all input: file uploads/downloads, CSV exports, proxying, ETL. Constant memory + lower time-to-first-byte; <code>pipeline()</code> wires error handling and backpressure.</p></details>
+      <details class="quiz"><summary>What is backpressure?</summary><p class="ans">When a fast producer outruns a slow consumer, the consumer's buffer fills and it signals "pause" upstream; the producer resumes on drain. <code>pipe/pipeline</code> implement it automatically — write your own write-loop and you must honor <code>write()</code> returning false.</p></details>
+      <details class="quiz"><summary>process.nextTick vs setImmediate — and which is misnamed?</summary><p class="ans">Both are misnamed, and saying so is the flex: <code>nextTick</code> runs <i>immediately</i> after the current operation (before promises, before any phase); <code>setImmediate</code> runs on the <i>next</i> loop iteration (check phase). Prefer setImmediate for "yield to the loop"; nextTick can starve I/O if abused.</p></details>
+      <details class="quiz"><summary>How does require/import caching behave, and what pattern does it enable?</summary><p class="ans">First load runs the module and caches its exports; every later require gets the same object. That makes a plain exported instance (db pool, config, logger) a natural singleton — and explains why mutating an imported object leaks state across the whole app.</p></details>
+      <details class="quiz"><summary>What does a graceful shutdown look like in Node?</summary><p class="ans">On SIGTERM: stop accepting new connections (<code>server.close</code>), let in-flight requests finish with a deadline, close DB pools/queues, then exit 0 — and the platform's load balancer has already stopped routing to you (that's why health checks exist). Kubernetes/ECS send SIGTERM then SIGKILL after the grace period.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"why did every request slow down at once?"</span><span class="then">one blocked loop — hunt the sync/CPU work</span></li>
+        <li><span class="cue">"the export endpoint OOMs on big accounts"</span><span class="then">buffered file in memory — stream it</span></li>
+        <li><span class="cue">"how do you use all 8 cores?"</span><span class="then">cluster/PM2 for requests, workers for compute</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-node-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Deliver the "single-threaded but scales" answer in 45 seconds, ending with the CPU caveat</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-node-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write the streamed-export route from memory with pipeline()</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-node-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain cluster vs worker_threads with one concrete use case each, out loud</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section class="topic" id="api">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 10:30 · 90 min</span><span class="chip">middleware · REST · auth</span></div>
+      <h3>Express &amp; API design</h3>
+      <p class="tagline">The interview version of the code you write most: what middleware really is, which status code when, and the JWT-vs-session answer you'll give a dozen times in your career.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Your <code>app.use(auth)</code> line, the <code>errorHandler</code> at the bottom of <code>app.js</code>, the CORS error you fixed by listing the frontend origin — the entire topic is code you maintain today, asked back at you as "why".</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Middleware is a pipeline:</b> each <code>(req, res, next)</code> function reads/annotates the request and either responds or calls <code>next()</code>. <b>Registration order is execution order</b> — auth before routes, error handler last. Forget <code>next()</code> and the request hangs forever.</li>
+        <li><b>Error handling is centralized:</b> one <code>(err, req, res, next)</code> middleware at the end; everything else throws or calls <code>next(err)</code>. In Express 5, rejected async handlers route there automatically; in Express 4 you wrap handlers (or a stray rejection kills the request silently).</li>
+        <li><b>REST semantics:</b> nouns for resources (<code>/orders/42</code>), verbs from the method. GET reads, POST creates, PUT replaces, PATCH partially updates, DELETE removes. <b>Idempotent</b> (safe to retry): GET, PUT, DELETE. POST isn't — which is why payment APIs take an <b>idempotency key</b>.</li>
+        <li><b>Status codes that matter:</b> 200/201/204 (ok / created / no body), 400 (bad input), <b>401 unauthenticated vs 403 unauthorized</b>, 404, 409 (conflict), 422 (validation), 429 (rate limited), 500 vs 503 (bug vs overloaded/down). Precision here is a cheap, loud competence signal.</li>
+        <li><b>Sessions vs JWT:</b> session = random id in an httpOnly cookie, state on the server (Redis) — easy revocation, needs shared session store to scale. JWT = signed claims held by the client, verified statelessly — <b>can't be revoked before expiry</b>, so: short-lived access token + refresh token, and keep tokens in <b>httpOnly cookies</b>, not localStorage (XSS-readable). The tradeoff sentence is the whole question.</li>
+        <li><b>Edge discipline:</b> validate input with a schema (zod/joi) before logic; rate-limit per user/IP; CORS is the <i>browser</i> enforcing which origins may read responses — the preflight OPTIONS is it asking permission for non-simple requests. CORS is not server security; authz is.</li>
+        <li><b>Pagination:</b> offset/limit is simple but drifts under writes and slows at depth; <b>cursor (keyset)</b> — "after id X" — is stable and index-friendly. Version your API (<code>/v1</code>) before you need to.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">app.js</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// The skeleton worth reproducing on a whiteboard
+app.use(express.json({ limit: '1mb' }));
+app.use(helmet());                        // sane security headers
+app.use(cors({ origin: ALLOWED, credentials: true }));
+app.use(rateLimit({ windowMs: 60_000, max: 100 }));
+
+app.use('/api', authenticate);            // 401 if no valid identity
+app.get('/api/orders', authorize('orders:read'), listOrders); // else 403
+
+// validation at the edge, before any logic
+const CreateOrder = z.object({ items: z.array(Item).min(1) });
+app.post('/api/orders', (req, res, next) =&gt; {
+  const parsed = CreateOrder.safeParse(req.body);
+  if (!parsed.success) return res.status(422).json(parsed.error.flatten());
+  createOrder(parsed.data).then(o =&gt; res.status(201).json(o)).catch(next);
+});
+
+// ONE error handler, dead last. Four args = Express knows.
+app.use((err, req, res, next) =&gt; {
+  logger.error({ err, path: req.path, reqId: req.id });
+  const status = err.status ?? 500;
+  res.status(status).json({
+    error: status === 500 ? 'internal error' : err.message, // no stack leaks
+  });
+});</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>What is middleware, and why does order matter?</summary><p class="ans">Functions in a chain, each seeing (req, res, next) — they compose cross-cutting concerns: parsing, auth, logging, rate limiting. Express runs them in registration order, so auth must precede routes and the error handler must come last; the order <i>is</i> the architecture.</p></details>
+      <details class="quiz"><summary>401 vs 403?</summary><p class="ans">401 Unauthorized actually means <b>unauthenticated</b> — "I don't know who you are; log in." 403 Forbidden means "I know exactly who you are, and no." Auth middleware sends 401; permission checks send 403.</p></details>
+      <details class="quiz"><summary>PUT vs PATCH?</summary><p class="ans">PUT replaces the whole resource (send everything, idempotent by definition); PATCH applies a partial change. Follow-up worth pre-empting: PATCH <i>can</i> be idempotent ("set status=paid") or not ("append item").</p></details>
+      <details class="quiz"><summary>JWT vs server sessions — give the tradeoff, not a winner.</summary><p class="ans">Sessions: server-held state, instant revocation, but every node needs the session store. JWT: stateless verification anywhere (great for microservices/mobile), but revocation before expiry needs a denylist — so short access tokens + refresh rotation. Then the kicker: either way the browser copy lives in an httpOnly cookie.</p></details>
+      <details class="quiz"><summary>Why is localStorage the wrong place for tokens?</summary><p class="ans">Any XSS — yours or a compromised npm dependency's — can read localStorage and exfiltrate the token. httpOnly cookies are invisible to JS; pair with SameSite and CSRF protection. "XSS steals localStorage; CSRF rides cookies; each store has its counter" is the complete answer.</p></details>
+      <details class="quiz"><summary>What actually triggers a CORS preflight, and what is CORS protecting?</summary><p class="ans">Non-simple requests — methods beyond GET/POST-with-form-encoding, custom headers like Authorization, JSON content-type — make the browser send OPTIONS first. CORS protects <i>users</i> from malicious origins reading cross-site responses in their browser; it does nothing against curl. Server auth is still doing the real guarding.</p></details>
+      <details class="quiz"><summary>What is an idempotency key and when do you need one?</summary><p class="ans">A client-generated unique id sent with a non-idempotent request (POST /payments); the server stores the result per key and replays it on retry instead of re-executing. Needed wherever retries + money/side effects meet — networks fail after the server succeeded.</p></details>
+      <details class="quiz"><summary>Offset vs cursor pagination?</summary><p class="ans">OFFSET n scans and discards n rows (slow at depth) and shifts when rows are inserted mid-scroll (duplicates/skips). Cursor: "WHERE (created, id) &lt; last-seen ORDER BY … LIMIT k" — stable under writes, uses the index. Offset is fine for small admin tables; cursors for feeds.</p></details>
+      <details class="quiz"><summary>How do you secure an Express API — the 30-second checklist?</summary><p class="ans">HTTPS everywhere; helmet for headers; schema-validate every input; parameterized queries; authn middleware then per-route authz; rate limiting; httpOnly+SameSite cookies; secrets in env/secret manager; audit deps; central error handler that never leaks stacks. Rattling this off calmly is the senior signal.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"design the API for X" on a screen</span><span class="then">resources → methods → status codes → auth → pagination, in that order</span></li>
+        <li><span class="cue">"the request just hangs"</span><span class="then">a middleware never called next() or res.end()</span></li>
+        <li><span class="cue">"how would you log users out everywhere?"</span><span class="then">the JWT revocation gap — refresh rotation + denylist</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-api-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write the app.js skeleton from memory — order intact, error handler last</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-api-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Design /api/v1 for a todo app aloud: routes, methods, codes, auth, pagination — 5 minutes</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-api-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Say the JWT-vs-sessions tradeoff and the localStorage answer until they're automatic</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SQL -->
+<section class="topic" id="sql">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 12:45 · 90 min</span><span class="chip">joins · NULL · transactions</span></div>
+      <h3>PostgreSQL: queries, joins, transactions</h3>
+      <p class="tagline">SQL screens have a canon: one join question, one NULL trap, one "explain ACID". All three are fully rehearsable, and the join question is nearly always the same join question.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>Every Prisma <code>include</code> is a join; every "why is this user missing from the report" you've debugged was an INNER join that should've been LEFT; every double-clicked checkout you've guarded was a transaction. The ORM has been writing this exam for you for years.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Joins:</b> INNER keeps only matching rows; LEFT keeps every left row, NULL-padding the misses; RIGHT is LEFT flipped; FULL keeps both sides. The canonical trap: a LEFT JOIN row-count question — one order per user duplicates the user row per order.</li>
+        <li><b>The anti-join</b> — "users with NO orders" — has two canonical spellings: <code>LEFT JOIN … WHERE o.id IS NULL</code>, and <code>NOT EXISTS (SELECT 1 …)</code>. Knowing both, and that <code>NOT IN</code> silently breaks when the subquery yields a NULL, is the whole question.</li>
+        <li><b>NULL is three-valued logic:</b> <code>NULL = NULL</code> is not true — any comparison with NULL is <i>unknown</i>, and WHERE keeps only <i>true</i>. Hence <code>IS NULL</code>/<code>IS DISTINCT FROM</code>, and why NULLs vanish from <code>COUNT(col)</code> but not <code>COUNT(*)</code>.</li>
+        <li><b>GROUP BY buckets rows; HAVING filters the buckets.</b> WHERE runs before grouping (can't see aggregates), HAVING after. "Customers with more than 5 orders" = GROUP BY + HAVING COUNT(*) &gt; 5.</li>
+        <li><b>Transactions are ACID:</b> atomic (all or nothing), consistent (constraints hold), isolated (concurrent transactions don't see each other's partials), durable (committed survives crash). Anything that moves value between rows — transfer, checkout, inventory — belongs in one.</li>
+        <li><b>Isolation levels, PG edition:</b> default is <b>Read Committed</b> — no dirty reads ever, but two reads in one transaction can disagree (non-repeatable). <b>Repeatable Read</b> gives a frozen snapshot; <b>Serializable</b> makes concurrent transactions behave as if run one-by-one (retry on serialization failure). PG does this with <b>MVCC</b> — writers make new row versions, readers read old ones, so readers and writers never block each other.</li>
+        <li><b>Constraints are the last line of defense:</b> primary keys, foreign keys, NOT NULL, UNIQUE, CHECK. App code has races; a UNIQUE index does not. "Enforce it in the schema, not just in JS" is a senior refrain.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-canon.sql</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-sql">-- Q: every user and how many orders they have — INCLUDING zero.
+SELECT u.id, u.name, COUNT(o.id) AS orders     -- COUNT(o.id), not (*):
+FROM users u                                    -- NULLs must count as 0
+LEFT JOIN orders o ON o.user_id = u.id
+GROUP BY u.id, u.name
+HAVING COUNT(o.id) &gt; 5;        -- HAVING: filter AFTER grouping
+
+-- Q: users with NO orders — both canonical forms
+SELECT u.* FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.id IS NULL;
+
+SELECT u.* FROM users u
+WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
+
+-- Q: the transfer. Atomic or it didn't happen.
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;   -- crash before this line → neither update exists</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>INNER vs LEFT JOIN — and the report-bug version of the question?</summary><p class="ans">INNER drops rows with no match; LEFT keeps them with NULLs. The bug version: "why did users disappear from the report?" — someone joined users to orders with INNER, silently excluding everyone with zero orders.</p></details>
+      <details class="quiz"><summary>Why does <code>WHERE deleted_at = NULL</code> return zero rows?</summary><p class="ans">Comparisons with NULL evaluate to <i>unknown</i>, never true — NULL isn't a value, it's "absent". You must write <code>IS NULL</code>. Bonus: this same rule is why <code>NOT IN</code> with a NULL in the list matches nothing.</p></details>
+      <details class="quiz"><summary>WHERE vs HAVING?</summary><p class="ans">WHERE filters rows before grouping — it can't see aggregates; HAVING filters groups after. Perf note worth adding: push every condition you can into WHERE so fewer rows get grouped at all.</p></details>
+      <details class="quiz"><summary>What is ACID — with one real example?</summary><p class="ans">Atomicity, Consistency, Isolation, Durability. Example that always lands: checkout decrements stock and inserts an order — in one transaction, either both happen or neither, constraints stay true, concurrent checkouts don't see half of mine, and once committed it survives a crash.</p></details>
+      <details class="quiz"><summary>Postgres's default isolation level, and what anomaly does it allow?</summary><p class="ans">Read Committed. Dirty reads are impossible, but <b>non-repeatable reads</b> aren't: read a row, someone commits a change, read again in the same transaction — different answer. Repeatable Read fixes that with a snapshot; Serializable removes anomalies entirely at the cost of retries.</p></details>
+      <details class="quiz"><summary>What is MVCC, in two sentences?</summary><p class="ans">Multi-Version Concurrency Control: every update writes a new row version instead of overwriting, and each transaction reads the versions visible to its snapshot. Readers never block writers and vice versa — and dead versions are why Postgres needs VACUUM.</p></details>
+      <details class="quiz"><summary>DELETE vs TRUNCATE?</summary><p class="ans">DELETE removes rows one by one — WHERE-able, fires triggers, fully transactional and slower. TRUNCATE deallocates the whole table's storage — instant, no per-row triggers, optionally <code>RESTART IDENTITY</code> (still transactional in PG). Prod rule: TRUNCATE is for test fixtures, not for tables with FKs pointing at them.</p></details>
+      <details class="quiz"><summary>Why store money as NUMERIC and not FLOAT?</summary><p class="ans">Floats are binary approximations — 0.1 + 0.2 ≠ 0.3 — and rounding errors compound in sums. NUMERIC is exact decimal arithmetic. Alternative correct answer: integer cents. Anyone who's shipped billing says this instantly, which is why it's asked.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"count per user including zero"</span><span class="then">LEFT JOIN + COUNT(col) + GROUP BY — the canon</span></li>
+        <li><span class="cue">"records that DON'T have a …"</span><span class="then">anti-join: LEFT+IS NULL or NOT EXISTS, never NOT IN</span></li>
+        <li><span class="cue">"two users clicked buy at the same time"</span><span class="then">transaction + constraint (or SELECT FOR UPDATE)</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-sql-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Write the orders-per-user-including-zero query and both anti-join forms, from memory</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-sql-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain ACID with your own app's checkout/transfer flow as the example, in 60 seconds</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-sql-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Say the isolation ladder — Read Committed → Repeatable Read → Serializable — with the anomaly each one kills</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DB PERF -->
+<section class="topic" id="dbperf">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 14:15 · 60 min</span><span class="chip">"why is this query slow?"</span></div>
+      <h3>Indexes, EXPLAIN &amp; the N+1 problem</h3>
+      <p class="tagline">Every backend interview reaches "the endpoint is slow — walk me through it." The answer is a ritual: EXPLAIN, index, and the N+1 you already know from your ORM.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>An index is the back-of-the-book kind: sorted, small, points at pages. You've also met N+1 — it's the endpoint that got slower with every customer, because the loop did one query per row. You fixed it with <code>include</code>; today you get to say why that worked.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>A B-tree index is a sorted structure</b> over one or more columns: equality and range lookups in O(log n) instead of scanning every row. The costs: extra writes on every INSERT/UPDATE (each index must update) and disk — <b>which is why you don't index everything</b>.</li>
+        <li><b>Composite index (a, b) obeys the leftmost-prefix rule:</b> serves <code>WHERE a</code> and <code>WHERE a AND b</code> — not <code>WHERE b</code> alone. Order columns by how you query: equality columns first, then the range/sort column.</li>
+        <li><b>When indexes don't fire:</b> leading-wildcard <code>LIKE '%foo'</code> (nothing sorted to walk), functions on the column (<code>lower(email)</code> — unless you build that expression index), low-selectivity columns (a boolean where half the table matches — a scan is genuinely cheaper), tiny tables.</li>
+        <li><b>EXPLAIN shows the plan; EXPLAIN ANALYZE runs it</b> and shows reality: Seq Scan vs Index Scan, estimated vs actual rows (a huge gap = stale stats), and <code>loops</code> — a nested query executing thousands of times is your N+1 in plan form. Read the innermost expensive node first.</li>
+        <li><b>N+1:</b> fetch 100 posts (1 query), then authors in a loop (100 queries). Fixes: JOIN, or batch <code>WHERE id IN (...)</code> — ORMs call this <code>include</code>/eager loading; GraphQL calls it DataLoader. Symptom: latency scales with result count.</li>
+        <li><b>Connection pooling is non-negotiable:</b> each PG connection is a whole server process, and Postgres has a max. One shared pool per app process, sized modestly (start ~10); serverless multiplies clients, hence PgBouncer / RDS Proxy in front.</li>
+        <li><b>The slow-endpoint ritual</b> (say it in this order): reproduce → find the query (logs/APM, <code>pg_stat_statements</code>) → EXPLAIN ANALYZE → fix the shape (index / rewrite / batch the N+1) → only then consider caching. Cache-first answers read as junior.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">explain-and-n+1.sql</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-sql">EXPLAIN ANALYZE
+SELECT * FROM orders WHERE user_id = 42 ORDER BY created_at DESC LIMIT 20;
+
+-- before: Seq Scan on orders (actual time=0.01..412.33 rows=20)
+--         → reads ALL rows, sorts, keeps 20
+CREATE INDEX idx_orders_user_created ON orders (user_id, created_at DESC);
+-- after:  Index Scan using idx_orders_user_created (actual time=0.04..0.09)
+--         → walks straight to user 42's newest rows. ~4000x.
+
+-- N+1, in the JS where it actually lives:
+const posts = await db.post.findMany({ take: 100 });
+for (const p of posts) {
+  p.author = await db.user.findUnique({ where: { id: p.authorId } });
+}                                   -- 1 + 100 queries
+
+const posts = await db.post.findMany({
+  take: 100,
+  include: { author: true },        -- 1-2 queries: JOIN or batched IN
+});</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>How does a B-tree index make a query fast — one sentence?</summary><p class="ans">It's a sorted tree over the column, so the database binary-searches to the matching entries and follows pointers to just those rows — O(log n) instead of reading the table.</p></details>
+      <details class="quiz"><summary>Why not add an index to every column?</summary><p class="ans">Every write must update every index — inserts and updates slow down, disk grows, and the planner gains nothing from indexes on low-selectivity or never-queried columns. Index what your WHERE/JOIN/ORDER BY actually use, and check usage stats before adding more.</p></details>
+      <details class="quiz"><summary>Index on (user_id, created_at): which queries can use it?</summary><p class="ans"><code>WHERE user_id = ?</code>, and <code>WHERE user_id = ? ORDER BY created_at</code> (equality then sort — the ideal). Not <code>WHERE created_at &gt; ?</code> alone — leftmost prefix rule. This exact question is the composite-index interview in miniature.</p></details>
+      <details class="quiz"><summary>What is the N+1 problem and how do you spot it without reading code?</summary><p class="ans">One query for a list, then one more per item — 1+N round trips. Spot it from symptoms: endpoint latency grows linearly with result size, and query logs show the same statement repeated with different ids. Fix: JOIN/eager-load or batch with IN.</p></details>
+      <details class="quiz"><summary>EXPLAIN vs EXPLAIN ANALYZE?</summary><p class="ans">EXPLAIN shows the planner's estimated plan; ANALYZE actually executes and reports real times and row counts. The gold is comparing estimated vs actual rows — a 1000x gap means stale statistics (run ANALYZE) or a query the planner can't reason about.</p></details>
+      <details class="quiz"><summary>Why can't <code>LIKE '%smith'</code> use a normal index — and what can?</summary><p class="ans">A B-tree is sorted from the string's start; a leading wildcard means there's no prefix to seek to. Options: trigram index (<code>pg_trgm</code> GIN) for substring search, or full-text search — naming either one is a strong senior tell.</p></details>
+      <details class="quiz"><summary>When is a Seq Scan the RIGHT answer?</summary><p class="ans">Small tables (the whole thing fits in a few pages) and low-selectivity queries returning a big fraction of rows — sequential reads beat millions of random index hops. "Seq scan isn't automatically bad" earns instant credibility.</p></details>
+      <details class="quiz"><summary>Why do serverless functions + Postgres need PgBouncer or RDS Proxy?</summary><p class="ans">Each function instance opens its own connections, and PG connections are expensive processes with a hard cap — a traffic spike exhausts them. A pooler multiplexes thousands of client connections onto a few dozen real ones.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"this endpoint got slower as data grew"</span><span class="then">missing index or N+1 — say the ritual, EXPLAIN first</span></li>
+        <li><span class="cue">"search is slow" + a LIKE '%term%'</span><span class="then">trigram or full-text — b-tree can't help</span></li>
+        <li><span class="cue">"we moved to Lambda and the DB fell over"</span><span class="then">connection storm — pooler in front</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-dbperf-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Run EXPLAIN ANALYZE on one real query from your project; find the most expensive node</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-dbperf-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Deliver the slow-endpoint ritual in 45 seconds — reproduce, find, EXPLAIN, fix shape, then cache</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-dbperf-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Explain the composite-index leftmost rule with the (user_id, created_at) example, unprompted</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- AWS -->
+<section class="topic" id="aws">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 15:15 · 90 min</span><span class="chip">the map, not the catalog</span></div>
+      <h3>AWS: the core map</h3>
+      <p class="tagline">AWS has 200+ services; interviews use about ten. Learn the map — what each core service is the managed version of — and every AWS question becomes a translation exercise.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You already run this stack — AWS just renames it: your VPS is <b>EC2</b>, your uploads folder is <b>S3</b>, your managed Postgres is <b>RDS</b>, your cron-plus-script is <b>Lambda</b>, your nginx upstream block is an <b>ALB</b>, and the <code>.env</code> you're ashamed of is <b>Secrets Manager</b>.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Geography first:</b> a region (mumbai, virginia) contains 3+ isolated <b>availability zones</b> — separate datacenters, low-latency linked. "Highly available" in AWS-speak almost always means "survives one AZ dying", which is why everything important runs in ≥2 AZs.</li>
+        <li><b>Compute ladder:</b> <b>EC2</b> — a VM you patch and scale yourself. <b>ECS/Fargate</b> — run containers, no servers to patch. <b>Lambda</b> — a function per event, scales to zero and to thousands, you give up long-running processes (15-min cap) and eat <b>cold starts</b>. The interview move is picking <i>by workload</i>: steady traffic → containers; spiky/event-driven glue → Lambda.</li>
+        <li><b>S3 is an object store,</b> not a filesystem: PUT/GET whole objects by key, effectively infinite, famously durable (the "11 nines" line), versioning + lifecycle rules to cheaper tiers. It serves your SPA build, stores uploads, backs your backups. <b>Presigned URLs</b> let clients upload/download directly, bypassing your servers — the standard uploads answer.</li>
+        <li><b>RDS is managed Postgres:</b> AWS runs backups, patching, failover. Two knobs interviews test: <b>Multi-AZ</b> = synchronous standby in another AZ for <i>availability</i> (failover, not extra speed); <b>read replicas</b> = async copies for <i>read scaling</i> (slightly stale, and your app must route reads). Say "Multi-AZ for uptime, replicas for reads" and the question is over.</li>
+        <li><b>IAM:</b> identities (users/roles) + JSON policies = who can do what to which resource. The two rules that matter: <b>least privilege</b>, and <b>roles, not keys</b> — code on EC2/Lambda assumes a role and gets rotating temporary credentials; an access key in an env var (or worse, a repo) is the classic breach story.</li>
+        <li><b>VPC in one breath:</b> your private network; public subnets hold load balancers, private subnets hold apps and databases; <b>security groups</b> are stateful per-resource firewalls (allow rules only); a <b>NAT gateway</b> lets private things call out without being reachable in. RDS goes in a private subnet — "the database has no public IP" is a sentence that wins security questions.</li>
+        <li><b>CloudWatch</b> collects logs + metrics and fires alarms; that's how you know you're down before Twitter does.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">default-mern-on-aws.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">The architecture to draw when asked "how would you deploy your app":
+
+  Route 53 (DNS)
+      │
+  CloudFront (CDN) ──────────► S3  (React build, images)
+      │  /api/*
+  ALB (public subnet, 2+ AZs)
+      │
+  ECS Fargate / EC2 ASG  ← Node API, stateless, private subnet
+      │            │
+  RDS Postgres   ElastiCache Redis   (private subnet)
+  (Multi-AZ,     (sessions, cache)
+   read replica)
+      │
+  S3 uploads (presigned URLs) · SQS (async jobs) · Lambda (workers)
+
+Config: Secrets Manager / SSM  ·  Logs+alarms: CloudWatch  ·  IAM roles everywhere</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>EC2 vs Lambda — how do you choose?</summary><p class="ans">By traffic shape and runtime: steady/long-running/predictable → EC2 or containers (cheaper at constant load, no cold starts, any process model); spiky, event-driven, or glue work → Lambda (scales to zero, no ops, but 15-min cap and cold starts). Most real systems: containers for the API, Lambda for events.</p></details>
+      <details class="quiz"><summary>What is S3 actually good for — and what should never go in it?</summary><p class="ans">Good: static assets, user uploads, backups, data-lake files — cheap, durable, infinitely scalable objects. Wrong: anything needing partial updates, low-latency queries, or filesystem semantics — that's a database's job. "S3 is not a database" gets a knowing nod.</p></details>
+      <details class="quiz"><summary>Multi-AZ vs read replica — the one-sentence-each answer?</summary><p class="ans">Multi-AZ: synchronous standby, automatic failover, zero extra read capacity — it's for <b>availability</b>. Read replica: asynchronous copy you point SELECTs at, slightly stale — it's for <b>scale</b>. They compose: Multi-AZ primary + replicas is the standard prod shape.</p></details>
+      <details class="quiz"><summary>Why IAM roles instead of access keys in env vars?</summary><p class="ans">Roles issue short-lived, auto-rotated credentials to the compute that assumes them — nothing to leak, commit, or rotate manually. Long-lived keys in env/repos are the #1 real-world AWS breach vector. Follow with "and least-privilege policies per service".</p></details>
+      <details class="quiz"><summary>How do users upload a 500MB video without melting your API?</summary><p class="ans">API issues a presigned S3 URL (scoped, expiring); the client PUTs directly to S3; S3 event (→ SQS/Lambda) triggers post-processing. Your servers never touch the bytes. This exact flow is the most-asked AWS design question at product companies.</p></details>
+      <details class="quiz"><summary>Security group vs NACL?</summary><p class="ans">Security group: stateful firewall on the resource — allow rules only, return traffic automatically permitted; it's the one you actually use daily. NACL: stateless allow/deny at the subnet boundary, both directions explicitly. Answer "SGs for everything, NACLs for coarse subnet guardrails".</p></details>
+      <details class="quiz"><summary>Where do secrets live, and how does the app get them?</summary><p class="ans">Secrets Manager (rotation built in) or SSM Parameter Store (simpler/cheaper); the app's IAM role grants read at boot or the platform injects them. Never in the repo, never baked into images, never in plaintext env files on servers.</p></details>
+      <details class="quiz"><summary>Your RDS is in a private subnet — how do you, a human, connect to it?</summary><p class="ans">Not by giving it a public IP: a bastion host, or the modern answer — SSM Session Manager port-forwarding through an instance/agent, with access logged by IAM. Shows you've actually operated a locked-down VPC.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"how would you deploy this app on AWS?"</span><span class="then">draw the default architecture, AZs and all</span></li>
+        <li><span class="cue">"how do you handle file uploads?"</span><span class="then">presigned URLs + S3 events — servers never touch bytes</span></li>
+        <li><span class="cue">"how is the database secured?"</span><span class="then">private subnet, SG from app tier only, secrets in SM, IAM roles</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-aws-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Draw the default MERN-on-AWS diagram from memory on paper, narrating each box</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-aws-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Tell the presigned-URL upload flow end to end in 60 seconds</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-aws-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Map YOUR current production setup onto AWS service names, out loud</span></label><span class="diff m">CORE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- AWS OPS -->
+<section class="topic" id="awsops">
+  <div class="topic-head">
+    <div class="topic-head-main">
+      <div class="chip-row"><span class="chip time">day 2 · 16:45 · 60 min</span><span class="chip">scaling · queues · cost</span></div>
+      <h3>Scaling, queues &amp; the bill</h3>
+      <p class="tagline">The difference between "has an AWS account" and "has run things on AWS" is three topics: how it scales, what the queue is for, and what surprised you on the invoice.</p>
+    </div>
+    <button class="toggle" aria-expanded="true" aria-label="Collapse section"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="topic-body">
+    <div class="analogy">
+      <h6>YOU ALREADY KNOW THIS</h6>
+      <p>You've already scaled horizontally the day you ran two PM2 workers — and hit the classic wall when in-memory sessions broke, which you fixed with Redis. That exact story, retold with an ALB and an Auto Scaling Group, is the whole scaling interview.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the idea</p>
+      <ul>
+        <li><b>Horizontal scaling requires statelessness:</b> any instance must serve any request, so sessions live in Redis/JWT, uploads in S3, state in the DB. Then an <b>ALB</b> spreads traffic over an <b>Auto Scaling Group</b> (or ECS service) that adds/removes instances on CPU/request metrics, across AZs. Health checks pull sick instances out automatically.</li>
+        <li><b>Queues decouple:</b> <b>SQS</b> between "accept the request" and "do the slow thing" (emails, exports, video processing) — producers and consumers scale independently, spikes become backlog instead of outage, retries are built in, and poison messages land in a <b>dead-letter queue</b> instead of retrying forever. <b>SNS</b> is pub/sub fan-out — one event, many subscribers; the classic combo is SNS → multiple SQS queues.</li>
+        <li><b>Lambda operational truths:</b> cold start = first-invocation latency for a new instance (bigger with heavy bundles and VPC attachment; mitigations: smaller functions, provisioned concurrency); per-invocation concurrency limits; and every Lambda talking to Postgres needs the pooler story from the last topic.</li>
+        <li><b>CloudFront (CDN)</b> caches at edge locations worldwide: static assets get long <code>max-age</code> + hashed filenames; it also fronts APIs for TLS termination and DDoS absorption. "Cache at the edge, invalidate by deploying new hashes" is the modern answer.</li>
+        <li><b>Deploys without downtime:</b> rolling (replace a few at a time), blue/green (run both fleets, flip traffic, instant rollback), canary (1% first, watch, then ramp). Know which your team runs and why.</li>
+        <li><b>The bill, honestly:</b> the classics that surprise people — NAT gateway data processing, cross-AZ/egress transfer, unattached EBS volumes and idle load balancers, over-provisioned RDS, S3 without lifecycle rules. Levers: right-size, autoscale to zero where possible, reserved/savings plans for the steady floor, budgets + alerts so you find out in days not months.</li>
+        <li><b>Observability minimum:</b> structured logs with request ids → CloudWatch; RED metrics (rate, errors, duration) per endpoint; alarms on error rate and p99, wired to a human. If you can say "our p99 was X and here's how I knew", you're hired-adjacent.</li>
+      </ul>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">async-email-flow.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-markdown">"Send a welcome email" — the answer that scales:
+
+  POST /signup
+     │  1. write user to Postgres (transaction)
+     │  2. enqueue {userId} → SQS          ← 5ms, request returns 201
+     ▼
+  SQS queue  ──►  worker (Lambda or ECS)
+                    │  3. render + send via SES
+                    │  4. success → delete message
+                    │     failure → retry (visibility timeout)
+                    ▼
+                  after N failures → dead-letter queue + alarm
+
+Why not send inline?  email provider is slow/down → signup is slow/down.
+The queue converts THEIR outage into YOUR backlog.
+Worker must be idempotent: retries mean "at least once", not "exactly once".</code></pre>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// rapid-fire — <b>answer out loud, then reveal</b></p>
+      <details class="quiz"><summary>How do you make an API horizontally scalable — the full sentence?</summary><p class="ans">Make instances stateless (sessions in Redis or JWT, files in S3), put an ALB in front of an auto-scaling group across ≥2 AZs, scale on request/CPU metrics, health-check instances out when they fail. Every clause earns a point; "stateless" is the load-bearing one.</p></details>
+      <details class="quiz"><summary>SQS vs SNS?</summary><p class="ans">SQS is a queue — messages wait until one consumer processes each, buffering work over time. SNS is pub/sub — one message pushed to all subscribers immediately, no storage. Fan-out pattern: publish once to SNS, deliver into several SQS queues so each consumer gets its own buffered copy.</p></details>
+      <details class="quiz"><summary>What's a dead-letter queue and why does every queue need one?</summary><p class="ans">Where messages go after N failed processing attempts. Without it, a poison message retries forever, burning compute and blocking insight; with it, bad messages park for inspection and an alarm fires. It's the difference between an incident and a mystery.</p></details>
+      <details class="quiz"><summary>Why must queue consumers be idempotent?</summary><p class="ans">Queues guarantee at-least-once delivery — crashes and visibility timeouts cause redelivery. Processing twice must be safe: dedupe by message/business id, or make the operation naturally re-runnable ("set status=sent", not "increment counter").</p></details>
+      <details class="quiz"><summary>What is a Lambda cold start and how do you reduce it?</summary><p class="ans">Latency to spin up a fresh execution environment — load runtime + your bundle — before the first invocation; subsequent calls reuse the warm instance. Reduce: smaller bundles, lighter runtimes, provisioned concurrency for latency-critical paths, and don't put chatty init in the handler path.</p></details>
+      <details class="quiz"><summary>Blue/green vs rolling deploy?</summary><p class="ans">Rolling swaps instances a few at a time — cheap, but two versions serve traffic simultaneously and rollback is another roll. Blue/green stands up the new fleet beside the old and flips traffic — instant rollback, costlier, needs backward-compatible DB migrations. Canary = blue/green with a 1% toe in the water.</p></details>
+      <details class="quiz"><summary>What typically surprises teams on their first real AWS bill?</summary><p class="ans">Data transfer — NAT gateway processing charges and cross-AZ/egress traffic — plus zombie resources: unattached EBS, idle ALBs, forgotten snapshots, oversized RDS. Naming NAT gateway specifically is the "has actually seen the invoice" tell.</p></details>
+      <details class="quiz"><summary>How do you know your service is down before users tell you?</summary><p class="ans">Health checks at the LB, CloudWatch alarms on error rate and p99 latency wired to a pager/Slack, and an external synthetic check hitting the real endpoint from outside — because internal dashboards can be green while DNS or certs are broken.</p></details>
+    </div>
+    <div class="spot">
+      <p class="mini-label">// spot it in the wild</p>
+      <ul>
+        <li><span class="cue">"signup is slow because of the email"</span><span class="then">queue it — draw the SQS flow, mention DLQ + idempotency</span></li>
+        <li><span class="cue">"traffic spikes at 9am and we fall over"</span><span class="then">stateless + autoscaling, or queue the burst</span></li>
+        <li><span class="cue">"how would you cut this AWS bill?"</span><span class="then">measure first: Cost Explorer → transfer, zombies, right-sizing</span></li>
+      </ul>
+    </div>
+    <div class="probs">
+      <p class="mini-label">// drills</p>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-awsops-1"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Draw the SQS email flow from memory, including DLQ and the idempotency note</span></label><span class="diff e">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-awsops-2"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Deliver the horizontal-scaling sentence and the SQS-vs-SNS answer back to back, cold</span></label><span class="diff m">CORE</span></div>
+      <div class="prob"><label class="prob-main"><input type="checkbox" data-day="2" data-key="fs-awsops-3"><span class="box"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L5.5 11L12 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pn">Tell one honest scaling-or-bill war story from your own infra in under 90 seconds</span></label><span class="diff h">STRETCH</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REFERENCE ================= -->
+
+<!-- PLAYBOOK -->
+<section class="section" id="playbook">
+  <p class="section-eyebrow">// reference · the meta-game</p>
+  <h2>The tech-screen playbook</h2>
+  <p class="sub">Knowledge questions are graded on shape as much as substance. These six moves apply to every question on this page.</p>
+  <div class="steps" style="margin-top:26px">
+    <div class="step">
+      <h5>01 · definition → example → tradeoff</h5>
+      <p>Three sentences, always: what it is, where <b>you've</b> used it, what it costs. "An index is a sorted lookup; we added one on orders.user_id and cut a report from 4s to 40ms; the price is slower writes." Complete, calm, done.</p>
+    </div>
+    <div class="step">
+      <h5>02 · trace out loud, never guess</h5>
+      <p>On "what does this log?" questions, silence reads as guessing. Narrate the machine: "sync runs first, so A and D… the .then is a microtask, so C before the timer's B." <b>A wrong answer with right reasoning scores better than a lucky guess.</b></p>
+    </div>
+    <div class="step">
+      <h5>03 · "I'd have to check the syntax" is a power move</h5>
+      <p>Said confidently about an argument order or config key, it signals you know what matters. Never say it about mechanisms — the event loop, indexes, and JWT tradeoffs are exactly what you're being paid to carry in your head.</p>
+    </div>
+    <div class="step">
+      <h5>04 · don't bluff — redirect</h5>
+      <p>Interviewers probe until they find the edge; bluffing moves the edge to a lie. Instead: "I haven't run Kafka — our scale fit SQS, and here's the queue reasoning I <b>do</b> own." Honest edges + strong adjacent ground beats fake coverage every time.</p>
+    </div>
+    <div class="step">
+      <h5>05 · volunteer the follow-up</h5>
+      <p>Every canned question has a planned follow-up. Beat them to it: JWT answer ends "…the catch is revocation", index answer ends "…and writes pay for it". You're answering the <i>next</i> question — that's what senior sounds like.</p>
+    </div>
+    <div class="step">
+      <h5>06 · after every real screen</h5>
+      <p>Five minutes, same day: write down every question asked. Anything you fumbled goes into your copy of the <a href="#qbank">bank</a> with the answer you <i>wish</i> you'd given. Three screens in, you've seen 80% of the deck.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUESTION MATCHER -->
+<section class="section" id="patterns">
+  <p class="section-eyebrow">// reference · 10-second lookup</p>
+  <h2>Question matcher</h2>
+  <p class="sub">Hear the shape on the left, run the play on the right.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>when the question sounds like…</th><th>they're testing</th><th>run this play</th></tr></thead>
+    <tbody>
+      <tr><td>"what will this code log?"</td><td>mental model of the runtime</td><td class="mono">trace aloud: sync → microtasks → tasks</td></tr>
+      <tr><td>"difference between X and Y?"</td><td>precision + judgment</td><td class="mono">one-liner each → when you'd pick each → which you use</td></tr>
+      <tr><td>"how does X work under the hood?"</td><td>depth</td><td class="mono">mechanism in 3 sentences → why it matters in practice</td></tr>
+      <tr><td>"why is this slow?"</td><td>debugging discipline</td><td class="mono">"measure first" → the ritual for that layer</td></tr>
+      <tr><td>"how would you build/deploy X?"</td><td>architecture instincts</td><td class="mono">draw the default shape → name tradeoffs unprompted</td></tr>
+      <tr><td>"have you used X?"</td><td>honesty calibration</td><td class="mono">yes + war story, or honest no + adjacent strength</td></tr>
+      <tr><td>"why did you choose X over Y?"</td><td>engineering judgment</td><td class="mono">constraints at the time, not fashion — and what would change your mind</td></tr>
+      <tr><td>"what happens when you type a URL…"</td><td>full-stack breadth</td><td class="mono">DNS → TCP/TLS → request → LB → app → response → render</td></tr>
+      <tr><td>"how do you secure/scale/test this?"</td><td>production maturity</td><td class="mono">the checklist for that axis, delivered calmly</td></tr>
+      <tr><td>"is that always true?" (pushback)</td><td>confidence under pressure</td><td class="mono">defend with a reason or update honestly — never flip-flop twice</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- RAPID-FIRE BANK -->
+<section class="section" id="qbank">
+  <p class="section-eyebrow">// reference · the night-before read</p>
+  <h2>The rapid-fire bank</h2>
+  <p class="sub">Fifty-six more questions — the ones screens actually ask, grouped by area, answers hidden until you commit. These deliberately don't repeat the topic questions above; together they're the full deck. Night-before ritual: run one group per stack area you'll be quizzed on, out loud.</p>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// javascript &amp; the browser</p>
+    <details class="quiz"><summary>What's the difference between <code>null</code> and <code>undefined</code>?</summary><p class="ans"><code>undefined</code> = never assigned (missing params, absent properties); <code>null</code> = deliberately empty, set by a human. JSON has only null; <code>typeof</code> disagrees on them; <code>x == null</code> catches both.</p></details>
+    <details class="quiz"><summary>Debounce vs throttle — and one real use of each?</summary><p class="ans">Debounce: wait for quiet, then fire once — search-as-you-type. Throttle: fire at most every N ms during activity — scroll/resize handlers. Both are closures around a timer.</p></details>
+    <details class="quiz"><summary>What is event delegation and why does React make it feel free?</summary><p class="ans">One listener on a parent catches bubbled events from all children — fewer listeners, works for future children. React does this internally: your onClicks attach to the root, not each node.</p></details>
+    <details class="quiz"><summary>localStorage vs sessionStorage vs cookies?</summary><p class="ans">localStorage: ~5-10MB, persists, JS-only, never sent to server. sessionStorage: same but per-tab, dies with it. Cookies: ~4KB, sent with every request, and the only one the server can set httpOnly — which is why auth lives there.</p></details>
+    <details class="quiz"><summary>How does garbage collection work in JS, one sentence?</summary><p class="ans">The engine periodically frees anything unreachable from the roots (globals, the stack, closures) — so "memory leak" in JS means an accidental reference: a forgotten listener, a growing module-level cache, a detached DOM node held in a closure.</p></details>
+    <details class="quiz"><summary>What is a WeakMap actually for?</summary><p class="ans">Keys are objects, held weakly — when the object dies, the entry is collected with it. Use: attaching metadata/caches to objects you don't own without leaking them. (Same idea powers per-object private state.)</p></details>
+    <details class="quiz"><summary>Why does <code>0.1 + 0.2 !== 0.3</code>, and what do you do about it?</summary><p class="ans">IEEE-754 binary floats can't represent decimal tenths exactly. Handle money in integer minor units or a decimal library; compare floats with an epsilon; never float columns in the DB for money.</p></details>
+    <details class="quiz"><summary>What does <code>use strict</code> change — and why do you rarely write it now?</summary><p class="ans">Throws on silent errors: undeclared globals, bad deletes; plain-call <code>this</code> becomes undefined instead of the global object. ES modules and class bodies are strict automatically — so modern code is strict without the pragma.</p></details>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// react</p>
+    <details class="quiz"><summary>useEffect vs useLayoutEffect?</summary><p class="ans">useEffect runs after paint (async, doesn't block); useLayoutEffect runs after DOM mutation but <i>before</i> paint — for measuring or repositioning without visible flicker (tooltips, scroll restoration). Default to useEffect; layout only when you saw the flicker.</p></details>
+    <details class="quiz"><summary>What's an error boundary, and what does it NOT catch?</summary><p class="ans">A component that catches render-phase errors in its subtree and shows a fallback instead of unmounting the app. Doesn't catch: event handlers, async/awaited code, SSR. Handlers use try/catch; there's no hook — it's a class component (or your framework's errorElement).</p></details>
+    <details class="quiz"><summary>What are portals for?</summary><p class="ans">Rendering children into a DOM node outside the parent hierarchy — modals, toasts, tooltips escaping overflow/z-index traps — while keeping React context and event bubbling intact.</p></details>
+    <details class="quiz"><summary>Controlled form library question: why do Formik/React Hook Form exist?</summary><p class="ans">Per-keystroke setState across a 30-field form = 30 re-renders of everything. RHF keeps values in refs (uncontrolled), re-rendering only what's touched, and layers validation on top. Knowing the "controlled forms don't scale" reason is the point.</p></details>
+    <details class="quiz"><summary>What is Suspense, beyond code-splitting?</summary><p class="ans">A declarative "while this subtree isn't ready, show the fallback" boundary. With React.lazy it waits for code; with RSC/React Query integrations it waits for data — streaming SSR sends the shell first and fills Suspense holes as they resolve.</p></details>
+    <details class="quiz"><summary>How do you test React components — what's the philosophy that gets you hired?</summary><p class="ans">React Testing Library: render, interact via roles/labels like a user, assert visible outcomes — never internals or instance state. "Test behavior, not implementation" plus one story about a refactor that didn't break tests = full marks.</p></details>
+    <details class="quiz"><summary>What's the key difference between state in React and a variable in the component?</summary><p class="ans">A plain variable resets every render and changing it triggers nothing; state persists across renders and its setter schedules the re-render. If it should survive renders but not cause them — that's the third option, a ref.</p></details>
+    <details class="quiz"><summary>Two components need the same fetched data — what's wrong with fetching in both?</summary><p class="ans">Nothing, if you're using React Query/SWR — same key dedupes to one request and one cache. Hand-rolled effects would double-fetch and drift; lifting to a parent couples layout to data. Naming the cache-key answer shows current-era React.</p></details>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// node &amp; apis</p>
+    <details class="quiz"><summary>npm install vs npm ci — and why does CI use the second?</summary><p class="ans"><code>install</code> resolves ranges and may update the lockfile; <code>ci</code> installs exactly the lockfile (deleting node_modules first) and fails if lockfile and package.json disagree — deterministic, faster, no surprise upgrades in CI.</p></details>
+    <details class="quiz"><summary>What does ^4.2.1 in package.json actually allow?</summary><p class="ans">Semver: any 4.x.y ≥ 4.2.1 — minor + patch, never major (5.0.0). Tilde ~4.2.1 = patch only. Majors signal breaking changes; the lockfile is what actually pins.</p></details>
+    <details class="quiz"><summary>How do you find a memory leak in a Node service?</summary><p class="ans">Confirm with RSS/heap metrics over time, then take two heap snapshots (Chrome DevTools via --inspect, or heapdump) minutes apart and diff what's growing — usually a module-level array/map, listeners never removed, or unbounded cache. Say "snapshot diff" and you pass.</p></details>
+    <details class="quiz"><summary>REST vs GraphQL — the calibrated answer?</summary><p class="ans">REST: simple, cacheable by URL, the default for service APIs. GraphQL: clients pick fields and traverse relations in one round trip — earns its complexity with many client shapes (mobile+web+partners) atop many services; costs: caching, N+1 resolvers (DataLoader), query cost control. "We'd start REST" is a fine answer with reasons.</p></details>
+    <details class="quiz"><summary>WebSockets vs SSE vs polling — pick for a notifications feature?</summary><p class="ans">Server→client only: SSE — plain HTTP, auto-reconnect, cheap. Two-way (chat, games): WebSockets. Polling: fine at low frequency, simplest infra. Most "real-time notifications" interviews want you to say SSE and explain why not WS.</p></details>
+    <details class="quiz"><summary>How do env-specific configs work in a 12-factor app?</summary><p class="ans">Config lives in the environment, not the code: same artifact deployed everywhere, behavior differs only by env vars/secrets injected per environment. No config files per env checked into the repo, no NODE_ENV branching for secrets.</p></details>
+    <details class="quiz"><summary>What is a health check endpoint supposed to check?</summary><p class="ans">Two flavors: liveness — "process is up" (cheap, always 200 unless wedged); readiness — "can serve traffic" (DB/queue reachable). LBs and orchestrators route on readiness and restart on liveness; conflating them causes restart storms during DB blips.</p></details>
+    <details class="quiz"><summary>How would you version and retire an API endpoint?</summary><p class="ans">Version at the path (/v1) or header; add v2 alongside, migrate consumers with metrics on v1 usage, deprecate with sunset headers + comms, remove when traffic hits zero. The word "metrics" is what makes this answer real.</p></details>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// http &amp; the web</p>
+    <details class="quiz"><summary>What happens when you type a URL and hit enter — the 60-second version?</summary><p class="ans">DNS resolves the name (cache → resolver → authoritative) → TCP handshake → TLS handshake (certs, keys) → HTTP request → CDN/LB routes to an app server → app queries DB, returns HTML/JSON → browser parses, fetches assets, builds DOM/CSSOM, renders, hydrates. Practice until fluid — it's the most-asked breadth question in existence.</p></details>
+    <details class="quiz"><summary>HTTP is stateless — what does that mean and how do apps fake state?</summary><p class="ans">Each request stands alone; the server keeps no per-connection memory. Continuity comes from tokens the client re-sends: cookies/session ids/JWTs — that's the entire reason auth headers and cookies exist.</p></details>
+    <details class="quiz"><summary>What do Cache-Control, ETag, and 304 do together?</summary><p class="ans">Cache-Control sets freshness (max-age, public/private, no-store); when stale, the browser revalidates with If-None-Match: etag; unchanged → 304 empty body, cache reused. Assets: hashed filenames + max-age=1yr, immutable. HTML: no-cache (revalidate every time).</p></details>
+    <details class="quiz"><summary>HTTP/1.1 vs HTTP/2 in one line each?</summary><p class="ans">1.1: one request at a time per connection → head-of-line blocking, browsers open ~6 sockets. 2: one connection, many multiplexed streams + header compression — bundling/spriting hacks became obsolete. (3/QUIC: same idea over UDP, kills TCP-level blocking.)</p></details>
+    <details class="quiz"><summary>What's the same-origin policy?</summary><p class="ans">Scripts can only read responses from their own scheme+host+port; everything cross-origin is blocked unless the target opts in via CORS headers. It's the browser's core security boundary — CORS is the relaxation valve, not the wall.</p></details>
+    <details class="quiz"><summary>GET request with a body — why is it a bad idea even though it's "possible"?</summary><p class="ans">Semantics: GET promises safety and cacheability keyed on URL; intermediaries (caches, LBs, CDNs) may drop or ignore GET bodies. Search with complex filters → POST /search, or encode in query params. Shows you think about the infrastructure between client and server.</p></details>
+    <details class="quiz"><summary>What is DNS TTL and how does it bite during migrations?</summary><p class="ans">How long resolvers may cache a record. Cutting over with a 24h TTL means a day of traffic split between old and new. Ritual: drop TTL to 60s well before, migrate, restore. A one-sentence war story here is gold.</p></details>
+    <details class="quiz"><summary>What's a CDN cache invalidation strategy that doesn't hurt?</summary><p class="ans">Don't invalidate — version: hashed asset filenames mean every deploy is new URLs, old ones stay valid; HTML stays short-TTL/no-cache. Purge APIs are for emergencies, not the deploy path.</p></details>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// sql &amp; data modeling</p>
+    <details class="quiz"><summary>Normalization vs denormalization — the working engineer's answer?</summary><p class="ans">Normalize (each fact once, FKs) for integrity by default; denormalize (duplicate a name/count onto rows that need it) when read paths hurt — accepting you now maintain the copy. "Third normal form until measured pain" is the calibrated line.</p></details>
+    <details class="quiz"><summary>SQL vs NoSQL — when is Postgres NOT the answer?</summary><p class="ans">Genuine key-value/document scale-out (Dynamo/Mongo), heavy ephemeral caching (Redis), search ranking (Elasticsearch), analytics over billions of rows (columnar warehouses). For the app's system of record with relations and transactions, Postgres wins by default — say that, then the exceptions.</p></details>
+    <details class="quiz"><summary>What's a CTE and when do you use one?</summary><p class="ans"><code>WITH name AS (SELECT …)</code> — a named subquery for readability and reuse within one statement; recursive CTEs walk trees (org charts, categories). Modern PG inlines them, so the old "optimization fence" caveat is mostly history.</p></details>
+    <details class="quiz"><summary>Window functions in one sentence + the classic use?</summary><p class="ans">Aggregates that see a "window" of related rows without collapsing them: <code>ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC)</code> = "latest order per user", also running totals and ranks. Naming that exact query is the flex.</p></details>
+    <details class="quiz"><summary>UNION vs UNION ALL?</summary><p class="ans">UNION dedupes (costs a sort/hash); UNION ALL just concatenates. If duplicates are impossible or acceptable, ALL is strictly faster — the follow-up they're fishing for.</p></details>
+    <details class="quiz"><summary>View vs materialized view?</summary><p class="ans">A view is a saved query — always fresh, no storage, runs on read. A materialized view stores the result — fast reads, but stale until you REFRESH (in PG, manually or via cron). Dashboard aggregations = the materialized use case.</p></details>
+    <details class="quiz"><summary>UUID vs serial integer primary keys?</summary><p class="ans">Serial: small, fast, index-friendly — but guessable and awkward across services. UUID: generatable anywhere, safe to expose — bigger, and random v4 scatters B-tree inserts (v7/time-ordered fixes that). Modern default: UUIDv7 externally, or serial internally + public UUID.</p></details>
+    <details class="quiz"><summary>How do schema migrations work safely on a live table?</summary><p class="ans">Versioned, incremental, reversible files (Prisma/Knex/Flyway) run in CI before deploy; expand-and-contract for breaking changes: add nullable column → backfill → dual-write → switch reads → drop old. Never DROP in the same deploy that stops writing.</p></details>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// aws &amp; devops</p>
+    <details class="quiz"><summary>Horizontal vs vertical scaling — one line + the catch of each?</summary><p class="ans">Vertical: bigger box — zero code changes, hard ceiling, still one failure point. Horizontal: more boxes — near-unlimited, needs statelessness and a load balancer. Real systems: vertical until it's silly, horizontal by design.</p></details>
+    <details class="quiz"><summary>Docker container vs VM?</summary><p class="ans">VMs virtualize hardware and boot a full OS each; containers share the host kernel and isolate processes with namespaces/cgroups — MBs not GBs, ms not minutes. "Same image runs identically on my laptop and ECS" is the why.</p></details>
+    <details class="quiz"><summary>What's in a good CI/CD pipeline for a Node app?</summary><p class="ans">On PR: install (npm ci) → lint + typecheck → unit tests → build. On merge: build the artifact/image once → deploy staging → smoke/e2e → promote the same artifact to prod (canary/rolling) → alarms watch the rollout. "Build once, promote the artifact" is the phrase that scores.</p></details>
+    <details class="quiz"><summary>Infrastructure as code — why, in two sentences?</summary><p class="ans">Terraform/CDK make infra reviewable, repeatable, and recoverable — the environment is a pull request, not a memory. Click-ops means the staging/prod drift and the "only Dave knows why that SG exists" problem.</p></details>
+    <details class="quiz"><summary>Where do you put a feature you must ship dark?</summary><p class="ans">Feature flags: deploy the code off, enable per user/percent, kill instantly without a deploy. Decouples deploy from release — also the honest answer to "how do you ship risky changes".</p></details>
+    <details class="quiz"><summary>ElastiCache Redis — name three distinct jobs it does?</summary><p class="ans">Session store (the horizontal-scaling enabler), hot-data cache (cache-aside with TTLs), and coordination primitives: rate-limit counters, distributed locks, pub/sub, queues. Bonus caveat: cache invalidation is the hard part — TTL + explicit bust on write.</p></details>
+    <details class="quiz"><summary>What is cache-aside, and its classic failure?</summary><p class="ans">Read: try cache → miss → read DB → write cache with TTL. Failure: stale data after DB writes (bust or update the key on write), and stampedes when a hot key expires (jittered TTLs, lock-and-refresh). Naming the stampede is senior.</p></details>
+    <details class="quiz"><summary>Kubernetes in one honest sentence for a screen?</summary><p class="ans">Declarative container orchestration — you state desired replicas/resources, it schedules, heals, and scales across nodes. Honest add-on if true: "we didn't need it at our scale; ECS/Fargate was less to operate" — that's judgment, not a gap.</p></details>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// security</p>
+    <details class="quiz"><summary>XSS — attack and the three defenses?</summary><p class="ans">Injected script runs in victims' browsers (stored/reflected/DOM). Defend: escape/encode output (React does by default — <code>dangerouslySetInnerHTML</code> is the named escape hatch), sanitize any rich HTML, CSP as backstop, httpOnly cookies so stolen JS context can't read the session.</p></details>
+    <details class="quiz"><summary>CSRF — attack and the modern defense?</summary><p class="ans">Another site triggers a state-changing request that rides the user's auto-sent cookies. Defend: SameSite=Lax/Strict cookies (the modern default that mostly kills it), CSRF tokens for forms, and never mutate on GET. If auth is a header token, CSRF largely doesn't apply — trade discussed under XSS.</p></details>
+    <details class="quiz"><summary>SQL injection — and why ORMs don't make you immune?</summary><p class="ans">Untrusted input concatenated into SQL. Defense: parameterized queries — the driver sends structure and data separately. ORMs parameterize by default, but every raw-query API (<code>$queryRawUnsafe</code>, string-built WHERE clauses) reopens the door.</p></details>
+    <details class="quiz"><summary>How do you store passwords?</summary><p class="ans">Never encrypted, never SHA-256 — slow adaptive hashes: bcrypt/argon2 with per-password salt (built into the format), cost tuned so brute force is expensive. Everything else — reset flows, 2FA, rate limits on login — assumes this floor.</p></details>
+    <details class="quiz"><summary>What does HTTPS actually protect, and what not?</summary><p class="ans">Encrypts and authenticates the pipe: no reading or tampering in transit, cert proves the server. Doesn't touch: XSS, SQLi, authz bugs, leaked tokens — everything inside the app. "TLS everywhere is the floor, not the security story."</p></details>
+    <details class="quiz"><summary>A dependency you use gets compromised — what limits the blast radius?</summary><p class="ans">Lockfiles + npm ci (no silent upgrades), audit/Dependabot for known CVEs, least-privilege runtime (the app's IAM role can't read all of S3), secrets in a manager not env-committed, and CSP/httpOnly limiting what injected client code can steal.</p></details>
+    <details class="quiz"><summary>Rate limiting — where and how?</summary><p class="ans">At the edge (ALB/CloudFront/WAF) for blunt abuse, in-app per user/API-key for fairness — token bucket in Redis is the standard implementation; return 429 + Retry-After. Login and OTP endpoints get their own, much tighter limits.</p></details>
+    <details class="quiz"><summary>What secrets hygiene do you actually practice?</summary><p class="ans">Secrets in a manager (not the repo — with git history scanned to prove it), injected at runtime via IAM, rotated on departure/leak, different per environment, and never logged. One honest sentence about a .env near-miss makes this answer human and credible.</p></details>
+  </div>
+</section>
+
+<!-- CHEAT TABLES -->
+<section class="section" id="cheats">
+  <p class="section-eyebrow">// reference · the 40-minute night-before read</p>
+  <h2>Cheat tables</h2>
+  <p class="sub">The lookup tables worth re-reading the night before any screen. Status codes and the AWS map cover most "precision" moments; the hooks table covers the React lightning round.</p>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// http status codes that matter</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>code</th><th>means</th><th>the interview nuance</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">200 / 201 / 204</td><td>ok / created / ok-no-body</td><td>201 from POST with a Location header; 204 from DELETE</td></tr>
+        <tr><td class="mono">301 / 302 / 304</td><td>moved / temporary / not modified</td><td>304 = your ETag matched; caching is working</td></tr>
+        <tr><td class="mono">400 / 422</td><td>malformed / understood-but-invalid</td><td>either is defensible for validation — be consistent</td></tr>
+        <tr><td class="mono">401</td><td><b>unauthenticated</b></td><td>"log in first" — despite being named Unauthorized</td></tr>
+        <tr><td class="mono">403</td><td><b>unauthorized</b></td><td>"I know you; no" — authz, not authn</td></tr>
+        <tr><td class="mono">404 / 409</td><td>not found / conflict</td><td>409 for duplicate-create and version conflicts</td></tr>
+        <tr><td class="mono">429</td><td>rate limited</td><td>send Retry-After; client backs off exponentially</td></tr>
+        <tr><td class="mono">500 / 502 / 503</td><td>bug / bad upstream / overloaded</td><td>502-503 from the LB usually mean deploy or crash-loop</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// hooks lightning round</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>hook</th><th>it's for</th><th>the gotcha they ask about</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">useState</td><td>render data</td><td>setter batches; functional form for updates-from-previous</td></tr>
+        <tr><td class="mono">useEffect</td><td>syncing with the outside world</td><td>deps by Object.is; cleanup before re-run; StrictMode double-fires in dev</td></tr>
+        <tr><td class="mono">useRef</td><td>mutable value / DOM handle, no re-render</td><td>changing .current renders nothing — by design</td></tr>
+        <tr><td class="mono">useMemo</td><td>cache a computed value</td><td>it's about identity for deps/memo, not raw speed</td></tr>
+        <tr><td class="mono">useCallback</td><td>cache a function</td><td>≡ useMemo(() =&gt; fn); useless without a memoized consumer</td></tr>
+        <tr><td class="mono">useContext</td><td>read DI'd globals</td><td>every consumer re-renders on value change — memoize the value</td></tr>
+        <tr><td class="mono">useReducer</td><td>multi-field state transitions</td><td>the "complex form state" answer; dispatch is stable</td></tr>
+        <tr><td class="mono">useLayoutEffect</td><td>measure/mutate before paint</td><td>blocks paint — only when useEffect visibly flickers</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:24px">
+    <p class="mini-label">// the aws translation map</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>service</th><th>it's the managed version of…</th><th>reach for it when</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">EC2</td><td>your VPS</td><td>full control, steady workloads</td></tr>
+        <tr><td class="mono">ECS / Fargate</td><td>docker-compose + a babysitter</td><td>containerized API, no servers to patch</td></tr>
+        <tr><td class="mono">Lambda</td><td>a script that runs itself</td><td>events, glue, spiky/zero-baseline traffic</td></tr>
+        <tr><td class="mono">S3</td><td>the uploads folder</td><td>objects: assets, uploads, backups</td></tr>
+        <tr><td class="mono">RDS</td><td>your Postgres + a DBA</td><td>the system of record — Multi-AZ for uptime, replicas for reads</td></tr>
+        <tr><td class="mono">ElastiCache</td><td>your Redis</td><td>sessions, cache, counters, locks</td></tr>
+        <tr><td class="mono">ALB</td><td>nginx upstream block</td><td>spreading traffic, TLS, health checks</td></tr>
+        <tr><td class="mono">CloudFront</td><td>a cache in every city</td><td>static assets, TLS at edge, DDoS absorption</td></tr>
+        <tr><td class="mono">SQS / SNS</td><td>BullMQ / an event emitter</td><td>decouple slow work / fan out events</td></tr>
+        <tr><td class="mono">Route 53</td><td>DNS</td><td>domains, failover routing</td></tr>
+        <tr><td class="mono">IAM</td><td>who-can-do-what</td><td>always — roles over keys, least privilege</td></tr>
+        <tr><td class="mono">CloudWatch</td><td>logs + alarms</td><td>knowing you're down before users do</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- SAFE TO SKIP -->
+<section class="section" id="skip">
+  <p class="section-eyebrow">// reference · scope control</p>
+  <h2>Safe to skip (this weekend)</h2>
+  <p class="sub">Real topics, honestly deprioritized. Know the one-liner, spend the hours on the rapid-fire bank instead.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Webpack/bundler internals</b> — "Vite for dev speed via native ESM, bundle + hash for prod" covers 95% of build questions. Config archaeology impresses no one.</li>
+      <li><b>JS arcana</b> — generators, Proxy/Reflect, Symbol.iterator, <code>with</code>. Asked roughly never on product-company screens; the event loop question is asked every single time. Ratio your prep accordingly.</li>
+      <li><b>CSS trick questions</b> — know flex vs grid in a sentence and specificity roughly; deep selector golf belongs to dedicated frontend loops, and those will tell you in advance.</li>
+      <li><b>Kubernetes internals</b> — unless the JD says k8s, "declarative orchestration; we used ECS because it was less to operate" is a complete, senior answer. etcd and CNI plugins are not coming up.</li>
+      <li><b>AWS certification trivia</b> — instance family letters, service quotas, Direct Connect. Interviews test the map and the judgment, not the catalog. If they want cert trivia, the JD says "certified".</li>
+      <li><b>Exotic Postgres</b> — logical replication internals, custom extensions, LISTEN/NOTIFY edge cases. Indexes, joins, transactions, EXPLAIN — that's the exam.</li>
+      <li><b>Memorizing Big-O tables</b> — that's the <a href="./dsa.html">DSA course's</a> job, and it teaches the five you need through problems, which is the only way they stick.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Reading is not answering.</b> Cover, say it aloud, reveal, compare. Do the two days, then one bank section per evening until the screen.</p>
+  <p>pairs with: <a href="./dsa.html">DSA in 48</a> · <a href="./system-design.html">System Design in 48</a> · <a href="./behavioral.html">Behavioral in 48</a><br>part of the <a href="./index.html">in-48 series</a> · works offline, no build<br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>good luck — you've been giving these answers in code for years.</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var K_PROGRESS = 'fs48:progress';
+  var K_COLLAPSED = 'fs48:collapsed';
+  var K_THEME = 'fs48:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    // syntax highlighting (deferred CDN script has already run at this point)
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- collapse toggles (persisted) ---------- */
+    var collapsed = load(K_COLLAPSED, []);
+    if (!Array.isArray(collapsed)) collapsed = [];
+    $('.topic').forEach(function (topic) {
+      if (collapsed.indexOf(topic.id) !== -1) {
+        topic.classList.add('collapsed');
+        var b = topic.querySelector('.toggle');
+        if (b) { b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', 'Expand section'); }
+      }
+    });
+    $('.toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var topic = btn.closest('.topic');
+        var isCollapsed = topic.classList.toggle('collapsed');
+        btn.setAttribute('aria-expanded', String(!isCollapsed));
+        btn.setAttribute('aria-label', isCollapsed ? 'Expand section' : 'Collapse section');
+        var i = collapsed.indexOf(topic.id);
+        if (isCollapsed && i === -1) collapsed.push(topic.id);
+        if (!isCollapsed && i !== -1) collapsed.splice(i, 1);
+        save(K_COLLAPSED, collapsed);
+      });
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- problem progress (persisted) ---------- */
+    var boxes = $('.prob input[type="checkbox"]');
+    var progress = load(K_PROGRESS, {});
+    if (!progress || typeof progress !== 'object') progress = {};
+    boxes.forEach(function (b) { if (progress[b.getAttribute('data-key')]) b.checked = true; });
+
+    function updateProgress() {
+      [1, 2].forEach(function (d) {
+        var group = boxes.filter(function (b) { return b.getAttribute('data-day') === String(d); });
+        var doneCount = group.filter(function (b) { return b.checked; }).length;
+        var countEl = document.getElementById('p' + d + '-count');
+        var barEl = document.getElementById('p' + d + '-bar');
+        if (countEl) countEl.textContent = doneCount + '/' + group.length;
+        if (barEl) barEl.style.width = (group.length ? (doneCount / group.length) * 100 : 0) + '%';
+      });
+    }
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        var key = b.getAttribute('data-key');
+        if (b.checked) progress[key] = 1; else delete progress[key];
+        save(K_PROGRESS, progress);
+        updateProgress();
+      });
+    });
+    updateProgress();
+
+    var resetBtn = document.getElementById('reset-progress');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!window.confirm('Clear all solved-problem checkmarks?')) return;
+        boxes.forEach(function (b) { b.checked = false; });
+        progress = {};
+        save(K_PROGRESS, progress);
+        updateProgress();
+      });
+    }
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+
+    /* ---------- print: expand everything, then put it back ---------- */
+    var printState = null;
+    window.addEventListener('beforeprint', function () {
+      printState = {
+        topics: $('.topic.collapsed'),
+        quizzes: $('.quiz:not([open])')
+      };
+      printState.topics.forEach(function (t) { t.classList.remove('collapsed'); });
+      printState.quizzes.forEach(function (q) { q.open = true; });
+    });
+    window.addEventListener('afterprint', function () {
+      if (!printState) return;
+      printState.topics.forEach(function (t) { t.classList.add('collapsed'); });
+      printState.quizzes.forEach(function (q) { q.open = false; });
+      printState = null;
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
