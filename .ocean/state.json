@@ -4,7 +4,7 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
   "status": "running",
-  "current_sprint": 7,
+  "current_sprint": 8,
   "sprints": [
     {
       "id": 1,
@@ -45,13 +45,13 @@
     {
       "id": 7,
       "title": "aws-cloud + system-design-backend",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "c1f72eb"
     },
     {
       "id": 8,
       "title": "frontend-system-design deep dive + interview-kit",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     },
     {
@@ -64,8 +64,8 @@
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786017670,
-  "heartbeat": 1786017670,
+  "last_checkpoint": 1786018724,
+  "heartbeat": 1786018724,
   "blockers": [],
-  "notes": "SP6 done. Next: sprint-start 7 — learn/aws-cloud.html (6 sections: the mental map, the 12 services, 3 reference architectures for MERN, IAM, ops/observability, cost sense; fav AW, accent #FB923C/#EA580C/#FDBA74/251,146,60) + learn/system-design-backend.html (7: the loop, estimation w/ interactive calculator, LB+scaling, caching, DB scaling patterns, queues/async, worked designs URL-shortener→cat-photo-feed; fav SD, accent #2DD4BF/#14A99A/#5EEAD4/45,212,191). ASCII-diagram code panels fine, keep capacity math honest (verify arithmetic by hand). Restore the aws-cloud mention link in node-backend.html §07 ('aws-cloud module (next on the shelf)' → real link). Flip hub cards, live 9→11. NOTE: browser-pane timers throttle to 1/s when hidden — verify timer-based demos with stubbed timers."
+  "notes": "SP7 done. Next: sprint-start 8 — learn/frontend-system-design.html (7 sections: RADIO practiced, rendering decision tree widget, component API design, state architecture, data+caching, perf budgets, resilience+a11y; fav FD, accent #F472B6/#E11D48/#FDA4AF/244,114,182) + learn/interview-kit.html (7: story bank w/ PERSISTED TEXTAREAS (new widget: textarea saving to learn:interview-kit:worksheet:<id>), resume walkthrough, mock-loop run sheets, question banks incl. questions YOU ask, offer/negotiation, 4-week study planner w/ checklist links to every module+course, day-before rituals; fav IK, accent #A78BFA/#7C3AED/#C4B5FD/167,139,250). Then: restore sd-backend's deferred link ('its deep-dive module lands on the shelf next' -> real link to ./frontend-system-design.html), flip hub cards, live 11→13, hub hero '13 modules planned/13 live' + remove 'rest landing this weekend'. Browser pane geometry unreliable when hidden — do functional JS checks only; full visual pass in SP9 with fresh preview."
 }
