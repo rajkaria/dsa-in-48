@@ -14,6 +14,18 @@ under interview pressure."
 | Behavioral in 48 | [`behavioral.html`](./behavioral.html) | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 | Full-Stack in 48 | [`fullstack.html`](./fullstack.html) | [/fullstack](https://dsa-in-48.vercel.app/fullstack) · [Pages](https://rajkaria.github.io/dsa-in-48/fullstack.html) |
 | Frontend System Design in 48 | [`frontend-system-design.html`](./frontend-system-design.html) | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
+| The Learn track (hub + 13 modules) | [`learn/`](./learn/) | [/learn](https://dsa-in-48.vercel.app/learn) · [Pages](https://rajkaria.github.io/dsa-in-48/learn/) |
+
+**The Learn track** (`learn/index.html` + 13 modules, added Aug 2026) is the self-paced
+deep-dive companion to the courses: beginner→advanced tutorials with inline-JS interactive
+widgets (MCQ quizzes with first-attempt scoring, sandboxed "run it" panels, hand-rolled
+visualizers, persisted worksheets). Module scaffolding lives in `.ocean/templates/`
+(`learn-head-base.html` + `make_head.py` + `learn-tail.html`) — new modules are built by
+instantiating the head (accent/meta/fav placeholders), writing the body, and appending the
+tail with the `__SLUG__` swap. localStorage: `learn:<slug>:done` (array of section ids),
+`learn:<slug>:quiz` (map qid→0/1), `learn:interview-kit:ws:*` (worksheets), and a single
+`learn:theme` shared across the whole track (deliberate exception to per-page themes).
+The hub reads every module's progress via those keys; its cards hardcode section totals.
 
 `index.html` used to be the DSA course; it became the landing page in Aug 2026 and the
 course moved to `dsa.html`. Old bookmarks to `/` now land on the hub, one click from the
@@ -98,7 +110,10 @@ Vercel GitHub app has no access to this repo. Until Raj grants it (Vercel dashbo
 
 ## Verifying a change
 
-There is no test suite; the check is visual + behavioural in a browser:
+First gate: `bash scripts/verify.sh` — static checks over every page (tag balance, unique
+`data-key`s, internal + cross-file anchor resolution, external-request allowlist, hljs
+integrity attribute, localStorage namespace hygiene). Green is required before any commit.
+Then the browser check:
 
 1. Serve the folder (`python3 -m http.server 8000`) — the pages must be served over HTTP,
    not `file://`, for localStorage to behave.

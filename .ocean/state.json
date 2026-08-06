@@ -4,7 +4,7 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
   "status": "running",
-  "current_sprint": 8,
+  "current_sprint": 9,
   "sprints": [
     {
       "id": 1,
@@ -51,21 +51,21 @@
     {
       "id": 8,
       "title": "frontend-system-design deep dive + interview-kit",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "889844c"
     },
     {
       "id": 9,
       "title": "Sweep + landing integration + deploy + REPORT",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     }
   ],
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786018724,
-  "heartbeat": 1786018724,
+  "last_checkpoint": 1786019328,
+  "heartbeat": 1786019329,
   "blockers": [],
-  "notes": "SP7 done. Next: sprint-start 8 — learn/frontend-system-design.html (7 sections: RADIO practiced, rendering decision tree widget, component API design, state architecture, data+caching, perf budgets, resilience+a11y; fav FD, accent #F472B6/#E11D48/#FDA4AF/244,114,182) + learn/interview-kit.html (7: story bank w/ PERSISTED TEXTAREAS (new widget: textarea saving to learn:interview-kit:worksheet:<id>), resume walkthrough, mock-loop run sheets, question banks incl. questions YOU ask, offer/negotiation, 4-week study planner w/ checklist links to every module+course, day-before rituals; fav IK, accent #A78BFA/#7C3AED/#C4B5FD/167,139,250). Then: restore sd-backend's deferred link ('its deep-dive module lands on the shelf next' -> real link to ./frontend-system-design.html), flip hub cards, live 11→13, hub hero '13 modules planned/13 live' + remove 'rest landing this weekend'. Browser pane geometry unreliable when hidden — do functional JS checks only; full visual pass in SP9 with fresh preview."
+  "notes": "SP8 done — all 13 modules live. Next: sprint-start 9 (the sweep): (1) landing page index.html gets a Learn track section (teaser + link to learn/, mention in hero/footer); (2) course pages get 'go deeper' cross-links to matching learn modules (light touch: one line in footers or howto); (3) README + CLAUDE.md + docs/context updated (learn track table, conventions, verify script); (4) full fresh-pane browser pass: preview_stop + preview_start, both themes on hub+2 modules+landing, 375px, console; (5) re-read .ocean/SPEC.md checking every deliverable; (6) merge branch to main, push origin main (GitHub Pages), vercel deploy --prod, verify live URLs; (7) write .ocean/REPORT.md + set-status complete. Deploy pre-authorized by Raj (D9)."
 }
