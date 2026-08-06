@@ -3,7 +3,7 @@
   "created_at": 1786008997,
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
-  "status": "running",
+  "status": "complete",
   "current_sprint": 9,
   "sprints": [
     {
@@ -57,15 +57,15 @@
     {
       "id": 9,
       "title": "Sweep + landing integration + deploy + REPORT",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "189121f"
     }
   ],
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786019328,
-  "heartbeat": 1786019329,
+  "last_checkpoint": 1786019992,
+  "heartbeat": 1786019992,
   "blockers": [],
   "notes": "SP8 done — all 13 modules live. Next: sprint-start 9 (the sweep): (1) landing page index.html gets a Learn track section (teaser + link to learn/, mention in hero/footer); (2) course pages get 'go deeper' cross-links to matching learn modules (light touch: one line in footers or howto); (3) README + CLAUDE.md + docs/context updated (learn track table, conventions, verify script); (4) full fresh-pane browser pass: preview_stop + preview_start, both themes on hub+2 modules+landing, 375px, console; (5) re-read .ocean/SPEC.md checking every deliverable; (6) merge branch to main, push origin main (GitHub Pages), vercel deploy --prod, verify live URLs; (7) write .ocean/REPORT.md + set-status complete. Deploy pre-authorized by Raj (D9)."
 }

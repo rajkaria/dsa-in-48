@@ -1,4 +1,23 @@
+---
+feature: learn-track
+globs:
+  - learn/**
+  - frontend-system-design.html
+  - scripts/**
+  - .ocean/templates/**
+updated: 2026-08-06
+---
+
 # The Learn track + Frontend System Design in 48 — the Aug 2026 expansion
+
+## Current state — what's working, deployed, broken
+
+- **DEPLOYED TO PROD 2026-08-06.** Vercel: merged to main (`0c4f4a7`), deployed
+  (`dpl_EcXu1ky6Zo6TALRyqkxWpKVivVBf`, aliased to dsa-in-48.vercel.app) — all URLs
+  verified 200 with correct titles. GitHub Pages: first build **errored** (Jekyll choked
+  on JSX `{{ }}` inside code panels) — fixed with a root `.nojekyll` (`c4c9afb`);
+  rebuild was in flight at save time. Ocean run `ocean-20260806-150637` complete
+  (9/9 sprints); full report in `.ocean/REPORT.md`.
 
 ## Current state — what's shipped
 
@@ -56,9 +75,14 @@
 - The runner note "— async work finished —" only prints when the wrapper resolves >150ms
   after click.
 
-## Next steps / open threads
+## Next steps — specific, actionable
 
-- Deploy (SP9): merge worktree branch → main, push (Pages auto), `vercel deploy --prod`.
-- Optional future: per-module og-images, a Learn-track progress overview on the hub
-  (aggregate %), spaced-repetition reminders (would need a service worker — currently
-  out of scope by the no-third-request rule).
+- **Confirm GitHub Pages went green** after the `.nojekyll` fix:
+  `curl -s -o /dev/null -w '%{http_code}' https://rajkaria.github.io/dsa-in-48/learn/`
+  (expect 200; if errored again: `gh api repos/rajkaria/dsa-in-48/pages/builds/latest`).
+- Optional polish, none blocking: per-module og-images; an aggregate progress bar on the
+  hub; a `.soon` placeholder card pattern for any future module 14; hero-meta count
+  checks added to `scripts/check_pages.py`.
+- Vercel git auto-deploy is STILL not connected (pushes need manual
+  `vercel deploy --prod` from the repo root) — granting the Vercel GitHub app access
+  remains Raj's call.
