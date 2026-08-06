@@ -4,7 +4,7 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
   "status": "running",
-  "current_sprint": 3,
+  "current_sprint": 4,
   "sprints": [
     {
       "id": 1,
@@ -21,13 +21,13 @@
     {
       "id": 3,
       "title": "js-async + react-deep-dive",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "16dde94"
     },
     {
       "id": 4,
       "title": "dsa-foundations + dsa-structures",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     },
     {
@@ -64,8 +64,8 @@
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786013340,
-  "heartbeat": 1786013340,
+  "last_checkpoint": 1786014518,
+  "heartbeat": 1786014518,
   "blockers": [],
-  "notes": "SP2 done. Next: sprint-start 3 — learn/js-async.html + learn/react-deep-dive.html using .ocean/templates (make_head.py args: slug title desc fav acc acc_deep acc_darkdeep acc_rgb; body pattern = jsf page; tail = learn-tail.html with __SLUG__ swap). js-async accent #38BDF8/#0284C7/#7DD3FC/56,189,248 · react #60A5FA/#2563EB/#93C5FD/96,165,250. Flip their hub cards live (remove .soon, add mod-foot with Start link + progress bar). Hub totals: js-async 7 sections, react 7."
+  "notes": "SP3 done. Next: sprint-start 4 — learn/dsa-foundations.html (7 sections: Big-O w/ growth-curve widget, arrays+strings, hashmaps/sets, two pointers, sliding window, prefix sums, practice map) + learn/dsa-structures.html (6: linked lists, stacks, queues/deques, heaps, intervals, practice map). Use .ocean/templates/make_head.py (FAV arg = plain ASCII initials, e.g. DF/DS — it lands inside URL-encoded SVG). Accents: dsa-foundations #FFD60A/#E8BE00/#F5CB1E/255,214,10 fav DF; dsa-structures #A3E635/#65A30D/#BEF264/163,230,53 fav DS. LeetCode links MUST be verified via curl leetcode API (see CLAUDE.md). Flip hub cards live + bump live count to 5. Body pattern: copy sidebar/hero/lesson shapes from learn/js-async.html."
 }
