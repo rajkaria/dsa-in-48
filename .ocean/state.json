@@ -4,7 +4,7 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
   "status": "running",
-  "current_sprint": 2,
+  "current_sprint": 3,
   "sprints": [
     {
       "id": 1,
@@ -15,13 +15,13 @@
     {
       "id": 2,
       "title": "Learn hub + module template + js-fundamentals",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "5957d52"
     },
     {
       "id": 3,
       "title": "js-async + react-deep-dive",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     },
     {
@@ -64,8 +64,8 @@
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786011306,
-  "heartbeat": 1786011306,
+  "last_checkpoint": 1786013340,
+  "heartbeat": 1786013340,
   "blockers": [],
-  "notes": "SP1 done (commit 9eabab8). Next: sprint-start 2 — build learn/index.html hub + learn/js-fundamentals.html (the template-bearer module). Conventions: learn:<slug>:* keys, cat examples, Professor Whiskers callouts, quiz engine + try-it runners inline. See PLAN.md SP2. Note: browser screenshot tool captures blank past ~2000px scroll — verify deep content programmatically (elementFromPoint/getComputedStyle), it's a tool artifact not a page bug."
+  "notes": "SP2 done. Next: sprint-start 3 — learn/js-async.html + learn/react-deep-dive.html using .ocean/templates (make_head.py args: slug title desc fav acc acc_deep acc_darkdeep acc_rgb; body pattern = jsf page; tail = learn-tail.html with __SLUG__ swap). js-async accent #38BDF8/#0284C7/#7DD3FC/56,189,248 · react #60A5FA/#2563EB/#93C5FD/96,165,250. Flip their hub cards live (remove .soon, add mod-foot with Start link + progress bar). Hub totals: js-async 7 sections, react 7."
 }
