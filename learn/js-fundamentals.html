@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Fundamentals — Learn track · in 48</title>
+<meta name="description" content="JavaScript from first principles for working engineers: values, coercion, closures, this, prototypes, modules, iteration — plain language, runnable examples, quizzes, and one very helpful cat. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="JS Fundamentals — Learn track · in 48">
+<meta property="og:description" content="JavaScript from first principles for working engineers: values, coercion, closures, this, prototypes, modules, iteration — plain language, runnable examples, quizzes, and one very helpful cat. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JS Fundamentals — Learn track · in 48">
+<meta name="twitter:description" content="JavaScript from first principles for working engineers: values, coercion, closures, this, prototypes, modules, iteration — plain language, runnable examples, quizzes, and one very helpful cat. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23FBBF24'%3EFS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#FBBF24;
+  --mark-deep:#D97706;
+  --mark-soft:rgba(251,191,36,.16);
+  --on-mark:#141B22;
+  --on-ink:#FBBF24;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FCD34D;
+  --mark-soft:rgba(251,191,36,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FCD34D;
+  --mark-soft:rgba(251,191,36,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,191,36,0) 0%, rgba(251,191,36,.95) 6%, rgba(251,191,36,.8) 94%, rgba(251,191,36,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,191,36,0) 0%, rgba(251,191,36,.95) 5%, rgba(251,191,36,.78) 95%, rgba(251,191,36,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(251,191,36,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(251,191,36,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,191,36,0) 0%, rgba(251,191,36,.9) 6%, rgba(251,191,36,.7) 94%, rgba(251,191,36,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· js fundamentals</em></div>
+      <div class="brand-sub">module 01 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#values"><span><i class="dot" data-for="values"></i> Values &amp; Types</span></a>
+    <a class="side-link" href="#coercion"><span><i class="dot" data-for="coercion"></i> Coercion &amp; Equality</span></a>
+    <a class="side-link" href="#closures"><span><i class="dot" data-for="closures"></i> Scope &amp; Closures</span></a>
+    <a class="side-link" href="#this"><span><i class="dot" data-for="this"></i> <code>this</code>, Tamed</span></a>
+    <a class="side-link" href="#prototypes"><span><i class="dot" data-for="prototypes"></i> Prototypes &amp; Classes</span></a>
+    <a class="side-link" href="#modules"><span><i class="dot" data-for="modules"></i> Modules</span></a>
+    <a class="side-link" href="#iteration"><span><i class="dot" data-for="iteration"></i> Arrays &amp; Iteration</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="../fullstack.html"><span>Full-Stack in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="../index.html"><span>All courses</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 01 <b>the language everything else stands on</b></p>
+  <h1>JavaScript, <span class="hl hl-anim" data-d="0">actually</span> <span class="hl hl-anim" data-d="1">understood</span>.</h1>
+  <p class="lede">You can ship JS all day and still feel like parts of it are folklore — why <code>this</code> betrays you, why <code>[] == false</code>, what a closure <i>really</i> is. This module rebuilds the language from first principles, in plain English, with code you can <b>run right on this page</b>.</p>
+  <p class="lede">Every section ramps <b>beginner → advanced</b>: skim what you know, slow down where it gets new. Examples feature a recurring cast of cats, because everything is easier to remember when a cat named Mochi is involved. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: total beginner</span>
+    <span class="level-chip i">middle: working engineer</span>
+    <span class="level-chip a">ends at: interview-grade depth</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>8</b> quiz questions</span>
+    <span><b>9</b> runnable panels</span>
+    <span><b>~4h</b> total, self-paced</span>
+  </div>
+  <a class="btn" href="#values">Start with values <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · VALUES -->
+<section class="lesson" id="values">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>Values &amp; types — what a variable actually holds</h3>
+      <p class="lvl">beginner → the reference model most bugs come from</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>JavaScript has exactly <b>eight types</b>. Seven are <b>primitives</b> — <code>string</code>, <code>number</code>, <code>boolean</code>, <code>undefined</code>, <code>null</code>, <code>bigint</code>, <code>symbol</code> — and everything else is an <b>object</b> (including arrays and functions; they're objects with extra talents).</p>
+    <p>The single most important idea in this whole module: <b>primitives are copied by value, objects are copied by reference</b>. A variable never "contains" an object — it holds a <i>pointer</i> to one, the way a cat's adoption certificate isn't the cat, just a way to find her.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>If two people both hold <b>a copy of Mochi's adoption paper</b>, and one of them takes Mochi to the groomer, <i>both</i> papers now point at a groomed cat. But if two people each write down her <b>weight</b> on their own paper, changing one paper changes nothing else. Objects are the cat; primitives are the number on the paper.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">one-cat-two-papers.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// primitives copy the VALUE
+let weight = 4.2;
+let weightCopy = weight;
+weightCopy = 5.0;
+console.log(weight);          // still 4.2 — separate papers
+
+// objects copy the REFERENCE
+const mochi = { name: 'Mochi', groomed: false };
+const sameCat = mochi;        // not a clone — the same cat!
+sameCat.groomed = true;
+console.log(mochi.groomed);   // true — one cat, two papers
+
+// "const" freezes the PAPER, not the cat
+mochi.name = 'Mochi II';      // fine — mutating the object
+console.log(mochi.name);
+// mochi = {} would throw — THAT reassigns the binding</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">runs right here — edit nothing, just watch the two behaviors</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>This is why a function can mutate an object you pass it (you handed over the real cat), and why <code>{...mochi}</code> — a <b>shallow copy</b> — only copies one level: nested objects inside are still shared references. A true clone of everything is <code>structuredClone(mochi)</code>.</p>
+    <div class="mcq" data-qid="jsf-values-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>function feed(cat) { cat.fed = true; cat = { fed: false }; }</code> — after <code>feed(mochi)</code>, what is <code>mochi.fed</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>true</code> — the mutation reached the real cat; the reassignment only changed the local parameter</button>
+        <button class="mcq-opt" type="button"><code>false</code> — the function replaced mochi with a new object</button>
+        <button class="mcq-opt" type="button"><code>undefined</code> — objects are copied into functions</button>
+        <button class="mcq-opt" type="button">It throws — function parameters are read-only</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the parameter received a copy of the <i>reference</i>. Line one follows that reference to the shared object — visible outside. Line two points the local copy somewhere new — invisible outside. This is "pass-by-value where the value is a reference" in one function, and it's a genuine screen question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>"JS is <b>always pass-by-value</b> — but for objects, the value being passed <i>is the reference</i>." That sentence, verbatim, settles a famously confused question.</li>
+        <li><code>typeof null === 'object'</code> is a 30-year-old bug kept for compatibility. Check null with <code>x === null</code>.</li>
+        <li>Numbers are IEEE-754 doubles: <code>0.1 + 0.2 !== 0.3</code>. Money lives in integer paise/cents, never floats.</li>
+        <li><code>Object.freeze(obj)</code> makes an object <i>shallowly</i> immutable — and is the start of the "how would you make this deeply immutable?" follow-up.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · COERCION -->
+<section class="lesson" id="coercion">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Coercion &amp; equality — the rules behind the "wat"</h3>
+      <p class="lvl">beginner → why == behaves and when to allow it</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>JavaScript converts types for you — helpfully in template strings, chaotically in comparisons. The chaos is <b>rule-based</b>, though, and there are only three rules you actually need.</p>
+    <p><b>Rule 1:</b> <code>===</code> compares type <i>and</i> value, converting nothing. <b>Rule 2:</b> <code>==</code> first converts both sides to a common type (usually numbers) — that's how <code>'5' == 5</code> is true. <b>Rule 3:</b> when JS needs a boolean (an <code>if</code>, a <code>!</code>), exactly <b>eight values are falsy</b> — <code>false, 0, -0, 0n, '', null, undefined, NaN</code> — and <i>everything</i> else is truthy, including <code>[]</code>, <code>{}</code>, and <code>'false'</code>.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Think of <code>==</code> as a cat translator with strong opinions: before comparing a cat's meow to a dog's bark, it <b>translates both into "animal sounds"</b> and then compares. Usually fine, occasionally you learn that an empty carrier <code>[]</code> translates to silence <code>''</code>, which translates to <code>0</code>. The translator isn't random — it's just <i>very</i> literal.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">the-translator.js — predict each line, then run</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Say each answer OUT LOUD before running. Grade yourself.
+console.log('5' == 5);        // ?
+console.log('5' === 5);       // ?
+console.log([] == false);     // ?  ([] → '' → 0, false → 0)
+console.log([] == ![]);       // ?  (![] is false! so: [] == false)
+console.log(null == undefined);   // ?  (special rule: only each other)
+console.log(null == 0);       // ?  (null only == undefined, nothing else)
+console.log(NaN === NaN);     // ?  (NaN equals NOTHING)
+console.log(Number.isNaN(NaN));   // the correct NaN check
+
+// the ONE respectable use of == :
+const x = undefined;
+console.log(x == null);       // true for null AND undefined — handy guard</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">score yourself honestly — this is a real screen question</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="jsf-coercion-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Mochi's shop sells treats: <code>if (cart.items.length) { checkout() }</code>. When does checkout NOT run?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Whenever the cart object is empty <code>{}</code></button>
+        <button class="mcq-opt" type="button" data-ok>When <code>length</code> is <code>0</code> — the only falsy case here</button>
+        <button class="mcq-opt" type="button">When <code>items</code> is <code>['tuna']</code> — arrays are falsy</button>
+        <button class="mcq-opt" type="button">Never — numbers are always truthy</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>length</code> is a number; the only falsy numbers are <code>0</code>, <code>-0</code> and <code>NaN</code>. An array with items has truthy length; empty array → <code>0</code> → falsy → no checkout. (And <code>{}</code> is truthy — objects always are.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The calibrated rule: <b>"always <code>===</code>, except <code>x == null</code> as a deliberate null-or-undefined guard."</b></li>
+        <li><code>??</code> (nullish coalescing) beats <code>||</code> for defaults: <code>count || 10</code> wrongly replaces <code>0</code>; <code>count ?? 10</code> only replaces null/undefined.</li>
+        <li><code>+'42'</code> is a number, <code>'' + 42</code> is a string, <code>1 + '2'</code> is <code>'12'</code> but <code>1 - '2'</code> is <code>-1</code> — <code>+</code> is the only operator that prefers strings.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · CLOSURES -->
+<section class="lesson" id="closures">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Scope &amp; closures — functions that remember</h3>
+      <p class="lvl">the #1 interview topic in all of JavaScript</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Scope</b> is "which variables can this line see?" — and in modern JS it follows the braces: a <code>let</code> or <code>const</code> lives inside the nearest <code>{ }</code> and nowhere else. (<code>var</code> ignores braces and belongs to the whole function — one of several reasons we've retired it.)</p>
+    <p>A <b>closure</b> is what happens when a function is created inside another function: the inner function keeps a <b>live link</b> to the outer function's variables — even after the outer function has finished and returned. Not a snapshot. A live link.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>An automatic treat dispenser is built (the outer function runs once) with <b>a jar of treats sealed inside</b> (its local variable). The dispenser's button (the inner function you kept) still reaches that jar every time it's pressed — long after the factory that built it closed. Two dispensers? <b>Two separate jars.</b> That's a closure: the button carries its jar with it.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">treat-dispenser.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">function makeDispenser(cat) {
+  let treats = 3;                  // the sealed jar
+  return function dispense() {     // the button — closes over `treats`
+    if (treats === 0) return `${cat}: jar empty 😾`;
+    treats--;                      // a LIVE link — it mutates the jar
+    return `${cat} gets a treat (${treats} left)`;
+  };
+}
+
+const forMochi = makeDispenser('Mochi');
+const forBiscuit = makeDispenser('Biscuit');  // separate jar!
+
+console.log(forMochi());     // 2 left
+console.log(forMochi());     // 1 left
+console.log(forBiscuit());   // 2 left — Biscuit's own jar
+console.log(forMochi());     // 0 left
+console.log(forMochi());     // jar empty 😾
+
+// makeDispenser finished running long ago —
+// yet `treats` lived on, privately, per dispenser.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">two dispensers, two jars — the whole concept in one run</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <h4>The interview classic: the loop that logs 3, 3, 3</h4>
+    <p>Because closures link to <i>variables</i> (not values), three callbacks closing over one shared <code>var i</code> all see its final value. <code>let</code> fixes it by creating a <b>fresh <code>i</code> per loop iteration</b> — three callbacks, three variables. Run it:</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">the-loop-question.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">for (var i = 0; i &lt; 3; i++) {
+  setTimeout(() =&gt; console.log('var says:', i));   // one shared i
+}
+for (let j = 0; j &lt; 3; j++) {
+  setTimeout(() =&gt; console.log('let says:', j));   // fresh j each loop
+}
+// prediction time: what prints, in what order?</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the timers fire after the loops finish — watch both behaviors</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="jsf-closures-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Where do you use closures in a normal React week — pick the answer an interviewer loves?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nowhere — closures are a Node.js feature</button>
+        <button class="mcq-opt" type="button" data-ok>Constantly: every event handler and effect reading component variables, every debounce timer</button>
+        <button class="mcq-opt" type="button">Only when I write <code>function</code> inside <code>function</code> on purpose</button>
+        <button class="mcq-opt" type="button">Only in class components via <code>this</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> every <code>onClick</code> arrow that mentions a prop or state variable is a closure over the render's scope — which is also exactly why stale-closure bugs exist in effects: the callback captured an old render's variables. Naming debounce ("the timer variable lives in a closure") makes the answer concrete.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>Stale closures in React:</b> an interval set up once captures that render's <code>count</code> forever. Fixes: functional updates (<code>setCount(c =&gt; c + 1)</code>), correct dep arrays, or a ref.</li>
+        <li><b>Closures are the memory-leak shape</b> in JS: a long-lived callback (listener, cache, timer) holding a huge object it no longer needs. The leak is the <i>reference</i>, not the closure itself.</li>
+        <li>Hoisting, precisely: <code>var</code> hoists as <code>undefined</code>; <code>let/const</code> hoist but are unusable until their line — the <b>temporal dead zone</b>. Saying "TDZ" earns the point.</li>
+        <li>Module-private state, debounce/throttle, once-functions, memoize — all closures. One implementation from memory (debounce) covers the practical follow-up.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · THIS -->
+<section class="lesson" id="this">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3><code>this</code>, tamed — four rules, zero mystery</h3>
+      <p class="lvl">intermediate → the bug class you'll never write again</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><code>this</code> feels haunted because it's decided at the <b>wrong moment</b> compared to everything else in JS. Variables are resolved where a function is <i>written</i> (lexical). <code>this</code> is resolved where a function is <i>called</i> — every single call, fresh.</p>
+    <p>Four rules, checked in order, answer every <code>this</code> question: <b>(1)</b> called with <code>new</code>? → the brand-new object. <b>(2)</b> called via <code>.call/.apply/.bind</code>? → whatever you passed. <b>(3)</b> called as a method, <code>obj.fn()</code>? → the thing before the dot. <b>(4)</b> called bare, <code>fn()</code>? → <code>undefined</code> in modules/strict mode. And the special case that fixes everything: <b>arrow functions have no <code>this</code> at all</b> — they see the enclosing scope's, like any other variable.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span><code>this</code> is <b>"whose lap is the function sitting on when it's called?"</b> — not whose house it was born in. <code>mochi.meow()</code>: sitting on Mochi's lap, <code>this</code> is Mochi. Hand the same <code>meow</code> to someone else and call it bare — it's on <b>nobody's lap</b>, and <code>this</code> is undefined. Arrow functions are kittens who <b>refuse to change laps</b>: they stay on the lap they were born on, forever.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">whose-lap.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const mochi = {
+  name: 'Mochi',
+  meow() { return `${this?.name ?? 'nobody'} says meow`; },
+};
+
+console.log(mochi.meow());        // rule 3: lap = mochi
+
+const detached = mochi.meow;      // took the function off the lap
+console.log(detached());          // rule 4: nobody's lap
+
+console.log(detached.call(mochi));       // rule 2: lap supplied
+const glued = detached.bind(mochi);      // permanently re-lapped
+console.log(glued());
+
+// arrows don't have their own `this` — they inherit
+const biscuit = {
+  name: 'Biscuit',
+  friends: ['Mochi', 'Clawdia'],
+  listFriends() {
+    // this arrow sees listFriends' `this` — biscuit. no .bind needed
+    return this.friends.map(f =&gt; `${this.name} ♥ ${f}`);
+  },
+};
+console.log(biscuit.listFriends());</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the four rules, live — narrate each line like an interview trace</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="jsf-this-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>setTimeout(mochi.meow, 100)</code> logs "nobody says meow". Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">setTimeout runs in a different thread without <code>this</code></button>
+        <button class="mcq-opt" type="button" data-ok>Passing <code>mochi.meow</code> detaches the function — the timer calls it bare, so rule 4 applies</button>
+        <button class="mcq-opt" type="button">Arrow functions inside timers lose their scope</button>
+        <button class="mcq-opt" type="button">Objects are garbage-collected before timers fire</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> only the function value travels into setTimeout — the <code>mochi.</code> lap is gone. The timer invokes it as a plain call. Fixes, all equivalent: <code>() =&gt; mochi.meow()</code> (call it ON the lap), <code>mochi.meow.bind(mochi)</code>, or make meow an arrow that closes over what it needs. This exact bug is why React class components needed <code>.bind(this)</code> — and why hooks + arrows made it extinct.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Arrows can't be constructors, have no <code>arguments</code>, and ignore <code>.call/.bind</code>'s this — the cost of lap-loyalty. Don't use them as object methods when you WANT the calling object.</li>
+        <li><code>class</code> fields like <code>handleClick = () =&gt; {}</code> are per-instance arrows — the modern auto-bind. Know the memory tradeoff: one function per instance instead of one shared prototype method.</li>
+        <li>In event handlers, DOM sets <code>this</code> to the element for regular functions — one more reason arrows + explicit variables read clearer.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 5 · PROTOTYPES -->
+<section class="lesson" id="prototypes">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Prototypes &amp; classes — inheritance without the theater</h3>
+      <p class="lvl">intermediate → what `class` actually compiles down to</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>JavaScript has no "real" classes under the hood — it has <b>objects linked to objects</b>. Every object carries a hidden link to a <i>prototype</i> object; when you read a property the object doesn't have, JS follows the link and looks there, then follows <i>that</i> object's link, until it finds the property or hits <code>null</code>. That walk is the <b>prototype chain</b>, and it's the entire inheritance system.</p>
+    <p>The <code>class</code> keyword is lovely, modern syntax for wiring exactly those links: methods go on <code>ClassName.prototype</code> (one shared copy, not one per instance), and <code>extends</code> points one prototype at another.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Ask Mochi to <code>fetchStick()</code>. She checks <b>her own tricks</b> — nothing. She checks what she learned from <b>Cat School</b> (her prototype) — nothing. Cat School checks <b>Animal Academy</b> (its prototype) — found! Every cat <i>shares</i> the school's single trick book instead of carrying a photocopy — that's why methods live on the prototype: one book, many cats.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">cat-school.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">class Animal {
+  constructor(name) { this.name = name; }        // own property per animal
+  eat() { return `${this.name} eats`; }          // shared, on the prototype
+}
+class Cat extends Animal {
+  meow() { return `${this.name} says meow`; }
+  eat() { return super.eat() + ' (elegantly)'; } // override + call up-chain
+}
+
+const mochi = new Cat('Mochi');
+console.log(mochi.meow());                  // found on Cat.prototype
+console.log(mochi.eat());                   // Cat's version, using super
+
+// proof it's all just linked objects:
+console.log(Object.getPrototypeOf(mochi) === Cat.prototype);           // true
+console.log(Object.getPrototypeOf(Cat.prototype) === Animal.prototype);// true
+console.log('meow' in mochi, mochi.hasOwnProperty('meow'));  // true, false!
+// `in` walks the chain; hasOwnProperty checks only the cat herself
+
+// the chain ends at null:
+console.log(Object.getPrototypeOf(Object.prototype));        // null</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch `in` vs hasOwnProperty split — that's the chain, visible</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="jsf-proto-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why do methods live on the prototype instead of being created in the constructor?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">They don't — <code>class</code> copies methods into each instance</button>
+        <button class="mcq-opt" type="button" data-ok>One shared function for all instances instead of a copy per object — memory and identity</button>
+        <button class="mcq-opt" type="button">Prototype methods run faster because they're compiled</button>
+        <button class="mcq-opt" type="button">So they can access <code>this</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> 10,000 cats with a constructor-created <code>meow = function(){}</code> = 10,000 function objects; on the prototype = exactly one, found via the chain. (It's also why <code>catA.meow === catB.meow</code> is true — handy for memo/equality reasoning.) Arrow-function class fields make the opposite tradeoff for lap-loyalty — see section 04.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>"Prototypal inheritance in two sentences": every object links to a prototype; failed lookups walk the chain until found or null. <code>class</code> is syntax over those links.</li>
+        <li><b>Composition over inheritance</b> is the design answer: deep <code>extends</code> chains are brittle; mixing in capabilities (functions, hooks) scales better. React chose composition — that's a great supporting example.</li>
+        <li><code>#private</code> fields are real privacy (not convention), <code>static</code> lives on the constructor itself, and <code>instanceof</code> just walks the chain looking for <code>Ctor.prototype</code>.</li>
+        <li><code>Object.create(proto)</code> makes an object with any prototype you like — the primitive underneath the whole system, and occasionally the cleanest way to make a lookup object with <b>no</b> prototype at all: <code>Object.create(null)</code>.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · MODULES -->
+<section class="lesson" id="modules">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Modules — how code finds other code</h3>
+      <p class="lvl">intermediate → live bindings, cycles, and the CJS/ESM split</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A module is a file with its own private scope — nothing leaks out unless you <code>export</code> it, nothing comes in unless you <code>import</code> it. Before modules, every script shared one global namespace, and library authors lived in fear of each other's variable names.</p>
+    <p>Two systems coexist: <b>ESM</b> (<code>import/export</code> — the standard, statically analyzable, what browsers and modern Node speak) and <b>CommonJS</b> (<code>require/module.exports</code> — Node's original, dynamic, still everywhere in npm). The differences that matter: ESM imports are <b>live read-only bindings</b> (not copies), they're resolved <i>before</i> code runs (so bundlers can tree-shake), and top-level <code>await</code> only works in ESM.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A module is a cat café with a <b>service window</b>. The kitchens (file internals) are private; only what's placed in the window (<code>export</code>) can be seen. And ESM's window is <b>glass, not a photo</b>: if the kitchen swaps the pastry, everyone looking through the window sees the new pastry instantly — a <i>live binding</i>, not a copy handed over once.</p>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">cafe-modules.js — the patterns to recognize</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// named exports — the default choice (refactor-safe, tree-shakeable)
+export const OPEN_HOURS = '9–17';
+export function orderTreat(cat) { /* … */ }
+
+// one default per module — for the module's "main thing"
+export default class Cafe { /* … */ }
+
+// importing
+import Cafe, { orderTreat, OPEN_HOURS as hours } from './cafe.js';
+import * as cafe from './cafe.js';       // namespace object
+const { heavy } = await import('./reports.js');  // dynamic — code splitting!
+
+// module-private state + closure = the classic singleton
+let visits = 0;                          // nobody outside can touch this
+export function checkIn() { return ++visits; }
+
+// CommonJS, for when you meet it in Node:
+const { orderTreat: order } = require('./cafe');  // runs the file, copies exports
+module.exports = { order };</code></pre>
+    </div>
+    <div class="mcq" data-qid="jsf-modules-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why can bundlers tree-shake <code>import { debounce } from 'lodash-es'</code> but not <code>const _ = require('lodash')</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">They can — tree shaking works on any module system</button>
+        <button class="mcq-opt" type="button" data-ok>ESM imports are static — analyzable without running code; require() is a runtime call that could do anything</button>
+        <button class="mcq-opt" type="button">lodash-es is smaller, so there's nothing to shake</button>
+        <button class="mcq-opt" type="button">require() caches modules, which blocks dead-code elimination</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> ESM's imports/exports are fixed at parse time — the bundler sees the full dependency graph and provably-unused exports without executing anything. <code>require('lo' + 'dash')</code> is legal CommonJS; nothing is provable, so everything ships. This one sentence is the whole "why ESM" story — and why <code>import()</code> (dynamic) is the deliberate escape hatch for code splitting.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>Modules are singletons:</b> evaluated once, cached; every importer shares the same instance. That's the standard way to share a DB pool or config — and the reason "just import it twice for a fresh copy" doesn't work.</li>
+        <li><b>Circular imports</b> don't crash ESM — one side temporarily sees an un-initialized binding. If you've hit "cannot access before initialization" across files, that's the cycle; fix by extracting the shared bit.</li>
+        <li>ES modules are strict mode automatically, deferred automatically in browsers (<code>type="module"</code>), and scoped per-file — three "free" behaviors worth naming.</li>
+        <li>Barrel files (<code>index.js</code> re-exporting everything) are convenient but can drag the whole folder into a bundle and slow builds — a current-era nuance that lands well.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · ITERATION -->
+<section class="lesson" id="iteration">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Arrays, objects &amp; iteration — the daily toolkit, sharpened</h3>
+      <p class="lvl">beginner → the fluency layer: destructuring, spread, the big five</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Ninety percent of day-to-day JS is reshaping data: pull things out (<b>destructuring</b>), copy-with-changes (<b>spread</b>), and transform lists (<b>map / filter / reduce / find / some</b>). Fluency here is what makes your code — and your interview answers — read like a native speaker's.</p>
+    <p>The mental model for the big five: <code>map</code> = same length, transformed. <code>filter</code> = same items, fewer. <code>reduce</code> = anything → one value. <code>find</code> = first match or undefined. <code>some/every</code> = boolean questions. None of them mutate — they hand you a new array, which is exactly what React's state model wants.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>An adoption day with a line of cats: <code>map</code> puts a bow on every cat (same cats, dressed up). <code>filter</code> lets only the vaccinated ones into the hall (fewer cats, unchanged). <code>reduce</code> weighs them all and reports <b>one number</b>. <code>find</code> walks the line and stops at the first tabby. Nobody rearranges the original line — every operation forms a <b>new</b> line.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">adoption-day.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const cats = [
+  { name: 'Mochi',   age: 2, weightKg: 4.2, vaccinated: true  },
+  { name: 'Biscuit', age: 5, weightKg: 6.1, vaccinated: true  },
+  { name: 'Clawdia', age: 1, weightKg: 3.0, vaccinated: false },
+];
+
+// destructuring + defaults + rename — read data like prose
+const [first, ...rest] = cats;
+const { name, weightKg: kg = 0 } = first;
+console.log(name, kg, 'and', rest.length, 'more');
+
+// the big five, chained like a sentence
+const adoptable = cats
+  .filter(c =&gt; c.vaccinated)
+  .map(c =&gt; `${c.name} (${c.age}y)`);
+console.log(adoptable);
+
+const totalWeight = cats.reduce((sum, c) =&gt; sum + c.weightKg, 0);
+console.log('total:', totalWeight.toFixed(1), 'kg');
+
+console.log(cats.find(c =&gt; c.age &lt; 2)?.name);   // first kitten
+console.log(cats.some(c =&gt; !c.vaccinated));      // any unvaccinated?
+
+// copy-with-changes — the React state idiom (never mutate!)
+const vaccinatedClawdia = cats.map(c =&gt;
+  c.name === 'Clawdia' ? { ...c, vaccinated: true } : c
+);
+console.log(vaccinatedClawdia[2], '— original untouched:', cats[2].vaccinated);
+
+// group by age bracket — reduce's favorite interview trick
+const byAge = cats.reduce((groups, c) =&gt; {
+  const key = c.age &lt; 2 ? 'kitten' : 'adult';
+  (groups[key] ??= []).push(c.name);
+  return groups;
+}, {});
+console.log(byAge);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">this file is 80% of practical day-job JavaScript</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="jsf-iter-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does React state code use <code>{ ...cat, vaccinated: true }</code> instead of <code>cat.vaccinated = true</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Spread is faster than assignment</button>
+        <button class="mcq-opt" type="button">Mutation is a syntax error on state objects</button>
+        <button class="mcq-opt" type="button" data-ok>React detects changes by reference — a mutated object is the SAME reference, so nothing re-renders</button>
+        <button class="mcq-opt" type="button">Spread performs a deep copy, protecting nested data</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> React compares old and new state with <code>Object.is</code> — mutate in place and old === new, so React sees "no change". A new object (spread) has a new reference. Bonus honesty: spread is a <i>shallow</i> copy — nested objects are still shared, which is why deeply-nested state updates get verbose (and why state shape is kept flat).</p>
+    </div>
+    <div class="mcq" data-qid="jsf-iter-2">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">When do you reach for <code>Map</code> over a plain object <code>{}</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Never — objects do everything Map does</button>
+        <button class="mcq-opt" type="button" data-ok>Non-string keys, frequent add/delete, size tracking, guaranteed insertion order — a real dictionary</button>
+        <button class="mcq-opt" type="button">When the data comes from JSON</button>
+        <button class="mcq-opt" type="button">Only for weak references</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Map takes any key type (objects included), has <code>.size</code>, cheap iteration, and no prototype baggage (a plain object "empty" dictionary still has <code>toString</code> up the chain!). Objects win for fixed, known shapes — records. Set is the same trade for uniqueness: <code>[...new Set(arr)]</code> is the one-line dedupe every interviewer has seen and still likes.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>Know what mutates:</b> <code>push/pop/splice/sort/reverse</code> mutate; <code>map/filter/slice/concat</code>, and the new-era <code>toSorted/toReversed/toSpliced</code>, don't. "sort mutates — I use toSorted" is a current-JS flex.</li>
+        <li>Optional chaining <code>?.</code> + nullish <code>??</code> replaced a decade of <code>x &amp;&amp; x.y &amp;&amp; x.y.z</code> guards — write them naturally.</li>
+        <li><code>for…of</code> iterates values of anything <i>iterable</i> (arrays, strings, Map, Set); <code>for…in</code> iterates object <i>keys</i> (including inherited ones) — mixing them up is a classic screen trap.</li>
+        <li>Every chained <code>.map().filter()</code> allocates an intermediate array — fine at app scale, worth one <code>reduce</code>/loop in a hot path. Saying "I'd measure first" completes the answer.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Re-read this table tomorrow, then once more before any interview. If a row feels fuzzy, its section number is right there.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>values &amp; references</td><td>Primitives copy the value; objects copy the reference — the paper vs the cat.</td></tr>
+      <tr><td class="mono">02</td><td>coercion</td><td>Always ===, except <code>x == null</code>; eight falsy values, everything else truthy.</td></tr>
+      <tr><td class="mono">03</td><td>closures</td><td>A function keeps a live link to the scope it was born in — the button carries its treat jar.</td></tr>
+      <tr><td class="mono">04</td><td><code>this</code></td><td>Decided at call time — whose lap is it sitting on? Arrows never change laps.</td></tr>
+      <tr><td class="mono">05</td><td>prototypes</td><td>Objects linked to objects; lookups walk the chain; class is syntax for the links.</td></tr>
+      <tr><td class="mono">06</td><td>modules</td><td>Private file scope + a service window; ESM's window is glass (live bindings), and static — hence tree shaking.</td></tr>
+      <tr><td class="mono">07</td><td>iteration</td><td>map transforms, filter keeps, reduce collapses — and never mutate what React is watching.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">This module is the foundation layer. Here's exactly where it surfaces, and which page to drill next.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Tech screens</b> open with sections 03 and 04 almost verbatim — "what's a closure", "what does this log". Drill the rapid-fire versions in <a href="../fullstack.html#jscore">Full-Stack in 48 · JS under the hood</a>.</li>
+      <li><b>The loop-with-setTimeout question</b> (section 03's runner) is the single most-asked JS puzzle in existence. Practice narrating it out loud until it's boring.</li>
+      <li><b>DSA rounds</b> lean on section 07 — Map/Set fluency and non-mutating array habits are assumed from line one. Warm up with <a href="../dsa.html#hash">DSA in 48 · hash maps</a>.</li>
+      <li><b>React interviews</b> are secretly sections 01+03+07: reference equality (why memo works), stale closures (why effects lie), immutable updates (why spread everywhere). The react-deep-dive module builds directly on this one.</li>
+      <li>Next module in the track: <b>js-async</b> — the event loop, promises, and async/await, with a visualizer. Everything here about closures carries straight in.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run every panel. Answer every quiz before peeking.</b> Reading about closures and having explained one out loud are different skills — this page only builds the second if you use it that way.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a> and <a href="../dsa.html">DSA in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>go get the vocabulary for what your hands already know. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'js-fundamentals';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

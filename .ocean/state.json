@@ -4,18 +4,18 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
   "status": "running",
-  "current_sprint": 1,
+  "current_sprint": 2,
   "sprints": [
     {
       "id": 1,
       "title": "Verify harness + Frontend System Design in 48 + wiring",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "9eabab8"
     },
     {
       "id": 2,
       "title": "Learn hub + module template + js-fundamentals",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     },
     {
@@ -64,8 +64,8 @@
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786009073,
-  "heartbeat": 1786009137,
+  "last_checkpoint": 1786011306,
+  "heartbeat": 1786011306,
   "blockers": [],
-  "notes": ""
+  "notes": "SP1 done (commit 9eabab8). Next: sprint-start 2 — build learn/index.html hub + learn/js-fundamentals.html (the template-bearer module). Conventions: learn:<slug>:* keys, cat examples, Professor Whiskers callouts, quiz engine + try-it runners inline. See PLAN.md SP2. Note: browser screenshot tool captures blank past ~2000px scroll — verify deep content programmatically (elementFromPoint/getComputedStyle), it's a tool artifact not a page bug."
 }

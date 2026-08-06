@@ -1,0 +1,224 @@
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = '__SLUG__';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
