@@ -4,7 +4,7 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
   "status": "running",
-  "current_sprint": 4,
+  "current_sprint": 5,
   "sprints": [
     {
       "id": 1,
@@ -27,13 +27,13 @@
     {
       "id": 4,
       "title": "dsa-foundations + dsa-structures",
-      "status": "in_progress",
-      "commit": ""
+      "status": "done",
+      "commit": "0c82e7f"
     },
     {
       "id": 5,
       "title": "dsa-trees-graphs + dsa-algorithms",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     },
     {
@@ -64,8 +64,8 @@
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786014518,
-  "heartbeat": 1786014518,
+  "last_checkpoint": 1786015529,
+  "heartbeat": 1786015529,
   "blockers": [],
-  "notes": "SP3 done. Next: sprint-start 4 — learn/dsa-foundations.html (7 sections: Big-O w/ growth-curve widget, arrays+strings, hashmaps/sets, two pointers, sliding window, prefix sums, practice map) + learn/dsa-structures.html (6: linked lists, stacks, queues/deques, heaps, intervals, practice map). Use .ocean/templates/make_head.py (FAV arg = plain ASCII initials, e.g. DF/DS — it lands inside URL-encoded SVG). Accents: dsa-foundations #FFD60A/#E8BE00/#F5CB1E/255,214,10 fav DF; dsa-structures #A3E635/#65A30D/#BEF264/163,230,53 fav DS. LeetCode links MUST be verified via curl leetcode API (see CLAUDE.md). Flip hub cards live + bump live count to 5. Body pattern: copy sidebar/hero/lesson shapes from learn/js-async.html."
+  "notes": "SP4 done. Next: sprint-start 5 — learn/dsa-trees-graphs.html (6 sections: trees+traversals, BSTs, tries, graphs+BFS/DFS grid visualizer, topo sort, union-find, ladder) + learn/dsa-algorithms.html (6: sorting w/ animated race, binary search patterns, recursion/backtracking, DP from first principles w/ memo grid, greedy, ladder). Accents: trees #34D399/#059669/#6EE7B7/52,211,153 fav TG · algorithms #22D3EE/#0891B2/#67E8F9/34,211,238 fav AL. Verify any NEW LC slugs via scratchpad lc.json (already downloaded). Flip hub cards, live count 5→7. Reuse body shape from learn/dsa-structures.html."
 }
