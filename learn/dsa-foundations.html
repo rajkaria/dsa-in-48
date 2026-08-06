@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Foundations — Learn track · in 48</title>
+<meta name="description" content="Big-O from scratch with an interactive growth explorer, arrays and strings, hash maps and sets, two pointers, sliding window, and prefix sums — plain language, runnable code, verified LeetCode ladders, and cats. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="DSA Foundations — Learn track · in 48">
+<meta property="og:description" content="Big-O from scratch with an interactive growth explorer, arrays and strings, hash maps and sets, two pointers, sliding window, and prefix sums — plain language, runnable code, verified LeetCode ladders, and cats. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DSA Foundations — Learn track · in 48">
+<meta name="twitter:description" content="Big-O from scratch with an interactive growth explorer, arrays and strings, hash maps and sets, two pointers, sliding window, and prefix sums — plain language, runnable code, verified LeetCode ladders, and cats. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23FFD60A'%3EDF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#FFD60A;
+  --mark-deep:#E8BE00;
+  --mark-soft:rgba(255,214,10,.16);
+  --on-mark:#141B22;
+  --on-ink:#FFD60A;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#F5CB1E;
+  --mark-soft:rgba(255,214,10,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#F5CB1E;
+  --mark-soft:rgba(255,214,10,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(255,214,10,0) 0%, rgba(255,214,10,.95) 6%, rgba(255,214,10,.8) 94%, rgba(255,214,10,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(255,214,10,0) 0%, rgba(255,214,10,.95) 5%, rgba(255,214,10,.78) 95%, rgba(255,214,10,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(255,214,10,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(255,214,10,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(255,214,10,0) 0%, rgba(255,214,10,.9) 6%, rgba(255,214,10,.7) 94%, rgba(255,214,10,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· dsa foundations</em></div>
+      <div class="brand-sub">module 03 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#bigo"><span><i class="dot" data-for="bigo"></i> Big-O, From Scratch</span></a>
+    <a class="side-link" href="#arrays"><span><i class="dot" data-for="arrays"></i> Arrays &amp; Strings</span></a>
+    <a class="side-link" href="#hashmaps"><span><i class="dot" data-for="hashmaps"></i> Hash Maps &amp; Sets</span></a>
+    <a class="side-link" href="#twopointers"><span><i class="dot" data-for="twopointers"></i> Two Pointers</span></a>
+    <a class="side-link" href="#window"><span><i class="dot" data-for="window"></i> Sliding Window</span></a>
+    <a class="side-link" href="#prefix"><span><i class="dot" data-for="prefix"></i> Prefix Sums</span></a>
+    <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Practice Ladder</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./js-fundamentals.html"><span>JS Fundamentals</span><span class="t">←</span></a>
+    <a class="side-link" href="../dsa.html"><span>DSA in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 03 <b>the patterns behind half of all interview questions</b></p>
+  <h1>DSA, starting from <span class="hl hl-anim" data-d="0">actually</span> <span class="hl hl-anim" data-d="1">zero</span>.</h1>
+  <p class="lede">Most DSA material assumes you already think in CS terms. This module doesn't. It starts with the only real question — <b>"how does the work grow when the input grows?"</b> — makes it visceral with an interactive explorer, then teaches the five foundation patterns that between them solve something like half of everything LeetCode asks.</p>
+  <p class="lede">You write JavaScript every day; every example here is JS you can run on the page. The cats are back — this time they're being organized, counted, and searched. They have opinions about it. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what's Big-O?"</span>
+    <span class="level-chip i">middle: the five patterns</span>
+    <span class="level-chip a">ends at: pattern-picking under pressure</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>8</b> quiz questions</span>
+    <span><b>1</b> growth explorer</span>
+    <span><b>18</b> verified LeetCode problems</span>
+    <span><b>~4h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#bigo">Start with growth <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · BIG O -->
+<section class="lesson" id="bigo">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>Big-O, from scratch — how work grows</h3>
+      <p class="lvl">beginner → the growth explorer makes it visceral</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Big-O answers one question: <b>if the input gets 10× bigger, how much more work does the code do?</b> Not "how fast is it in milliseconds" — machines vary — but how the work <i>scales</i>. O(n) = work grows in step with input. O(n²) = 10× input, 100× work. O(log n) = 10× input, barely any extra work. O(1) = input size is irrelevant.</p>
+    <p>Two simplifications make it usable: <b>drop constants</b> (O(2n) is O(n) — doubling speed doesn't change the <i>shape</i> of growth) and <b>keep only the biggest term</b> (O(n² + n) is O(n²) — at scale the square dwarfs everything). Read code by its loops: a loop over n is O(n); a loop <i>inside</i> a loop is O(n²); halving the search space each step is O(log n).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A shelter with n cats. <b>O(1):</b> "fetch the cat in cage 7" — same effort whether there are 10 cats or 10,000. <b>O(log n):</b> find Mochi in an <i>alphabetized</i> registry — open the middle, go left or right, repeat; 10,000 cats ≈ 14 peeks. <b>O(n):</b> weigh every cat. <b>O(n²):</b> introduce every cat to every other cat — 100 cats is 4,950 introductions, 10,000 cats is ruinous. The shape of the chore, not the speed of the volunteer.</p>
+    </div>
+
+    <div class="viz" id="growth-viz">
+      <h6>GROWTH EXPLORER — feel the shapes diverge</h6>
+      <p style="font-size:.9rem;color:var(--ink-2);margin-bottom:10px">Operations each complexity performs at input size n. Watch what happens to n² as you climb.</p>
+      <div class="viz-controls">
+        <button class="viz-btn" type="button" data-n="10">n = 10</button>
+        <button class="viz-btn primary" type="button" data-n="100">n = 100</button>
+        <button class="viz-btn" type="button" data-n="1000">n = 1,000</button>
+        <button class="viz-btn" type="button" data-n="100000">n = 100,000</button>
+      </div>
+      <div class="viz-stage" id="growth-stage"></div>
+      <p class="run-hint" id="growth-note" style="margin-top:10px"></p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-bigo-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Nested loops: for each cat, scan all n cats for a name clash — but you added <code>break</code> on first match. What's the worst-case complexity?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">O(n) — the break short-circuits it</button>
+        <button class="mcq-opt" type="button" data-ok>O(n²) — worst case (no clashes) still scans everything; Big-O describes the worst case unless stated otherwise</button>
+        <button class="mcq-opt" type="button">O(n log n) — break halves the work on average</button>
+        <button class="mcq-opt" type="button">O(2n) — two loops means times two</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a break helps <i>lucky</i> inputs; Big-O is the guarantee for unlucky ones. When no duplicates exist, every inner scan completes: n × n. (And O(2n) isn't a thing — constants drop.) Bonus vocabulary: best case, average case, and <b>amortized</b> — the occasional expensive operation averaged over many cheap ones, like array push.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>Space complexity</b> gets the same treatment: extra memory as a function of n. The follow-up "can you do it in O(1) space?" is asking you to trade the helper array for pointers.</li>
+        <li>Two sequential loops = O(n + n) = O(n). A loop over n with an inner loop over <i>m</i> (different input!) = O(n·m) — don't collapse different variables.</li>
+        <li>The five shapes worth recognizing on sight: O(1), O(log n) (halving), O(n), O(n log n) (sort), O(n²) (all pairs). Interview answers rarely need more.</li>
+        <li>"n is small, so n² is fine" is a legitimate engineering sentence — Big-O guides choices at scale; it doesn't forbid nested loops over 20 items.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · ARRAYS -->
+<section class="lesson" id="arrays">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Arrays &amp; strings — the costs you're already paying</h3>
+      <p class="lvl">beginner → what's O(1), what's secretly O(n)</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>An array is a numbered row of boxes. Index access (<code>cats[7]</code>) is O(1) — the position is computed, not searched. The end of the array is cheap real estate: <code>push/pop</code> are O(1). The <i>front</i> is expensive: <code>shift/unshift</code> move every remaining element — O(n). Same for <code>splice</code> in the middle. And the innocuous-looking ones that touch everything — <code>includes, indexOf, slice, spread, filter, map</code> — are all O(n).</p>
+    <p>Strings in JS are <b>immutable arrays of characters</b>: every "modification" builds a new string. Building a string with <code>+=</code> in a loop re-copies the whole thing each time — the classic accidental O(n²); collect parts in an array and <code>join</code> once.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">costs-measured.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// feel the front-vs-back difference on a real array
+const N = 60_000;
+const cats = Array.from({ length: N }, (_, i) =&gt; 'cat' + i);
+
+let t0 = performance.now();
+const a = [...cats];
+for (let i = 0; i &lt; 5_000; i++) a.pop();          // O(1) each
+console.log('5k pops:   ', (performance.now() - t0).toFixed(1), 'ms');
+
+t0 = performance.now();
+const b = [...cats];
+for (let i = 0; i &lt; 5_000; i++) b.shift();        // O(n) each!
+console.log('5k shifts: ', (performance.now() - t0).toFixed(1), 'ms');
+
+// string building: += vs join
+t0 = performance.now();
+let s = '';
+for (let i = 0; i &lt; 20_000; i++) s += 'meow';     // re-copies s each time
+console.log('+= loop:   ', (performance.now() - t0).toFixed(1), 'ms');
+
+t0 = performance.now();
+const parts = [];
+for (let i = 0; i &lt; 20_000; i++) parts.push('meow');
+const joined = parts.join('');                     // one pass
+console.log('join once: ', (performance.now() - t0).toFixed(1), 'ms',
+            '(same result:', s === joined, ')');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">numbers vary by machine — the RATIO is the lesson</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-arr-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Processing a queue of jobs with <code>while (jobs.length) { const job = jobs.shift(); … }</code> over 100k jobs is mysteriously slow. Why, and the O(1) fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">shift() allocates a new array each call — use structuredClone</button>
+        <button class="mcq-opt" type="button" data-ok>Each shift moves all remaining elements — O(n²) total. Fix: walk an index pointer forward (or use a real deque/linked list)</button>
+        <button class="mcq-opt" type="button">The while condition re-counts the array — cache the length</button>
+        <button class="mcq-opt" type="button">Nothing wrong — shift is O(1) like pop</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> shift is the front of the row — everyone shuffles down one seat, 100k times ≈ 5 billion moves. An index pointer (<code>let i = 0; jobs[i++]</code>) makes "removal" free by just moving the start marker — which is also exactly the trick that makes BFS queues fast in the trees module. Recognizing hidden O(n) inside a loop is <i>the</i> foundational skill.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>"Is <code>arr.includes</code> inside a loop O(1)?" — no, it scans: loop + includes = O(n²). The fix is section 03's Set. Interviewers plant this deliberately.</li>
+        <li>In-place reversal/swap with two indexes is the O(1)-space idiom: <code>[a[i], a[j]] = [a[j], a[i]]</code> — the warm-up for two pointers.</li>
+        <li>JS arrays are dynamic (push is <i>amortized</i> O(1) — occasional internal regrow) and can be sparse; engines optimize dense same-type arrays. One sentence of that = strong JS-specific signal.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/valid-palindrome/" target="_blank" rel="noopener noreferrer">125 · Valid Palindrome</a> · <a href="https://leetcode.com/problems/move-zeroes/" target="_blank" rel="noopener noreferrer">283 · Move Zeroes</a> · <a href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank" rel="noopener noreferrer">238 · Product of Array Except Self</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · HASHMAPS -->
+<section class="lesson" id="hashmaps">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Hash maps &amp; sets — trading memory for speed</h3>
+      <p class="lvl">the single most useful tool in interviews, period</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A hash map buys O(1) lookup by spending memory: a <b>hash function</b> turns any key into a bucket number, and the value goes in that bucket. Ask for the key later — same function, same bucket, no searching. A Set is the same machine storing only "have I seen this?"</p>
+    <p>The interview superpower: hash maps convert <b>"search for it" (O(n)) into "remember it" (O(1))</b>. Whole problem categories collapse: duplicates (Set), frequency counting (Map of counts), grouping (Map of key → list), and the legendary two-sum move — <i>store what you've seen, look up what you need</i>.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The shelter's <b>cubby wall</b>: each cat's name decides its cubby number (the hash). Where's Mochi's vet record? Compute her cubby — walk straight to it. No cubby wall means rifling through a drawer of n folders every time. Two cats hash to one cubby (a <b>collision</b>)? The cubby holds a short list — fine until the wall is overcrowded, which real implementations fix by adding cubbies (resizing). One-time filing cost, instant lookups forever.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">two-sum-both-ways.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// THE interview problem: which two cats' weights sum to the target?
+// values ≤ 4000, so no accidental pair can reach 10,000…
+const weights = Array.from({ length: 4_000 }, () =&gt; Math.ceil(Math.random() * 4000));
+weights[1500] = 4001; weights[3800] = 5999;        // …except the planted one
+
+// brute force: every pair — O(n²)
+function twoSumBrute(nums, target) {
+  for (let i = 0; i &lt; nums.length; i++)
+    for (let j = i + 1; j &lt; nums.length; j++)
+      if (nums[i] + nums[j] === target) return [i, j];
+}
+// hash map: remember what you've seen — O(n)
+function twoSumMap(nums, target) {
+  const seen = new Map();                       // value → index
+  for (let i = 0; i &lt; nums.length; i++) {
+    const need = target - nums[i];
+    if (seen.has(need)) return [seen.get(need), i];
+    seen.set(nums[i], i);
+  }
+}
+
+let t0 = performance.now();
+console.log('brute:', twoSumBrute(weights, 10_000),
+            (performance.now() - t0).toFixed(2) + 'ms');
+t0 = performance.now();
+console.log('map:  ', twoSumMap(weights, 10_000),
+            (performance.now() - t0).toFixed(2) + 'ms');
+
+// frequency counting — the pattern behind anagrams, top-k, and more
+const adopters = ['amy', 'raj', 'amy', 'lin', 'raj', 'amy'];
+const counts = new Map();
+for (const name of adopters)
+  counts.set(name, (counts.get(name) ?? 0) + 1);
+console.log('visit counts:', Object.fromEntries(counts));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">same answer, two very different bills</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-hash-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"Are these two strings anagrams?" — the hash-map instinct is…</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Try every rearrangement of the first string — O(n!)</button>
+        <button class="mcq-opt" type="button" data-ok>Count each string's letters into maps and compare counts — O(n); or sort both and compare, O(n log n)</button>
+        <button class="mcq-opt" type="button">Check if each letter of A appears in B with includes()</button>
+        <button class="mcq-opt" type="button">Compare their Sets — same unique letters means anagram</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> anagram = same letter <i>frequencies</i> — and "compare frequencies" is a frequency map. The Set answer is the planted trap: 'aab' and 'abb' share the set {a,b} but aren't anagrams — sets forget counts. Saying both the O(n) map and O(n log n) sort answers, then picking, is exactly the calibration interviews grade.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The honest caveat: O(1) is <i>average</i>; adversarial collisions degrade it — real engines resize and randomize to keep the promise. One sentence, big credibility.</li>
+        <li>Grouping idiom from memory: <code>(map.get(key) ?? map.set(key, []).get(key)).push(item)</code> — or the cleaner two-liner. Group Anagrams is exactly this with sorted-word keys.</li>
+        <li>Object vs Map recap from JS Fundamentals: Map for real dictionaries (any key type, .size, clean iteration); object for fixed shapes.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener noreferrer">1 · Two Sum</a> · <a href="https://leetcode.com/problems/valid-anagram/" target="_blank" rel="noopener noreferrer">242 · Valid Anagram</a> · <a href="https://leetcode.com/problems/group-anagrams/" target="_blank" rel="noopener noreferrer">49 · Group Anagrams</a> · <a href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank" rel="noopener noreferrer">347 · Top K Frequent</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 4 · TWO POINTERS -->
+<section class="lesson" id="twopointers">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Two pointers — meeting in the middle</h3>
+      <p class="lvl">intermediate → turning O(n²) pair-scans into one pass</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>When a problem asks about <b>pairs or ranges in a sorted (or sortable) array</b>, checking every pair is O(n²). Two pointers replaces that with one smart pass: start a pointer at each end, look at what they point to, and — this is the whole trick — <b>the comparison tells you which pointer can safely move</b>. Every step eliminates a whole batch of pairs you now know can't win. n² candidates, n steps.</p>
+    <p>The reasoning template to say out loud: "if the sum is too small, only moving the <i>left</i> pointer up can help (right is already the biggest); too big, only moving right down helps." The pattern's power is that discard argument — find it and the problem is done.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Cats lined up by weight, and you need two whose weights sum to exactly 10kg. Check the <b>lightest and heaviest</b>: 2kg + 9kg = 11 — too heavy, and pairing the 9kg cat with anyone even lighter only gets heavier-than-needed… wait, lighter. The point: the 9kg cat is <i>done</i> — no partner to its left can fix "too big" better than trying the next-heaviest. Dismiss her, step inward. Each comparison retires one cat and all her un-tried pairings at once. That wholesale dismissal is why it's O(n).</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">converging-pointers.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// pair-sum in a SORTED array — the canonical converging pattern
+function pairWithSum(sorted, target) {
+  let left = 0, right = sorted.length - 1, steps = 0;
+  while (left &lt; right) {
+    steps++;
+    const sum = sorted[left] + sorted[right];
+    if (sum === target) return { pair: [sorted[left], sorted[right]], steps };
+    if (sum &lt; target) left++;      // smallest is hopeless — retire it
+    else right--;                  // biggest is hopeless — retire it
+  }
+  return { pair: null, steps };
+}
+const weights = [1, 2, 3, 5, 6, 7, 8, 8, 9, 11, 12, 14];
+console.log('target 20 →', pairWithSum(weights, 20));
+console.log('checked', weights.length * (weights.length - 1) / 2,
+            'possible pairs — visited far fewer');
+
+// same skeleton, different clothes: is it a palindrome?
+function isPalindrome(s) {
+  const t = s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let i = 0, j = t.length - 1;
+  while (i &lt; j) {
+    if (t[i] !== t[j]) return false;
+    i++; j--;
+  }
+  return true;
+}
+console.log('taco cat →', isPalindrome('Taco cat!'));
+console.log('tuna cat →', isPalindrome('Tuna cat'));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">66 possible pairs, single-digit steps</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-tp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Container With Most Water: bars of heights, pick two that trap the most area. Pointers at both ends — which one moves, and why is it safe?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Always the left one — scan order matters</button>
+        <button class="mcq-opt" type="button" data-ok>The SHORTER bar's pointer — the area is capped by the short bar, so keeping it while narrowing width can only lose; moving it is the only possible improvement</button>
+        <button class="mcq-opt" type="button">Whichever side has more bars remaining</button>
+        <button class="mcq-opt" type="button">Both — shrink symmetrically for balance</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> area = min(heights) × width. Move the taller bar inward and min can't rise (still capped by the short one) while width definitely shrinks — provably never better. Move the shorter and you <i>might</i> find taller. That "provably can't win → discard" argument IS the two-pointer pattern; interviews grade the argument, not the loop.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The second flavor — <b>slow/fast on the same side</b> — powers Move Zeroes (writer chases reader) and cycle detection (next module). Converging = pairs; chasing = in-place rewrites.</li>
+        <li>3Sum = sort + fix one element + two-pointer the rest: O(n²) instead of O(n³), plus the duplicate-skipping discipline. It's THE "medium that's really a pattern check".</li>
+        <li>If the array isn't sorted and can't be: that's usually the hash-map version of the problem (Two Sum) — sorting costs O(n log n) and destroys indices. Saying which tool and why = the senior move.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/valid-palindrome/" target="_blank" rel="noopener noreferrer">125 · Valid Palindrome</a> · <a href="https://leetcode.com/problems/container-with-most-water/" target="_blank" rel="noopener noreferrer">11 · Container With Most Water</a> · <a href="https://leetcode.com/problems/3sum/" target="_blank" rel="noopener noreferrer">15 · 3Sum</a> · <a href="https://leetcode.com/problems/move-zeroes/" target="_blank" rel="noopener noreferrer">283 · Move Zeroes</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · SLIDING WINDOW -->
+<section class="lesson" id="window">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Sliding window — a caterpillar over the array</h3>
+      <p class="lvl">intermediate → "longest/shortest substring/subarray with…"</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Trigger phrase: <b>"longest / shortest / best <i>contiguous</i> run that satisfies a condition."</b> Checking every start-end range is O(n²). The window is two same-side pointers forming a caterpillar: the <b>right end stretches forward</b> growing the window; when the window breaks the rule, the <b>left end contracts</b> until it's legal again. Each pointer only ever moves forward → O(n) total.</p>
+    <p>The bookkeeping between the moves is the problem-specific part: a Set of what's in the window, a count map, a running sum — whatever answers "is this window still valid?" in O(1).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">caterpillar.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// longest stretch of distinct treats (LC 3, cat edition)
+function longestDistinctRun(treats) {
+  const inWindow = new Set();
+  let left = 0, best = 0, bestAt = 0;
+  for (let right = 0; right &lt; treats.length; right++) {
+    while (inWindow.has(treats[right])) {   // rule broken → contract
+      inWindow.delete(treats[left]);
+      left++;
+    }
+    inWindow.add(treats[right]);            // stretch
+    if (right - left + 1 &gt; best) { best = right - left + 1; bestAt = left; }
+  }
+  return { best, run: treats.slice(bestAt, bestAt + best) };
+}
+const bowl = ['tuna','salmon','tuna','chicken','salmon','beef','tuna','duck'];
+console.log(longestDistinctRun(bowl));
+
+// fixed-size window: best 3-day treat total — subtract the tail, add the head
+function bestWindowSum(nums, k) {
+  let sum = 0;
+  for (let i = 0; i &lt; k; i++) sum += nums[i];
+  let best = sum;
+  for (let i = k; i &lt; nums.length; i++) {
+    sum += nums[i] - nums[i - k];           // O(1) per slide — no re-add!
+    best = Math.max(best, sum);
+  }
+  return best;
+}
+console.log('best 3-day haul:', bestWindowSum([3,1,4,1,5,9,2,6], 3));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">left never backtracks — that's the O(n) guarantee</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-win-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why is the distinct-run function O(n) when it contains a while-loop inside a for-loop?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It isn't — nested loops always mean O(n²)</button>
+        <button class="mcq-opt" type="button" data-ok>Amortized analysis: left only moves FORWARD, at most n times across the entire run — total work is bounded by 2n, not n per iteration</button>
+        <button class="mcq-opt" type="button">The Set makes the inner loop O(1)</button>
+        <button class="mcq-opt" type="button">JS engines optimize while-inside-for automatically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> count total pointer movement, not loop nesting: right advances n times ever, left advances at most n times ever — ≤2n steps however they interleave. "Nested ≠ quadratic when the inner loop consumes a shared budget" is a genuinely impressive sentence to say out loud, and it's the same argument behind monotonic stacks in the next module.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Variable window + count map + a "how many chars still missing" counter = Minimum Window Substring (hard, but it's this exact skeleton with heavier bookkeeping).</li>
+        <li>"At most K distinct/replacements" problems: the window stays valid via a budget you spend and reclaim — Longest Repeating Character Replacement is the archetype.</li>
+        <li>Negative numbers break the "shrink to fix the sum" logic — that's when subarray-sum problems switch to prefix sums (next section). Knowing the boundary between the patterns is the real skill.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/longest-substring-without-repeating-characters/" target="_blank" rel="noopener noreferrer">3 · Longest Substring w/o Repeats</a> · <a href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock/" target="_blank" rel="noopener noreferrer">121 · Best Time to Buy/Sell</a> · <a href="https://leetcode.com/problems/longest-repeating-character-replacement/" target="_blank" rel="noopener noreferrer">424 · Char Replacement</a> · <a href="https://leetcode.com/problems/minimum-window-substring/" target="_blank" rel="noopener noreferrer">76 · Min Window (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · PREFIX SUMS -->
+<section class="lesson" id="prefix">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Prefix sums — pre-compute once, answer forever</h3>
+      <p class="lvl">intermediate → range queries and the elegant map trick</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Precompute a running total: <code>prefix[i]</code> = sum of everything up to i. Now <b>any range sum is one subtraction</b> — sum(i..j) = prefix[j] − prefix[i−1]. O(n) once, O(1) per question, forever. It's the same instinct as a cache: pay upfront, answer instantly.</p>
+    <p>The advanced form marries it to a hash map: walking the array, ask "have I <i>seen</i> a prefix equal to <code>currentPrefix − k</code>?" If yes, a subarray summing to exactly k just ended here. That combo — running value + map of seen values — cracks Subarray Sum Equals K and an entire family of "count the ranges" problems, negatives included (where sliding windows give up).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">running-totals.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// daily treats dispensed this week
+const daily = [3, 1, 4, 1, 5, 9, 2];
+
+// build once: prefix[i] = total through day i (with a 0 sentinel)
+const prefix = [0];
+for (const d of daily) prefix.push(prefix[prefix.length - 1] + d);
+console.log('prefix:', prefix);
+
+const rangeSum = (i, j) =&gt; prefix[j + 1] - prefix[i];   // O(1) forever
+console.log('days 2–4:', rangeSum(2, 4));               // 4+1+5
+console.log('days 0–6:', rangeSum(0, 6));
+
+// the map trick: COUNT subarrays summing to exactly k (negatives welcome)
+function countSubarrays(nums, k) {
+  const seen = new Map([[0, 1]]);          // prefix 0 seen once (empty start)
+  let running = 0, count = 0;
+  for (const x of nums) {
+    running += x;
+    count += seen.get(running - k) ?? 0;   // ranges ending here
+    seen.set(running, (seen.get(running) ?? 0) + 1);
+  }
+  return count;
+}
+console.log('subarrays summing to 6:', countSubarrays([3, 1, 4, 1, 5, -4, 6], 6));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the Map([[0,1]]) seed is the detail everyone forgets</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-pre-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A dashboard hits you with 10,000 queries like "total adoptions between day i and day j" over a fixed year of data. Architecture instinct?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Loop and sum per query — 10,000 × O(n) is fine</button>
+        <button class="mcq-opt" type="button" data-ok>Build the prefix array once, O(n); every query becomes one subtraction — O(n + q) total instead of O(n·q)</button>
+        <button class="mcq-opt" type="button">Cache each query's result in a map keyed by (i, j)</button>
+        <button class="mcq-opt" type="button">Sort the data first so ranges are contiguous</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> many queries over static data = precompute. Memoizing per-(i,j) only helps repeated identical queries; prefix sums make <i>every possible</i> range O(1) with n numbers of storage. This is also a systems instinct wearing DSA clothes — materialized views and CDN caches are prefix sums' grown-up cousins, and saying so connects your two worlds.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Product of Array Except Self = prefix <i>products</i> from both directions — same idea, multiplication, and the follow-up bans the division shortcut.</li>
+        <li>2D prefix sums exist (image integral tables) — one sentence acknowledging the dimension jump is plenty.</li>
+        <li>Kadane's algorithm (Maximum Subarray) is the sibling: a running best that resets when it goes negative — technically DP, spiritually "one pass with memory".</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/subarray-sum-equals-k/" target="_blank" rel="noopener noreferrer">560 · Subarray Sum Equals K</a> · <a href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank" rel="noopener noreferrer">238 · Product Except Self</a> · <a href="https://leetcode.com/problems/maximum-subarray/" target="_blank" rel="noopener noreferrer">53 · Maximum Subarray</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · PRACTICE -->
+<section class="lesson" id="practice">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>The practice ladder — how to actually get good</h3>
+      <p class="lvl">method → the 20-minute rule and pattern-first drilling</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>The method matters more than the volume.</b> Grinding 300 random problems builds anxiety; drilling patterns builds recognition. The routine that works: pick ONE pattern, read its template until you can write it blind, then solve 3–4 of its problems in a row. Your brain starts seeing the pattern's shape in the wording — which is the actual skill interviews test.</p>
+    <p><b>The 20-minute rule:</b> stuck for 20 minutes → read the solution <i>completely</i>, close it, and re-implement from memory. Then — non-negotiable — <b>re-solve it from scratch two days later</b>. Struggling forever teaches frustration; the read-rebuild-revisit loop teaches patterns. Track your re-solves; they're the real progress metric.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Cats don't learn to hunt by staring at a mouse for three hours. They watch one good demonstration, try, fail, nap, and <b>try again tomorrow</b> — and the nap is load-bearing. Spaced repetition isn't a productivity hack; it's how pattern memory consolidates. Be like cat: short intense sessions, shameless imitation, sacred naps.</p>
+    </div>
+    <div class="idea">
+      <p class="mini-label">// the ladder for THIS module — in order, all links verified</p>
+      <ul>
+        <li><b>Warm-up (easy):</b> <a href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener noreferrer">1 · Two Sum</a> → <a href="https://leetcode.com/problems/valid-anagram/" target="_blank" rel="noopener noreferrer">242 · Valid Anagram</a> → <a href="https://leetcode.com/problems/valid-palindrome/" target="_blank" rel="noopener noreferrer">125 · Valid Palindrome</a> → <a href="https://leetcode.com/problems/move-zeroes/" target="_blank" rel="noopener noreferrer">283 · Move Zeroes</a> → <a href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock/" target="_blank" rel="noopener noreferrer">121 · Buy/Sell Stock</a></li>
+        <li><b>The core (medium):</b> <a href="https://leetcode.com/problems/group-anagrams/" target="_blank" rel="noopener noreferrer">49 · Group Anagrams</a> → <a href="https://leetcode.com/problems/longest-substring-without-repeating-characters/" target="_blank" rel="noopener noreferrer">3 · Longest Substring</a> → <a href="https://leetcode.com/problems/container-with-most-water/" target="_blank" rel="noopener noreferrer">11 · Container</a> → <a href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank" rel="noopener noreferrer">238 · Product Except Self</a> → <a href="https://leetcode.com/problems/subarray-sum-equals-k/" target="_blank" rel="noopener noreferrer">560 · Subarray Sum K</a> → <a href="https://leetcode.com/problems/3sum/" target="_blank" rel="noopener noreferrer">15 · 3Sum</a></li>
+        <li><b>Prove it (stretch):</b> <a href="https://leetcode.com/problems/longest-repeating-character-replacement/" target="_blank" rel="noopener noreferrer">424 · Char Replacement</a> → <a href="https://leetcode.com/problems/minimum-window-substring/" target="_blank" rel="noopener noreferrer">76 · Minimum Window Substring</a></li>
+        <li><b>Then:</b> the drills + timed schedule live in <a href="../dsa.html">DSA in 48</a> — this module is the depth, that course is the reps.</li>
+      </ul>
+    </div>
+    <div class="mcq" data-qid="dsf-prac-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">You've been stuck on 3Sum for 45 minutes and feel you "should" push through. Best move, per the evidence on skill acquisition?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Push through — struggle is where learning happens, always</button>
+        <button class="mcq-opt" type="button" data-ok>Read the full solution now, rebuild it from memory today, and re-solve from scratch in two days — the revisit is where the pattern sticks</button>
+        <button class="mcq-opt" type="button">Skip it permanently — 3Sum is memorization, not learning</button>
+        <button class="mcq-opt" type="button">Watch three different video solutions back to back</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> productive struggle has a budget (~20 min); past it you're rehearsing being stuck. Worked examples + retrieval practice (the from-memory rebuild) + spacing (the 2-day revisit) is the strongest-evidence combo in learning science. Passive video marathons feel productive and test nothing. Schedule the revisit or it won't happen.</p>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any coding screen. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>Big-O</td><td>How does work grow when input grows? Drop constants, keep the biggest term, assume worst case.</td></tr>
+      <tr><td class="mono">02</td><td>arrays</td><td>Ends are cheap, fronts and middles are O(n), and += string-building is the hidden n².</td></tr>
+      <tr><td class="mono">03</td><td>hash maps</td><td>Convert "search for it" into "remember it" — the cubby wall. Counts, groups, seen-sets.</td></tr>
+      <tr><td class="mono">04</td><td>two pointers</td><td>Sorted pairs: each comparison PROVES one end can't win — retire it, step inward.</td></tr>
+      <tr><td class="mono">05</td><td>sliding window</td><td>Contiguous best-run: stretch right, contract left, both only move forward — amortized O(n).</td></tr>
+      <tr><td class="mono">06</td><td>prefix sums</td><td>Precompute running totals; any range is a subtraction; + a map, it counts exact-sum ranges.</td></tr>
+      <tr><td class="mono">07</td><td>practice</td><td>Pattern-first, 20-minute rule, rebuild from memory, re-solve in two days. Be like cat.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">Foundations are most of the exam: easy/medium array-and-string questions dominate real screens.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Hear "find a pair / duplicate / count things"</b> → hash map or set, almost reflexively. Say the O(n) time / O(n) space trade unprompted.</li>
+      <li><b>Hear "longest/shortest contiguous…"</b> → sliding window; <b>"sorted array + pairs"</b> → two pointers; <b>"many range queries / exact subarray sums"</b> → prefix sums. This trigger-phrase→pattern mapping is the whole game — <a href="../dsa.html#patterns">DSA in 48's pattern matcher</a> is the drill version.</li>
+      <li><b>Always narrate complexity</b> as you code: "this pass is O(n), the sort dominates at O(n log n)". It's free points and it steers you away from accidental n².</li>
+      <li>Next modules: <b>dsa-structures</b> (linked lists, stacks, queues, heaps — the machinery) then <b>dsa-trees-graphs</b>. The patterns here reappear inside both.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run every panel, argue every discard out loud, schedule the re-solves.</b> Recognition is built through repetition with reflection — not through reading, and never through dread.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../dsa.html">DSA in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>short sessions, shameless imitation, sacred naps. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+/* growth explorer — operation counts per complexity at chosen n */
+(function () {
+  var stage = document.getElementById('growth-stage');
+  var note = document.getElementById('growth-note');
+  if (!stage) return;
+  var rows = [
+    { name: 'O(1)',       f: function (n) { return 1; } },
+    { name: 'O(log n)',   f: function (n) { return Math.ceil(Math.log2(n)); } },
+    { name: 'O(n)',       f: function (n) { return n; } },
+    { name: 'O(n log n)', f: function (n) { return Math.ceil(n * Math.log2(n)); } },
+    { name: 'O(n²)',      f: function (n) { return n * n; } }
+  ];
+  function fmt(x) {
+    if (x >= 1e9) return (x / 1e9).toFixed(1) + ' billion';
+    if (x >= 1e6) return (x / 1e6).toFixed(1) + ' million';
+    return x.toLocaleString('en-US');
+  }
+  function paint(n) {
+    var max = Math.log10(n * n);
+    stage.innerHTML = rows.map(function (r) {
+      var v = r.f(n);
+      var w = Math.max(2, (Math.log10(v + 1) / max) * 100);
+      return '<div style="display:grid;grid-template-columns:92px 1fr 130px;gap:10px;align-items:center;margin-top:8px">' +
+        '<span>' + r.name + '</span>' +
+        '<div style="height:14px;border-radius:99px;background:rgba(var(--tint),.08);overflow:hidden">' +
+          '<div style="height:100%;width:' + w + '%;background:var(--mark);border-radius:99px"></div></div>' +
+        '<span style="text-align:right">' + fmt(v) + ' ops</span></div>';
+    }).join('');
+    note.textContent = 'bars are log-scale (linear would push n² through your ceiling) — at n = ' +
+      n.toLocaleString('en-US') + ', n² does ' + fmt(n * n) + ' operations while log n does ' +
+      Math.ceil(Math.log2(n)) + '.';
+    document.querySelectorAll('#growth-viz .viz-btn').forEach(function (b) {
+      b.classList.toggle('primary', parseInt(b.getAttribute('data-n'), 10) === n);
+    });
+  }
+  document.querySelectorAll('#growth-viz .viz-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      paint(parseInt(b.getAttribute('data-n'), 10));
+    });
+  });
+  paint(100);
+})();
+</script>
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'dsa-foundations';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

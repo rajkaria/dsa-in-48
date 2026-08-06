@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Interview Kit — Learn track · in 48</title>
+<meta name="description" content="The meta-game: a story-bank worksheet that saves as you type, the resume walkthrough script, mock-loop run sheets, question banks for every round including the questions you ask, offer and negotiation basics, and a four-week study planner. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Interview Kit — Learn track · in 48">
+<meta property="og:description" content="The meta-game: a story-bank worksheet that saves as you type, the resume walkthrough script, mock-loop run sheets, question banks for every round including the questions you ask, offer and negotiation basics, and a four-week study planner. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Interview Kit — Learn track · in 48">
+<meta name="twitter:description" content="The meta-game: a story-bank worksheet that saves as you type, the resume walkthrough script, mock-loop run sheets, question banks for every round including the questions you ask, offer and negotiation basics, and a four-week study planner. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23A78BFA'%3EIK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#A78BFA;
+  --mark-deep:#7C3AED;
+  --mark-soft:rgba(167,139,250,.16);
+  --on-mark:#141B22;
+  --on-ink:#A78BFA;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#C4B5FD;
+  --mark-soft:rgba(167,139,250,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#C4B5FD;
+  --mark-soft:rgba(167,139,250,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(167,139,250,0) 0%, rgba(167,139,250,.95) 6%, rgba(167,139,250,.8) 94%, rgba(167,139,250,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(167,139,250,0) 0%, rgba(167,139,250,.95) 5%, rgba(167,139,250,.78) 95%, rgba(167,139,250,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(167,139,250,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(167,139,250,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(167,139,250,0) 0%, rgba(167,139,250,.9) 6%, rgba(167,139,250,.7) 94%, rgba(167,139,250,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+
+.ws-grid{display:grid;gap:16px;margin-top:20px}
+.ws label{display:block;font-weight:600;font-size:.95rem;margin-bottom:6px}
+.ws label span{display:block;font-weight:400;font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3);margin-top:2px}
+.ws textarea{
+  width:100%;resize:vertical;font-family:var(--font-mono);font-size:.82rem;line-height:1.7;
+  color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;
+  padding:12px 14px;
+}
+.ws textarea:focus{outline:none;border-color:var(--mark-deep)}
+.ws textarea::placeholder{color:var(--ink-3);opacity:.7}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· interview kit</em></div>
+      <div class="brand-sub">module 13 · the meta-game</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#stories"><span><i class="dot" data-for="stories"></i> The Story Bank</span></a>
+    <a class="side-link" href="#pitch"><span><i class="dot" data-for="pitch"></i> The 90-Second Pitch</span></a>
+    <a class="side-link" href="#mockloop"><span><i class="dot" data-for="mockloop"></i> Mock-Loop Run Sheets</span></a>
+    <a class="side-link" href="#questions"><span><i class="dot" data-for="questions"></i> Questions, Both Ways</span></a>
+    <a class="side-link" href="#offer"><span><i class="dot" data-for="offer"></i> The Offer</span></a>
+    <a class="side-link" href="#planner"><span><i class="dot" data-for="planner"></i> The 4-Week Planner</span></a>
+    <a class="side-link" href="#rituals"><span><i class="dot" data-for="rituals"></i> Day-Before Rituals</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="../behavioral.html"><span>Behavioral in 48</span><span class="t">→</span></a>
+    <a class="side-link" href="../index.html"><span>All courses</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/2</span></div>
+    </div>
+    <p class="progress-note">progress, worksheets + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 13 <b>everything around the technical rounds</b></p>
+  <h1>The interview <span class="hl hl-anim" data-d="0">kit</span>. Write in it.</h1>
+  <p class="lede">Offers are won in the technical rounds and lost everywhere else: the fumbled "tell me about yourself", the story you remembered in the elevator down, the negotiation that never happened. This module is a <b>workbook</b> — the worksheets save as you type (in this browser, nowhere else), so it becomes YOUR kit, not another article you read once.</p>
+  <p class="lede">It pairs with <a href="../behavioral.html">Behavioral in 48</a> (the full behavioral course); this is the everything-else: pitch, logistics, questions, money, and the planner that schedules the entire track. Fill it in over a week of coffees. ☕🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">for: everyone, any level</span>
+    <span class="level-chip a">output: a filled-in, reusable kit</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>12</b> saved worksheets</span>
+    <span><b>1</b> study planner</span>
+    <span><b>~3h</b> + ongoing</span>
+  </div>
+  <a class="btn" href="#stories">Open the workbook <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · STORIES -->
+<section class="lesson" id="stories">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>The story bank — six stories cover every question</h3>
+      <p class="lvl">the workbook's heart: write them once, deploy forever</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Behavioral rounds ask forty different questions that map to about <b>six stories</b>. Write each as <b>STAR+</b>: Situation (one sentence of context), Task (your specific responsibility), Action (what YOU did — "I", not "we", with technical meat), Result (numbers where possible), and the <b>+</b>: what you'd do differently — the reflection that separates senior answers. Two to four sentences per letter; you're writing retrieval cues, not essays.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A cat doesn't improvise the pounce — she rehearses it on every sock in the house, so when the real mouse appears the movement is <b>already in her body</b>. Write the stories now, say them aloud twice, and in the room you'll be remembering, not composing. Composing under adrenaline is how good engineers give bad interviews.</p>
+    </div>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-hard">1 · The hard technical problem <span>debugging saga, gnarly migration, the thing you're proud of</span></label><textarea id="ws-hard" data-wskey="story-hard" rows="6" placeholder="S — the payment webhooks were silently double-firing…&#10;T — I owned the dedupe fix end to end…&#10;A — I traced…, built…, added idempotency keys…&#10;R — zero duplicates in 6 months, ₹X saved…&#10;+ — I'd add the alerting BEFORE the fix next time…"></textarea></div>
+      <div class="ws"><label for="ws-fail">2 · The failure you own <span>a real one, with the lesson operationalized</span></label><textarea id="ws-fail" data-wskey="story-failure" rows="6" placeholder="S/T — I shipped the config change on a Friday…&#10;A — what I did when it went wrong, including owning it…&#10;R — impact, honestly stated…&#10;+ — the checklist/process that exists BECAUSE of this…"></textarea></div>
+      <div class="ws"><label for="ws-conflict">3 · The disagreement <span>technical conflict, resolved like an adult</span></label><textarea id="ws-conflict" data-wskey="story-conflict" rows="6" placeholder="S — senior dev wanted X, I believed Y…&#10;A — how I argued with data, when I conceded / when I didn't…&#10;R — what shipped and what the relationship became…&#10;+ — …"></textarea></div>
+      <div class="ws"><label for="ws-lead">4 · The leadership moment <span>mentoring, unblocking, driving without authority</span></label><textarea id="ws-lead" data-wskey="story-leadership" rows="6" placeholder="the junior you unblocked weekly, the initiative you drove, the process you fixed…"></textarea></div>
+      <div class="ws"><label for="ws-pressure">5 · The deadline / pressure <span>scope-cutting under a clock, done responsibly</span></label><textarea id="ws-pressure" data-wskey="story-pressure" rows="6" placeholder="what you cut, what you protected (quality floor), how you communicated it…"></textarea></div>
+      <div class="ws"><label for="ws-growth">6 · The growth arc <span>feedback that changed you, a skill deliberately built</span></label><textarea id="ws-growth" data-wskey="story-growth" rows="6" placeholder="the code-review feedback that stung and stuck, the gap you closed on purpose…"></textarea></div>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP</h6>
+      <ul>
+        <li>Tag each story with the questions it answers ("failure" also answers "risk", "feedback", "wrong decision") — one bank, forty questions. The full mapping lives in <a href="../behavioral.html#star">Behavioral in 48 · the story bank</a>.</li>
+        <li>Say each story aloud once after writing it — sentences that read fine often speak clunky. Edit for the mouth, not the eye.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">worksheets save as you type</span></div>
+  </div>
+</section>
+
+<!-- 2 · PITCH -->
+<section class="lesson" id="pitch">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>The 90-second pitch — "tell me about yourself", solved</h3>
+      <p class="lvl">the question you WILL be asked, scripted on purpose</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every loop opens with it, and it sets the interviewer's prior for everything after. The shape that works: <b>present → proof → pivot.</b> Present: one sentence of who you are professionally ("full-stack engineer, N years, React/Node/Postgres, currently building X at Y"). Proof: two concrete highlights with numbers — chosen to match THIS job's needs. Pivot: why this role, specifically, stated with energy ("which is why this team's work on Z is exactly where I want to go deeper"). Ninety seconds, then stop — a clean stop invites the next question; trailing off invites doubt.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-pitch">Your pitch <span>write it, then edit it down to 90 spoken seconds</span></label><textarea id="ws-pitch" data-wskey="pitch" rows="7" placeholder="Present — I'm a…&#10;Proof — most recently I…, and before that…&#10;Pivot — I'm talking to you because…"></textarea></div>
+      <div class="ws"><label for="ws-why">The "why us / why now" variant <span>every company gets its own last line</span></label><textarea id="ws-why" data-wskey="pitch-why" rows="4" placeholder="for company A: …&#10;for company B: …"></textarea></div>
+    </div>
+    <div class="mcq" data-qid="ik-pitch-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Where do most "tell me about yourself" answers actually fail?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Too short — interviewers want the full career history</button>
+        <button class="mcq-opt" type="button" data-ok>Chronological résumé recitation with no selection — three unfocused minutes that answer "what have you done" instead of "why are you RIGHT for this" — and no clean stop</button>
+        <button class="mcq-opt" type="button">Too much personality — keep it strictly technical</button>
+        <button class="mcq-opt" type="button">Mentioning the current employer by name</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the question is an editing test disguised as small talk — they have your résumé; what they're learning is what YOU think matters. Selection (two highlights aimed at their needs) + the pivot + the stop is the whole craft. Rehearse it aloud five times; it's the highest-ROI ninety seconds in the entire prep.</p>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">worksheets save as you type</span></div>
+  </div>
+</section>
+
+<!-- 3 · MOCK LOOP -->
+<section class="lesson" id="mockloop">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Mock-loop run sheets — rehearse the whole day</h3>
+      <p class="lvl">simulate the loop before the loop simulates you</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A real loop is 3–5 rounds back to back — and stamina, context-switching, and recovery-from-a-bad-round are trainable, but only by simulating the day. The run sheet: <b>Round 1 (45'):</b> a timed DSA problem, out loud, from <a href="../dsa.html">DSA in 48</a>'s drills. <b>Break (10') — practice the reset ritual:</b> water, walk, three breaths, next round is a new interviewer who knows nothing about the last one. <b>Round 2 (45'):</b> a system design prompt (<a href="./system-design-backend.html">module §07</a>'s five, or frontend via <a href="./frontend-system-design.html">module 12</a>). <b>Round 3 (45'):</b> behavioral — four questions from <a href="../behavioral.html">Behavioral in 48</a>, answered from your §01 bank. <b>Debrief (15'):</b> the worksheet below, immediately, while it's raw.</p>
+    <p>Do one full loop-day per week of prep. The first one is humbling; the third one is transformative. Recruit a friend for one round if you can — even a non-engineer catches "you said um for thirty seconds" truths.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-debrief">Loop debrief log <span>append one entry per mock loop — date, what cracked, what to drill</span></label><textarea id="ws-debrief" data-wskey="mock-debrief" rows="7" placeholder="2026-08-09 · loop 1&#10;— DSA: froze on the follow-up; drill: narrate complexity WHILE coding&#10;— design: forgot the envelope; drill: numbers first, always&#10;— behavioral: conflict story rambled; edit to 90s&#10;— energy: crashed in round 3; eat before, not during"></textarea></div>
+    </div>
+    <div class="mcq" data-qid="ik-mock-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">You bomb round 2 of a real loop. What does the evidence on interview outcomes say to do?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Mention it to round 3's interviewer so they have context</button>
+        <button class="mcq-opt" type="button" data-ok>Run the reset ritual and play round 3 fresh — rounds are scored independently, most loops tolerate one weak round, and the visible skill of recovering IS itself assessed. Carrying the wreckage forward is the only guaranteed loss</button>
+        <button class="mcq-opt" type="button">Ask the recruiter for a restart of the loop</button>
+        <button class="mcq-opt" type="button">Accept the loop is over and treat the rest as practice</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> debriefs average independent signals — one bad round with strong others is a hire at most companies; two rounds sacrificed to one bad round is not. The reset ritual you practiced in mock loops is FOR this exact moment. (And round 3's interviewer genuinely doesn't know — don't tell them.) This is why the run sheet trains the break as seriously as the rounds.</p>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">worksheets save as you type</span></div>
+  </div>
+</section>
+
+<!-- 4 · QUESTIONS -->
+<section class="lesson" id="questions">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Questions, both ways — the banks and the reversal</h3>
+      <p class="lvl">what they'll ask, and the questions YOU ask</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Their side</b> is covered across the series — the rapid-fire banks in <a href="../fullstack.html#qbank">Full-Stack</a> (56), <a href="../frontend-system-design.html#qbank">Frontend SD</a> (48), and <a href="../behavioral.html#qbank">Behavioral</a> (40) total ~150 real questions with answers. The kit's job is the routing table: screens → fullstack bank; frontend loops → frontend bank + module 12; senior loops → behavioral bank + your §01 stories. Night before any round, run the matching bank once, out loud.</p>
+    <p><b>Your side</b> is graded too — "any questions for me?" is the last impression. Three tiers that work: <b>the role's reality</b> ("what does the team's deploy-to-rollback path look like?", "who owns the design system and how do teams contribute?" — you're demonstrating operating instincts from the modules); <b>the growth honest-check</b> ("what separates the engineers who thrive here?", "what's the messiest part of the codebase and is there appetite to fix it?"); <b>the closer</b> ("is there anything about my background giving you hesitation I could address now?" — bold, and it converts silent nos into conversations). Write yours below; generic questions read as generic interest.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-myqs">Your question set <span>5–8, tuned per company; the specific beats the clever</span></label><textarea id="ws-myqs" data-wskey="my-questions" rows="6" placeholder="1. how do frontend teams own metrics here — RUM? error budgets?&#10;2. walk me through the last incident postmortem…&#10;3. …"></textarea></div>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">worksheets save as you type</span></div>
+  </div>
+</section>
+
+<!-- 5 · OFFER -->
+<section class="lesson" id="offer">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>The offer — the ten minutes worth lakhs</h3>
+      <p class="lvl">negotiation basics nobody teaches engineers</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The rules that survive contact with reality. <b>1 — Never give the first number.</b> "What are your expectations?" → "I'd rather understand the full scope first — what's the band for this level?" (Bands exist. Recruiters can share them. In many places they legally must.) <b>2 — The offer call is for gratitude, not decisions:</b> "I'm excited — let me review the full picture and come back Thursday." Enthusiasm + delay is the entire script. <b>3 — Negotiate total comp, not base:</b> base, bonus, equity (with its vesting and refresh story), joining bonus — the joining bonus is the easiest yes in the building. <b>4 — Competing timelines are leverage, politely:</b> "I have another loop concluding next week" is a fact, not a threat, and it moves numbers. <b>5 — Every ask is easier with a reason attached</b> — the market data point, the competing number, the level mismatch — and 'the band's midpoint given my N years with this exact stack' is a reason.</p>
+    <p>And the one that changes careers more than any single number: <b>negotiate the level, not just the money</b> — a level too low compounds for years of raises and promotions. If the offer's level reads below your loop performance, that's the conversation to have first. The deep dive — leveling, counter-scripts, the full decision framework — is <a href="../behavioral.html#offer">Behavioral in 48 · negotiation</a>; this section is the card you re-read before the call.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-numbers">Your numbers, prepared BEFORE any call <span>walk-away, target, market data points — decided calm, deployed under pressure</span></label><textarea id="ws-numbers" data-wskey="offer-numbers" rows="5" placeholder="market data: levels.fyi shows … for this level/city&#10;target total: …&#10;walk-away: …&#10;current loop timelines: company A ends …, B ends …"></textarea></div>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">worksheets save as you type</span></div>
+  </div>
+</section>
+
+<!-- 6 · PLANNER -->
+<section class="lesson" id="planner">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>The 4-week planner — the whole track, scheduled</h3>
+      <p class="lvl">from "where do I start" to a calendar</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The assumption: working full-time, ~1 focused hour on weekdays, one 3–4h weekend block. Adjust freely — the <i>sequence</i> is the point. Deep modules on weekdays (they're sectioned for coffee-sized bites), crash courses on weekends (they're built as sprints), mock loops as the graduation exam of each phase.</p>
+    <div class="idea">
+      <p class="mini-label">// week 1 — the language layer</p>
+      <ul>
+        <li>Weekdays: <a href="./js-fundamentals.html">JS Fundamentals</a> (2 sections/day) → <a href="./js-async.html">Async JS</a> (start).</li>
+        <li>Weekend: finish Async JS · run <a href="../fullstack.html">Full-Stack in 48</a> day 1 as the drill pass.</li>
+      </ul>
+      <p class="mini-label" style="margin-top:16px">// week 2 — dsa</p>
+      <ul>
+        <li>Weekdays: <a href="./dsa-foundations.html">Foundations</a> → <a href="./dsa-structures.html">Structures</a>, with the practice ladders (20-min rule, re-solves scheduled).</li>
+        <li>Weekend: <a href="./dsa-trees-graphs.html">Trees &amp; Graphs</a> + <a href="./dsa-algorithms.html">Algorithms &amp; DP</a> · then <a href="../dsa.html">DSA in 48</a> as the timed pass. <b>Mock loop #1</b> (run sheet §03).</li>
+      </ul>
+      <p class="mini-label" style="margin-top:16px">// week 3 — the stack in depth</p>
+      <ul>
+        <li>Weekdays: <a href="./react-deep-dive.html">React</a> → <a href="./node-backend.html">Node</a> → <a href="./postgres-databases.html">Postgres</a> (the daily-stack trio).</li>
+        <li>Weekend: <a href="./aws-cloud.html">AWS</a> + <a href="../fullstack.html">Full-Stack in 48</a> day 2 · <b>Mock loop #2</b>.</li>
+      </ul>
+      <p class="mini-label" style="margin-top:16px">// week 4 — systems &amp; the meta-game</p>
+      <ul>
+        <li>Weekdays: <a href="./system-design-backend.html">System Design</a> → <a href="./frontend-system-design.html">Frontend SD deep-dive</a> · story bank + pitch polished (§01–02).</li>
+        <li>Weekend: <a href="../system-design.html">System Design in 48</a> or <a href="../frontend-system-design.html">Frontend SD in 48</a> (pick your loop's flavor) · <a href="../behavioral.html">Behavioral in 48</a> day 1 · <b>Mock loop #3 — full dress rehearsal</b>.</li>
+      </ul>
+      <p class="mini-label" style="margin-top:16px">// the standing rules</p>
+      <ul>
+        <li>Interviews scheduled mid-plan? Compress by cutting depth, never the mock loops — rehearsal beats coverage.</li>
+        <li>Every module's recap table gets re-read once, days later — spaced repetition is the multiplier on everything above.</li>
+        <li>The night before any real round: the matching course's cheat tables + bank, once, out loud. Then sleep. (§07 has the full ritual.)</li>
+      </ul>
+    </div>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-plan">Your adapted plan <span>real dates, real constraints — write it and it becomes real</span></label><textarea id="ws-plan" data-wskey="my-plan" rows="6" placeholder="week 1 (Aug 10–16): …&#10;interviews already booked: …&#10;my weak spots to overweight: …"></textarea></div>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">worksheets save as you type</span></div>
+  </div>
+</section>
+
+<!-- 7 · RITUALS -->
+<section class="lesson" id="rituals">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Day-before &amp; day-of — the rituals</h3>
+      <p class="lvl">boring on purpose; boring is what works under adrenaline</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Day before:</b> nothing new — re-reads only (the matching cheat tables, your story bank, your pitch). One full RADIO or DSA pattern pass out loud, timed, then STOP by early evening. Prep the logistics like a flight: link tested, camera framed, water filled, notes page open (one page max), charger in the wall. Sleep is a performance drug; take it seriously.</p>
+    <p><b>Day of:</b> warm up the voice and the brain 30 minutes before — explain one favorite concept aloud to the wall (or the cat, who has heard the event loop explanation eleven times and remains unimpressed). In the room: ask the clarifying question FIRST even when you think you understand (it buys ten seconds of calm and occasionally saves the round), narrate always, and when you don't know — the honest redirect from the courses' playbooks, never the bluff. Between rounds: the §03 reset ritual. After the loop: the debrief worksheet within an hour, every question you remember — three loops in, you've seen most of the deck.</p>
+    <p>Last thing, and it's not a platitude: you've shipped real systems for years. The interviews test <i>recall and narration</i> of things you already do — which is exactly what this track trained. Walk in like someone reviewing their own work, because that's what this is. 🐾</p>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">that's the whole track — go get it</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up</p>
+  <h2>The kit, at a glance</h2>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the asset</th><th>when it deploys</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>six STAR+ stories</td><td>every behavioral question, mapped via the Behavioral course</td></tr>
+      <tr><td class="mono">02</td><td>the 90-second pitch</td><td>the opening of every single round</td></tr>
+      <tr><td class="mono">03</td><td>mock-loop run sheets + debriefs</td><td>weekly during prep; the reset ritual mid-loop for real</td></tr>
+      <tr><td class="mono">04</td><td>question routing + your question set</td><td>night-before (theirs) and last-five-minutes (yours)</td></tr>
+      <tr><td class="mono">05</td><td>numbers decided in advance</td><td>the offer call — gratitude, delay, negotiate total + level</td></tr>
+      <tr><td class="mono">06</td><td>the 4-week planner</td><td>today</td></tr>
+      <tr><td class="mono">07</td><td>the rituals</td><td>every day-before and day-of, forever</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer class="footer">
+  <p><b>This module is only real if the textareas have words in them.</b> Fifteen minutes on the story bank today beats an hour of reading next week.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../behavioral.html">Behavioral in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>rehearse the pounce. then go be the cat. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+/* persisted worksheets — save as you type, restore on load */
+(function () {
+  var NS = 'learn:interview-kit:ws:';
+  var areas = document.querySelectorAll('textarea[data-wskey]');
+  areas.forEach(function (ta) {
+    var key = NS + ta.getAttribute('data-wskey');
+    try {
+      var saved = localStorage.getItem(key);
+      if (saved) ta.value = saved;
+    } catch (e) {}
+    var timer;
+    ta.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        try { localStorage.setItem(key, ta.value); } catch (e) {}
+      }, 400);
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'interview-kit';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

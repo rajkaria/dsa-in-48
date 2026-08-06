@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontend System Design, Deeply — Learn track · in 48</title>
+<meta name="description" content="Course 05's topics at tutorial pace: the RADIO walkthrough practiced on real prompts, a rendering-strategy decision tree, component API design, state architecture, data and caching, performance budgets, and resilience — with interactive widgets. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Frontend System Design, Deeply — Learn track · in 48">
+<meta property="og:description" content="Course 05's topics at tutorial pace: the RADIO walkthrough practiced on real prompts, a rendering-strategy decision tree, component API design, state architecture, data and caching, performance budgets, and resilience — with interactive widgets. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Frontend System Design, Deeply — Learn track · in 48">
+<meta name="twitter:description" content="Course 05's topics at tutorial pace: the RADIO walkthrough practiced on real prompts, a rendering-strategy decision tree, component API design, state architecture, data and caching, performance budgets, and resilience — with interactive widgets. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23F472B6'%3EFD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#F472B6;
+  --mark-deep:#E11D48;
+  --mark-soft:rgba(244,114,182,.16);
+  --on-mark:#141B22;
+  --on-ink:#F472B6;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FDA4AF;
+  --mark-soft:rgba(244,114,182,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FDA4AF;
+  --mark-soft:rgba(244,114,182,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(244,114,182,0) 0%, rgba(244,114,182,.95) 6%, rgba(244,114,182,.8) 94%, rgba(244,114,182,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(244,114,182,0) 0%, rgba(244,114,182,.95) 5%, rgba(244,114,182,.78) 95%, rgba(244,114,182,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(244,114,182,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(244,114,182,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(244,114,182,0) 0%, rgba(244,114,182,.9) 6%, rgba(244,114,182,.7) 94%, rgba(244,114,182,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· frontend sd</em></div>
+      <div class="brand-sub">module 12 · intermediate → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#radio"><span><i class="dot" data-for="radio"></i> RADIO, Practiced</span></a>
+    <a class="side-link" href="#rendering"><span><i class="dot" data-for="rendering"></i> Rendering (decision tree)</span></a>
+    <a class="side-link" href="#components"><span><i class="dot" data-for="components"></i> Component APIs</span></a>
+    <a class="side-link" href="#state"><span><i class="dot" data-for="state"></i> State Architecture</span></a>
+    <a class="side-link" href="#data"><span><i class="dot" data-for="data"></i> Data &amp; Caching</span></a>
+    <a class="side-link" href="#perf"><span><i class="dot" data-for="perf"></i> Performance Budgets</span></a>
+    <a class="side-link" href="#resilience"><span><i class="dot" data-for="resilience"></i> Resilience &amp; A11y</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./react-deep-dive.html"><span>React, Deeply</span><span class="t">←</span></a>
+    <a class="side-link" href="../frontend-system-design.html"><span>Frontend SD in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 12 <b>the course's twelve topics, at tutorial pace</b></p>
+  <h1>Frontend design, <span class="hl hl-anim" data-d="0">slowly</span>, then <span class="hl hl-anim" data-d="1">all at once</span>.</h1>
+  <p class="lede"><a href="../frontend-system-design.html">Frontend System Design in 48</a> is the sprint — built for the weekend before the interview. This module is the <b>practice field</b>: the same material with room to breathe, worked examples you walk through slowly, an interactive rendering decision tree, and the connective tissue to everything else in the track (the React module's mechanics, the Async module's races, the systems module's other half).</p>
+  <p class="lede">Best order: skim the course once, work this module over a week, then re-run the course's drills — they'll feel like review. The cat-photo feed is the running example throughout, obviously. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip i">assumes: React fluency</span>
+    <span class="level-chip a">ends at: full-prompt fluency under a clock</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>7</b> quiz questions</span>
+    <span><b>1</b> decision-tree widget</span>
+    <span><b>~4h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#radio">To the practice field <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · RADIO -->
+<section class="lesson" id="radio">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>RADIO, practiced — a full pass, annotated</h3>
+      <p class="lvl">the walkthrough with the "why" behind every move</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The course gives you RADIO's phases; here's a full <b>annotated pass</b> on "design an autocomplete", with the meta-commentary an interviewer never says out loud. <b>R (5'):</b> the questions you ask ARE the evaluation — "data source? result count? mobile? a11y bar?" each signals a dimension you know exists. Scope cuts signal senior-ness: "ranking is server-side; I'll design the client." <b>A (10'):</b> draw <code>SearchInput → useAutocomplete() → ResultsList</code> with a query cache beside it — and say WHY the hook exists (testable logic, swappable UI — the React module's §05 talking). <b>D (10'):</b> server state = suggestions keyed by query; UI state = highlighted index, open/closed; URL state = none (ephemeral) — the taxonomy said aloud is worth more than any single choice.</p>
+    <p><b>I (10'):</b> two contracts: HTTP (<code>GET /suggest?q=&amp;limit=</code>, ordered, with an id per suggestion) and the component's props (<code>getSuggestions, onSelect, renderItem, minChars</code>) — designing the second unprompted is the differentiator. <b>O (10'):</b> pick TWO themes and go deep: races + cancellation (Async §07 verbatim), and a11y (the APG combobox from the course). Close with the ritual: failure modes, what you'd build first, what you deferred. Practice this exact pass out loud three times this week — it transfers to every prompt.</p>
+    <div class="mcq" data-qid="fd-radio-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The interviewer interrupts your architecture phase: "actually, let's talk about how you'd cache suggestions." The right move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Politely finish the architecture — structure matters</button>
+        <button class="mcq-opt" type="button" data-ok>Follow them immediately — interruptions ARE the interview steering toward what they grade; flag the unfinished thread ("I'll note we still owe the data model") and dive into caching</button>
+        <button class="mcq-opt" type="button">Ask them to hold questions until the optimization phase</button>
+        <button class="mcq-opt" type="button">Restart RADIO from R with caching as a requirement</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> RADIO is your default itinerary, not a contract — interviewers redirect toward their rubric's meat, and following smoothly (while parking the open thread aloud) shows exactly the meeting-running skill the structure was proving anyway. Refusing the redirect to protect your script is the inverted failure: the structure mattering more than the collaboration. "Loose grip on the map, firm grip on the thread" is the sentence.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Time your practice passes: 40 minutes wall-clock, phone timer per phase. Fluency under a clock is a trained skill, not a personality trait.</li>
+        <li>Three prompts cover the space: autocomplete (data flow), feed (lists + optimism), chat (real-time). One full pass each = 2 hours that upgrades every future round.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · RENDERING -->
+<section class="lesson" id="rendering">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Rendering strategy — walk the decision tree</h3>
+      <p class="lvl">the four questions, as an interactive widget</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The course teaches the strategies; this widget drills the <b>decision procedure</b> until it's reflex. Four questions decide everything: does the public internet need to index it? Is it the same for every viewer? How stale can it be? How interactive after load? Answer them for any surface and the strategy falls out — which is exactly the sentence you say in the round before naming the answer.</p>
+    <div class="viz" id="tree-viz">
+      <h6>THE DECISION TREE — answer four questions, get the verdict</h6>
+      <div id="tree-q" style="margin-bottom:12px;font-weight:600"></div>
+      <div class="viz-controls" id="tree-opts"></div>
+      <div class="viz-stage" id="tree-verdict"></div>
+    </div>
+    <div class="mcq" data-qid="fd-rend-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A recipe site: public, identical for everyone, edited rarely — but it has a live "cooking mode" timer feature. Strategy?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">SSR everything — the timer makes it dynamic</button>
+        <button class="mcq-opt" type="button" data-ok>SSG/ISR for the recipe content (public, shared, rarely-changing), with the timer as a client-side island — rendering strategy is per-surface, and interactivity doesn't contaminate the whole page</button>
+        <button class="mcq-opt" type="button">CSR — it has JavaScript features, so it's an app</button>
+        <button class="mcq-opt" type="button">Streaming SSR with the timer in a Suspense boundary</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the trap is letting one interactive widget reclassify the whole page — the islands insight (course, rendering topic) says static shell + hydrated pockets. Suspense streaming (option 4) solves slow DATA, which this page doesn't have. The transferable rule: <b>decompose the surface first, classify each piece second</b> — most "which strategy?" traps dissolve under decomposition.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Run the tree on five real sites you use today — out loud, with the four answers stated before the verdict. Ten minutes, permanent reflex.</li>
+        <li>The React module's §07 (RSC/streaming) is this section's mechanism layer — quote it when the follow-up goes deep.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · COMPONENTS -->
+<section class="lesson" id="components">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Component APIs — contracts you design on purpose</h3>
+      <p class="lvl">the DataTable worked example, decision by decision</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Let's design <code>&lt;CatTable&gt;</code> the way the round wants — narrating each decision's <i>why</i>. <b>Data in:</b> <code>rows</code> + <code>columns</code> where each column is <code>{key, header, render?}</code> — the render function is the extensibility valve (custom cells without new props). <b>Events out:</b> <code>onSort, onRowClick</code> — the table reports, the page decides (containers stay thin). <b>Controlled where shared:</b> <code>sortState</code> + <code>onSortChange</code> lives with the caller because the URL wants it (State §04's taxonomy deciding a props question — the modules compound). <b>Slots for variation:</b> <code>empty</code>, <code>loading</code> render props. <b>Stated non-goals:</b> fetching and pagination live outside — "the table renders; the page owns data." Five moves, five reasons — that's a complete senior answer.</p>
+    <p>The compound-component upgrade (<code>Table.Head</code>, <code>Table.Row</code>) earns its complexity when callers need structural freedom — mention it as the escalation path, not the default. And the a11y floor is part of the API: sortable headers are <code>&lt;button aria-sort&gt;</code>, row click targets are real interactive elements — accessible by construction, inherited by every consumer.</p>
+    <div class="mcq" data-qid="fd-comp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Product asks CatTable to support "click a row to expand details". Two teams want different expansion content. The API move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Add <code>expandedContentType: 'profile' | 'medical'</code> and render both variants internally</button>
+        <button class="mcq-opt" type="button" data-ok>A render prop / slot: <code>renderExpanded={(row) =&gt; …}</code> with the table owning expand state (or controlled via <code>expandedIds</code>) — callers compose ANY content, the table never learns product domains</button>
+        <button class="mcq-opt" type="button">Fork the table per team — tables are cheap</button>
+        <button class="mcq-opt" type="button">Emit <code>onExpand</code> and let each page render details in a modal</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the enum prop (option 1) couples the design system to product features — every new use case is a PR to the table; the fork (3) orphans a11y and fixes. The render prop inverts the dependency: the table provides the mechanism (expansion, animation, aria-expanded), callers provide meaning. Option 4 is legitimate but changes the UX (modal ≠ inline). "Mechanism in the system, meaning in the product" is the design-system sentence worth memorizing.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Prop-count as a smell metric: past ~10, look for config objects that should be composition.</li>
+        <li>The escape-hatch ladder (compose → className passthrough → upstream proposal → never fork) from the course's Q&A — recite it when "what if the system doesn't support X" appears.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · STATE -->
+<section class="lesson" id="state">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>State architecture — the audit ritual</h3>
+      <p class="lvl">the four-kinds taxonomy as a practiced skill</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The course names the taxonomy (server / UI / app / URL); the skill is <b>auditing a real screen fast</b>. The ritual, on the cat feed: list every piece of state the screen touches, then home each one with a reason. Posts + profiles → <b>server state</b> (query cache; it's a cache problem — staleness, dedupe, invalidation). Composer draft → <b>local UI</b>… except drafts should survive refresh → <i>persisted local</i> (localStorage), a deliberate exception you say out loud. Auth/user → <b>app state</b> (tiny store). Active filter + scroll cursor → <b>URL</b> (shareable, back-button-correct). Like-in-flight → <b>server-state mutation metadata</b> (the query cache's job, not yours). Two minutes, five homes, every choice reasoned — that audit IS the interview answer.</p>
+    <p>The advanced layer: <b>state machines for multi-step flows</b>. The composer (idle → editing → uploading → posted | failed) as a reducer with named transitions kills the boolean soup (<code>isUploading &amp;&amp; !hasFailed &amp;&amp; …</code>) that breeds impossible states. "I'd model this as a state machine" + drawing the transition diagram is a senior move that costs 30 seconds.</p>
+    <div class="mcq" data-qid="fd-state-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The feed's "3 new posts — tap to show" pill: where does the count of pending-unseen posts live, and why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">URL state — it describes the view</button>
+        <button class="mcq-opt" type="button" data-ok>UI state derived from server state: the socket/poll delivers new posts into the cache buffer; the pill's count is computed from "buffered but not yet merged into the visible list" — displayed by local state, owned by the data layer</button>
+        <button class="mcq-opt" type="button">Global app store — multiple components need it</button>
+        <button class="mcq-opt" type="button">A cookie, so it survives refresh</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the pill is a <i>view</i> of data-layer reality (posts fetched but held back to avoid yanking the scroll — the frontend course's lists topic). Deriving beats duplicating: a separate counter drifts the moment merge logic changes. Refresh (option 4) SHOULD reset it — after reload the feed is fresh. This question rewards the derived-state instinct from JS Fundamentals §07 and React §03, at design altitude — three modules, one answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Practice the two-minute audit on three screens of your real app this week — the ritual, not the taxonomy, is what performs under pressure.</li>
+        <li>Undo/redo, offline queues, and optimistic rollbacks all get trivial when transitions are centralized — the payoff sentence for the state-machine investment.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · DATA -->
+<section class="lesson" id="data">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Data &amp; caching — the five-layer answer</h3>
+      <p class="lvl">where every deep-dive request eventually lands</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>When the interviewer says "go deeper on data", they want the <b>layered story</b>, and you now own every layer from three modules. <b>Layer 1 — the contract:</b> cursor pagination, stable ids, an error envelope (node-backend §04). <b>Layer 2 — the transport:</b> dedupe + abort in-flight duplicates (async §07). <b>Layer 3 — the cache:</b> normalized entities, lists as id arrays, stale-while-revalidate with per-key staleness budgets. <b>Layer 4 — mutations:</b> optimistic for high-success toggles with rollback; invalidate-vs-write-through as a stated choice per mutation. <b>Layer 5 — persistence:</b> cache snapshot to IndexedDB for instant revisit paint + the offline read story.</p>
+    <p>The worked detail that impresses: <b>the like button's full journey.</b> Tap → cache updates optimistically (count+1, filled heart) → request fires with idempotency key → success confirms silently / failure rolls back + toast → a background refetch reconciles eventually. Six beats, four modules' worth of machinery, told in twenty seconds — rehearse it verbatim.</p>
+    <div class="mcq" data-qid="fd-data-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Feed post appears in the timeline, the user's profile grid, and a "trending" rail — the user likes it from the rail. What must be true of the cache for all three views to update?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Each view refetches its own list on any mutation</button>
+        <button class="mcq-opt" type="button" data-ok>Posts are stored NORMALIZED — one entity per id, lists referencing ids — so one entity update fans out to every view rendering it; denormalized copies would need three separate writes</button>
+        <button class="mcq-opt" type="button">The rail broadcasts an event the other views listen to</button>
+        <button class="mcq-opt" type="button">It can't be done client-side; the socket must push the change</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> this is the postgres module's "one card per cat" — in the browser. Normalization isn't a server-only idea: entity-by-id + lists-of-ids is how client caches (React Query's structural sharing, Apollo's normalized store) make one update omnipresent. Options 1/3 work but are the hand-rolled, drift-prone versions of what normalization gives structurally. Saying "same normalization argument as the database, one layer up" connects two modules in one sentence — interviewers visibly enjoy that.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Staleness budgets per data type, stated like SLOs: profile 5 min, feed 30 s, unread badge 5 s, price 0 — "freshness is a product decision expressed in cache config".</li>
+        <li>Prefetch on hover/viewport + cache persistence = the "instant app" feel — cheap tricks, name them together.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · PERF -->
+<section class="lesson" id="perf">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Performance budgets — numbers you commit to</h3>
+      <p class="lvl">turning "make it fast" into an engineering plan</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The senior move in the perf deep-dive is converting vibes into <b>budgets</b>: LCP ≤ 2.5s on a mid-range Android over 4G; INP ≤ 200ms; initial route JS ≤ 200KB gz; images ≤ 200KB above the fold; then <b>defending each budget in CI</b> (size-limit, Lighthouse CI) and <b>watching it in RUM</b> at p75. With budgets stated, every technique becomes a line item with an owner: route-split the bundle (assets topic), stream the shell (rendering), virtualize the list (lists), transition the heavy updates (React §06), lazy-decode the images. The plan writes itself once the numbers exist — which is why you state numbers first.</p>
+    <p>And the diagnosis ladder when a budget's blown, in strict order: <b>field data first</b> (which users, which metric), <b>then the trace</b> (Lighthouse/Profiler on a throttled device), <b>then the fix targeting the dominant term</b> — never the reverse. "We optimized what the RUM said, not what annoyed us locally" is a sentence that carries a whole round.</p>
+    <div class="mcq" data-qid="fd-perf-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">RUM says p75 LCP is 4.1s on mobile but 1.9s on desktop. Lab runs on your machine show 1.6s everywhere. First move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Trust the lab — RUM includes users on broken networks you can't fix</button>
+        <button class="mcq-opt" type="button" data-ok>Reproduce the field conditions: throttle to mid-range mobile CPU + 4G in the trace, segment RUM by device/geo/connection to find the dominant cohort — the gap IS the finding, and lab-at-full-speed was measuring a different product</button>
+        <button class="mcq-opt" type="button">Ship a lighter mobile-only site</button>
+        <button class="mcq-opt" type="button">Move LCP tracking to the server where it's consistent</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the lab/field gap is the classic tell that your test conditions flatter you — mobile CPUs execute your JS 4–6× slower and 4G round-trips stack. Segmenting RUM tells you WHERE the 4.1s lives (device class? one geo's CDN gap? one route?); throttled traces then show WHY. Options 1 and 4 are measurement-denial in different hats. "Debug in lab, decide in field — and make the lab lie less" wraps it.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Budgets are per-route, not per-app — the checkout can spend more JS than the landing page. Saying so shows you've operated them.</li>
+        <li>The full drills: course topics <a href="../frontend-system-design.html#perf">perf</a> + <a href="../frontend-system-design.html#assets">assets</a> — this section is their planning layer.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · RESILIENCE -->
+<section class="lesson" id="resilience">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Resilience &amp; a11y — the requirements that upgrade your level</h3>
+      <p class="lvl">designing the unhappy paths first</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The strongest closing habit in frontend rounds: <b>design the unhappy paths as requirements, not patches.</b> For every surface, four questions asked in the same breath as the feature itself: What renders while loading (skeletons matching final layout — CLS!)? What renders on failure (retryable error states per region, error boundaries containing the blast)? What happens offline (reads from cache, writes queued with pending badges — the network topic's full story)? What happens for keyboard and screen-reader users (focus management on every transition, live-region announcements for async results)?</p>
+    <p>The interview mechanics: raise a11y in the <i>requirements</i> phase ("targeting WCAG AA — it'll shape the component APIs"), then let it surface naturally in each design decision (the combobox's aria-activedescendant, the modal's focus trap, the feed's announced updates). One requirements-phase sentence + two concrete mechanisms later = the a11y box checked at senior level, without a dedicated lecture. Resilience gets the same treatment: "every fetch in this design has a retry policy and a visible failure state" stated once, then honored visibly.</p>
+    <div class="mcq" data-qid="fd-res-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The infinite feed hits a fetch error on page 4. Grade these UX options, best first?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Silent retry forever — errors are transient, users shouldn't see them</button>
+        <button class="mcq-opt" type="button" data-ok>Keep pages 1–3 rendered; inline a compact "couldn't load more — retry" row at the boundary (announced politely); auto-retry with backoff behind it; scroll position untouched</button>
+        <button class="mcq-opt" type="button">Full-page error boundary — the feed is broken, say so honestly</button>
+        <button class="mcq-opt" type="button">Toast the error and stop the infinite scroll for the session</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the loaded content is still VALID — nuking it (option 3) punishes the user for your pagination hiccup; silent-forever (1) strands them wondering; killing the mechanism (4) turns a blip into a session-long downgrade. The inline boundary row preserves everything, communicates honestly, retries ambiently, and stays accessible. "Degrade the smallest possible region, keep what works, offer the retry where the failure lives" — that's the resilience design principle in one sentence, and it applies to every surface in the round.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The unhappy-path grid (loading/error/offline/a11y × each surface) makes a great literal whiteboard artifact — draw it and fill it live.</li>
+        <li>This module + the course = both altitudes covered. Final step: the <a href="./interview-kit.html">interview kit</a>'s mock-loop run sheets, where you perform all of it under a clock.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any frontend design round.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>RADIO</td><td>Loose grip on the map, firm grip on the thread — follow redirects, park open threads aloud.</td></tr>
+      <tr><td class="mono">02</td><td>rendering</td><td>Four questions, then the verdict — and decompose the surface before classifying it.</td></tr>
+      <tr><td class="mono">03</td><td>components</td><td>Mechanism in the system, meaning in the product; render props are the extensibility valve.</td></tr>
+      <tr><td class="mono">04</td><td>state</td><td>The two-minute audit: every piece of state, homed, with a reason. Machines for multi-step flows.</td></tr>
+      <tr><td class="mono">05</td><td>data</td><td>Five layers (contract → transport → cache → mutations → persistence); normalize entities — the database argument, one layer up.</td></tr>
+      <tr><td class="mono">06</td><td>performance</td><td>Budgets with numbers, defended in CI, watched in RUM; field decides, lab explains.</td></tr>
+      <tr><td class="mono">07</td><td>resilience</td><td>Unhappy paths as requirements; degrade the smallest region; a11y raised at requirements, honored in mechanisms.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">This module + the course = the full loadout for the frontend design round.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>The week-of sequence:</b> this module for depth → <a href="../frontend-system-design.html">the course</a> for drills and the night-before read → three timed RADIO passes out loud.</li>
+      <li><b>Cross-module ammunition:</b> races (async §07), re-render discipline (react §06), normalization (postgres §02 + here §05), the systems half of feed/chat (<a href="./system-design-backend.html">system-design §07</a>). You hold both sides of every full-stack prompt.</li>
+      <li>Last stop on the track: <b>the interview kit</b> — stories, run sheets, and the planner that schedules all of this.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Three timed passes, out loud, this week.</b> The round is a performance — and performances are rehearsed, not understood into existence.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../frontend-system-design.html">Frontend SD in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>loose grip on the map, firm grip on the thread. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+/* rendering decision tree — four questions to a verdict */
+(function () {
+  var qEl = document.getElementById('tree-q');
+  var optsEl = document.getElementById('tree-opts');
+  var verdictEl = document.getElementById('tree-verdict');
+  if (!qEl) return;
+  var questions = [
+    { q: '1/4 · Does the public internet need to find and index this surface?', opts: ['yes — SEO matters', 'no — behind a login'] },
+    { q: '2/4 · Is the content the same for every viewer?', opts: ['same for everyone', 'personalized per user'] },
+    { q: '3/4 · How fresh must it be?', opts: ['live / seconds', 'minutes-to-hours is fine', 'changes rarely'] },
+    { q: '4/4 · How interaction-heavy after load?', opts: ['mostly reading', 'app-grade interaction'] }
+  ];
+  var answers = [];
+  function verdict() {
+    var seo = answers[0] === 0, shared = answers[1] === 0, fresh = answers[2], heavy = answers[3] === 1;
+    var v, why;
+    if (!seo && heavy) { v = 'CSR (or light SSR shell)'; why = 'no index pressure + app-grade interactivity: optimize for post-load feel; hosting is a static bucket.'; }
+    else if (seo && shared && fresh === 2) { v = 'SSG'; why = 'public, identical, rarely changing — bake at build, serve from CDN, unbeatable.'; }
+    else if (seo && shared && fresh === 1) { v = 'ISR'; why = 'public and shared with bounded staleness — static speed, re-baked every N seconds.'; }
+    else if (fresh === 0 || !shared) { v = 'SSR' + (heavy ? ' + streaming' : ''); why = 'personalized or live content that must arrive rendered — server renders per request' + (heavy ? '; stream the shell so slow data can\'t block first paint.' : '.'); }
+    else { v = 'SSR / islands'; why = 'mixed signals — decompose the surface: static shell, dynamic pockets.'; }
+    verdictEl.innerHTML = '<div style="padding:12px 16px;border-radius:10px;background:var(--mark-soft)"><b>verdict: ' + v + '</b><br><span style="font-size:.88rem">' + why + '</span><br><span style="font-size:.8rem;color:var(--ink-3)">now say it as a sentence: "because ' + why.charAt(0).toLowerCase() + why.slice(1) + '"</span></div>' +
+      '<button class="viz-btn" style="margin-top:10px" onclick="this.parentElement.dispatchEvent(new CustomEvent(\'restart\', {bubbles: true}))">start over</button>';
+  }
+  function ask(i) {
+    if (i >= questions.length) { qEl.textContent = 'the four answers decide it:'; optsEl.innerHTML = ''; verdict(); return; }
+    qEl.textContent = questions[i].q;
+    verdictEl.innerHTML = '';
+    optsEl.innerHTML = '';
+    questions[i].opts.forEach(function (o, oi) {
+      var b = document.createElement('button');
+      b.className = 'viz-btn'; b.type = 'button'; b.textContent = o;
+      b.addEventListener('click', function () { answers[i] = oi; ask(i + 1); });
+      optsEl.appendChild(b);
+    });
+  }
+  document.getElementById('tree-viz').addEventListener('restart', function () { answers = []; ask(0); });
+  ask(0);
+})();
+</script>
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'frontend-system-design';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

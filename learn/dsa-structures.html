@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Structures — Learn track · in 48</title>
+<meta name="description" content="Linked lists made intuitive with a pointer-surgery step-through, stacks, queues and deques, heaps from scratch, and interval patterns — runnable code, quizzes, verified LeetCode ladders, and cats. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Linear Structures — Learn track · in 48">
+<meta property="og:description" content="Linked lists made intuitive with a pointer-surgery step-through, stacks, queues and deques, heaps from scratch, and interval patterns — runnable code, quizzes, verified LeetCode ladders, and cats. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Linear Structures — Learn track · in 48">
+<meta name="twitter:description" content="Linked lists made intuitive with a pointer-surgery step-through, stacks, queues and deques, heaps from scratch, and interval patterns — runnable code, quizzes, verified LeetCode ladders, and cats. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23A3E635'%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#A3E635;
+  --mark-deep:#65A30D;
+  --mark-soft:rgba(163,230,53,.16);
+  --on-mark:#141B22;
+  --on-ink:#A3E635;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#BEF264;
+  --mark-soft:rgba(163,230,53,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#BEF264;
+  --mark-soft:rgba(163,230,53,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(163,230,53,0) 0%, rgba(163,230,53,.95) 6%, rgba(163,230,53,.8) 94%, rgba(163,230,53,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(163,230,53,0) 0%, rgba(163,230,53,.95) 5%, rgba(163,230,53,.78) 95%, rgba(163,230,53,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(163,230,53,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(163,230,53,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(163,230,53,0) 0%, rgba(163,230,53,.9) 6%, rgba(163,230,53,.7) 94%, rgba(163,230,53,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· structures</em></div>
+      <div class="brand-sub">module 04 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#lists"><span><i class="dot" data-for="lists"></i> Linked Lists</span></a>
+    <a class="side-link" href="#stacks"><span><i class="dot" data-for="stacks"></i> Stacks</span></a>
+    <a class="side-link" href="#queues"><span><i class="dot" data-for="queues"></i> Queues &amp; Deques</span></a>
+    <a class="side-link" href="#heaps"><span><i class="dot" data-for="heaps"></i> Heaps</span></a>
+    <a class="side-link" href="#intervals"><span><i class="dot" data-for="intervals"></i> Intervals</span></a>
+    <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Practice Ladder</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./dsa-foundations.html"><span>DSA Foundations</span><span class="t">←</span></a>
+    <a class="side-link" href="../dsa.html"><span>DSA in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/6</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 04 <b>the machinery under every algorithm</b></p>
+  <h1>Structures you can <span class="hl hl-anim" data-d="0">see</span>, finally.</h1>
+  <p class="lede">Linked lists, stacks, queues, heaps, intervals — the structures interviews love precisely because you <i>can't</i> fake them with array methods. The trouble was never difficulty; it's that pointer surgery is invisible in code. So this module <b>shows</b> it: a step-through for the list reversal everyone fumbles, runnable implementations of everything else, and honest talk about when each structure earns its keep.</p>
+  <p class="lede">Prerequisite: <a href="./dsa-foundations.html">DSA Foundations</a> (Big-O and the reference model). The shelter cats return — this time they're forming lines, towers, and priority queues. Reluctantly. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what IS a linked list?"</span>
+    <span class="level-chip i">middle: implementations you can run</span>
+    <span class="level-chip a">ends at: heap-vs-sort judgment calls</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>6</b> sections</span>
+    <span><b>7</b> quiz questions</span>
+    <span><b>1</b> pointer-surgery stepper</span>
+    <span><b>14</b> verified LeetCode problems</span>
+    <span><b>~3.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#lists">Start with lists <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · LINKED LISTS -->
+<section class="lesson" id="lists">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>Linked lists — cats holding tails</h3>
+      <p class="lvl">beginner → the reversal, stepped through slowly</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A linked list is nodes scattered anywhere in memory, each holding a value and a <b>pointer to the next node</b>. No indexes — to reach item 500 you walk 500 hops (O(n)). So why bother? Because <b>splicing is O(1)</b>: insert or remove anywhere by rewiring two pointers, no mass shuffling of neighbors like an array.</p>
+    <p>Interview reality: you'll rarely <i>choose</i> a linked list at work (arrays are cache-friendly and usually win), but interviews use them constantly because they test whether you can <b>manipulate references without losing your grip</b> — which is a real skill you use every day in object graphs.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A conga line of cats, each holding the tail of the <b>next</b> cat. You only know where the front cat is. Finding the 5th cat = walking down the line. But slipping a new cat into the middle? The cat in front lets go of one tail, grabs the newcomer's — <b>two grip changes</b>, nobody else moves. Try that with theater seats (an array) and twenty cats shuffle over. The danger: let go of a tail before grabbing the rest of the line, and <b>everyone behind that point wanders off forever</b>. That's the bug the stepper below is about.</p>
+    </div>
+
+    <div class="viz" id="rev-viz">
+      <h6>POINTER SURGERY — reverse a list without dropping it</h6>
+      <p style="font-size:.9rem;color:var(--ink-2);margin-bottom:10px">Three variables walk the list: <code>prev</code> (reversed so far), <code>curr</code> (working on), <code>next</code> (the safety grip). Watch the arrows flip one at a time.</p>
+      <div class="viz-controls">
+        <button class="viz-btn primary" id="rev-step" type="button">step →</button>
+        <button class="viz-btn" id="rev-reset" type="button">reset</button>
+        <span class="run-hint" id="rev-narr">press step to begin</span>
+      </div>
+      <div class="viz-stage" id="rev-stage" style="font-size:.85rem;overflow-x:auto;white-space:nowrap;padding:8px 0"></div>
+    </div>
+
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">conga-line.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// build: mochi → biscuit → clawdia → null
+const node = (name, next = null) =&gt; ({ name, next });
+let head = node('mochi', node('biscuit', node('clawdia')));
+
+const show = (h, label) =&gt; {
+  const parts = [];
+  for (let n = h; n; n = n.next) parts.push(n.name);
+  console.log(label, parts.join(' → ') + ' → null');
+};
+show(head, 'before:');
+
+// the reversal — the exact loop from the stepper above
+function reverse(h) {
+  let prev = null, curr = h;
+  while (curr) {
+    const next = curr.next;   // 1. grip the rest BEFORE letting go
+    curr.next = prev;         // 2. flip this cat's arrow
+    prev = curr;              // 3. reversed section grows
+    curr = next;              // 4. step forward along the grip
+  }
+  return prev;                // prev is the new front
+}
+head = reverse(head);
+show(head, 'after: ');
+
+// fast & slow — find the middle in ONE pass
+function middle(h) {
+  let slow = h, fast = h;
+  while (fast &amp;&amp; fast.next) { slow = slow.next; fast = fast.next.next; }
+  return slow.name;
+}
+console.log('middle:', middle(head));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the four lines of the while-loop, in the stepper's order</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-list-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does the fast/slow pointer trick detect a cycle (Floyd's algorithm)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The fast pointer throws when it revisits a node</button>
+        <button class="mcq-opt" type="button" data-ok>In a cycle, fast gains one position on slow per step — on a circular track it must eventually land exactly on slow; with no cycle, fast just hits null</button>
+        <button class="mcq-opt" type="button">It can't — you need a Set of visited nodes</button>
+        <button class="mcq-opt" type="button">JS garbage collection breaks cycles automatically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> relative speed is +1 node per step, so the gap closes by exactly one each time — no jumping over. The Set answer also works but costs O(n) memory; Floyd is the O(1)-space flex, and "fast laps slow like runners on a track" is the sentence to say. Same duo finds the middle (fast at end → slow at mid) — one tool, three problems.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>The dummy head</b>: a fake node before the real head makes "delete the first node" and "insert at front" stop being special cases — <code>dummy.next</code> is the answer at the end. Interviewers smile when it appears unprompted.</li>
+        <li>Merge Two Sorted Lists = the zipper: dummy + tail pointer, always attach the smaller head. It's the building block of mergesort's merge.</li>
+        <li>Remove-Nth-from-end = two pointers with an n-node head start — one pass, no length count. Doubly-linked lists trade an extra pointer per node for O(1) removal <i>given the node</i> — which is exactly what LRU cache needs (map → node + doubly-linked recency list).</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/reverse-linked-list/" target="_blank" rel="noopener noreferrer">206 · Reverse Linked List</a> · <a href="https://leetcode.com/problems/middle-of-the-linked-list/" target="_blank" rel="noopener noreferrer">876 · Middle of List</a> · <a href="https://leetcode.com/problems/linked-list-cycle/" target="_blank" rel="noopener noreferrer">141 · Cycle</a> · <a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="noopener noreferrer">21 · Merge Sorted</a> · <a href="https://leetcode.com/problems/remove-nth-node-from-end-of-list/" target="_blank" rel="noopener noreferrer">19 · Remove Nth</a> · <a href="https://leetcode.com/problems/lru-cache/" target="_blank" rel="noopener noreferrer">146 · LRU Cache (stretch)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · STACKS -->
+<section class="lesson" id="stacks">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Stacks — last in, first out, everywhere</h3>
+      <p class="lvl">beginner → matching, undo, and the monotonic upgrade</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A stack is a pile: add on top (<code>push</code>), take from the top (<code>pop</code>), both O(1) — a plain JS array IS one. The pattern trigger: <b>"most recent unfinished thing"</b>. Matching brackets (most recent unclosed opener), undo history (most recent action), the call stack itself (most recent unfinished function), DFS (most recent unexplored branch).</p>
+    <p>The interview upgrade is the <b>monotonic stack</b>: keep the stack sorted-by-construction by popping everything your new element beats. Each pop <i>permanently resolves</i> a waiting item ("found the next warmer day!") — n pushes, n pops max, so the scary-looking nested loop is O(n) by the same amortized budget as the sliding window.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">piles-of-cats.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// valid parentheses — the stack "hello world" (LC 20)
+function validBrackets(s) {
+  const pair = { ')': '(', ']': '[', '}': '{' };
+  const stack = [];
+  for (const ch of s) {
+    if ('([{'.includes(ch)) stack.push(ch);
+    else if (stack.pop() !== pair[ch]) return false;  // wrong/missing opener
+  }
+  return stack.length === 0;                          // nothing left open
+}
+console.log('([{}]) →', validBrackets('([{}])'));
+console.log('([)]   →', validBrackets('([)]'));
+
+// monotonic stack: days until a warmer day (LC 739, cat-nap edition)
+// temps of the sunbeam spot; a cat naps until it's warmer than today
+function daysUntilWarmer(temps) {
+  const wait = new Array(temps.length).fill(0);
+  const stack = [];                        // indexes of unresolved days
+  for (let i = 0; i &lt; temps.length; i++) {
+    while (stack.length &amp;&amp; temps[i] &gt; temps[stack[stack.length - 1]]) {
+      const day = stack.pop();             // resolved forever — that's the O(n)
+      wait[day] = i - day;
+    }
+    stack.push(i);
+  }
+  return wait;
+}
+console.log(daysUntilWarmer([23, 24, 21, 19, 22, 26, 23]));
+// each index pushed once, popped at most once → 2n operations total</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the while-inside-for that's still O(n) — same budget argument as the window</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-stack-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Min Stack: design a stack whose <code>getMin()</code> is O(1) at all times. The trick?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Keep a sorted copy of the stack alongside</button>
+        <button class="mcq-opt" type="button" data-ok>A second stack of "minimum so far" that pushes/pops in lockstep — the top is always the current min, and popping restores the previous min automatically</button>
+        <button class="mcq-opt" type="button">Track min in a variable, rescan on every pop</button>
+        <button class="mcq-opt" type="button">Use Math.min over the array — it's O(1) in V8</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the hard part is that popping the minimum must <i>reveal the previous minimum</i> — a single variable loses history (option 3 degrades pops to O(n)). A parallel min-stack carries the history: each level remembers "the min when I was pushed". Space for time, the recurring trade — and the pattern (auxiliary stack tracking a running property) generalizes.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Say the call-stack connection: recursion IS a stack — every recursive DFS can be rewritten with an explicit stack, which is also the stack-overflow fix. This bridges straight into trees.</li>
+        <li>Monotonic-stack triggers: "next greater element", "days until…", "largest rectangle", "visible buildings". The phrase "each element pushed and popped at most once" is the complexity proof in one line.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/valid-parentheses/" target="_blank" rel="noopener noreferrer">20 · Valid Parentheses</a> · <a href="https://leetcode.com/problems/min-stack/" target="_blank" rel="noopener noreferrer">155 · Min Stack</a> · <a href="https://leetcode.com/problems/daily-temperatures/" target="_blank" rel="noopener noreferrer">739 · Daily Temperatures</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · QUEUES -->
+<section class="lesson" id="queues">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Queues &amp; deques — fair lines and clever windows</h3>
+      <p class="lvl">beginner → BFS's engine, plus the deque party trick</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A queue is a fair line: in at the back, out at the front, FIFO. It's the engine of <b>breadth-first search</b> (process things in discovery order → shortest paths), task schedulers, buffers, and rate limiters. The JS gotcha you already know from Foundations: <code>shift()</code> is O(n), so real queues use an index pointer, a linked list, or a ring buffer.</p>
+    <p>A <b>deque</b> (double-ended queue) opens both ends. Its star turn is the <b>monotonic deque</b> behind Sliding Window Maximum: keep candidates in decreasing order — new arrivals evict everyone smaller from the back (they can never be a max while a bigger, newer value lives), and the front retires when it slides out of the window. Every element enters and leaves once: O(n) window maximums.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The dinner line is FIFO — cats who queue first eat first, and BFS is just "serve dinner in waves: everyone 1 hop away, then everyone 2 hops away". The deque trick is the <b>judging panel</b> at a cat show with a 3-cat viewing window: when a clearly-more-magnificent cat struts in, every less magnificent cat still waiting at the back <b>leaves immediately</b> — they can never win while the new cat is around and newer. The front of the panel is always the current champion.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">dinner-lines.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// an O(1) queue: index pointer instead of shift()
+class Queue {
+  constructor() { this.items = []; this.head = 0; }
+  push(x) { this.items.push(x); }
+  shift() { return this.items[this.head++]; }         // "remove" = move marker
+  get length() { return this.items.length - this.head; }
+}
+const dinner = new Queue();
+['mochi', 'biscuit', 'clawdia'].forEach(c =&gt; dinner.push(c));
+while (dinner.length) console.log('now eating:', dinner.shift());
+
+// monotonic deque: max of each sliding window of 3 (LC 239)
+function windowMax(nums, k) {
+  const dq = [];                            // indexes, values decreasing
+  const out = [];
+  for (let i = 0; i &lt; nums.length; i++) {
+    while (dq.length &amp;&amp; nums[i] &gt;= nums[dq[dq.length - 1]]) dq.pop();
+    dq.push(i);                             // evict the outclassed, join
+    if (dq[0] &lt;= i - k) dq.shift();         // champion aged out of window
+    if (i &gt;= k - 1) out.push(nums[dq[0]]);  // front = current champion
+  }
+  return out;
+}
+console.log('maxes:', windowMax([1, 3, -1, -3, 5, 3, 6, 7], 3));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the champion logic: evict the outclassed, retire the aged-out</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-queue-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Implement a queue using two stacks (LC 232) — how, and what's the cost?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Impossible — stacks reverse order irreparably</button>
+        <button class="mcq-opt" type="button" data-ok>Push into stack A; to dequeue, if stack B is empty, pour ALL of A into B (reversing it), then pop B — amortized O(1) since each element makes the A→B trip once</button>
+        <button class="mcq-opt" type="button">Pour A into B and back for every dequeue — O(n) each, that's the accepted answer</button>
+        <button class="mcq-opt" type="button">Keep both stacks mirrored on every push</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two reversals make a FIFO — but the insight graded is the <i>amortized</i> argument: the expensive pour is rare, and per-element lifetime cost is exactly two pushes + two pops. It's the cleanest interview showcase of amortized analysis, and the same "measure per-element lifetime, not per-operation worst case" lens you used on the window and the monotonic stack.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>BFS = queue, DFS = stack — swapping the container literally swaps the traversal. This one-liner carries you into the trees module.</li>
+        <li>Real-world queues you already operate: BullMQ/SQS job queues, Node's event loop task queue, backpressure buffers in streams. Naming them makes the abstract concrete.</li>
+        <li>Ring buffer: fixed array + two wrapping indexes — the allocation-free queue behind audio buffers and high-perf systems. One sentence is plenty.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/implement-queue-using-stacks/" target="_blank" rel="noopener noreferrer">232 · Queue via Stacks</a> · <a href="https://leetcode.com/problems/sliding-window-maximum/" target="_blank" rel="noopener noreferrer">239 · Sliding Window Maximum (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 4 · HEAPS -->
+<section class="lesson" id="heaps">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Heaps — always know the winner</h3>
+      <p class="lvl">intermediate → a real MinHeap in 30 lines, then top-k judgment</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A heap answers one question, constantly and cheaply: <b>"who's currently first?"</b> Peek the min (or max) in O(1); insert or remove-the-top in O(log n). It does this by maintaining a <i>weak</i> promise — not full sorted order, just "every parent beats its children" — and weak promises are cheap to repair.</p>
+    <p>The elegant bit: the "tree" is <b>just an array</b>. Node i's children live at 2i+1 and 2i+2; its parent at ⌊(i−1)/2⌋. Insert = append + <b>bubble up</b> while beating your parent. Remove-top = move the last element to the root + <b>sift down</b> toward the better child. The tree is complete, so the height is log n — that's the whole complexity story.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The vet's waiting room doesn't keep cats <b>fully sorted</b> by urgency — that would mean re-sorting the whole room every arrival. Instead: a tournament bracket where every cat only promises to be <i>less urgent than the cat above it</i>. New arrival? She challenges her way up a single column — log n hisses, not a room-wide reshuffle. "Who's next?" is always the cat at the top. Weak ordering, strong answer, tiny maintenance.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">vet-triage.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">class MinHeap {
+  constructor() { this.a = []; }
+  get size() { return this.a.length; }
+  peek() { return this.a[0]; }
+  push(x) {
+    this.a.push(x);
+    let i = this.a.length - 1;                  // bubble up
+    while (i &gt; 0) {
+      const p = (i - 1) &gt;&gt; 1;
+      if (this.a[p] &lt;= this.a[i]) break;
+      [this.a[p], this.a[i]] = [this.a[i], this.a[p]];
+      i = p;
+    }
+  }
+  pop() {
+    const top = this.a[0], last = this.a.pop();
+    if (this.a.length) {
+      this.a[0] = last;
+      let i = 0;                                 // sift down
+      while (true) {
+        const l = 2 * i + 1, r = l + 1;
+        let best = i;
+        if (l &lt; this.a.length &amp;&amp; this.a[l] &lt; this.a[best]) best = l;
+        if (r &lt; this.a.length &amp;&amp; this.a[r] &lt; this.a[best]) best = r;
+        if (best === i) break;
+        [this.a[best], this.a[i]] = [this.a[i], this.a[best]];
+        i = best;
+      }
+    }
+    return top;
+  }
+}
+
+// top-3 heaviest cats from a stream — keep a SMALL min-heap of winners
+const weights = [4.2, 6.1, 3.0, 5.5, 7.3, 2.8, 6.8, 4.9, 5.1];
+const h = new MinHeap();
+for (const w of weights) {
+  h.push(w);
+  if (h.size &gt; 3) h.pop();      // evict the lightest of the champions
+}
+const top3 = [];
+while (h.size) top3.push(h.pop());
+console.log('top-3 heaviest:', top3);
+// n items through a k-sized heap: O(n log k) — and the stream
+// never needed to fit in memory. THAT's the heap's real pitch.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">a min-heap of maximums — the inversion that confuses everyone once</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-heap-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Kth largest element: sort is O(n log n), heap is O(n log k). When is the heap genuinely the better answer, not just flexing?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Always — log k beats log n, end of story</button>
+        <button class="mcq-opt" type="button" data-ok>When k ≪ n, or the data is a STREAM you can't hold or re-sort — the heap keeps k winners in memory while items flow past</button>
+        <button class="mcq-opt" type="button">Never — quickselect's O(n) average beats both, so heaps are obsolete</button>
+        <button class="mcq-opt" type="button">Only when the input is already partially sorted</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> for a one-shot array, sort is simpler and often fine — say so. The heap earns its keep when data streams (top-10 trending from millions of events, "as results arrive") or k is tiny versus n. Quickselect is worth naming as the O(n)-average alternative — knowing all three and picking by context is exactly what "senior" sounds like in this question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Two-heap trick: a max-heap of the lower half + min-heap of the upper half = O(log n) running median. Named unprompted, it's a strong signal.</li>
+        <li>"Merge k sorted lists" = min-heap of k current heads — every stream/log-merge system does this for real.</li>
+        <li>JS has no built-in heap — in interviews either bring this 30-liner or say "assume a MinHeap class" and keep moving; interviewers accept both. Priority queues in schedulers, Dijkstra, and A* are all this structure.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/kth-largest-element-in-an-array/" target="_blank" rel="noopener noreferrer">215 · Kth Largest</a> · <a href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank" rel="noopener noreferrer">347 · Top K Frequent</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · INTERVALS -->
+<section class="lesson" id="intervals">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Intervals — sort, then sweep</h3>
+      <p class="lvl">intermediate → the overlap test and the one pattern that rules them</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Interval problems (meetings, bookings, nap schedules) all rest on two moves. <b>Move 1 — the overlap test:</b> two ranges overlap iff <code>a.start ≤ b.end &amp;&amp; b.start ≤ a.end</code> — memorize it as "neither starts after the other ends." <b>Move 2 — sort by start, then sweep once:</b> after sorting, any overlap must involve your <i>immediate neighbor</i>, so one linear pass with a "current merged block" handles everything. O(n log n) for the sort, O(n) for the sweep.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Five cats book the sunbeam. Sort the bookings by start time, then walk them holding one <b>"current sunbeam session"</b>: next booking starts before the current session ends? Same pile of cats — extend the session to the later end. Starts after? Close the session, start fresh. One walk down the list and every overlapping pile is found — because after sorting, an overlap can't <i>skip over</i> your neighbor to reach you.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">sunbeam-schedule.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// merge overlapping sunbeam bookings (LC 56)
+function mergeBookings(intervals) {
+  const sorted = [...intervals].sort((a, b) =&gt; a[0] - b[0]);
+  const merged = [sorted[0].slice()];
+  for (const [start, end] of sorted.slice(1)) {
+    const current = merged[merged.length - 1];
+    if (start &lt;= current[1]) current[1] = Math.max(current[1], end); // extend
+    else merged.push([start, end]);                                  // new block
+  }
+  return merged;
+}
+const bookings = [[13, 15], [1, 3], [2, 6], [8, 10], [15, 18]];
+console.log('merged:', JSON.stringify(mergeBookings(bookings)));
+
+// min removals so no two bookings overlap (LC 435) — greedy by END time
+function minRemovals(intervals) {
+  const byEnd = [...intervals].sort((a, b) =&gt; a[1] - b[1]);
+  let keptEnd = -Infinity, removed = 0;
+  for (const [start, end] of byEnd) {
+    if (start &gt;= keptEnd) keptEnd = end;   // compatible — keep it
+    else removed++;                        // overlaps a kept one — drop it
+  }
+  return removed;
+}
+console.log('remove', minRemovals([[1,2],[2,3],[3,4],[1,3]]), 'booking(s)');
+// why sort by END? keeping the earliest-ending booking leaves the
+// most room for everyone after — the exchange argument in one line.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">merge sorts by START; the greedy scheduler sorts by END — know why</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-int-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"How many meeting rooms do we need?" (classic variant). The cleanest approach?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Merge the intervals — the answer is how many merged blocks remain</button>
+        <button class="mcq-opt" type="button" data-ok>Sweep the timeline: sort starts and ends separately, walk both — each start is +1 room, each end −1; the answer is the peak of that running count</button>
+        <button class="mcq-opt" type="button">Sort by duration and assign greedily to the least-loaded room</button>
+        <button class="mcq-opt" type="button">n rooms — one per meeting is always safe</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> rooms = <b>maximum simultaneous overlap</b>, which merging destroys (a merged block of 3 stacked meetings looks like 1). The +1/−1 sweep (or a min-heap of end times) reads concurrency directly off the timeline. This "events on a timeline with a running counter" idea is also how load graphs and connection-pool sizing work — another DSA-to-systems bridge worth saying.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Insert Interval doesn't need re-sorting: before / overlapping (absorb while <code>start ≤ newEnd</code>) / after — three phases, one pass.</li>
+        <li>Sort-by-end = greedy scheduling ("activity selection"); sort-by-start = merging. Mixing them up is THE classic interval error — say which and why before coding.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/merge-intervals/" target="_blank" rel="noopener noreferrer">56 · Merge Intervals</a> · <a href="https://leetcode.com/problems/insert-interval/" target="_blank" rel="noopener noreferrer">57 · Insert Interval</a> · <a href="https://leetcode.com/problems/non-overlapping-intervals/" target="_blank" rel="noopener noreferrer">435 · Non-overlapping Intervals</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · PRACTICE -->
+<section class="lesson" id="practice">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>The practice ladder — structures edition</h3>
+      <p class="lvl">method → build each one once, then drill its problems</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Structures reward a different drill than patterns: <b>implement each one from scratch, once, from memory</b> — the 30-line heap, the O(1) queue, reverse-a-list — then never again. The implementation isn't the interview skill; the <i>fluency</i> it leaves behind is. After building a heap once, "min-heap of size k" stops being scary vocabulary and becomes a tool you reach for.</p>
+    <p>Same 20-minute rule as Foundations, same sacred re-solve two days later. And interleave: a list problem, then a stack problem, then heaps — interleaving feels harder and works better; blocked practice feels smooth and evaporates.</p>
+    <div class="idea">
+      <p class="mini-label">// the ladder for THIS module — in order, all links verified</p>
+      <ul>
+        <li><b>Warm-up (easy):</b> <a href="https://leetcode.com/problems/reverse-linked-list/" target="_blank" rel="noopener noreferrer">206 · Reverse List</a> → <a href="https://leetcode.com/problems/valid-parentheses/" target="_blank" rel="noopener noreferrer">20 · Valid Parentheses</a> → <a href="https://leetcode.com/problems/middle-of-the-linked-list/" target="_blank" rel="noopener noreferrer">876 · Middle of List</a> → <a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="noopener noreferrer">21 · Merge Sorted Lists</a> → <a href="https://leetcode.com/problems/linked-list-cycle/" target="_blank" rel="noopener noreferrer">141 · Cycle</a> → <a href="https://leetcode.com/problems/implement-queue-using-stacks/" target="_blank" rel="noopener noreferrer">232 · Queue via Stacks</a></li>
+        <li><b>The core (medium):</b> <a href="https://leetcode.com/problems/min-stack/" target="_blank" rel="noopener noreferrer">155 · Min Stack</a> → <a href="https://leetcode.com/problems/remove-nth-node-from-end-of-list/" target="_blank" rel="noopener noreferrer">19 · Remove Nth</a> → <a href="https://leetcode.com/problems/daily-temperatures/" target="_blank" rel="noopener noreferrer">739 · Daily Temperatures</a> → <a href="https://leetcode.com/problems/kth-largest-element-in-an-array/" target="_blank" rel="noopener noreferrer">215 · Kth Largest</a> → <a href="https://leetcode.com/problems/merge-intervals/" target="_blank" rel="noopener noreferrer">56 · Merge Intervals</a> → <a href="https://leetcode.com/problems/non-overlapping-intervals/" target="_blank" rel="noopener noreferrer">435 · Non-overlapping</a></li>
+        <li><b>Prove it (stretch):</b> <a href="https://leetcode.com/problems/lru-cache/" target="_blank" rel="noopener noreferrer">146 · LRU Cache</a> → <a href="https://leetcode.com/problems/sliding-window-maximum/" target="_blank" rel="noopener noreferrer">239 · Sliding Window Maximum</a></li>
+        <li><b>Then:</b> the timed drills live in <a href="../dsa.html">DSA in 48</a> day 1 — do them after this module and they'll feel like review, which is the point.</li>
+      </ul>
+    </div>
+    <div class="mcq" data-qid="dss-prac-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">LRU Cache asks for O(1) get AND put with eviction of the least-recently-used. Which pair of structures, and why both?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A sorted array by timestamp — binary search the oldest</button>
+        <button class="mcq-opt" type="button" data-ok>Hash map (key → node, O(1) find) + doubly-linked list (O(1) move-to-front and evict-from-back) — each covers the other's weakness</button>
+        <button class="mcq-opt" type="button">Two hash maps — one forward, one by recency</button>
+        <button class="mcq-opt" type="button">A heap keyed on last-access time</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the map finds nodes instantly but has no order; the doubly-linked list maintains recency order with O(1) splicing (that's why doubly — you unlink a node given only itself) but can't find things. Together: find via map, reorder via list. The heap fails because bumping recency is O(log n) and JS Maps' insertion order can't re-order on access cheaply… and this is exactly why Redis exists in your systems interviews. One problem, two courses connected.</p>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any coding screen. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>linked lists</td><td>Cats holding tails: O(1) splicing, O(n) reach — grip the rest BEFORE letting go (prev/curr/next).</td></tr>
+      <tr><td class="mono">02</td><td>stacks</td><td>"Most recent unfinished thing" — brackets, undo, DFS; monotonic stacks resolve each element exactly once.</td></tr>
+      <tr><td class="mono">03</td><td>queues</td><td>Fair lines power BFS; shift() is O(n) so use an index pointer; the deque keeps window champions.</td></tr>
+      <tr><td class="mono">04</td><td>heaps</td><td>Weak promise ("parent beats children") in an array → O(1) peek, O(log n) fix-ups; top-k = min-heap of size k.</td></tr>
+      <tr><td class="mono">05</td><td>intervals</td><td>Overlap iff neither starts after the other ends; sort by start to merge, by end to schedule greedily.</td></tr>
+      <tr><td class="mono">06</td><td>practice</td><td>Build each once from memory, drill its problems interleaved, keep the re-solve ritual.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">Structures questions test grip, not memorization — the narration matters as much as the code.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Linked-list rounds grade pointer narration:</b> "I grip next before rewiring" out loud, every time. The dummy-head trick volunteered = instant credibility.</li>
+      <li><b>Hear "next greater / until warmer / visible from…"</b> → monotonic stack. <b>"Top k / k-th / merge k"</b> → heap, with the sort-vs-heap-vs-quickselect calibration. <b>"Meetings/bookings"</b> → sort-then-sweep, and know WHICH sort key.</li>
+      <li><b>LRU Cache</b> is the structures capstone — map + doubly-linked list, and it doubles as a systems talking point (it IS Redis's eviction story).</li>
+      <li>The timed drill versions of all of this: <a href="../dsa.html#stacks">DSA in 48 · stacks &amp; queues</a>, <a href="../dsa.html#lists">· linked lists</a>, <a href="../dsa.html#heaps">· heaps</a>.</li>
+      <li>Next module: <b>dsa-trees-graphs</b> — where the queue becomes BFS, the stack becomes DFS, and the conga line grows branches.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Implement each structure once, from memory, this week.</b> The heap you build yourself is the heap you'll never fear again.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../dsa.html">DSA in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>grip the rest of the line before you let go. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+/* pointer-surgery stepper — reverse mochi → biscuit → clawdia */
+(function () {
+  var stepBtn = document.getElementById('rev-step');
+  var resetBtn = document.getElementById('rev-reset');
+  var stage = document.getElementById('rev-stage');
+  var narr = document.getElementById('rev-narr');
+  if (!stepBtn) return;
+  // each state: cells [name, arrow] plus pointer labels and narration
+  var states = [
+    { narr: "start: prev = null, curr = mochi. The whole line hangs off curr.",
+      cells: [["null","p"],["mochi →","c"],["biscuit →",""],["clawdia → null",""]] },
+    { narr: "1 · next = curr.next — grip biscuit (and everyone behind her) BEFORE any rewiring.",
+      cells: [["null","p"],["mochi →","c"],["biscuit →","n"],["clawdia → null",""]] },
+    { narr: "2 · curr.next = prev — mochi's arrow FLIPS to null. The line is briefly split in two — but next still grips the back half.",
+      cells: [["null ← mochi","p·c"],["biscuit →","n"],["clawdia → null",""]] },
+    { narr: "3+4 · prev = curr, curr = next — the machine slides one cat forward.",
+      cells: [["null ← mochi","p"],["biscuit →","c"],["clawdia → null","n→"]] },
+    { narr: "repeat on biscuit: grip clawdia, flip biscuit's arrow onto mochi, slide forward.",
+      cells: [["null ← mochi ← biscuit","p"],["clawdia → null","c"]] },
+    { narr: "repeat on clawdia: nothing left to grip (next = null), flip her arrow onto biscuit.",
+      cells: [["null ← mochi ← biscuit ← clawdia","p"],["null","c"]] },
+    { narr: "curr = null → loop ends. Return prev: clawdia is the new head. Fully reversed, nobody lost.",
+      cells: [["clawdia → biscuit → mochi → null","✓ new head"]] }
+  ];
+  var i = -1;
+  function paint() {
+    if (i < 0) {
+      stage.innerHTML = '<span style="opacity:.5">the list: mochi → biscuit → clawdia → null</span>';
+      narr.textContent = 'press step to begin';
+      stepBtn.disabled = false;
+      return;
+    }
+    var s = states[i];
+    stage.innerHTML = s.cells.map(function (c) {
+      return '<span style="display:inline-block;margin-right:14px;padding:6px 12px;border:1.5px solid var(--line);border-radius:8px">' +
+        c[0] + (c[1] ? ' <b style="color:var(--mark-deep)">[' + c[1] + ']</b>' : '') + '</span>';
+    }).join('');
+    narr.textContent = (i + 1) + '/' + states.length + ' — ' + s.narr;
+    stepBtn.disabled = i === states.length - 1;
+  }
+  stepBtn.addEventListener('click', function () { if (i < states.length - 1) { i++; paint(); } });
+  resetBtn.addEventListener('click', function () { i = -1; paint(); });
+  paint();
+})();
+</script>
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'dsa-structures';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

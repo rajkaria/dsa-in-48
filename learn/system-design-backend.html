@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Design, from Zero — Learn track · in 48</title>
+<meta name="description" content="The design loop, back-of-envelope estimation with an interactive calculator, load balancing, caching, database scaling, queues, and five worked designs from URL shortener to a photo feed for ten million cats. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="System Design, from Zero — Learn track · in 48">
+<meta property="og:description" content="The design loop, back-of-envelope estimation with an interactive calculator, load balancing, caching, database scaling, queues, and five worked designs from URL shortener to a photo feed for ten million cats. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="System Design, from Zero — Learn track · in 48">
+<meta name="twitter:description" content="The design loop, back-of-envelope estimation with an interactive calculator, load balancing, caching, database scaling, queues, and five worked designs from URL shortener to a photo feed for ten million cats. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%232DD4BF'%3ESD%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#2DD4BF;
+  --mark-deep:#14A99A;
+  --mark-soft:rgba(45,212,191,.16);
+  --on-mark:#141B22;
+  --on-ink:#2DD4BF;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#5EEAD4;
+  --mark-soft:rgba(45,212,191,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#5EEAD4;
+  --mark-soft:rgba(45,212,191,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(45,212,191,0) 0%, rgba(45,212,191,.95) 6%, rgba(45,212,191,.8) 94%, rgba(45,212,191,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(45,212,191,0) 0%, rgba(45,212,191,.95) 5%, rgba(45,212,191,.78) 95%, rgba(45,212,191,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(45,212,191,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(45,212,191,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(45,212,191,0) 0%, rgba(45,212,191,.9) 6%, rgba(45,212,191,.7) 94%, rgba(45,212,191,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· system design</em></div>
+      <div class="brand-sub">module 11 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#loop"><span><i class="dot" data-for="loop"></i> The Design Loop</span></a>
+    <a class="side-link" href="#estimate"><span><i class="dot" data-for="estimate"></i> Estimation (calculator)</span></a>
+    <a class="side-link" href="#traffic"><span><i class="dot" data-for="traffic"></i> Spreading Traffic</span></a>
+    <a class="side-link" href="#caching"><span><i class="dot" data-for="caching"></i> Caching</span></a>
+    <a class="side-link" href="#datascale"><span><i class="dot" data-for="datascale"></i> Scaling the Data</span></a>
+    <a class="side-link" href="#queues"><span><i class="dot" data-for="queues"></i> Queues &amp; Async</span></a>
+    <a class="side-link" href="#worked"><span><i class="dot" data-for="worked"></i> Worked Designs</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./aws-cloud.html"><span>AWS &amp; Cloud</span><span class="t">←</span></a>
+    <a class="side-link" href="../system-design.html"><span>System Design in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 11 <b>boxes, arrows, and the numbers behind them</b></p>
+  <h1>System design, from <span class="hl hl-anim" data-d="0">zero</span> to <span class="hl hl-anim" data-d="1">whiteboard</span>.</h1>
+  <p class="lede">System design is learnable because it's <b>six building blocks and one loop</b>, recombined forever: spread the traffic, cache the heat, scale the data, queue the slow, estimate honestly, and walk the loop out loud. You already operate all six — this module makes them explicit, gives you a working <b>estimation calculator</b>, and closes with five worked designs that grow in difficulty until "design a photo feed for ten million cats" feels routine.</p>
+  <p class="lede">Prerequisites: the <a href="./postgres-databases.html">postgres</a> and <a href="./aws-cloud.html">aws</a> modules make this one land twice as hard, but it stands alone. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what do I even draw first?"</span>
+    <span class="level-chip i">middle: the six blocks, deeply</span>
+    <span class="level-chip a">ends at: five full designs</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>7</b> quiz questions</span>
+    <span><b>1</b> estimation calculator</span>
+    <span><b>5</b> worked designs</span>
+    <span><b>~4.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#loop">Enter the loop <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · LOOP -->
+<section class="lesson" id="loop">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>The design loop — requirements, envelope, skeleton, deep-dive</h3>
+      <p class="lvl">beginner → the 4 phases that structure every answer</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every design interview (and every real design doc) walks the same loop. <b>Phase 1 — requirements (5 min):</b> functional ("shorten URLs, redirect fast") and the numbers that shape everything: how many users, what read/write ratio, how fresh must data be, what can we lose? Scope out loud. <b>Phase 2 — the envelope (5 min):</b> back-of-envelope math (next section) that tells you whether you're designing for one Postgres box or a fleet — the single highest-leverage five minutes, because <b>the numbers pick the architecture</b>.</p>
+    <p><b>Phase 3 — the skeleton (10 min):</b> the stage-2 shape from the AWS module — client → LB → stateless app tier → cache → database, with S3/CDN for files. Draw it fast and say why each box exists. <b>Phase 4 — deep-dives (20 min):</b> the interviewer (or the workload) picks the hard parts: the data model, the cache policy, the queue, the sharding story, the failure modes. The rest of this module is those deep-dives, one per section.</p>
+    <div class="mcq" data-qid="sd-loop-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The single most common way candidates fail system design rounds?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Not knowing enough exotic technologies</button>
+        <button class="mcq-opt" type="button" data-ok>Skipping phases 1–2 and drawing a memorized mega-architecture for a problem whose numbers never justified it — Kafka and shards for 100 requests/second</button>
+        <button class="mcq-opt" type="button">Spending too long on the data model</button>
+        <button class="mcq-opt" type="button">Forgetting to mention monitoring</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the round tests whether your design follows from requirements — a beautiful unjustified diagram proves the opposite. 100 rps fits comfortably on stage-1/stage-2 infrastructure; saying so, THEN describing what changes at 100× scale, demonstrates the actual skill: matching architecture to numbers. "Let me do the envelope first, because it decides how much machinery we need" is the strongest possible opening sentence.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Read/write ratio is the first number to extract — a 100:1 read-heavy system (most consumer apps) designs completely differently from write-heavy telemetry ingest.</li>
+        <li>CAP in one honest breath: during a network partition you choose availability or consistency — banks pick C (reject writes), feeds pick A (serve stale). Nobody needs the theorem's proof; everybody needs the instinct.</li>
+        <li>The timed drill version of this loop is <a href="../system-design.html">System Design in 48</a>'s whole day 1 — this module is the depth behind it.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · ESTIMATE -->
+<section class="lesson" id="estimate">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Estimation — the envelope, with a calculator</h3>
+      <p class="lvl">the five minutes that pick your architecture</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Four numbers carry every estimate. <b>1 — requests:</b> daily active users × actions/day ÷ 86,400 ≈ average RPS (~10⁵ seconds/day makes mental division easy); peak ≈ 3–10× average. <b>2 — storage:</b> items/day × bytes/item × days retained. <b>3 — bandwidth:</b> RPS × payload size. <b>4 — memory for cache:</b> the hot fraction (80/20 rule: ~20% of data serves ~80% of reads). Round brutally — powers of ten, not decimals; the goal is picking between "one box", "a few boxes", and "a fleet", not accounting.</p>
+    <p>Calibration anchors worth memorizing: one Postgres box handles <b>thousands</b> of simple queries/sec (not millions); one app server handles <b>hundreds to low thousands</b> of RPS; Redis does <b>100k+</b> ops/sec; a disk seek ~10ms, same-region network hop ~1ms, memory read ~100ns. With those five anchors, the calculator below is just multiplication.</p>
+    <div class="viz" id="calc-viz">
+      <h6>THE ENVELOPE CALCULATOR — numbers → architecture</h6>
+      <p style="font-size:.9rem;color:var(--ink-2);margin-bottom:10px">Pick a scenario (or reason along). Watch which architecture the numbers demand.</p>
+      <div class="viz-controls">
+        <button class="viz-btn" type="button" data-dau="10000" data-apd="20" data-bytes="2000">startup · 10k DAU</button>
+        <button class="viz-btn primary" type="button" data-dau="1000000" data-apd="30" data-bytes="2000">grown · 1M DAU</button>
+        <button class="viz-btn" type="button" data-dau="50000000" data-apd="40" data-bytes="1500">huge · 50M DAU</button>
+      </div>
+      <div class="viz-stage" id="calc-stage" style="line-height:2"></div>
+    </div>
+    <div class="mcq" data-qid="sd-est-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">1M DAU, each reading 30 items and writing 1 (2KB each). Which claim does the envelope support?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Writes require sharded Postgres from day one</button>
+        <button class="mcq-opt" type="button" data-ok>~350 read RPS avg (≈1–3.5k peak) and ~12 write RPS: reads want a cache + maybe a replica; writes are trivial for one Postgres. Storage ~2GB/day — years fit on one volume</button>
+        <button class="mcq-opt" type="button">1M users means Big Data — a warehouse and Kafka are table stakes</button>
+        <button class="mcq-opt" type="button">The numbers can't be estimated without load testing</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> 1M × 30 ÷ 86,400 ≈ 347 read RPS; 1M × 1 ÷ 86,400 ≈ 12 write RPS; 1M × 2KB ≈ 2GB/day. Even at 10× peak, reads are cache-and-replica territory and writes barely register — the envelope just deleted the sharding conversation and the Kafka conversation. That deletion IS the skill: five multiplications that keep the design honest. (Anchors: one PG box = thousands of QPS.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>State your anchors before using them ("assuming a Postgres box comfortably does a few thousand simple QPS…") — auditable math beats confident magic.</li>
+        <li>p50 vs p99: averages hide tail pain; SLOs are set on percentiles. One sentence, big signal.</li>
+        <li>The 80/20 cache estimate: hot 20% of 100GB = a 20GB Redis — suddenly "will it fit in cache?" is answerable arithmetic.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · TRAFFIC -->
+<section class="lesson" id="traffic">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Spreading traffic — LBs, statelessness, and failure as routine</h3>
+      <p class="lvl">intermediate → horizontal scaling's actual mechanics</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Vertical scaling (bigger box) is correct until it isn't: no code changes, but a hard ceiling and still one failure point. Horizontal scaling (more boxes) is unbounded but demands the discipline you built across two modules: <b>stateless app servers</b> (sessions in Redis, files in S3) so any box can serve any request, behind a <b>load balancer</b> doing three jobs — spreading load (round-robin/least-connections), <b>health-checking</b> (a failing box is quietly removed: failure becomes routine, not incident), and TLS termination.</p>
+    <p>The part that separates rehearsed answers from understood ones: what the LB <i>enables</i>. Deploys become rolling (drain one box, replace, next); capacity becomes elastic (auto-scaling adds boxes on signals); and failure recovery becomes automatic — a crashed server is just a failed health check. The load balancer isn't a traffic cop; it's <b>the mechanism that turns servers into cattle</b>.</p>
+    <div class="mcq" data-qid="sd-lb-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">WebSocket chat servers hold open connections — each socket lives on ONE box. How does horizontal scaling survive this statefulness?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It can't — real-time systems scale vertically only</button>
+        <button class="mcq-opt" type="button" data-ok>Connections are pinned (that's fine — they're re-establishable state), and a pub/sub backbone (Redis) bridges boxes: a message to server A's user from server B's user hops through the channel. Reconnect + catch-up handles box death</button>
+        <button class="mcq-opt" type="button">Sticky sessions solve it permanently</button>
+        <button class="mcq-opt" type="button">Store the sockets themselves in Redis</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the nuance is distinguishing state <i>kinds</i>: a socket is connection state (re-establishable — the frontend module's reconnect/catch-up dance), not data state (which still lives in Redis/PG). The pub/sub bridge (socket.io's Redis adapter is exactly this) lets any box deliver to any user. "Sockets in Redis" is a category error — sockets are OS resources, not data. This question is THE chat-design filter, from both sides of the stack.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>L4 vs L7 in one line: L4 balances TCP (fast, blind), L7 reads HTTP (routes by path/host, terminates TLS) — ALB is L7; that's why it can send /api and /ws to different services.</li>
+        <li>DNS + anycast + CDN is the load balancing ABOVE your LB — how traffic picks a region before it picks a server.</li>
+        <li>"Cattle, not pets" + health checks + statelessness is a three-legged stool — remove one leg and the other two stop working. Saying WHY (state pins, no checks means routing to corpses) beats reciting the slogan.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · CACHING -->
+<section class="lesson" id="caching">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Caching — the fastest request is a skipped one</h3>
+      <p class="lvl">intermediate → layers, policies, and the two classic failures</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Caching happens at every layer, and interviews want you to see the whole stack: browser cache → CDN (whole responses at the edge) → app-level Redis (query results, computed objects) → the database's own buffer pool. Each layer answers the same three questions: <b>what's cached</b> (key design), <b>when does it die</b> (TTL / explicit invalidation on write / LRU eviction under memory pressure — the structure you built in dsa-structures!), and <b>what happens on a miss</b>.</p>
+    <p>The default pattern is <b>cache-aside</b>: read → try cache → miss → read DB → write cache with TTL. Its two classic failures are interview gold: <b>stale reads</b> after writes (fix: bust or update the key on write, accept a staleness window, and say WHICH the product tolerates) and the <b>stampede</b> — a hot key expires and ten thousand concurrent misses hit the DB at once (fixes: jittered TTLs so keys don't expire in sync, a per-key lock so ONE request rebuilds while others wait or serve stale). Naming the stampede unprompted is a seniority marker in both this round and real Redis postmortems.</p>
+    <div class="mcq" data-qid="sd-cache-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your product page cache (60s TTL) causes this bug report: "I updated the price and the site showed the old one for a minute." Product says unacceptable. Options, best first?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Drop the TTL to 1 second — near-fresh with cache benefits</button>
+        <button class="mcq-opt" type="button" data-ok>Invalidate (or overwrite) the product's cache key inside the price-update path — writes are rare, so the cache stays hot for reads AND correct after writes; TTL remains as the backstop</button>
+        <button class="mcq-opt" type="button">Remove the cache — correctness beats performance</button>
+        <button class="mcq-opt" type="button">Cache only for logged-out users</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> write-triggered invalidation gets both properties because the write path is the one place that KNOWS the data changed — TTL alone is a freshness lottery. 1s TTLs mostly delete the cache's value (and stampede hourly); removing it entirely trades a solved problem for a capacity one. The pro-level addendum: invalidation fans out in multi-layer setups (Redis + CDN both need the purge) — which is why "how many layers hold this value?" is the first debugging question for staleness bugs.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Write-through (write cache+DB together) and write-behind (cache first, flush async — fast and scary) complete the pattern family — one line each, cache-aside as your stated default.</li>
+        <li>"What's your hit rate?" — the cache metric that matters; below ~80% on a hot path, revisit key design or TTLs.</li>
+        <li>Negative caching (cache the 404s) stops misses-for-things-that-don't-exist from hammering the DB — tiny trick, real systems, rarely said.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 5 · DATA SCALE -->
+<section class="lesson" id="datascale">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Scaling the data — replicas, partitions, shards, and honesty</h3>
+      <p class="lvl">advanced → the postgres module's ladder, at whiteboard altitude</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>You built this ladder in the postgres module; the design round wants it at altitude. <b>Read replicas</b> multiply read capacity and carry replication lag — the read-your-own-writes wrinkle is now a <i>design consideration</i> you volunteer, not a bug you hit. <b>Partitioning</b> splits one table by time/tenant inside one server. <b>Sharding</b> splits data ACROSS servers by a shard key — the real answer to write scale, at the real price: cross-shard queries and transactions stop being free, and resharding is surgery.</p>
+    <p>The design-round questions that matter: <b>what's the shard key?</b> (user_id spreads load but scatters a user's social graph; a bad key creates hot shards — the celebrity problem); <b>how do you route?</b> (hash the key → shard, with consistent hashing so adding shards moves 1/n of data, not all of it); <b>what breaks?</b> (global uniqueness needs id services or UUIDs; cross-shard joins become fan-out + merge in the app — the DSA merge you know). And the honest alternative worth saying: at feed-scale reads, a <b>denormalized NoSQL store</b> (Dynamo-style, partition key = the access pattern) is sometimes the cleaner tool — "Postgres as system of record, purpose-built stores for the extreme paths".</p>
+    <div class="mcq" data-qid="sd-shard-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Sharding chat messages: shard by conversation_id or by sender's user_id?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">user_id — users are the natural unit of everything</button>
+        <button class="mcq-opt" type="button" data-ok>conversation_id — the dominant query is "load THIS conversation's messages", which becomes single-shard; sharding by sender scatters one conversation across shards and every load becomes a fan-out</button>
+        <button class="mcq-opt" type="button">message_id — perfectly even distribution</button>
+        <button class="mcq-opt" type="button">Timestamp — recent messages together</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the shard key rule is <b>"co-locate what you query together"</b> — pick the key that makes the hot query single-shard. message_id distributes beautifully and ruins every read (the distribution-vs-locality trap); time-sharding makes NOW a hot shard. Follow-up to volunteer: a mega-group-chat is still a hot conversation — cap group sizes or sub-partition. The reasoning pattern transfers to every "what's your partition key?" question, SQL or NoSQL.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Consistent hashing in one sentence: keys and nodes live on a ring; a node's arrival claims only its arc — 1/n of keys move instead of nearly all (naive modulo). That sentence is the whole interview requirement.</li>
+        <li>Fan-out cost honesty: a cross-shard query is min(shards touched) round trips + an app-side merge — "I'd design the schema so the 99% query never fans out".</li>
+        <li>"Shard when a beefy primary + replicas + partitioning can't hold writes — which for most products is never" — the calibrated close, again.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · QUEUES -->
+<section class="lesson" id="queues">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Queues &amp; async — decouple the slow from the now</h3>
+      <p class="lvl">advanced → the buffer that absorbs spikes and survives crashes</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A queue between "accept the request" and "do the slow work" buys four properties at once: <b>latency</b> (respond in 50ms, render the PDF later), <b>spike absorption</b> (a 10× burst becomes queue depth, not dropped requests — workers drain at their own pace), <b>failure isolation</b> (email provider down = queue grows, site unaffected), and <b>retry-ability</b> (a crashed worker's message reappears after the visibility timeout). The price, which you must say in the same breath: <b>eventual consistency</b> (the user gets 202-accepted, the effect lands later — the UI shows "processing", the frontend module's optimistic/pending patterns) and <b>at-least-once delivery</b>, which makes <b>idempotent consumers</b> non-negotiable (the idempotency-key discipline from node-backend, now mandatory).</p>
+    <p>Queue vs pub/sub vs event log, in one line each: a <b>queue</b> (SQS) is a to-do list — one consumer group, message deleted when done. <b>Pub/sub</b> (SNS) is an announcement — every subscriber gets a copy, fire-and-forget. An <b>event log</b> (Kafka-style) is an append-only history consumers replay at their own cursor — fan-out AND replay AND ordering per partition, at real operational cost. "SQS until proven otherwise" is the calibrated default for product work.</p>
+    <div class="mcq" data-qid="sd-queue-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Order placement does: charge card, then queue [send email, update analytics, notify warehouse]. The email worker crashes mid-send and the message redelivers. What MUST be true?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — queues guarantee exactly-once delivery</button>
+        <button class="mcq-opt" type="button" data-ok>The worker must be idempotent — dedupe on an order-scoped key (e.g. "email:order-123") so redelivery can't double-send; at-least-once delivery makes duplicates a WHEN, not an if</button>
+        <button class="mcq-opt" type="button">The charge must be inside the same queue message</button>
+        <button class="mcq-opt" type="button">Email must move back into the request path for safety</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "exactly-once delivery" is the famous impossible promise (the message may have been processed right before the crash-ack was lost) — real systems do at-least-once + idempotent processing, which composes to effectively-once. The dedupe key can live in Redis/DB ("processed set") or the provider's idempotency header. Bonus depth: poison messages (fail forever) go to a dead-letter queue after N attempts — the DLQ mention completes the answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Queue health = <b>oldest-message age</b>, not length (the AWS module's ops lesson) — and workers auto-scale on it.</li>
+        <li>Ordering: queues don't promise it globally; when order matters, partition by key (per-user FIFO lanes) — same co-location logic as sharding.</li>
+        <li>The outbox pattern in one line: write "email pending" in the SAME DB transaction as the order, a relay publishes it — closes the "charged but never queued" gap. Rarely named, heavily rewarded.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · WORKED -->
+<section class="lesson" id="worked">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Five worked designs — the blocks, recombined</h3>
+      <p class="lvl">the payoff: watch the same six blocks solve everything</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>1 · URL shortener (the classic opener).</b> Envelope: write-light, read-heavy, tiny rows. Design: POST → generate a short code (base62 of a counter, or random + collision check) → one Postgres table; GET → cache-aside Redis (hot links are VERY hot) → 301. The twist interviewers add: analytics — answer with a queue (fire a click event, count async) so redirects stay fast. Every block, smallest possible dose.</p>
+    <p><b>2 · Rate limiter.</b> Token bucket per user in Redis (atomic INCR + TTL — the postgres lost-update lesson says why atomicity matters); at the edge for blunt abuse, in-app for fairness; return 429 + Retry-After. Distributed subtlety: per-node buckets drift — a shared Redis makes the limit global.</p>
+    <p><b>3 · News feed (the big one — full walkthrough).</b> Envelope at 10M cats posting + following: reads dwarf writes ~100:1. The core decision: <b>fan-out on write</b> (push each new post into followers' precomputed feed lists — reads are O(1) list fetches; a celebrity with 5M followers makes one post = 5M writes) vs <b>fan-out on read</b> (compute the feed at request time — cheap writes, expensive every read). The answer that wins: <b>hybrid</b> — push for normal accounts, pull-and-merge for celebrity follows (the DSA merge-k-lists, in production). Feed lists in Redis, posts in Postgres/S3, media on CDN, everything downstream of a queue.</p>
+    <p><b>4 · Chat.</b> The frontend module owns the client half (sockets, reconnect, optimistic sends); this side: socket servers with a Redis pub/sub bridge (§03's quiz), messages sharded by conversation_id (§05's quiz), delivery states (sent/delivered/read) as receipts flowing back through the same pipes, offline users caught up from the message store on reconnect — the sequence-number catch-up from the frontend course, served from this side.</p>
+    <p><b>5 · "Design Google Docs" (the humility test).</b> The expected answer is mostly <i>shape</i>: operational transforms or CRDTs for concurrent edits (name, don't derive), a socket fan-out layer like chat's, snapshots + operation logs for history, and presence as ephemeral pub/sub. Knowing what you'd NOT build (the OT engine — you'd use Yjs) is the senior move, one last time.</p>
+    <div class="mcq" data-qid="sd-feed-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In the hybrid feed, WHY do celebrity posts use fan-out-on-read instead of write?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Celebrities post too often for push to keep up</button>
+        <button class="mcq-opt" type="button" data-ok>One celebrity post would trigger millions of list-writes (one per follower) — a write amplification bomb; letting followers PULL that one post at read time and merge it in costs each reader almost nothing</button>
+        <button class="mcq-opt" type="button">Celebrity content needs stricter consistency</button>
+        <button class="mcq-opt" type="button">It's a cost optimization with no latency effect</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> fan-out-on-write's cost scales with follower count — fine at 200 followers, catastrophic at 5M (write amplification: 1 action → 5M operations). The hybrid puts each account on the side of the trade its numbers favor, and the reader merges "my precomputed list + posts from the 3 celebrities I follow" — a k-way merge over tiny k. This one question contains the module: envelope → identify the amplification → split the strategy → reuse a DSA primitive. If you can narrate it cold, you're ready.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Every design ends with the same 60-second closer: failure modes (what breaks, what users see), the monitoring that catches it (symptoms!), and what you'd build first vs defer. Rehearse it as a ritual.</li>
+        <li>The five designs above map to <a href="../system-design.html">System Design in 48</a>'s drills — do them timed there after learning them here.</li>
+        <li>And the frontend halves of feed/chat/docs live in <a href="../frontend-system-design.html">Frontend SD in 48</a> + the <a href="./frontend-system-design.html">deep-dive module</a> — you now hold both sides of every full-stack design question. That's rare. Use it.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any design round. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>the loop</td><td>Requirements → envelope → skeleton → deep-dives; the numbers pick the architecture.</td></tr>
+      <tr><td class="mono">02</td><td>estimation</td><td>DAU × actions ÷ 86,400; peak ×3–10; anchors: PG = thousands QPS, Redis = 100k, app box = hundreds-to-low-thousands RPS.</td></tr>
+      <tr><td class="mono">03</td><td>traffic</td><td>Stateless + LB + health checks = cattle; pinned connections bridge via pub/sub.</td></tr>
+      <tr><td class="mono">04</td><td>caching</td><td>Cache-aside + TTL backstop + write-path invalidation; jitter and per-key locks stop stampedes.</td></tr>
+      <tr><td class="mono">05</td><td>data scale</td><td>Replicas → partitions → shards; shard key = co-locate what you query together; consistent hashing moves 1/n.</td></tr>
+      <tr><td class="mono">06</td><td>queues</td><td>Decouple slow from now; at-least-once + idempotent consumers = effectively once; DLQ the poison; age over length.</td></tr>
+      <tr><td class="mono">07</td><td>designs</td><td>Shortener, limiter, hybrid feed (write-amplification!), chat, docs — six blocks, recombined forever.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">The design round rewards structure, numbers, and named tradeoffs — all three are rehearsable.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>Open with the loop, audibly:</b> "requirements and numbers first, then a skeleton, then let's go deep where it's interesting." The interviewer relaxes; you've taken the wheel.</li>
+      <li><b>Do the envelope even if unasked</b> — it's the five minutes that makes everything after defensible, and skipping it is the #1 failure mode.</li>
+      <li><b>Volunteer a failure story per component:</b> "if Redis dies, we degrade to DB reads with a latency hit; if the queue backs up, the age alarm fires and workers scale." That closing ritual is worth a level.</li>
+      <li>Timed drills: <a href="../system-design.html">System Design in 48</a> (the whole course is this module at sprint pace). The <b>interview-kit</b> module (next!) adds the mock-loop run sheets to practice it under a clock.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run the calculator on every app you use this week.</b> Estimation is a habit, not a talent — and it's the habit that makes design rounds feel like home turf.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../system-design.html">System Design in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>the numbers pick the architecture. let them. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+/* envelope calculator — DAU scenarios → RPS/storage/architecture verdict */
+(function () {
+  var stage = document.getElementById('calc-stage');
+  if (!stage) return;
+  function fmt(x) {
+    if (x >= 1e9) return (x / 1e9).toFixed(1) + 'B';
+    if (x >= 1e6) return (x / 1e6).toFixed(1) + 'M';
+    if (x >= 1e3) return (x / 1e3).toFixed(1) + 'k';
+    return String(Math.round(x * 10) / 10);
+  }
+  function gb(bytes) {
+    if (bytes >= 1e12) return (bytes / 1e12).toFixed(1) + ' TB';
+    if (bytes >= 1e9) return (bytes / 1e9).toFixed(1) + ' GB';
+    return (bytes / 1e6).toFixed(1) + ' MB';
+  }
+  function paint(dau, actionsPerDay, bytesPerItem) {
+    var reads = dau * actionsPerDay / 86400;
+    var writes = dau * 1 / 86400;                  // assume 1 write/user/day
+    var peakReads = reads * 5;
+    var storagePerDay = dau * 1 * bytesPerItem;    // writes drive storage
+    var storagePerYear = storagePerDay * 365;
+    var cacheNeed = storagePerYear * 0.2 * 0.1;    // hot 20% of recent 10%
+    var verdict;
+    if (peakReads < 500) {
+      verdict = 'stage 1: one app box + one Postgres. A cache is optional politeness. Do NOT say Kafka.';
+    } else if (peakReads < 20000) {
+      verdict = 'stage 2: a few stateless app boxes + ALB, Redis cache-aside, Postgres + 1 replica. The career default.';
+    } else {
+      verdict = 'stage 3: CDN on hot reads, serious cache tier, replicas fanned out, queues everywhere — and NOW sharding/denormalized stores enter the conversation.';
+    }
+    var rows = [
+      ['avg read RPS', fmt(reads) + '/s', 'DAU × ' + actionsPerDay + ' ÷ 86,400'],
+      ['peak read RPS (×5)', fmt(peakReads) + '/s', 'the number that sizes the fleet'],
+      ['avg write RPS', fmt(writes) + '/s', 'almost always tiny — say it out loud'],
+      ['storage / year', gb(storagePerYear), dau.toLocaleString('en-US') + ' × ' + bytesPerItem + 'B × 365'],
+      ['cache to fit the heat', gb(cacheNeed), '~hot 20% of the recent slice']
+    ];
+    stage.innerHTML = rows.map(function (r) {
+      return '<div style="display:grid;grid-template-columns:170px 110px 1fr;gap:12px;border-bottom:1px dashed var(--line);padding:4px 0">' +
+        '<span>' + r[0] + '</span><b>' + r[1] + '</b><span style="color:var(--ink-3);font-size:.74rem">' + r[2] + '</span></div>';
+    }).join('') +
+    '<div style="margin-top:12px;padding:10px 14px;border-radius:9px;background:var(--mark-soft)"><b>verdict:</b> ' + verdict + '</div>';
+  }
+  var btns = document.querySelectorAll('#calc-viz .viz-btn');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (x) { x.classList.remove('primary'); });
+      b.classList.add('primary');
+      paint(+b.getAttribute('data-dau'), +b.getAttribute('data-apd'), +b.getAttribute('data-bytes'));
+    });
+  });
+  paint(1000000, 30, 2000);
+})();
+</script>
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'system-design-backend';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

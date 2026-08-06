@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS &amp; the Cloud — Learn track · in 48</title>
+<meta name="description" content="The AWS mental map, the twelve services that matter, three reference architectures for a MERN app, IAM without tears, operations, and cost sense — plain language, honest tradeoffs, and cats in the cloud. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AWS &amp; the Cloud — Learn track · in 48">
+<meta property="og:description" content="The AWS mental map, the twelve services that matter, three reference architectures for a MERN app, IAM without tears, operations, and cost sense — plain language, honest tradeoffs, and cats in the cloud. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AWS &amp; the Cloud — Learn track · in 48">
+<meta name="twitter:description" content="The AWS mental map, the twelve services that matter, three reference architectures for a MERN app, IAM without tears, operations, and cost sense — plain language, honest tradeoffs, and cats in the cloud. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23FB923C'%3EAW%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#FB923C;
+  --mark-deep:#EA580C;
+  --mark-soft:rgba(251,146,60,.16);
+  --on-mark:#141B22;
+  --on-ink:#FB923C;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FDBA74;
+  --mark-soft:rgba(251,146,60,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#FDBA74;
+  --mark-soft:rgba(251,146,60,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,146,60,0) 0%, rgba(251,146,60,.95) 6%, rgba(251,146,60,.8) 94%, rgba(251,146,60,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,146,60,0) 0%, rgba(251,146,60,.95) 5%, rgba(251,146,60,.78) 95%, rgba(251,146,60,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(251,146,60,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(251,146,60,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(251,146,60,0) 0%, rgba(251,146,60,.9) 6%, rgba(251,146,60,.7) 94%, rgba(251,146,60,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· aws &amp; cloud</em></div>
+      <div class="brand-sub">module 10 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#map"><span><i class="dot" data-for="map"></i> The Mental Map</span></a>
+    <a class="side-link" href="#services"><span><i class="dot" data-for="services"></i> The Twelve Services</span></a>
+    <a class="side-link" href="#architectures"><span><i class="dot" data-for="architectures"></i> Three Architectures</span></a>
+    <a class="side-link" href="#iam"><span><i class="dot" data-for="iam"></i> IAM Without Tears</span></a>
+    <a class="side-link" href="#ops"><span><i class="dot" data-for="ops"></i> Running It</span></a>
+    <a class="side-link" href="#cost"><span><i class="dot" data-for="cost"></i> The Bill</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./node-backend.html"><span>Node &amp; Backend</span><span class="t">←</span></a>
+    <a class="side-link" href="../fullstack.html"><span>Full-Stack in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/6</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/6</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 10 <b>two hundred services, twelve that matter</b></p>
+  <h1>AWS as a <span class="hl hl-anim" data-d="0">map</span>, not a <span class="hl hl-anim" data-d="1">catalog</span>.</h1>
+  <p class="lede">AWS feels unlearnable because people study it as an alphabet of product names. It isn't — it's <b>five questions every deployment answers</b> (where does code run, where do files live, where does data live, how does traffic arrive, how do parts talk), each with a managed answer. Learn the questions, and two hundred services collapse into a map with twelve landmarks.</p>
+  <p class="lede">This module builds the map, tours the twelve, assembles them into <b>three honest reference architectures</b> for a MERN app, then covers the two things everyone learns by incident instead: IAM and the bill. The cats are deploying their café app. Against all advice. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what even is EC2?"</span>
+    <span class="level-chip i">middle: assembling real architectures</span>
+    <span class="level-chip a">ends at: IAM &amp; cost judgment</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>6</b> sections</span>
+    <span><b>6</b> quiz questions</span>
+    <span><b>3</b> reference architectures</span>
+    <span><b>~3.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#map">Unfold the map <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · MAP -->
+<section class="lesson" id="map">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>The mental map — five questions, five aisles</h3>
+      <p class="lvl">beginner → the frame that makes everything else attachable</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every app you've ever deployed answers the same five questions. <b>Compute:</b> where does my code run? <b>Object storage:</b> where do files/uploads/builds live? <b>Data:</b> where does structured state live? <b>Networking/edge:</b> how does traffic find me, get balanced, get cached? <b>Messaging:</b> how do parts talk without holding hands? AWS is those five aisles, plus two cross-cutting layers over everything: <b>IAM</b> (who may do what) and <b>observability</b> (what's happening).</p>
+    <p>The second half of the frame is the <b>managed-ness slider</b>: for each aisle you choose how much you operate yourself. Compute runs from EC2 (a VM you patch) → ECS/Fargate (containers, no hosts) → Lambda (functions, no anything). More managed = less ops and less control, usually more per-unit cost and less to go wrong. Nearly every AWS decision is this slider wearing a product name.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Feeding a cat, at every point on the managed-ness slider: <b>EC2</b> is adopting the cat — total control, you handle vet visits at 3am. <b>ECS/Fargate</b> is a cattery — you specify the diet, they run the place. <b>Lambda</b> is a cat café — you show up, cat appears, you leave, you pay per cuddle. None is "best": the adopter, the cattery client, and the café visitor are all correct <i>for their life circumstances</i>. Say that sentence in an interview and the EC2-vs-Lambda question is over.</p>
+    </div>
+    <div class="mcq" data-qid="aw-map-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A teammate says "we should move to Lambda because it's more modern than ECS." What's the senior reframe?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Agree — serverless is the stated direction of AWS</button>
+        <button class="mcq-opt" type="button" data-ok>It's a slider, not a ladder: Lambda wins for spiky/event-driven/zero-baseline work; a steady-traffic long-running API is often cheaper and simpler on containers. Match the workload, not the fashion</button>
+        <button class="mcq-opt" type="button">Disagree — Lambda is only for cron jobs and glue</button>
+        <button class="mcq-opt" type="button">Suggest Kubernetes as the neutral middle ground</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the axes that actually decide it: traffic shape (spiky → Lambda's scale-to-zero shines; steady → you're renting per-invocation markup for nothing), execution model (15-min limit, cold starts vs long-lived connections/pools), and team ops appetite. "Modern" isn't an axis. Bonus nuance: Lambda + RDS needs RDS Proxy because per-invocation connections savage Postgres — the pooling lesson from the postgres module, wearing cloud clothes.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Regions (isolated geographies) → Availability Zones (independent data centers within one) — "multi-AZ = survives a building; multi-region = survives a city, at 10× the complexity". Most products need the first, not the second.</li>
+        <li>VPC in one sentence: your private network — public subnets for things the internet reaches (ALB), private subnets for everything else (app, DB). That's 90% of network questions.</li>
+        <li>"Undifferentiated heavy lifting" is the phrase that explains WHY managed services exist — you sell cat photos, not database backups.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · SERVICES -->
+<section class="lesson" id="services">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>The twelve services — each in one honest paragraph</h3>
+      <p class="lvl">the working vocabulary, aisle by aisle</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Compute.</b> <b>EC2</b>: virtual machines — full control, steady workloads, you patch. <b>ECS on Fargate</b>: hand over a container image + CPU/RAM spec; AWS runs and scales it — the default home for a Node API in 2026. <b>Lambda</b>: functions triggered by events (HTTP, queue messages, S3 uploads, cron) — spiky work, glue, and zero-baseline economics.</p>
+    <p><b>Storage &amp; data.</b> <b>S3</b>: infinitely-scaling object storage for files — uploads, builds, backups, static sites; you'll use it weekly forever. <b>RDS (Postgres)</b>: your database with backups, patching, Multi-AZ failover, and read replicas managed — everything from the postgres module, operated for you. <b>ElastiCache (Redis)</b>: managed cache/session store/rate-limit counters. <b>DynamoDB</b>: AWS's own key-value store — single-digit-ms at any scale, in exchange for modeling around access patterns; the "when not Postgres" answer.</p>
+    <p><b>Traffic &amp; edge.</b> <b>Route 53</b>: DNS. <b>ALB</b>: the load balancer — TLS termination, health checks, spreading traffic across app copies. <b>CloudFront</b>: the CDN — your static assets cached in 400 cities, plus TLS at the edge.</p>
+    <p><b>Messaging &amp; the layers.</b> <b>SQS</b>: the queue — decouple slow work from request paths (the email-sending, PDF-rendering answer — and the fix for node-backend's noon mystery). <b>SNS/EventBridge</b>: fan-out and event routing. Over everything: <b>IAM</b> (§04) and <b>CloudWatch</b> (§05).</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-map.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext">          how traffic arrives                where code runs
+  Route 53 → CloudFront → ALB      →   ECS/Fargate containers (the API)
+   (DNS)      (CDN edge)  (balance)      · EC2 when you need the metal
+                                         · Lambda for events &amp; spikes
+          where files live                where data lives
+  S3 (uploads, builds, backups)      RDS Postgres (system of record)
+                                     ElastiCache Redis (cache/sessions)
+                                     DynamoDB (KV at extreme scale)
+          how parts talk
+  SQS (queues) · SNS/EventBridge (fan-out, events)
+
+  over EVERYTHING: IAM (who may do what) · CloudWatch (what's happening)
+  translation table from your current stack: fullstack.html#aws</code></pre>
+    </div>
+    <div class="mcq" data-qid="aw-svc-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Users upload 200MB videos through your Node API to S3. The right architecture?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">POST to the API → API streams to S3 — keep control in one place</button>
+        <button class="mcq-opt" type="button" data-ok>API generates a presigned S3 URL; the browser uploads DIRECTLY to S3; S3 fires an event (Lambda/queue) for post-processing — your servers never touch the bytes</button>
+        <button class="mcq-opt" type="button">Base64 the video into a JSON payload</button>
+        <button class="mcq-opt" type="button">Store videos in RDS as bytea for transactional safety</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> proxying 200MB through your API burns its bandwidth, memory, and ALB timeouts for zero added value — the presigned URL (a time-limited, permission-scoped upload pass) lets S3 do what it's for, and the S3-event → Lambda/SQS chain handles thumbnails/scanning asynchronously. This pattern — <b>"hand the client a scoped pass, let the managed service do the heavy lifting, react to its events"</b> — is the single most reusable AWS design move, and this exact question is asked constantly.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>S3 nuances worth one line each: versioning (undelete), lifecycle rules (auto-archive to Glacier), and "S3 is not a filesystem — it's a key-value store for blobs".</li>
+        <li>SQS semantics: at-least-once delivery + visibility timeout → consumers must be idempotent (the frontend course's retry lesson, server-side) — and a dead-letter queue catches poison messages.</li>
+        <li>DynamoDB vs RDS in one breath: "known access patterns at massive scale vs flexible queries with relations — most products are the second until proven otherwise."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · ARCHITECTURES -->
+<section class="lesson" id="architectures">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Three architectures — the same app at three life stages</h3>
+      <p class="lvl">intermediate → assembling the twelve into real shapes</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The cat café app (React front, Node API, Postgres) at three honest life stages. <b>Stage 1 — the scrappy start (≈$30–60/mo):</b> one EC2 instance running the API (PM2), RDS single-AZ, S3 + CloudFront for the frontend build. It's "a VPS with better neighbors" — and it's genuinely correct for a new product. Its known sins: deploys drop requests, one AZ, one instance = one 3am pager.</p>
+    <p><b>Stage 2 — the grown-up default (≈$200–500/mo):</b> the frontend unchanged (S3+CloudFront scale infinitely for pennies); the API as containers on ECS Fargate (2+ tasks across AZs) behind an ALB with health checks; RDS Multi-AZ + a read replica; Redis for sessions/cache (statelessness unlocked horizontal scaling — the node module's auth design pays off here); SQS + a worker service for slow jobs. This is the architecture that carries most products from launch to acquisition.</p>
+    <p><b>Stage 3 — event-driven growth:</b> same skeleton, plus: auto-scaling policies on ECS (scale on CPU/queue depth), CloudFront in front of the API too (cached GETs at the edge), EventBridge routing domain events (adoption.created → notify, analytics, email fan-out), and aggressive Lambda adoption for the spiky edges. The skeleton doesn't get replaced — it gets <i>relieved</i>: each piece that hurts gets a managed pressure valve.</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">stage-2-the-default.txt</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-plaintext">                     users
+                       │
+              Route 53 (DNS)
+               ┌───────┴────────┐
+        CloudFront          ALB (TLS, health checks)
+        (static app,         │
+         cached edge)   ┌────┴─────┐        private subnets
+        S3 (build)      ECS task  ECS task   ← 2+ AZs, stateless
+                        (Node)    (Node)
+                          │  \      │  \
+                          │   └──┬──┘   └──→ SQS → worker task
+                          │      │            (emails, PDFs, resize)
+                    RDS Postgres  ElastiCache
+                    Multi-AZ +    Redis
+                    read replica  (sessions · cache · rate limits)
+
+ deploys: image built once in CI → ECS rolling update, health-checked
+ the whole node-backend module runs INSIDE those two ECS boxes
+ the whole postgres module runs INSIDE that RDS box</code></pre>
+    </div>
+    <div class="mcq" data-qid="aw-arch-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In stage 2, sessions moved from the API's memory to Redis. What breaks if you skip that — and what AWS feature papers over it badly?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing breaks — the ALB round-robins users to the same task naturally</button>
+        <button class="mcq-opt" type="button" data-ok>With 2+ tasks, a user's next request lands on a task that's never heard of them — random logouts. ALB sticky sessions "fix" it while breaking even scaling and graceful deploys; externalizing state (Redis) is the real fix</button>
+        <button class="mcq-opt" type="button">Sessions break only during deploys, which is acceptable</button>
+        <button class="mcq-opt" type="button">JWTs make this question obsolete everywhere</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> in-memory state is the thing that forbids horizontal scaling — the second instance is a different universe. Sticky sessions pin users to tasks (uneven load, sessions die with the task, deploys log users out) — name it as the tempting anti-pattern. JWTs partially dodge it (stateless auth) but the auth module's revocation trade still applies, and non-auth state (carts, rate limits) needs a home anyway. "Stateless app tier, state in Redis/RDS" is the sentence the whole stage-2 diagram hangs from.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Deploy story for stage 2, in a breath: build once in CI → push to ECR → ECS rolling update behind the ALB's health checks → SIGTERM-graceful tasks drain — zero-downtime with all the pieces you already know.</li>
+        <li>Where Terraform/CDK enters: the whole diagram as reviewable code — "the environment is a pull request". One sentence; deep IaC is its own interview.</li>
+        <li>The honest stage-1 defense: "I'd start on stage 1 and I can name exactly which pain triggers each stage-2 upgrade" reads as far more senior than defaulting to microservices on day one.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · IAM -->
+<section class="lesson" id="iam">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>IAM without tears — roles, not keys</h3>
+      <p class="lvl">the section that prevents your worst production day</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>IAM's model in four words: <b>who · can-do · what · on-which.</b> Policies are JSON statements (Effect/Action/Resource) attached to identities. The two identities that matter: <b>users</b> (humans — should be rare, MFA'd, and mostly replaced by SSO) and <b>roles</b> — identities that services <i>assume</i> temporarily. The golden rule that prevents the classic disaster: <b>code never holds long-lived keys.</b> Your ECS task gets a role; AWS injects short-lived, auto-rotated credentials; the SDK just works. A leaked .env with AKIA-keys is how startups end up mining bitcoin for strangers — a role can't leak that way.</p>
+    <p><b>Least privilege</b> is the design discipline: the API's role can read/write <i>its</i> S3 bucket and <i>its</i> queue — not <code>s3:*</code> on <code>*</code>. When something's denied, you widen deliberately, one action at a time. Tedious exactly once, priceless the day any component is compromised: the blast radius is the role's permissions, not your account.</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">api-task-role.json — least privilege, annotated</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-json">{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "UploadsBucketOnly",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::cafe-uploads/*"
+    },
+    {
+      "Sid": "OwnQueueOnly",
+      "Effect": "Allow",
+      "Action": ["sqs:SendMessage"],
+      "Resource": "arn:aws:sqs:ap-south-1:123456789012:cafe-jobs"
+    }
+  ]
+}</code></pre>
+    </div>
+    <div class="mcq" data-qid="aw-iam-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A dependency you ship gets compromised and runs attacker code inside your API container. Which prior decision most limits the damage?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">HTTPS everywhere — the attacker can't read traffic</button>
+        <button class="mcq-opt" type="button" data-ok>The task role's least-privilege policy: the attacker holds only short-lived credentials scoped to one bucket and one queue — not account-wide keys from an env file</button>
+        <button class="mcq-opt" type="button">The WAF in front of the ALB</button>
+        <button class="mcq-opt" type="button">Multi-AZ RDS — the data is replicated safely</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the attacker inherits exactly what the compromised process could do — that's why the role's scope IS the blast radius. TLS protects transit (irrelevant here — they're inside), WAF filters inbound (they're already in), replication protects against hardware (not attackers with credentials). This supply-chain scenario appears in the fullstack course's security bank too — the answer is the same from both directions: least privilege turned a catastrophe into an incident.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Secrets that aren't IAM (DB passwords, API keys): Secrets Manager/Parameter Store, fetched at boot by the role — the .env file's grown-up replacement, closing the node module's config story.</li>
+        <li>Presigned URLs (§02) are IAM in miniature: a time-boxed capability minted from your role's permissions — one concept, two sections.</li>
+        <li>"IAM is deny-by-default; explicit Deny beats any Allow" — the two evaluation rules that answer most policy-puzzle questions.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · OPS -->
+<section class="lesson" id="ops">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Running it — knowing before the users tweet</h3>
+      <p class="lvl">intermediate → logs, metrics, alarms, and the deploy loop</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>CloudWatch</b> is three tools sharing a name. <b>Logs:</b> every container's stdout (the node module's structured JSON) lands in log groups — searchable with Logs Insights; request ids make one user's journey traceable. <b>Metrics:</b> numbers over time — the free ones (CPU, ALB 5xx rate, target response time, queue depth, DB connections) plus your custom RED metrics per route. <b>Alarms:</b> thresholds on metrics that page you — and the discipline is alarming on <b>symptoms users feel</b> (5xx rate, p99 latency, queue age) rather than causes (CPU%), because causes without symptoms are just weather.</p>
+    <p>The loop that makes it real: deploy (rolling, health-checked) → watch the release-annotated dashboards → alarm fires → logs filtered by request id → fix or roll back (the previous task definition is one click). Health checks split exactly as in the node module: liveness ("restart me") vs readiness ("don't route to me") — ALBs act on the second; conflating them causes the restart-storm-during-DB-blip incident everyone has once.</p>
+    <div class="mcq" data-qid="aw-ops-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Which alarm set is right for the stage-2 café app — pick the SYMPTOM-first set?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">CPU &gt; 80%, memory &gt; 80%, disk &gt; 80% on every task</button>
+        <button class="mcq-opt" type="button" data-ok>ALB 5xx rate, p99 latency, SQS oldest-message age, RDS connection saturation — each one IS user pain or imminent user pain; CPU alone is just weather</button>
+        <button class="mcq-opt" type="button">One alarm on total request count — traffic is the leading indicator</button>
+        <button class="mcq-opt" type="button">No alarms — check dashboards each morning</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a CPU spike serving fast responses needs no human; a 5xx spike at 2% CPU absolutely does. Symptom alarms have near-zero false positives (users ARE hurting) and cause metrics stay on dashboards for diagnosis, not paging. "Queue oldest-message age" over "queue length" is the connoisseur pick — length can be high and healthy; age growing means consumers are losing. Alert fatigue from cause-alarms is why on-call rotations burn out — saying that shows you've lived it.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Auto-scaling policies read like alarms too: target-tracking on CPU or ALB requests-per-target for the API; queue depth for workers — "scale on the same signals you'd page on, one notch earlier".</li>
+        <li>Cold rollback beats hot debugging at 2am: previous image + previous task definition, then diagnose in daylight — the frontend course's "mitigate before diagnose", infra edition.</li>
+        <li>X-Ray/tracing in one line: request ids across service hops, automated — name it, don't tour it.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · COST -->
+<section class="lesson" id="cost">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>The bill — cost as an architecture property</h3>
+      <p class="lvl">advanced → the four line items and the classic surprises</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>AWS bills for four things, roughly in this order for a typical app: <b>compute time</b> (EC2/Fargate hours, Lambda GB-seconds), <b>database</b> (instance hours + storage + Multi-AZ doubling), <b>data transfer OUT</b> (the sneaky one — into AWS is free, out to the internet costs, cross-AZ costs both ways), and <b>storage</b> (cheap until you never delete anything). The classic surprises are all transfer: NAT gateway hourly + per-GB fees for private-subnet internet access, cross-AZ chatter between services, and un-cached images served from S3 instead of CloudFront.</p>
+    <p>Cost discipline that fits in one paragraph: tag everything (know which feature spends), budgets + billing alarms from day one (the free insurance nobody buys), right-size after measuring (the t3.large at 4% CPU), Savings Plans once steady-state is known (~30–40% off compute you'll run anyway), lifecycle-expire old S3 data and logs, and put CloudFront in front of anything users download twice. And the architecture-level truth: <b>the cheapest request is the one a cache absorbed</b> — CloudFront and Redis are cost tools as much as latency tools.</p>
+    <div class="mcq" data-qid="aw-cost-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The bill doubled this month. Traffic didn't. The three most likely suspects, in order?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">AWS raised prices; check the announcements page</button>
+        <button class="mcq-opt" type="button" data-ok>Cost Explorer grouped by service first: usually (1) data transfer — a new chatty cross-AZ path or un-cached assets, (2) something left running — a forgotten environment or oversized instance, (3) storage/logs growing without lifecycle rules</button>
+        <button class="mcq-opt" type="button">Someone mined bitcoin — rotate all keys immediately</button>
+        <button class="mcq-opt" type="button">Multi-AZ silently doubled the RDS bill</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> method first — Cost Explorer's group-by-service + the tag report turns a mystery into a diff; the trio above covers most real doublings. Compromise (option 3) is real but announces itself as GPU instances in regions you've never used — worth one glance, not panic. Multi-AZ doubling is visible the month you enable it, not randomly. "Cost is observable like latency — measure, don't speculate" is the transferable sentence.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Lambda's economics in one line: free at zero, brilliant at spiky, and at sustained high throughput a steady Fargate service is often cheaper — do the arithmetic, not the ideology.</li>
+        <li>"We put a billing alarm at 2× expected on day one" is the cheapest sentence that sounds like scar tissue — because it always is.</li>
+        <li>The interview close: cost, latency, and resilience are the same three-way trade — every cache, replica, and AZ is a position in it. Frame answers that way and infra questions become design questions.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any infra-flavored interview. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>the map</td><td>Five questions (compute, files, data, traffic, messaging) + two layers (IAM, observability); every choice is the managed-ness slider.</td></tr>
+      <tr><td class="mono">02</td><td>the twelve</td><td>Fargate runs it, S3 holds files, RDS holds truth, Redis holds heat, ALB spreads, CloudFront caches, SQS decouples — presigned URLs hand clients scoped passes.</td></tr>
+      <tr><td class="mono">03</td><td>architectures</td><td>Stage 1 honest EC2 → stage 2 stateless Fargate+ALB+Multi-AZ (the career default) → stage 3 events and edges. Upgrade on pain, not fashion.</td></tr>
+      <tr><td class="mono">04</td><td>IAM</td><td>Roles, never keys; least privilege = the blast radius; deny by default.</td></tr>
+      <tr><td class="mono">05</td><td>ops</td><td>Alarm on symptoms (5xx, p99, queue AGE), dashboard the causes; liveness ≠ readiness; roll back cold.</td></tr>
+      <tr><td class="mono">06</td><td>cost</td><td>Compute, DB, transfer-out, storage — transfer is the ambush; caches are cost tools; billing alarms on day one.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">AWS questions test judgment about managed services, not console trivia.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"How would you deploy this app?"</b> — draw stage 2 from memory, then narrate stage 1 as where you'd actually start and what pain triggers each upgrade. The staging story IS the senior answer.</li>
+      <li><b>"EC2 vs ECS vs Lambda?"</b> — the slider + workload shape, with the cattery analogy if the room is friendly. Rapid-fire pairs: <a href="../fullstack.html#aws">Full-Stack in 48 · AWS map</a> and <a href="../fullstack.html#awsops">· scaling &amp; the bill</a>.</li>
+      <li><b>"How do you secure service-to-service access?"</b> — roles-not-keys, least privilege, secrets manager, presigned URLs. Four phrases, full marks.</li>
+      <li>Next module: <b>system-design-backend</b> — where these boxes become the vocabulary for designs at whiteboard scale.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Draw stage 2 until your hand knows it.</b> The map is small; the confidence of holding it is enormous.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>adopt, board, or visit — but decide like it's a cat. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'aws-cloud';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

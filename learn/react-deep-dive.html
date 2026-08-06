@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React, Deeply — Learn track · in 48</title>
+<meta name="description" content="The React mental model rebuilt from first principles: rendering and reconciliation, every hook with its real purpose, state architecture, performance discipline, Suspense and Server Components — with quizzes and interactive demos. Part of the in-48 Learn track.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="React, Deeply — Learn track · in 48">
+<meta property="og:description" content="The React mental model rebuilt from first principles: rendering and reconciliation, every hook with its real purpose, state architecture, performance discipline, Suspense and Server Components — with quizzes and interactive demos. Part of the in-48 Learn track.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="React, Deeply — Learn track · in 48">
+<meta name="twitter:description" content="The React mental model rebuilt from first principles: rendering and reconciliation, every hook with its real purpose, state architecture, performance discipline, Suspense and Server Components — with quizzes and interactive demos. Part of the in-48 Learn track.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%2360A5FA'%3ERX%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#60A5FA;
+  --mark-deep:#2563EB;
+  --mark-soft:rgba(96,165,250,.16);
+  --on-mark:#141B22;
+  --on-ink:#60A5FA;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#93C5FD;
+  --mark-soft:rgba(96,165,250,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#93C5FD;
+  --mark-soft:rgba(96,165,250,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(96,165,250,0) 0%, rgba(96,165,250,.95) 6%, rgba(96,165,250,.8) 94%, rgba(96,165,250,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(96,165,250,0) 0%, rgba(96,165,250,.95) 5%, rgba(96,165,250,.78) 95%, rgba(96,165,250,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(96,165,250,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(96,165,250,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(96,165,250,0) 0%, rgba(96,165,250,.9) 6%, rgba(96,165,250,.7) 94%, rgba(96,165,250,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· react</em></div>
+      <div class="brand-sub">module 07 · intermediate → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#model"><span><i class="dot" data-for="model"></i> The Mental Model</span></a>
+    <a class="side-link" href="#rendering"><span><i class="dot" data-for="rendering"></i> Renders &amp; Reconciliation</span></a>
+    <a class="side-link" href="#state"><span><i class="dot" data-for="state"></i> useState, Precisely</span></a>
+    <a class="side-link" href="#effects"><span><i class="dot" data-for="effects"></i> Effects Done Right</span></a>
+    <a class="side-link" href="#hooks"><span><i class="dot" data-for="hooks"></i> The Other Hooks</span></a>
+    <a class="side-link" href="#performance"><span><i class="dot" data-for="performance"></i> Performance Discipline</span></a>
+    <a class="side-link" href="#modern"><span><i class="dot" data-for="modern"></i> Suspense &amp; RSC</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./js-fundamentals.html"><span>JS Fundamentals</span><span class="t">←</span></a>
+    <a class="side-link" href="./js-async.html"><span>Async JS</span><span class="t">←</span></a>
+    <a class="side-link" href="../fullstack.html"><span>Full-Stack in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/9</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 07 <b>the "why does it re-render" module</b></p>
+  <h1>React, without the <span class="hl hl-anim" data-d="0">folk</span> <span class="hl hl-anim" data-d="1">theories</span>.</h1>
+  <p class="lede">You can be productive in React for years on pattern-matching — copy the useEffect shape, sprinkle useCallback when the linter sulks — and still not have the machine model: <b>what a render actually is, when it happens, and what it costs</b>. Interviews are where the folk theories go to die.</p>
+  <p class="lede">This module rebuilds React from its one governing equation, then works through state, effects, hooks, and performance the way the library actually thinks about them. Prerequisites: closures and reference equality from <a href="./js-fundamentals.html">JS Fundamentals</a> — React interviews are secretly JS interviews wearing a component costume. The café cats are now… a cat café <i>app</i>. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">assumes: you've shipped some React</span>
+    <span class="level-chip i">middle: the render machine, precisely</span>
+    <span class="level-chip a">ends at: architecture &amp; the RSC era</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>7</b> sections</span>
+    <span><b>9</b> quiz questions</span>
+    <span><b>1</b> re-render simulator</span>
+    <span><b>~4.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#model">Start with the model <span class="arrow">↓</span></a>
+</header>
+
+<!-- 1 · MODEL -->
+<section class="lesson" id="model">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>The mental model — UI as a function of state</h3>
+      <p class="lvl">the one equation: view = f(state), re-run on change</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>React's entire premise fits in one line: <b>your UI is the return value of a function of your data.</b> You never edit the screen — you change the data and React calls your function again. "Re-render" literally means <b>your component function runs again, top to bottom</b>, producing a new description of what the screen should be.</p>
+    <p>That description — the element tree, "virtual DOM" if you like — is cheap JS objects. React <b>diffs</b> the new description against the previous one and applies only the differences to the real DOM. So: render = your function running (cheap-ish, happens a lot); commit = DOM mutations (expensive, minimized by the diff).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The café's menu board isn't edited letter by letter — the manager keeps a <b>master ledger</b> (state), and whenever it changes, an assistant <b>rewrites the whole menu on paper</b> (render), compares it to the board (diff), and repaints <b>only the lines that differ</b> (commit). Rewriting paper is cheap; repainting the board is work. React's whole design: rewrite freely, repaint minimally.</p>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-equation.jsx</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// UI = f(state). No imperative edits, ever.
+function CafeBoard({ cats }) {
+  const open = cats.filter(c =&gt; c.onShift);
+  return (
+    &lt;ul&gt;
+      {open.map(c =&gt; &lt;li key={c.id}&gt;{c.name} is serving&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}
+// change `cats` → React re-runs CafeBoard → diffs → patches the &lt;ul&gt;
+
+// what a re-render is NOT:
+//  ✗ the DOM being rebuilt        (only diffs are committed)
+//  ✗ slow by definition           (it's a function call)
+//  ✗ something you manually cause (state/props changes cause it)
+
+// three things trigger a component to re-render:
+//  1. its own state changed        (setX)
+//  2. its parent re-rendered       (default: children run too!)
+//  3. a context it reads changed</code></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-model-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A parent re-renders. Its child receives the exact same props. What happens to the child by default?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — React skips children whose props didn't change</button>
+        <button class="mcq-opt" type="button" data-ok>The child function runs again anyway — same props or not — though the DOM likely won't change after the diff</button>
+        <button class="mcq-opt" type="button">Only its DOM is refreshed, not the function</button>
+        <button class="mcq-opt" type="button">It throws unless props are memoized</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> re-rendering cascades down by default — React doesn't compare props unless you ask (<code>React.memo</code>). This surprises almost everyone and reframes performance work: the question isn't "why did my child render" (that's normal), it's "is the cascade expensive enough to prune?" The diff still protects the DOM either way.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Render must be <b>pure</b>: same props/state → same output, no side effects during it. That contract is what makes concurrent rendering (React can pause/discard renders) legal — and it's why StrictMode double-invokes renders in dev to catch violations.</li>
+        <li>JSX is just <code>createElement</code>/jsx calls returning objects — "the virtual DOM is a description, not a copy of the DOM" is precise language that lands.</li>
+        <li>Naming the two phases — render (interruptible, pure) and commit (synchronous DOM work + refs + layout effects) — instantly signals depth.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · RENDERING -->
+<section class="lesson" id="rendering">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Renders &amp; reconciliation — the diff, and why keys matter</h3>
+      <p class="lvl">intermediate → the simulator: watch the cascade</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Reconciliation is the diff's rulebook, and it's short: <b>same element type</b> in the same position → keep the DOM node, update its props, recurse into children. <b>Different type</b> → tear down that subtree, build fresh (state inside is lost!). <b>Lists</b> → match children by <code>key</code>, not by position.</p>
+    <p>That last rule is where the famous bugs live. Index keys mean "position IS identity": delete the first cat from a list and every row's data shifts into its neighbor's old component — checked checkboxes stay behind, inputs keep the wrong text. A stable id key means identity travels with the item.</p>
+    <div class="viz" id="cascade-viz">
+      <h6>SIMULATOR — who re-renders when state changes?</h6>
+      <p style="font-size:.9rem;color:var(--ink-2);margin-bottom:10px">The café app's tree. Click a button to set state in that component — components that re-render flash. Notice the cascade goes <b>down</b>, never up or sideways.</p>
+      <div class="viz-controls">
+        <button class="viz-btn primary" type="button" data-set="App">setState in App</button>
+        <button class="viz-btn primary" type="button" data-set="Menu">setState in Menu</button>
+        <button class="viz-btn primary" type="button" data-set="Cart">setState in Cart</button>
+        <span class="run-hint" id="cascade-note">renders this click: —</span>
+      </div>
+      <div class="viz-stage" id="cascade-tree" style="line-height:2.1"></div>
+    </div>
+    <div class="mcq" data-qid="rdd-rec-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A todo list keyed by array index. The user deletes the FIRST item. What does React do to the remaining rows?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Removes the first DOM row; the rest are untouched</button>
+        <button class="mcq-opt" type="button" data-ok>Every row "becomes" its neighbor: item 2's data flows into the component that was item 1 — and any internal row state (inputs, checks) stays behind with the position</button>
+        <button class="mcq-opt" type="button">React warns and falls back to full re-mount</button>
+        <button class="mcq-opt" type="button">Nothing special — index keys are only a lint style rule</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> with index keys, React matches old-key-0 with new-key-0 — different item, same key — so it <i>updates</i> each row's props instead of removing one component. Uncontrolled inputs, animations, and memoization all misfire. Stable ids make React delete the right component. Index keys are fine ONLY for static, never-reordered, stateless lists — say the exception to show calibration.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Changing a component's <code>key</code> on purpose is a legit tool: it force-remounts the subtree ("reset this form" = <code>key={userId}</code>). The trick question is recognizing it's the same mechanism.</li>
+        <li>"Type changed → subtree state is lost" explains the classic bug of defining a component <i>inside</i> another component: a new function identity every render = new type = remount every render.</li>
+        <li>React 18+ batches all setStates in one event (and in timeouts/promises too) into one render — "renders per event, not per setState".</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · USESTATE -->
+<section class="lesson" id="state">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>useState, precisely — snapshots, batching, and the updater</h3>
+      <p class="lvl">intermediate → the three rules that end the confusion</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Three precise rules replace all the useState folklore. <b>Rule 1 — state is a snapshot:</b> within one render, the state variable is a constant; <code>setX</code> never changes it "now", it schedules the <i>next</i> render. <b>Rule 2 — updates batch:</b> all setStates in one event handler produce one re-render, and calling <code>setCount(count + 1)</code> three times sets the same value three times. <b>Rule 3 — the updater form reads fresh:</b> <code>setCount(c =&gt; c + 1)</code> queues a function that receives the latest value — three of those genuinely add three.</p>
+    <p>And because React compares with <code>Object.is</code>: <b>mutating an object and setting it back is a no-op</b> — same reference, "nothing changed", no render. New object or no news.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">snapshots-simulated.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a faithful 20-line simulation of useState's queue semantics
+function simulateEventHandler(updates) {
+  let state = 0;                       // the snapshot this "render" sees
+  const queue = [];
+  const setState = (u) =&gt; queue.push(u);
+
+  updates(state, setState);            // run the "event handler"
+
+  // React later processes the queue to compute the NEXT render's state
+  let next = state;
+  for (const u of queue) next = typeof u === 'function' ? u(next) : u;
+  return next;
+}
+
+// the classic: three plain sets — same snapshot, same value
+console.log('plain x3 →', simulateEventHandler((count, set) =&gt; {
+  set(count + 1);   // 0 + 1
+  set(count + 1);   // still 0 + 1  (count is a snapshot!)
+  set(count + 1);   // still 0 + 1
+}));                // → 1
+
+// updater functions — each receives the latest
+console.log('updater x3 →', simulateEventHandler((count, set) =&gt; {
+  set(c =&gt; c + 1);  // 0 → 1
+  set(c =&gt; c + 1);  // 1 → 2
+  set(c =&gt; c + 1);  // 2 → 3
+}));                // → 3
+
+// mix them — trace it! plain set REPLACES, updater builds on latest
+console.log('mixed →', simulateEventHandler((count, set) =&gt; {
+  set(count + 5);   // → 5
+  set(c =&gt; c + 1);  // 5 → 6
+  set(42);          // → 42
+}));                // → 42</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">this queue model is exactly how React resolves setState calls</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-state-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>cat.treats.push('tuna'); setCat(cat);</code> — the UI doesn't update. What's the precise reason?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">push is async, so the set fires too early</button>
+        <button class="mcq-opt" type="button" data-ok>setCat received the SAME reference — Object.is(old, new) is true, so React bails out of the render entirely</button>
+        <button class="mcq-opt" type="button">Arrays can't be state; only objects and primitives</button>
+        <button class="mcq-opt" type="button">The update batched and will appear on the next event</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> React's change detection is reference equality, full stop. Mutation changes contents, not identity. Fix: <code>setCat({...cat, treats: [...cat.treats, 'tuna']})</code>. This is JS Fundamentals §01 (the cat vs the paper) cashing out — and the single most common React bug in code review.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Lazy initialization: <code>useState(() =&gt; expensive())</code> runs once; <code>useState(expensive())</code> runs the expensive call <b>every render</b> and discards it. Tiny syntax, real cost.</li>
+        <li>"Why is my console.log showing the old state right after setState?" — because the snapshot rule; the log is correct <i>for this render</i>. The new value exists only in the next render's world.</li>
+        <li>Derived data doesn't belong in state (compute it in render); mirrored props in state is the related smell — both create sync bugs. "State is for what React can't compute" is the aphorism.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · EFFECTS -->
+<section class="lesson" id="effects">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Effects done right — synchronization, not lifecycle</h3>
+      <p class="lvl">the most misused hook, rehabilitated</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The mental model that fixes everything: <b>useEffect is not "run code on mount/update" — it's "keep an external system synchronized with my state."</b> The effect body says how to <i>start</i> syncing (subscribe, connect, fetch); the cleanup says how to <i>stop</i>; the dependency array lists which values the sync depends on. React's contract: before re-running an effect (and on unmount), it runs the previous cleanup — so you're always cleanly re-syncing, never stacking subscriptions.</p>
+    <p>Dependencies aren't optional bookkeeping — they're the <b>truth about what the effect reads</b>. Lying about them (empty array with variables inside) creates <b>stale closures</b>: the effect's callback holds the variables of the render it was created in, forever.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>An effect is a <b>standing arrangement</b>: "while Mochi is on shift, keep her water bowl connected to the fountain." Mochi swaps out for Biscuit (deps changed)? First <b>disconnect Mochi's bowl</b> (cleanup), then connect Biscuit's (effect re-runs). Café closes (unmount)? Disconnect everything. If you skip the disconnect step, by Friday there are nine bowls flooding the floor — that's every "why does my socket subscribe five times" bug.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">stale-closure-demo.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// The stale-closure bug, reproduced in 15 lines of plain JS.
+// (An "effect with [] deps" = a callback created once, reused forever.)
+function mountCounterComponent() {
+  let count = 0;                        // the state
+  let renderedCount = count;            // what THIS render sees
+
+  // ✗ the "[] deps" interval: closes over render #1's snapshot forever
+  const staleTimer = setInterval(() =&gt; {
+    console.log('stale interval sees count =', renderedCount);
+  }, 200);
+
+  // ✓ the updater-function fix: reads the LATEST value each tick
+  const freshTimer = setInterval(() =&gt; {
+    console.log('updater-style sees count =', count);   // live reference
+  }, 200);
+
+  // simulate three setCount(c =&gt; c+1) re-renders
+  const clicks = setInterval(() =&gt; { count++; }, 180);
+
+  setTimeout(() =&gt; {                    // "unmount" — cleanup!
+    [staleTimer, freshTimer, clicks].forEach(clearInterval);
+    console.log('unmounted — all intervals cleaned up');
+  }, 800);
+}
+mountCounterComponent();</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch one interval frozen at 0 while the other counts</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-fx-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Search results sometimes show a PREVIOUS query's data when the user types fast. The effect fetches on <code>[query]</code>. What's missing?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A debounce — fewer requests means no bug</button>
+        <button class="mcq-opt" type="button" data-ok>Cleanup that cancels/ignores the stale request — old fetches resolve late and overwrite newer results without it</button>
+        <button class="mcq-opt" type="button">The deps array should also include setResults</button>
+        <button class="mcq-opt" type="button">useLayoutEffect, so the fetch blocks paint</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each query starts a fetch; nothing stops an older one from finishing <i>after</i> a newer one. The effect contract hands you the fix: cleanup runs before the next effect — <code>return () =&gt; ctrl.abort()</code> (or an <code>ignore</code> flag). Debounce reduces the odds; it can't eliminate the race. This is Async JS §07 wearing a React costume — and a top-3 senior React question.</p>
+    </div>
+    <div class="mcq" data-qid="rdd-fx-2">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Which of these does NOT need useEffect at all?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Subscribing to a WebSocket while the chat screen is open</button>
+        <button class="mcq-opt" type="button" data-ok>Computing <code>filteredCats</code> from <code>cats</code> + <code>filter</code> and storing it in state</button>
+        <button class="mcq-opt" type="button">Syncing document.title with the unread count</button>
+        <button class="mcq-opt" type="button">Attaching a window resize listener</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> deriving state from state is render-time math — <code>const filteredCats = cats.filter(…)</code>, memoized if heavy. The effect+setState version renders twice per change and can desync. The other three genuinely touch <i>external</i> systems (socket, document, window) — that's the "is it external?" test, and "You Might Not Need an Effect" is the canonical reference to name-drop.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>StrictMode mounts → unmounts → remounts in dev to prove your effect + cleanup pair is safe. "My effect broke under StrictMode" = the effect was already buggy.</li>
+        <li>Effects run <i>after</i> paint; <code>useLayoutEffect</code> runs before it (measure/position without flicker) and blocks rendering — reach for it only on visible flicker.</li>
+        <li>Fetch-in-effect at scale = React Query/SWR territory (dedupe, cache, races solved once) or router loaders/RSC — "effects are for sync, libraries for server state" is the architecture answer.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+<!-- 5 · HOOKS -->
+<section class="lesson" id="hooks">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>The other hooks — one job each</h3>
+      <p class="lvl">intermediate → ref vs memo vs callback vs reducer vs context</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every hook answers one specific question. <b>useRef:</b> "I need a value that survives renders but shouldn't cause them" — a mutable box whose <code>.current</code> you can write freely (DOM handles, timer ids, previous values). <b>useMemo:</b> "this computed value is expensive or needs a stable identity — recompute only when inputs change." <b>useCallback:</b> literally <code>useMemo</code> for a function. <b>useReducer:</b> "several fields change together under named transitions — centralize the rules." <b>useContext:</b> "this stable app-wide value shouldn't be threaded through 10 layers of props."</p>
+    <p>The deep fact under refs and effects: <b>hooks work by call order.</b> React keeps a list of "slots" per component; each hook call reads the next slot. That's the real reason for the Rules of Hooks — a hook inside an <code>if</code> shifts every later hook into the wrong slot.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">hooks-by-slot.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// why hooks break inside conditionals — the slot machine, simulated
+function makeComponent() {
+  const slots = [];
+  let cursor = 0;
+  function useSlot(initial) {
+    if (slots[cursor] === undefined) slots[cursor] = initial;
+    return slots[cursor++];
+  }
+  return function render(showBio) {
+    cursor = 0;                                    // every render restarts
+    const name = useSlot('Mochi');                 // slot 0
+    if (showBio) useSlot('loves tuna');            // slot 1… sometimes!
+    const age = useSlot(2);                        // slot 1 or 2 — uh oh
+    return { name, age };
+  };
+}
+
+const render = makeComponent();
+console.log('render #1 (with bio):', render(true));   // age reads slot 2 → 2 ✓
+console.log('render #2 (no bio): ', render(false));   // age reads slot 1…
+// age is now 'loves tuna' — a STRING. Every hook after the
+// conditional shifted one slot left. That's the whole rule.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">age becomes "loves tuna" — the Rules of Hooks, demonstrated</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-hooks-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">You need to track "how many times has this component rendered" for a debug overlay — without causing extra renders. Which tool?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>useState</code> — increment it in the component body</button>
+        <button class="mcq-opt" type="button" data-ok><code>useRef</code> — <code>renders.current++</code> in the body; mutating a ref triggers nothing</button>
+        <button class="mcq-opt" type="button"><code>useMemo</code> with no deps</button>
+        <button class="mcq-opt" type="button">A module-level variable outside the component</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> setState in the body = infinite render loop; a module variable is shared across ALL instances of the component. A ref is per-instance, persistent, and render-silent — exactly the "survives renders, doesn't cause them" job description. (The state/ref/variable triangle — causes renders / survives silently / neither — is a beautiful interview litmus.)</p>
+    </div>
+    <div class="mcq" data-qid="rdd-hooks-2">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">When does <code>useCallback</code> actually pay for itself?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Always — recreating functions every render is expensive</button>
+        <button class="mcq-opt" type="button" data-ok>When the function's identity matters downstream: a prop to a memoized child, or a dependency of an effect/useMemo</button>
+        <button class="mcq-opt" type="button">Only for event handlers on DOM elements</button>
+        <button class="mcq-opt" type="button">Never — it's deprecated in React 19</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> creating a function is nanoseconds — the cost was never creation. The cost is a <i>new identity</i> defeating <code>React.memo</code>'s prop comparison or re-firing an effect that lists the function. No memoized consumer, no benefit — just noise. (And worth one sentence: the React Compiler is automating exactly this class of memoization, which is why "memoize by hand everywhere" is aging out.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Context re-renders every consumer when its value changes — pass a memoized object (<code>useMemo(() =&gt; ({user, logout}), [user])</code>) or split contexts (state vs dispatch) to stop the "theme change re-renders the app" bug.</li>
+        <li><code>useReducer</code>'s dispatch is identity-stable forever — the tidy escape from callback-prop churn in deep trees; also the answer to "state machine in a component".</li>
+        <li>Custom hooks are just functions that call hooks — the reuse unit for stateful logic (<code>useDebounce</code>, <code>useLocalStorage</code>). Each call gets its own slots; hooks share <i>logic</i>, never <i>state</i>.</li>
+        <li>Modern additions in one line each: <code>useSyncExternalStore</code> (subscribe to non-React stores, tear-free), <code>useId</code> (SSR-safe ids), <code>useDeferredValue</code> (lag a value behind urgent updates).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · PERFORMANCE -->
+<section class="lesson" id="performance">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Performance discipline — measure, colocate, then memoize</h3>
+      <p class="lvl">advanced → the order of operations that actually works</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>React performance work has an order of operations, and memoization is <b>last</b>, not first. <b>Step 1 — measure:</b> React DevTools Profiler; find what's actually slow and why it rendered ("why did this render?" is a checkbox). <b>Step 2 — restructure:</b> push state down to the smallest component that needs it (the typing-lags bug is state living too high), or lift content up as <code>children</code> (a re-rendering wrapper doesn't re-render the children elements it received). <b>Step 3 — memoize what remains:</b> <code>React.memo</code> the hot leaf, with <code>useMemo/useCallback</code> keeping its props' identities stable — all three or none, half-memoization is decoration.</p>
+    <p><b>Step 4 — schedule:</b> when work is genuinely heavy, mark the update non-urgent with <code>useTransition</code>/<code>useDeferredValue</code> so typing stays crisp while the big list catches up. Cache vs schedule — different tools, both current.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The café's order board repaints whenever <b>anything</b> changes because the manager keeps ALL the ledgers on one giant page (state too high). Splitting the ledgers per station (colocation) fixes 80% before any cleverness. Memoization is laminating specific menu cards so they're skipped while repainting — useful for the fancy expensive ones, silly to laminate napkins. And laminate fully: one un-stable prop identity and the card repaints anyway.</p>
+    </div>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-ladder.jsx</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// STEP 2a — push state DOWN: the search box lags…
+function Page() {                        // ✗ every keystroke renders Page
+  const [q, setQ] = useState('');
+  return (&lt;&gt;&lt;SearchInput q={q} setQ={setQ} /&gt;&lt;HeavyDashboard /&gt;&lt;/&gt;);
+}
+// ✓ move q INTO SearchInput — HeavyDashboard never hears about typing
+
+// STEP 2b — lift content up as children:
+function ThemeWrapper({ children }) {    // re-renders on theme change…
+  const [theme, setTheme] = useState('latte');
+  return &lt;div className={theme}&gt;{children}&lt;/div&gt;;
+}
+// …but `children` was created by the PARENT — same element reference,
+// so React skips re-rendering it. Free win, no memo() involved.
+
+// STEP 3 — the full lamination (all three or none):
+const CatRow = React.memo(function CatRow({ cat, onAdopt }) { /* … */ });
+function CatList({ cats }) {
+  const onAdopt = useCallback(id =&gt; adopt(id), []);      // stable prop
+  const sorted = useMemo(() =&gt; [...cats].sort(byAge), [cats]);
+  return sorted.map(c =&gt; &lt;CatRow key={c.id} cat={c} onAdopt={onAdopt} /&gt;);
+}
+
+// STEP 4 — schedule: keep typing crisp, defer the heavy list
+const [q, setQ] = useState('');
+const deferredQ = useDeferredValue(q);          // lags behind while busy
+const results = useMemo(() =&gt; bigFilter(deferredQ), [deferredQ]);</code></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-perf-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>&lt;CatRow /&gt;</code> is wrapped in <code>React.memo</code> but still re-renders every keystroke. The props are <code>cat</code> (from a stable array) and <code>onAdopt={() =&gt; adopt(cat.id)}</code>. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">memo only works on class components</button>
+        <button class="mcq-opt" type="button" data-ok>The inline arrow is a new function identity every render — memo's shallow compare sees a "changed" prop each time</button>
+        <button class="mcq-opt" type="button">memo can't compare object props like <code>cat</code> at all</button>
+        <button class="mcq-opt" type="button">Keystroke state updates bypass memo by design</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> memo compares props with Object.is; an inline function is born new each render, so the compare fails on <code>onAdopt</code> every time — lamination defeated by one prop. Fixes: useCallback the handler, pass the id and a stable handler, or dispatch from context. "Memoization is a chain — one unstable link and you've paid comparison cost for nothing" is the summarizing line interviewers reward.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The <b>React Compiler</b> (shipping into the ecosystem now) auto-memoizes components and values — the discipline that stays yours: state placement, list keys, and not creating types inside render.</li>
+        <li>Lists at 1,000+ rows are a <i>virtualization</i> problem, not a memo problem — hand off to react-window/TanStack Virtual (the frontend course's Lists topic has the mechanism).</li>
+        <li>"Profiler first" isn't a platitude — flame graphs regularly reveal the surprise culprit (context value churn, a date lib in every row). Guessing optimizes the wrong thing with full confidence.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · MODERN -->
+<section class="lesson" id="modern">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Suspense &amp; Server Components — the current era, minus the fog</h3>
+      <p class="lvl">advanced → what actually changed, in five honest paragraphs</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Suspense</b> is a declarative loading boundary: "while anything below me isn't ready, show this fallback." It started with <code>React.lazy</code> (waiting for code) and grew to waiting for <i>data</i> (in frameworks and React Query integrations). Boundaries compose — nest them and each region resolves independently, which is what makes <b>streaming SSR</b> work: the server sends the shell immediately and pipes each Suspense hole's HTML as its data lands.</p>
+    <p><b>Server Components (RSC)</b> split the component tree by <i>where it runs</i>. Server components execute only on the server: they can read the database directly, keep secrets, and — the headline — <b>ship zero JS to the browser</b>; the client receives their rendered output. Client components (<code>'use client'</code>) are classic React: state, effects, event handlers. The tree interleaves both; props crossing the boundary must be serializable.</p>
+    <p>The honest "why": years of client-bundle growth. RSC moves data-heavy, interaction-free rendering (layouts, product descriptions, markdown) off the client entirely — hydration cost and bundle size drop together. The honest "cost": a genuinely split mental model, framework dependence (Next.js App Router is the mainstream vehicle), and an ecosystem still settling.</p>
+    <p><b>Server Actions</b> close the loop: functions marked <code>'use server'</code> that client forms/buttons can invoke like RPC — mutations without hand-writing API routes, with progressive enhancement (forms work pre-hydration) as the underrated bonus.</p>
+    <div class="mcq" data-qid="rdd-modern-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A marketing page section renders rich product data, has zero interactivity, and its dependencies include a markdown parser + syntax highlighter (300KB). In an RSC app, what's the win of making it a server component?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It renders faster because servers have better CPUs</button>
+        <button class="mcq-opt" type="button" data-ok>The 300KB of parsing libraries never enter the client bundle — the browser gets only the rendered HTML, and there's nothing to hydrate</button>
+        <button class="mcq-opt" type="button">It becomes cacheable, which client components can't be</button>
+        <button class="mcq-opt" type="button">SEO — crawlers can't read client components</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the dependency weight stays server-side — that's THE RSC value proposition in one example. (SSR already solved crawler-visible HTML; caching exists at many layers.) Flip side to volunteer: the moment that section needs an onClick, it needs a client boundary — "islands of interactivity in a server sea" is the architecture in six words.</p>
+    </div>
+    <div class="mcq" data-qid="rdd-modern-2">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Nested Suspense boundaries around a feed page's header, list, and sidebar — what does streaming SSR do with them?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Waits for all three, then sends the complete page</button>
+        <button class="mcq-opt" type="button" data-ok>Sends the shell + fallbacks immediately, then streams each region's real HTML the moment ITS data resolves — slowest region no longer blocks first paint</button>
+        <button class="mcq-opt" type="button">Streams only the client components</button>
+        <button class="mcq-opt" type="button">Falls back to client rendering for the slow regions</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each boundary is an independent streaming unit — TTFB decouples from the slowest query. This is the same story the frontend systems course tells about streaming (rendering topic) — recognizing it's ONE mechanism seen from two courses is exactly the depth senior interviews reward.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Error boundaries + Suspense boundaries pair per region: one catches "it broke", the other handles "it's loading" — co-locating them is current best practice.</li>
+        <li>"RSC replaces the data-fetching effect, not the interactive component" — useState/useEffect aren't deprecated; they moved to the leaves that earn them.</li>
+        <li>Calibrated take for "should we adopt RSC?": new app on Next.js — yes by default; healthy SPA — the migration must earn itself. Restraint reads senior.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any React interview. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>the model</td><td>UI = f(state); re-render = your function re-runs; diff protects the DOM.</td></tr>
+      <tr><td class="mono">02</td><td>reconciliation</td><td>Same type updates, different type remounts, lists match by key — ids, not indexes.</td></tr>
+      <tr><td class="mono">03</td><td>useState</td><td>State is a snapshot; sets batch per event; updater form reads fresh; new reference or no render.</td></tr>
+      <tr><td class="mono">04</td><td>effects</td><td>Effects synchronize external systems; cleanup runs before re-run; deps are the truth, not paperwork.</td></tr>
+      <tr><td class="mono">05</td><td>hooks</td><td>Ref survives silently, memo caches identity, reducer centralizes transitions, context injects — and slots explain the Rules.</td></tr>
+      <tr><td class="mono">06</td><td>performance</td><td>Measure → move state down / children up → memoize completely → schedule with transitions.</td></tr>
+      <tr><td class="mono">07</td><td>modern</td><td>Suspense = declarative loading regions that stream; RSC = components whose JS never ships.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">React questions cluster into four asks — this module maps onto all of them.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"Explain rendering / why does this re-render?"</b> = sections 01–02. Drill the rapid-fire pairs in <a href="../fullstack.html#react">Full-Stack in 48 · React rendering</a>.</li>
+      <li><b>"Fix this buggy hook"</b> = sections 03–04: stale closure, missing cleanup, mutated state, derived-state-in-effect. The four bugs cover ~90% of live-debugging exercises.</li>
+      <li><b>"How would you make this app fast?"</b> = section 06's ladder, told in that order — measurement before memo is itself the answer. Cross-train with <a href="../frontend-system-design.html#perf">Frontend SD · performance</a>.</li>
+      <li><b>"Thoughts on Server Components?"</b> = section 07's honest paragraphs: what changed, what it costs, when you'd adopt. Calibration beats cheerleading.</li>
+      <li>Next modules: <b>node-backend</b> (the other side of your fetch calls) and <b>frontend-system-design</b> (this module's ideas at architecture scale).</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run the simulators. Trace the slot machine. Say the ladder out loud.</b> React rewards people who can explain it to a rubber duck — interviews are just ducks with badges.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>UI is a function of state — everything else is commentary. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+/* re-render cascade simulator — click a component, watch the flash travel down */
+(function () {
+  var tree = [
+    { id: 'App',     depth: 0, parent: null },
+    { id: 'Header',  depth: 1, parent: 'App' },
+    { id: 'Menu',    depth: 1, parent: 'App' },
+    { id: 'MenuItem ×3', depth: 2, parent: 'Menu' },
+    { id: 'Cart',    depth: 1, parent: 'App' },
+    { id: 'CartRow ×2', depth: 2, parent: 'Cart' },
+    { id: 'Footer',  depth: 1, parent: 'App' }
+  ];
+  var stage = document.getElementById('cascade-tree');
+  var note = document.getElementById('cascade-note');
+  if (!stage) return;
+  function descendants(root) {
+    var ids = [root], changed = true;
+    while (changed) {
+      changed = false;
+      tree.forEach(function (n) {
+        if (n.parent && ids.indexOf(n.parent) !== -1 && ids.indexOf(n.id) === -1) {
+          ids.push(n.id); changed = true;
+        }
+      });
+    }
+    return ids;
+  }
+  function paint(flashIds) {
+    stage.innerHTML = tree.map(function (n) {
+      var on = flashIds && flashIds.indexOf(n.id) !== -1;
+      return '<div style="padding-left:' + (n.depth * 26) + 'px">' +
+        '<span style="display:inline-block;padding:3px 12px;border-radius:8px;border:1.5px solid ' +
+        (on ? 'var(--mark-deep)' : 'var(--line)') + ';' +
+        (on ? 'background:var(--mark-soft);font-weight:700' : 'opacity:.8') + '">' +
+        (on ? '⟳ ' : '') + '&lt;' + n.id + '&gt;</span></div>';
+    }).join('');
+  }
+  document.querySelectorAll('#cascade-viz .viz-btn[data-set]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var root = btn.getAttribute('data-set');
+      var ids = descendants(root);
+      paint(ids);
+      note.textContent = 'renders this click: ' + ids.join(', ') + ' — siblings & ancestors untouched';
+    });
+  });
+  paint(null);
+})();
+</script>
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'react-deep-dive';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

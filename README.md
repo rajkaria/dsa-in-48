@@ -13,6 +13,13 @@ routes you to whichever course you need (and to every future one).
 | **System Design in 48** | 12 system-design topics, 32 whiteboard drills, the 6-step interview framework, 3 classic designs (URL shortener · feed · chat) | [/system-design](https://dsa-in-48.vercel.app/system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
 | **Behavioral in 48** | 13 behavioral & leadership topics for senior loops at US product companies — story bank, STAR+, hiring-manager round, 40-question senior bank, negotiation | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 | **Full-Stack in 48** | 12 tech-screen topics across JavaScript, React, Node.js, PostgreSQL & AWS — 150+ rapid-fire questions with answers, cheat tables, the night-before refresher | [/fullstack](https://dsa-in-48.vercel.app/fullstack) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/fullstack.html) |
+| **Frontend System Design in 48** | 12 topics for the senior frontend design round — RADIO walkthrough, rendering strategies, state & data architecture, CWV, resilience, a11y, security — 140+ Q&As with answers | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
+
+**Not cramming?** The **[Learn track](https://dsa-in-48.vercel.app/learn)** is the other speed:
+thirteen self-paced, beginner-to-advanced modules (JS ×2, DSA ×4, React, Node, PostgreSQL,
+AWS, system design ×2, and an interview kit with persisted worksheets) — plain language,
+code that runs on the page, quizzes, visualizers, and per-module progress. Each module is
+one self-contained HTML file under [`learn/`](./learn/), same rules as the courses.
 
 ---
 
@@ -54,7 +61,10 @@ open index.html
 ```
 
 `index.html` is the landing page; `dsa.html`, `system-design.html`, `behavioral.html`,
-and `fullstack.html` are the courses.
+`fullstack.html`, and `frontend-system-design.html` are the courses; `learn/` holds the
+Learn track (hub + 13 modules). Serve over HTTP (not `file://`) for localStorage progress
+to behave, and run `bash scripts/verify.sh` for the static checks (tag balance, anchors,
+unique drill keys, external-request allowlist).
 
 Or serve the folder:
 
