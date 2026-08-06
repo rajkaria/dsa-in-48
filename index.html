@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>in 48 — weekend crash syllabi for working engineers</title>
-<meta name="description" content="Two-day interview-prep courses for full-stack JavaScript engineers. DSA, system design, behavioral, and full-stack fundamentals — every concept mapped to something you have already shipped.">
+<meta name="description" content="Two-day interview-prep courses for full-stack JavaScript engineers. DSA, system design, behavioral, full-stack fundamentals, and frontend system design — every concept mapped to something you have already shipped.">
 <meta name="author" content="in 48">
 <meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="in 48 — weekend crash syllabi for working engineers">
-<meta property="og:description" content="Two-day interview-prep courses for full-stack JavaScript engineers. DSA, system design, behavioral, and full-stack fundamentals — every concept mapped to something you have already shipped.">
+<meta property="og:description" content="Two-day interview-prep courses for full-stack JavaScript engineers. DSA, system design, behavioral, full-stack fundamentals, and frontend system design — every concept mapped to something you have already shipped.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="in 48 — weekend crash syllabi for working engineers">
-<meta name="twitter:description" content="Two-day interview-prep courses for full-stack JavaScript engineers. DSA, system design, behavioral, and full-stack fundamentals — every concept mapped to something you have already shipped.">
+<meta name="twitter:description" content="Two-day interview-prep courses for full-stack JavaScript engineers. DSA, system design, behavioral, full-stack fundamentals, and frontend system design — every concept mapped to something you have already shipped.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23FFD60A'%3E48%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -208,6 +208,7 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .x-item.sd{--acc-soft:rgba(45,212,191,.16)}
 .x-item.bh{--acc-soft:rgba(167,139,250,.18)}
 .x-item.fs{--acc-soft:rgba(251,146,60,.16)}
+.x-item.fesd{--acc-soft:rgba(244,114,182,.16)}
 
 /* ---------- course cards ---------- */
 .courses{display:flex;flex-direction:column;gap:22px;margin-top:32px}
@@ -229,15 +230,18 @@ button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .course.sd{--acc:#2DD4BF;--acc-deep:#14A99A;--acc-soft:rgba(45,212,191,.15)}
 .course.bh{--acc:#A78BFA;--acc-deep:#7C3AED;--acc-soft:rgba(167,139,250,.18)}
 .course.fs{--acc:#FB923C;--acc-deep:#EA580C;--acc-soft:rgba(251,146,60,.16)}
+.course.fesd{--acc:#F472B6;--acc-deep:#E11D48;--acc-soft:rgba(244,114,182,.16)}
 :root[data-theme="dark"] .course.dsa{--acc-deep:#F5CB1E;--acc-soft:rgba(255,214,10,.13)}
 :root[data-theme="dark"] .course.sd{--acc-deep:#5EEAD4;--acc-soft:rgba(45,212,191,.13)}
 :root[data-theme="dark"] .course.bh{--acc-deep:#C4B5FD;--acc-soft:rgba(167,139,250,.15)}
 :root[data-theme="dark"] .course.fs{--acc-deep:#FDBA74;--acc-soft:rgba(251,146,60,.13)}
+:root[data-theme="dark"] .course.fesd{--acc-deep:#FDA4AF;--acc-soft:rgba(244,114,182,.13)}
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]) .course.dsa{--acc-deep:#F5CB1E;--acc-soft:rgba(255,214,10,.13)}
   :root:not([data-theme="light"]) .course.sd{--acc-deep:#5EEAD4;--acc-soft:rgba(45,212,191,.13)}
   :root:not([data-theme="light"]) .course.bh{--acc-deep:#C4B5FD;--acc-soft:rgba(167,139,250,.15)}
   :root:not([data-theme="light"]) .course.fs{--acc-deep:#FDBA74;--acc-soft:rgba(251,146,60,.13)}
+  :root:not([data-theme="light"]) .course.fesd{--acc-deep:#FDA4AF;--acc-soft:rgba(244,114,182,.13)}
 }
 .course-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .course-num{
@@ -413,10 +417,10 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
   <p class="lede">Every course here is <b>one self-contained page</b> and <b>two days long</b>. No signup, no video, no build step — open it Saturday morning, work through it, walk into the interview Monday.</p>
   <p class="lede">The premise never changes: you've shipped production systems for years, so you already <b>use</b> this material daily. These syllabi just attach the interview vocabulary to instincts you already have.</p>
   <div class="hero-meta">
-    <span><b>4</b> courses</span>
-    <span><b>50</b> topics</span>
-    <span><b>152</b> problems &amp; drills</span>
-    <span><b>~68h</b> total</span>
+    <span><b>5</b> courses</span>
+    <span><b>62</b> topics</span>
+    <span><b>188</b> problems &amp; drills</span>
+    <span><b>~84h</b> total</span>
     <span><b>$0</b> · MIT</span>
   </div>
   <div class="hero-cta">
@@ -439,6 +443,8 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
       <div class="x-item bh reveal" data-d="9"><span class="x-from">the junior you unblocked weekly</span><span class="x-arrow">→</span><span class="x-to">Mentorship Story</span><span class="x-tag">behavioral</span></div>
       <div class="x-item fs reveal" data-d="10"><span class="x-from">the useEffect cleanup at 2am</span><span class="x-arrow">→</span><span class="x-to">Stale Closures</span><span class="x-tag">full-stack</span></div>
       <div class="x-item fs reveal" data-d="11"><span class="x-from">the slow query you EXPLAINed</span><span class="x-arrow">→</span><span class="x-to">Indexes</span><span class="x-tag">full-stack</span></div>
+      <div class="x-item fesd reveal" data-d="12"><span class="x-from">the feed that loads as you scroll</span><span class="x-arrow">→</span><span class="x-to">Virtualization</span><span class="x-tag">frontend</span></div>
+      <div class="x-item fesd reveal" data-d="13"><span class="x-from">the like that flips before the server replies</span><span class="x-arrow">→</span><span class="x-to">Optimistic UI</span><span class="x-tag">frontend</span></div>
     </div>
   </div>
 </header>
@@ -446,8 +452,8 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
 <!-- ======================= COURSES ======================= -->
 <section class="section" id="courses">
   <p class="section-eyebrow">// the series</p>
-  <h2>Four courses. Four weekends.</h2>
-  <p class="sub">Each one stands alone — same format, same promise, a different round of the interview loop: the coding round, the design round, the level-setting round, and the tech screen that gets you into the loop at all. Progress and theme save in your browser, per course, and nothing is ever sent anywhere.</p>
+  <h2>Five courses. Five weekends.</h2>
+  <p class="sub">Each one stands alone — same format, same promise, a different round of the interview loop: the coding round, the design round, the level-setting round, the frontend design round, and the tech screen that gets you into the loop at all. Progress and theme save in your browser, per course, and nothing is ever sent anywhere.</p>
 
   <div class="courses">
 
@@ -669,11 +675,65 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
       </div>
     </article>
 
-    <!-- ---------- NEXT ---------- -->
-    <article class="course next reveal" data-d="4">
+    <!-- ---------- FRONTEND SYSTEM DESIGN ---------- -->
+    <article class="course fesd reveal" data-d="4">
       <div class="course-top">
         <div>
-          <p class="course-num">// course 05</p>
+          <p class="course-num">// course 05 · the senior frontend round</p>
+          <h3>Frontend System Design in 48</h3>
+        </div>
+        <span class="course-badge">new</span>
+      </div>
+      <p class="tagline">Senior frontend loops now have their own design round: <b>"design an autocomplete", "design a news feed", "design chat"</b> — and it is not the backend round with different nouns. Twelve topics on architecting rendering, state, data flow, and failure handling in the browser, run through the RADIO walkthrough structure, with <b>140+ real interview Q&amp;As answered in full</b>.</p>
+      <div class="course-stats">
+        <span><b>12</b> topics</span>
+        <span><b>140+</b> Q&amp;As with answers</span>
+        <span><b>36</b> drills</span>
+        <span><b>~8h</b> per day</span>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-col">
+          <h6>// day 1 — architect the render</h6>
+          <div class="chips">
+            <span class="chip">The RADIO Loop</span>
+            <span class="chip">Rendering Strategies</span>
+            <span class="chip">Component Architecture</span>
+            <span class="chip">State at Scale</span>
+            <span class="chip">Data Fetching &amp; Caching</span>
+            <span class="chip">Performance &amp; CWV</span>
+          </div>
+        </div>
+        <div class="topic-col">
+          <h6>// day 2 — production-grade frontend</h6>
+          <div class="chips">
+            <span class="chip">Assets &amp; Bundling</span>
+            <span class="chip">Real-Time &amp; Resilience</span>
+            <span class="chip">Lists at Scale</span>
+            <span class="chip">Accessibility &amp; i18n</span>
+            <span class="chip">Frontend Security</span>
+            <span class="chip">Observability</span>
+            <span class="chip ref">+ walkthrough script · question matcher · cheat tables</span>
+          </div>
+        </div>
+      </div>
+      <div class="course-actions">
+        <a class="btn" href="./frontend-system-design.html">Start Frontend SD in 48 <span class="arrow">→</span></a>
+        <div class="deep-links">
+          <a href="./frontend-system-design.html#howto">ground rules</a>
+          <a href="./frontend-system-design.html#d1">day 1</a>
+          <a href="./frontend-system-design.html#assets">day 2</a>
+          <a href="./frontend-system-design.html#playbook">walkthrough script</a>
+          <a href="./frontend-system-design.html#qbank">rapid-fire bank</a>
+          <a href="./frontend-system-design.html#skip">safe to skip</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ---------- NEXT ---------- -->
+    <article class="course next reveal" data-d="5">
+      <div class="course-top">
+        <div>
+          <p class="course-num">// course 06</p>
           <h3>The next one lands here</h3>
         </div>
       </div>
@@ -699,6 +759,8 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
       <tr><td>Applying a level above your current title</td><td class="mono"><b>Behavioral</b> day 1 first</td><td>Punching above is argued with evidence, not years — the leveling + story-bank material is exactly that case.</td></tr>
       <tr><td>Coding screen on Monday</td><td class="mono"><b>DSA</b> day 1 only</td><td>Hash maps, two pointers, sliding window, trees, binary search ≈ 70% of what's actually asked.</td></tr>
       <tr><td>"Technical discussion" screen this week — React/Node/SQL rapid-fire</td><td class="mono"><b>Full-Stack</b></td><td>That round is definitions under pressure. The rapid-fire bank + cheat tables are built as the night-before read.</td></tr>
+      <tr><td>Senior frontend / UI engineer loop — "design an autocomplete" round</td><td class="mono"><b>Frontend SD</b>, then Full-Stack</td><td>That round is graded on the RADIO walkthrough and browser-side tradeoffs — a different rubric from the backend design round.</td></tr>
+      <tr><td>Frontend role, but the JD says "system design round" without specifics</td><td class="mono"><b>Frontend SD</b> day 1, then Design day 1</td><td>Covers both interpretations: the component/state/data walkthrough and the boxes-and-arrows backend basics.</td></tr>
       <tr><td>Long gap since you touched fundamentals, loop not yet scheduled</td><td class="mono"><b>Full-Stack</b>, then DSA</td><td>Rebuilds the vocabulary across the whole stack first; every other course lands better on top of it.</td></tr>
       <tr><td>You've never drawn an architecture diagram out loud</td><td class="mono"><b>Design</b></td><td>The gap there is talking, not knowing. Day 1 fixes it in an afternoon.</td></tr>
       <tr><td>No interview scheduled, just leveling up</td><td class="mono">Either — one per month</td><td>Both are built for re-reading. The reference sections are the part you'll come back to.</td></tr>
@@ -745,7 +807,7 @@ table.tbl td.mono{font-family:var(--font-mono);font-size:.8rem}
 <!-- ======================= FOOTER ======================= -->
 <footer class="footer">
   <p><b>Reading is not practicing.</b> Type every snippet, draw every diagram, narrate out loud. Do the two days, then a little every day until the onsite.</p>
-  <p><a href="./dsa.html">DSA in 48</a> · <a href="./system-design.html">System Design in 48</a> · <a href="./behavioral.html">Behavioral in 48</a> · <a href="./fullstack.html">Full-Stack in 48</a><br>
+  <p><a href="./dsa.html">DSA in 48</a> · <a href="./system-design.html">System Design in 48</a> · <a href="./behavioral.html">Behavioral in 48</a> · <a href="./fullstack.html">Full-Stack in 48</a> · <a href="./frontend-system-design.html">Frontend SD in 48</a><br>
   <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
   <b>good luck — you've been ready longer than you think.</b></p>
 </footer>

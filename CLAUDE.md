@@ -13,6 +13,7 @@ under interview pressure."
 | System Design in 48 | [`system-design.html`](./system-design.html) | [/system-design](https://dsa-in-48.vercel.app/system-design) · [Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
 | Behavioral in 48 | [`behavioral.html`](./behavioral.html) | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 | Full-Stack in 48 | [`fullstack.html`](./fullstack.html) | [/fullstack](https://dsa-in-48.vercel.app/fullstack) · [Pages](https://rajkaria.github.io/dsa-in-48/fullstack.html) |
+| Frontend System Design in 48 | [`frontend-system-design.html`](./frontend-system-design.html) | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
 
 `index.html` used to be the DSA course; it became the landing page in Aug 2026 and the
 course moved to `dsa.html`. Old bookmarks to `/` now land on the hub, one click from the
@@ -49,10 +50,11 @@ pages' footers and the README.
   `--tint` RGB triple, so light/dark flips with one variable. Text on the accent marker
   uses `--on-mark` (always dark) and text on `--ink` fills uses `--on-ink`.
 - **Accent per course:** DSA = yellow `#FFD60A`, System Design = teal `#2DD4BF`,
-  Behavioral = violet `#A78BFA`, Full-Stack = orange `#FB923C`. A new course gets a new
-  accent and swaps `--mark`/`--mark-deep`/`--mark-soft`.
-- **localStorage is namespaced per course** (`dsa48:*`, `sd48:*`, `bh48:*`, `fs48:*`, and
-  `in48:theme` for the landing page) so progress and theme never collide. Keys: `<ns>:progress`,
+  Behavioral = violet `#A78BFA`, Full-Stack = orange `#FB923C`, Frontend System Design =
+  rose `#F472B6`. A new course gets a new accent and swaps
+  `--mark`/`--mark-deep`/`--mark-soft`.
+- **localStorage is namespaced per course** (`dsa48:*`, `sd48:*`, `bh48:*`, `fs48:*`,
+  `fesd48:*`, and `in48:theme` for the landing page) so progress and theme never collide. Keys: `<ns>:progress`,
   `<ns>:collapsed`, `<ns>:theme`. An anti-FOUC bootstrap in `<head>` sets `data-theme`
   before first paint. Theme is deliberately *not* shared across pages.
 - **The landing page is accent-neutral.** It keeps yellow as the page `--mark` and gives

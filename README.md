@@ -13,6 +13,7 @@ routes you to whichever course you need (and to every future one).
 | **System Design in 48** | 12 system-design topics, 32 whiteboard drills, the 6-step interview framework, 3 classic designs (URL shortener · feed · chat) | [/system-design](https://dsa-in-48.vercel.app/system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/system-design.html) |
 | **Behavioral in 48** | 13 behavioral & leadership topics for senior loops at US product companies — story bank, STAR+, hiring-manager round, 40-question senior bank, negotiation | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 | **Full-Stack in 48** | 12 tech-screen topics across JavaScript, React, Node.js, PostgreSQL & AWS — 150+ rapid-fire questions with answers, cheat tables, the night-before refresher | [/fullstack](https://dsa-in-48.vercel.app/fullstack) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/fullstack.html) |
+| **Frontend System Design in 48** | 12 topics for the senior frontend design round — RADIO walkthrough, rendering strategies, state & data architecture, CWV, resilience, a11y, security — 140+ Q&As with answers | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
 
 ---
 
@@ -54,7 +55,7 @@ open index.html
 ```
 
 `index.html` is the landing page; `dsa.html`, `system-design.html`, `behavioral.html`,
-and `fullstack.html` are the courses.
+`fullstack.html`, and `frontend-system-design.html` are the courses.
 
 Or serve the folder:
 
