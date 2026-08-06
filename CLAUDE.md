@@ -23,6 +23,12 @@ project are still named `dsa-in-48` from before the second course — the folder
 Renaming them is optional and would change the Pages URL + the links baked into both
 pages' footers and the README.
 
+## Context docs
+
+| doc | covers |
+|---|---|
+| [`docs/context/fullstack-course.md`](./docs/context/fullstack-course.md) | Full-Stack in 48 (`fullstack.html`) + its landing-page wiring — state, decisions, next steps |
+
 ## Hard rules
 
 - **One file per course. No build step, no framework, no npm dependencies.** Everything —
