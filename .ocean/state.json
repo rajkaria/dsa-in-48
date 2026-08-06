@@ -1,0 +1,71 @@
+{
+  "run_id": "ocean-20260806-150637",
+  "created_at": 1786008997,
+  "spec_path": ".ocean/SPEC.md",
+  "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
+  "status": "running",
+  "current_sprint": 0,
+  "sprints": [
+    {
+      "id": 1,
+      "title": "Verify harness + Frontend System Design in 48 + wiring",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 2,
+      "title": "Learn hub + module template + js-fundamentals",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 3,
+      "title": "js-async + react-deep-dive",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 4,
+      "title": "dsa-foundations + dsa-structures",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 5,
+      "title": "dsa-trees-graphs + dsa-algorithms",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 6,
+      "title": "node-backend + postgres-databases",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 7,
+      "title": "aws-cloud + system-design-backend",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 8,
+      "title": "frontend-system-design deep dive + interview-kit",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 9,
+      "title": "Sweep + landing integration + deploy + REPORT",
+      "status": "todo",
+      "commit": ""
+    }
+  ],
+  "verify_cmd": "bash scripts/verify.sh",
+  "iteration": 0,
+  "reopen_count": 0,
+  "last_checkpoint": 1786009073,
+  "heartbeat": 1786009073,
+  "blockers": [],
+  "notes": ""
+}
