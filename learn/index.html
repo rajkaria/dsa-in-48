@@ -697,6 +697,20 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   } catch (e) {}
 })();
 </script>
+<script>
+/* Vercel's clean URLs serve this directory index at /learn (no trailing slash),
+   which would make the browser resolve our relative module links against the
+   site root — /js-fundamentals instead of /learn/js-fundamentals. Anchor the
+   base back to this directory whenever the path has no slash or extension. */
+(function () {
+  var p = window.location.pathname;
+  if (p.charAt(p.length - 1) !== '/' && p.indexOf('.html') === -1) {
+    var b = document.createElement('base');
+    b.href = window.location.origin + p + '/';
+    document.head.appendChild(b);
+  }
+})();
+</script>
 </head>
 <body>
 <div class="wrap">
