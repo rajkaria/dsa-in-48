@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -675,6 +679,14 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#services"><span><i class="dot" data-for="services"></i> The Twelve Services</span></a>
     <a class="side-link" href="#architectures"><span><i class="dot" data-for="architectures"></i> Three Architectures</span></a>
     <a class="side-link" href="#iam"><span><i class="dot" data-for="iam"></i> IAM Without Tears</span></a>
+    <a class="side-link" href="#iamplus"><span><i class="dot" data-for="iamplus"></i> IAM, Mechanically</span></a>
+    <a class="side-link" href="#vpc"><span><i class="dot" data-for="vpc"></i> VPC Networking</span></a>
+    <a class="side-link" href="#compute"><span><i class="dot" data-for="compute"></i> The Compute Spectrum</span></a>
+    <a class="side-link" href="#s3"><span><i class="dot" data-for="s3"></i> S3, Deeply</span></a>
+    <a class="side-link" href="#datastores"><span><i class="dot" data-for="datastores"></i> RDS · Aurora · Dynamo</span></a>
+    <a class="side-link" href="#messaging"><span><i class="dot" data-for="messaging"></i> SQS · SNS · EventBridge</span></a>
+    <a class="side-link" href="#edge"><span><i class="dot" data-for="edge"></i> CloudFront &amp; the Edge</span></a>
+    <a class="side-link" href="#iac"><span><i class="dot" data-for="iac"></i> Infrastructure as Code</span></a>
     <a class="side-link" href="#ops"><span><i class="dot" data-for="ops"></i> Running It</span></a>
     <a class="side-link" href="#cost"><span><i class="dot" data-for="cost"></i> The Bill</span></a>
   </nav>
@@ -694,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/6</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/6</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -721,13 +733,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: IAM &amp; cost judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>6</b> sections</span>
-    <span><b>6</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>14</b> quiz questions</span>
     <span><b>3</b> reference architectures</span>
-    <span><b>~3.5h</b> self-paced</span>
+    <span><b>8</b> runnable panels</span>
+    <span><b>~9.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#map">Unfold the map <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the map &amp; the twelve</span></div>
 
 <!-- 1 · MAP -->
 <section class="lesson" id="map">
@@ -820,6 +835,8 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — the working stack, piece by piece</span></div>
 
 <!-- 3 · ARCHITECTURES -->
 <section class="lesson" id="architectures">
@@ -934,10 +951,570 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 5 · OPS -->
-<section class="lesson" id="ops">
+<!-- 5 · IAM PLUS -->
+<section class="lesson" id="iamplus">
   <div class="lesson-head">
     <span class="lesson-num">05</span>
+    <div>
+      <h3>IAM, mechanically — policy evaluation &amp; assumed roles</h3>
+      <p class="lvl">intermediate → how a request is actually judged</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 04 gave the philosophy; here's the machine. Every API call is judged against all applicable policies by three rules in strict order: <b>(1) explicit Deny anywhere → denied, final</b> — no Allow outranks it; <b>(2) otherwise, any matching Allow → allowed; (3) otherwise → implicit deny</b> (the default state of everything). Policies are JSON statements — Effect, Action (<code>s3:GetObject</code>), Resource (an ARN, wildcardable), optional Condition (IP, tags, encryption state). That's the whole calculus; everything else is <i>which</i> policies apply (identity-attached, resource-attached like bucket policies, permission boundaries, org SCPs — all funnel into the same three rules).</p>
+    <p><b>AssumeRole</b> is the verb behind "roles, never keys": STS issues <b>temporary credentials</b> (minutes-hours) for a role, given the role's <b>trust policy</b> agrees you may wear it. EC2 instance profiles, Lambda execution roles, cross-account access, and CI deployments via OIDC federation — all the same handshake: prove who you are, borrow a costume with its own permissions, let it expire.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">policy-judge.js — run it (the evaluator, complete)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// the three-rule judgment, implemented
+const match = (pattern, value) =&gt;
+  new RegExp('^' + pattern.split('*').map(s =&gt; s.replace(/[.+?^${}()|[\]\\]/g, '\\$&amp;')).join('.*') + '$').test(value);
+
+function judge(policies, action, resource) {
+  const applicable = policies.flatMap(p =&gt; p.statements)
+    .filter(s =&gt; match(s.action, action) &amp;&amp; match(s.resource, resource));
+  if (applicable.some(s =&gt; s.effect === 'Deny'))  return 'DENY  (explicit — nothing overrides it)';
+  if (applicable.some(s =&gt; s.effect === 'Allow')) return 'ALLOW';
+  return 'DENY  (implicit — nobody said yes)';
+}
+
+const policies = [
+  { name: 'app-role', statements: [
+    { effect: 'Allow', action: 's3:GetObject', resource: 'arn:aws:s3:::cat-photos/*' },
+    { effect: 'Allow', action: 's3:PutObject', resource: 'arn:aws:s3:::cat-photos/uploads/*' },
+  ]},
+  { name: 'org-guardrail', statements: [
+    { effect: 'Deny', action: 's3:*', resource: 'arn:aws:s3:::cat-photos/vet-records/*' },
+  ]},
+];
+
+const cases = [
+  ['s3:GetObject', 'arn:aws:s3:::cat-photos/mochi.jpg'],
+  ['s3:PutObject', 'arn:aws:s3:::cat-photos/uploads/new.jpg'],
+  ['s3:PutObject', 'arn:aws:s3:::cat-photos/mochi.jpg'],          // outside uploads/
+  ['s3:GetObject', 'arn:aws:s3:::cat-photos/vet-records/x.pdf'],  // guardrail!
+  ['s3:DeleteObject', 'arn:aws:s3:::cat-photos/mochi.jpg'],       // nobody allowed it
+];
+for (const [action, res] of cases)
+  console.log(`${action.padEnd(16)} ${res.split(':::')[1].padEnd(28)} → ${judge(policies, action, res)}`);
+console.log('\nnote the vet-records GET: an Allow matched AND a Deny matched — Deny wins.');
+console.log('that is why org guardrails are Denies: they cannot be accidentally out-allowed.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">five judgments, three rules — the vet-records case is the whole exam</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-iamp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your CI needs to deploy to AWS. The modern setup — and why not an IAM user with access keys in CI secrets?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">IAM user + keys is fine — CI secret stores are encrypted</button>
+        <button class="mcq-opt" type="button" data-ok>OIDC federation: CI proves its identity per-run and AssumeRoles into short-lived credentials — no long-lived secret exists to leak, rotate, or forget in a fork</button>
+        <button class="mcq-opt" type="button">A shared admin role with MFA</button>
+        <button class="mcq-opt" type="button">Root account keys, restricted by IP condition</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> static keys are the #1 breach vector (leaked in logs, forks, laptops) and they never expire on their own. Federation inverts it: the trust policy says "tokens signed by this CI provider, for this repo and branch, may wear the deploy role for an hour" — leakproof by construction, auditable per-run. "No long-lived credentials anywhere" is the sentence that passes security review.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Evaluation order in one line: <b>"explicit deny, then any allow, else implicit deny"</b> — and SCPs/boundaries can only shrink, never grant.</li>
+        <li>Least privilege is iterative in practice: start narrow, read Access Analyzer / CloudTrail's "what did it actually use", tighten. Nobody writes perfect policies first try — saying so is credibility, not weakness.</li>
+        <li>Resource policies (bucket policy) vs identity policies: cross-account access needs a yes from BOTH sides — the handshake framing prevents the classic S3-sharing confusion.</li>
+        <li><code>sts:AssumeRole</code> chains are auditable in CloudTrail — "who wore the costume, when, from where" is the incident-response question IAM answers.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · VPC -->
+<section class="lesson" id="vpc">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>VPC networking — subnets, routes &amp; the two firewalls</h3>
+      <p class="lvl">intermediate → where packets may go, decided by four tables</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>VPC</b> is your private network: a CIDR block (say <code>10.0.0.0/16</code>) carved into <b>subnets</b> per availability zone. A subnet is <b>public</b> or <b>private</b> by exactly one distinction: does its <b>route table</b> send <code>0.0.0.0/0</code> to an <b>Internet Gateway</b> (two-way internet) or to a <b>NAT Gateway</b> (outbound-only — the pattern for app servers that call APIs but must not be reachable)? The standard stage-2 topology: ALB in public subnets, app + database in private ones, NAT for the app's outbound. Databases get no internet route at all.</p>
+    <p>Two firewalls filter what routes allow: <b>Security Groups</b> — attached to resources, <b>stateful</b> (a reply to an allowed request is automatically allowed), allow-rules only, and they can reference <i>each other</i> ("db-sg allows 5432 from app-sg" — identity-based, survives IP churn); <b>NACLs</b> — subnet-level, stateless, with deny rules — the coarse outer fence you mostly leave alone.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">packet-walk.js — run it (route table + SG evaluation)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const subnets = {
+  'public-a':  { cidr: '10.0.1.0/24', route: { '0.0.0.0/0': 'igw' } },
+  'private-a': { cidr: '10.0.10.0/24', route: { '0.0.0.0/0': 'nat' } },
+  'db-a':      { cidr: '10.0.20.0/24', route: {} },                    // no internet route
+};
+const sgs = {
+  'alb-sg': [{ port: 443, from: '0.0.0.0/0' }],
+  'app-sg': [{ port: 3000, from: 'alb-sg' }],          // SG references SG!
+  'db-sg':  [{ port: 5432, from: 'app-sg' }],
+};
+
+function inbound(target, port, source) {
+  const ok = sgs[target].some(r =&gt; r.port === port &amp;&amp; (r.from === source || r.from === '0.0.0.0/0'));
+  return `${source} → ${target}:${port}  ${ok ? '✓ allowed' : '✗ no rule → dropped'}`;
+}
+console.log('— inbound, judged by security groups —');
+console.log(inbound('alb-sg', 443, '0.0.0.0/0'));
+console.log(inbound('app-sg', 3000, 'alb-sg'));
+console.log(inbound('app-sg', 3000, '0.0.0.0/0'));     // internet straight to app?
+console.log(inbound('db-sg', 5432, 'app-sg'));
+console.log(inbound('db-sg', 5432, 'alb-sg'));          // ALB to DB?
+
+console.log('\n— outbound, judged by route tables —');
+for (const [name, s] of Object.entries(subnets)) {
+  const via = s.route['0.0.0.0/0'];
+  console.log(`${name.padEnd(10)} to api.stripe.com → ` + (
+    via === 'igw' ? 'internet gateway (and the internet can route BACK in)' :
+    via === 'nat' ? 'NAT gateway (outbound only — no unsolicited inbound)' :
+    'NO ROUTE — the database cannot phone anyone. Correct.'));
+}</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">SG-references-SG is the line to remember — identity beats IP lists</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-vpc-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">App servers in private subnets need to call Stripe's API. They have no public IPs. What makes the call work, and what keeps them unreachable?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">An Internet Gateway route — it's required for any internet traffic</button>
+        <button class="mcq-opt" type="button" data-ok>Their route table points 0.0.0.0/0 at a NAT Gateway — outbound connections are translated and replies return, but the internet cannot initiate a connection inward</button>
+        <button class="mcq-opt" type="button">Security groups open port 443 outbound to Stripe's IPs</button>
+        <button class="mcq-opt" type="button">A VPC peering connection to Stripe</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> NAT is the "can call out, can't be called" primitive — the same asymmetry as your home router. SGs (option C) permit but don't route — without the NAT route there's no path regardless of rules. And the cost tie-in worth volunteering: NAT Gateways bill per-GB processed — heavy S3 traffic from private subnets wants a (free) S3 gateway endpoint instead, a classic bill-surprise from §14's ambush list.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The one-sentence taxonomy: "routes decide <i>where packets can go</i>; SGs decide <i>which conversations may start</i>; stateful means replies ride free."</li>
+        <li>Multi-AZ means the whole sandwich duplicated per AZ — subnets are AZ-scoped; one NAT per AZ or you've built a cross-AZ single point of failure (and a data-transfer bill).</li>
+        <li>VPC endpoints (gateway for S3/Dynamo, interface for the rest) keep AWS-bound traffic off the NAT — security AND cost in one move.</li>
+        <li>"Why did the connection time out?" debugging order: route table → SG → NACL → the service's own binding — naming a fixed order is the ops-experience tell.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · COMPUTE -->
+<section class="lesson" id="compute">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>The compute spectrum — EC2 to Lambda, priced honestly</h3>
+      <p class="lvl">intermediate → workload shape picks the runtime, not fashion</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 02 introduced the slider; this section gives it numbers and edges. <b>EC2</b>: a rented computer — max control, you patch it, you pay while it idles. <b>ECS on Fargate</b>: containers without servers — the steady-state default; you say CPU/memory/count, AWS finds the metal. <b>Lambda</b>: functions per-request — zero idle cost, automatic scale, but <b>cold starts</b> (a paused runtime spinning up: ~100ms–1s+, worse with VPC attachment and heavy runtimes), 15-minute max, and per-invocation pricing that <i>crosses over</i>: at sustained load, always-on containers get cheaper than a million-invocations bill. <b>App Runner / Elastic Beanstalk</b>: PaaS wrappers — fine starts, fewer knobs.</p>
+    <p>The decision inputs that matter: <b>traffic shape</b> (spiky/rare → Lambda; steady → containers), <b>duration</b> (long jobs can't Lambda), <b>latency floor</b> (cold starts on the checkout path?), <b>state</b> (websockets §nb-13 want long-lived processes), and <b>ops appetite</b>. Say those five and the "which compute?" question answers itself in front of the interviewer.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">crossover-math.js — run it (Lambda vs Fargate, priced)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// rough public-ish prices (illustrative, the SHAPE is the lesson)
+const lambda = (reqPerMo, msPerReq, gb) =&gt; {
+  const gbSeconds = reqPerMo * (msPerReq / 1000) * gb;
+  return reqPerMo * 0.0000002 + gbSeconds * 0.0000167;
+};
+const fargate = (vcpu, gb) =&gt; (vcpu * 0.04048 + gb * 0.004445) * 730;  // always-on, hourly
+
+console.log('API: 200ms/req at 1GB — Lambda vs one 0.5vCPU/1GB Fargate task:\n');
+console.log('  req/month        Lambda          Fargate');
+for (const req of [1e5, 1e6, 5e6, 2e7, 1e8]) {
+  const l = lambda(req, 200, 1), f = fargate(0.5, 1);
+  console.log(`  ${req.toExponential(0).padEnd(8)}   $${l.toFixed(2).padStart(9)}   $${f.toFixed(2).padStart(9)}   ${l &lt; f ? '← Lambda wins' : '← container wins'}`);
+}
+console.log('\nthe crossover is real and it is BORING traffic that finds it:');
+console.log('spiky/rare → pay per use. steady hum → pay for the box.');
+console.log('(and at 1e8, remember the container needs replicas — the shape still holds.)');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">find the row where the winner flips — that row is the whole decision</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-comp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Nightly video transcoding: 4 hours of heavy CPU, once a day. Which compute, and what's wrong with the others?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Lambda — it's the most modern option</button>
+        <button class="mcq-opt" type="button" data-ok>Batch/scheduled Fargate task (or Spot EC2 for the price) — Lambda's 15-min cap excludes it, and an always-on server idles 20 hours a day for nothing</button>
+        <button class="mcq-opt" type="button">An always-on EC2 instance sized for the peak</button>
+        <button class="mcq-opt" type="button">App Runner with autoscaling</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the three constraints eliminate cleanly: duration kills Lambda (15 min), idle-cost kills the 24/7 box (83% waste), and request-serving PaaS (App Runner) isn't shaped for batch at all. Scheduled container tasks — spun up, run, torn down — fit exactly; Spot instances add the "interruptible batch work at 70% off" flourish. Elimination-by-constraint is the answer format that scores.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Cold-start mitigations in one breath: provisioned concurrency (paying to pre-warm), lighter runtimes, keeping Lambdas out of VPCs unless needed — then the honest turn: "if I'm paying to keep it warm, I've reinvented a container."</li>
+        <li>EKS vs ECS: Kubernetes buys portability and its ecosystem at real operational cost — "ECS until the org demands k8s" is a defensible default; wanting k8s on a three-person team is the anti-signal.</li>
+        <li>Graviton (ARM) is a ~20% discount for a checkbox in most Node workloads — small, real, and shows you read the bill.</li>
+        <li>Autoscaling lag: scale-out takes minutes — spiky-to-zero traffic is Lambda's actual home turf; containers absorb spikes only above a warm floor.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · S3 -->
+<section class="lesson" id="s3">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>S3, deeply — classes, lifecycle &amp; the URL-shaped passes</h3>
+      <p class="lvl">intermediate → the object store as a system component</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>S3 is a <b>key→object</b> store (no real folders — the slashes are cosplay) with eleven-nines durability and, since 2020, <b>strong read-after-write consistency</b> (the eventual-consistency folklore is dated — knowing that dates <i>you</i>). The system-design power comes from three features. <b>Storage classes + lifecycle rules</b>: Standard → Infrequent Access → Glacier tiers, with rules that demote objects on a schedule — logs that are hot for a week and archival forever shouldn't pay hot prices for year two. <b>Presigned URLs</b> (§02's scoped passes): uploads and downloads go <b>client↔S3 directly</b>, so 100MB videos never transit your Node server (backpressure problem deleted, not solved). <b>Event notifications</b>: an upload can trigger a Lambda/queue — "thumbnail on upload" without polling.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">lifecycle-bill.js — run it (classes + lifecycle, priced)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 10TB of logs/month, hot for 30 days, kept 1 year for compliance
+const TB = 1024;             // GB
+const prices = { standard: 0.023, ia: 0.0125, glacierIR: 0.004, deep: 0.00099 }; // $/GB-mo
+
+const strategies = {
+  'all Standard forever': (mo) =&gt; {
+    let cost = 0;                                           // data ACCUMULATES —
+    for (let m = 1; m &lt;= mo; m++) cost += 10 * TB * m * prices.standard;
+    return cost;                                            // month 12 stores 120TB
+  },
+  'lifecycle: 30d Std → IA → 90d Glacier-IR': (mo) =&gt; {
+    let cost = 0;
+    for (let m = 1; m &lt;= mo; m++) {
+      cost += 10 * TB * prices.standard;                    // this month's fresh logs
+      if (m &gt; 1) cost += 10 * TB * Math.min(m - 1, 2) * prices.ia;   // months 2-3
+      if (m &gt; 3) cost += 10 * TB * (m - 3) * prices.glacierIR;       // 4+
+    }
+    return cost;
+  },
+};
+for (const [name, fn] of Object.entries(strategies))
+  console.log(`${name.padEnd(42)} 12-month total: $${Math.round(fn(12)).toLocaleString()}`);
+
+console.log('\nsame bytes, same durability — the lifecycle RULE is the savings.');
+console.log('the catch to name: retrieval fees + minimum storage durations on cold tiers;');
+console.log('Glacier is for data you expect NOT to read. Reading it all back monthly un-saves everything.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">one lifecycle rule ≈ halving the bill — and the retrieval-fee caveat is the senior half</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-s3-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Users upload 200MB videos "through" your API (client → Node → S3) and uploads stall under load. The architectural fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Bigger Fargate tasks — more memory buffers more uploads</button>
+        <button class="mcq-opt" type="button" data-ok>Your API returns a presigned PUT URL (with content-type/size conditions); the client uploads straight to S3, multipart for size; an S3 event kicks off processing — your server never touches the bytes</button>
+        <button class="mcq-opt" type="button">Stream through Node with proper backpressure</button>
+        <button class="mcq-opt" type="button">Have clients base64 the video into JSON</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> option C is the well-engineered version of the wrong architecture — the bytes still consume your compute, connections, and NAT. Presigning moves the data plane to S3 entirely; your server does control-plane work only (auth, issuing the pass, reacting to the done-event). "Move the bytes off my boxes" is the S3 answer to a whole family of questions — and the conditions on the presigned URL (size cap, content type) are the security detail that completes it.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Key design still matters at extreme request rates (prefix throughput) — but the old hash-prefix ritual is mostly obsolete; knowing it's <i>dated</i> is the current knowledge.</li>
+        <li>Versioning + lifecycle noncurrent-expiry = undelete protection without infinite growth; MFA-delete / Object Lock for the compliance conversation.</li>
+        <li>Static site hosting: S3 + CloudFront (§11) is the canonical "this page you're reading" architecture — zero servers, pennies.</li>
+        <li>Egress is the ambush (§14): S3 → internet bills per GB; S3 → CloudFront → users is cheaper AND faster — the rare same-direction win.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 9 · DATASTORES -->
+<section class="lesson" id="datastores">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>RDS, Aurora &amp; DynamoDB — the managed-data decision</h3>
+      <p class="lvl">intermediate → relational vs single-table, without the tribalism</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>RDS</b> is managed Postgres/MySQL — everything the postgres module taught, with AWS running backups, patches, Multi-AZ failover, and read replicas. <b>Aurora</b> reimplements the storage layer (six-way replicated, storage auto-grows, replicas share it) — better failover and scale headroom at a premium; Aurora Serverless adds per-second elasticity. <b>DynamoDB</b> is a different animal: a managed <b>key-value/wide-column</b> store where you get O(1)-ish reads/writes at any scale — <i>if</i> you know your <b>access patterns up front</b>. Single-table design inverts everything §pg-02 taught: instead of normalized entities joined at query time, you pre-join by storing items so each access pattern is one partition-key lookup. No ad-hoc queries, no joins — that's the price of horizontal infinity.</p>
+    <p>The decision heuristic that survives contact: <b>relational until access patterns are few, known, and scale-critical.</b> Dynamo shines for carts, sessions, feature flags, IoT firehoses; it punishes evolving products that suddenly need "show me all orders over $50 last month" (that's a scan, or an export to analytics).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">single-table.js — run it (the same data, both shapes)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// access pattern: "load a cat AND its recent visits" — one page, hot path
+// RELATIONAL: two tables, a join (or two queries) at read time
+const cats = [{ id: 'c1', name: 'Mochi' }];
+const visits = [
+  { catId: 'c1', date: '2026-08-01', note: 'checkup' },
+  { catId: 'c1', date: '2026-08-05', note: 'shots' },
+];
+console.log('relational read: SELECT … JOIN visits — flexible, any future question answerable\n');
+
+// DYNAMO single-table: pre-joined by KEY DESIGN — entity type lives in the sort key
+const table = [
+  { PK: 'CAT#c1', SK: 'PROFILE',            name: 'Mochi' },
+  { PK: 'CAT#c1', SK: 'VISIT#2026-08-01',   note: 'checkup' },
+  { PK: 'CAT#c1', SK: 'VISIT#2026-08-05',   note: 'shots' },
+];
+// Query(PK = CAT#c1) → profile + visits, ONE request, already sorted by SK
+const page = table.filter(i =&gt; i.PK === 'CAT#c1');
+console.log('dynamo read: Query(PK="CAT#c1") returns', page.length, 'items in one round trip:');
+page.forEach(i =&gt; console.log(`  ${i.SK.padEnd(18)} ${i.name ?? i.note}`));
+
+console.log('\nnow the question the design DIDN\'T plan for: "all visits in August, any cat"');
+console.log('relational: WHERE date BETWEEN … (an index away).');
+console.log('dynamo: full table Scan (reads EVERY item) — or a new GSI shaped for it.');
+console.log('→ Dynamo trades query freedom for guaranteed-flat latency. Know which you\'re buying.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">one Query vs one Scan — the whole single-table bargain in two lines</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-data-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A startup's product is evolving weekly; queries change constantly; scale is ~thousands of users. A consultant proposes DynamoDB single-table "for scale". Assessment?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Correct — designing for scale early avoids migrations</button>
+        <button class="mcq-opt" type="button" data-ok>Wrong tool for this phase — single-table requires access patterns known up front, and weekly product pivots mean weekly key-redesigns; RDS Postgres answers arbitrary new questions with an index, at this scale trivially</button>
+        <button class="mcq-opt" type="button">Wrong only because Aurora is strictly better than Dynamo</button>
+        <button class="mcq-opt" type="button">Either works — data stores are interchangeable behind an ORM</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Dynamo's constraint (patterns-first) is exactly what an exploring product can't provide — you'd be buying web-scale latency guarantees you don't need with flexibility you desperately do. The reverse mistake is real too (Postgres melting under a true single-pattern firehose) — the skill being tested is matching the store to the <i>certainty of the access patterns</i>, not to ambition. "Postgres until the patterns crystallize" is the calibrated answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Read replicas ≠ Multi-AZ: replicas scale <i>reads</i> (async — the read-your-writes caveat from pg §15), Multi-AZ is <i>failover</i> (sync standby). Mixing them up is the classic slip.</li>
+        <li>Dynamo vocabulary that signals depth: partition key design against hot partitions, GSIs as "alternate pre-joins", on-demand vs provisioned capacity, DAX for read-through caching.</li>
+        <li>ElastiCache (Redis) completes the data tier: cache-aside for hot reads, plus its side jobs — rate limits (§nb-11), pub/sub (§nb-13), sessions (§nb-12). One box, four cameos.</li>
+        <li>"Big analytical questions" belong to neither: export to the analytics stack (Athena/Redshift) — OLTP stores answering OLAP questions is its own outage genre.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · MESSAGING -->
+<section class="lesson" id="messaging">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>SQS, SNS &amp; EventBridge — decoupling, with delivery honesty</h3>
+      <p class="lvl">intermediate → queues vs fan-out vs event routing, and the retry rules</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Three services, three shapes. <b>SQS</b> — a queue: one producer side, one consumer <i>pool</i>; work sits until someone takes it; scale consumers to drain faster. <b>SNS</b> — pub/sub fan-out: one event, N subscribers each get a copy (email service AND analytics AND audit — none knowing about the others). <b>EventBridge</b> — an event <i>bus</i> with content-based routing rules ("orders over $500 → fraud check"), schemas, and third-party sources; SNS with a brain, for event-driven architectures. The standard combo: SNS/EventBridge fans out <i>into</i> SQS queues per consumer, so each consumer gets buffering + retries independently.</p>
+    <p>The honesty part every interview probes: SQS standard is <b>at-least-once</b> — a consumer that takes a message but crashes before deleting it will see the message <b>redelivered</b> after the <b>visibility timeout</b>. That's not a bug; it's the contract. Consequences: handlers must be <b>idempotent</b> (dedupe by message/business id — nb's dedupe map, now mandatory), poison messages need a <b>DLQ</b> (dead-letter queue after N failed receives — quarantine, alert, inspect), and ordering isn't promised (FIFO queues exist, at a throughput price, for when it truly is).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">at-least-once.js — run it (crash, redelivery, idempotent survival)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// an SQS-ish queue: visibility timeout + receive counts + DLQ after 3
+const queue = [{ id: 'm1', body: 'charge order#42 — $19', receives: 0, visibleAt: 0 }];
+const dlq = [];
+const processed = new Set();                       // idempotency ledger (by business key)
+
+function receiveAndHandle(t, { crash = false } = {}) {
+  const msg = queue.find(m =&gt; m.visibleAt &lt;= t);
+  if (!msg) return console.log(`t=${t}s: queue quiet`);
+  msg.receives++;
+  msg.visibleAt = t + 30;                          // invisible while being worked
+  if (msg.receives &gt; 3) {
+    queue.splice(queue.indexOf(msg), 1); dlq.push(msg);
+    return console.log(`t=${t}s: receive #${msg.receives} → over limit → DLQ + alert 🚨`);
+  }
+  console.log(`t=${t}s: receive #${msg.receives} of "${msg.body}"`);
+  if (crash) {
+    processed.add('order#42');
+    console.log('        charged $19, ledger updated');
+    return console.log('        💥 consumer crashed BEFORE deleting the message');
+  }
+  if (processed.has('order#42')) {
+    console.log('        already-processed ledger hit → skip charge, just delete ✓ (idempotent!)');
+  } else {
+    processed.add('order#42');
+    console.log('        charged $19, ledger updated');
+  }
+  queue.splice(queue.indexOf(msg), 1);             // the DELETE — the real ack
+  console.log('        message deleted — done');
+}
+
+receiveAndHandle(0, { crash: true });              // charge happens, delete doesn't!
+receiveAndHandle(10);                              // still invisible…
+receiveAndHandle(31);                              // visibility expired → REDELIVERED
+console.log('\nwithout the ledger, order#42 is charged twice. At-least-once means');
+console.log('"design for the duplicate" — the queue kept its promise; naive code broke its own.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the crash-then-redelivery is the whole contract — the ledger is the fix</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-msg-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Order events must reach: email service, warehouse, analytics. New consumers get added quarterly. The wiring?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The API calls all three services in sequence</button>
+        <button class="mcq-opt" type="button">One SQS queue all three read from</button>
+        <button class="mcq-opt" type="button" data-ok>SNS/EventBridge topic → one SQS queue PER consumer — each gets every event with its own buffering, retries and DLQ; new consumers subscribe without touching anyone</button>
+        <button class="mcq-opt" type="button">Write to a table the services poll every minute</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> option B is the famous trap — a queue delivers each message to ONE consumer in the pool; the three services would steal each other's events. Fan-out-then-buffer gives broadcast semantics AND per-consumer queue benefits. Option A couples the API to every consumer's uptime (checkout fails because analytics is down — the exact coupling messaging exists to delete). The "add a consumer without touching producers" clause is what makes this an architecture answer, not a services quiz.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Queue health metric: <b>oldest message age</b>, not queue length — length spikes are fine if drain keeps up; age growing means falling behind (aws §13's alarm list, justified).</li>
+        <li>Exactly-once is a lie at the transport level — FIFO's dedupe window helps, but true exactly-once is at-least-once + idempotent handlers, always (system-design's truth, restated).</li>
+        <li>Backpressure appears AGAIN: queues absorb producer/consumer speed mismatch — the async module's bounded-buffer, as managed infrastructure.</li>
+        <li>Long polling (WaitTimeSeconds=20) is the free fix for the "empty-receive bill and latency" — one parameter, worth naming.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the edge &amp; the codified stack</span></div>
+
+<!-- 11 · EDGE -->
+<section class="lesson" id="edge">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>CloudFront &amp; the edge — caching where the users are</h3>
+      <p class="lvl">advanced → cache keys, invalidation &amp; signed access</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>CloudFront</b> parks copies of your responses in ~600 locations near users: static assets obviously, but also API responses (short TTLs), and even dynamic content benefits from edge <b>connection termination</b> (TLS handshakes complete near the user; the long haul rides AWS's backbone). The engineering lives in two decisions. The <b>cache key</b>: which parts of the request (path, which headers, which query params, cookies?) define "the same response" — too broad a key and users see each other's content (the cache-poisoning family of bugs); too narrow and your hit ratio evaporates (every UTM param a fresh miss). And <b>invalidation strategy</b>: paths can be invalidated (slow-ish, costs per path), but the grown-up pattern is <b>immutable filenames</b> — <code>app.3f9c2.js</code> cached forever, deploys just reference new names (the frontend course's asset story, seen from the server side).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">cache-key-design.js — run it (hit ratios under three key choices)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1000 requests for /api/cats: 3 real variants (en/de/fr via Accept-Language),
+// but every request carries a unique utm_source query param
+function simulate(keyOf) {
+  const cache = new Map();
+  let hits = 0;
+  for (let i = 0; i &lt; 1000; i++) {
+    const req = {
+      path: '/api/cats',
+      lang: ['en', 'de', 'fr'][i % 3],
+      query: `utm_source=campaign${i}`,            // unique every time!
+      user: `u${i % 40}`,
+    };
+    const key = keyOf(req);
+    if (cache.has(key)) hits++;
+    else cache.set(key, `response-${req.lang}`);
+  }
+  return { hits: (hits / 10).toFixed(1) + '%', variants: cache.size };
+}
+
+console.log('key = path only:                 ', JSON.stringify(simulate(r =&gt; r.path)),
+  ' ← 99% hits BUT German users get English (wrong-content bug)');
+console.log('key = path+lang (correct):       ', JSON.stringify(simulate(r =&gt; r.path + r.lang)));
+console.log('key = path+lang+query (naive):   ', JSON.stringify(simulate(r =&gt; r.path + r.lang + r.query)),
+  ' ← utm params nuked the cache');
+console.log('key = path+lang+user:            ', JSON.stringify(simulate(r =&gt; r.path + r.lang + r.user)),
+  ' ← per-user keys: why personalized responses do not edge-cache');
+console.log('\nthe craft: include EXACTLY what changes the response — nothing else.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">same traffic, four hit ratios — the key definition IS the caching strategy</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-edge-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Paid course videos live in S3. Users must access them only while subscribed, via CDN. The pattern?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Public bucket + obscure UUID filenames</button>
+        <button class="mcq-opt" type="button" data-ok>Private bucket, CloudFront with Origin Access Control in front, and CloudFront signed URLs/cookies with short expiry issued by your auth layer — the CDN checks the signature at the edge</button>
+        <button class="mcq-opt" type="button">Stream every video through the API server after auth</button>
+        <button class="mcq-opt" type="button">S3 presigned URLs shared directly, skipping the CDN</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> obscurity (A) is one shared link from collapse; proxying (C) is the §08 bytes-through-my-server mistake with video-sized consequences; raw S3 presigns (D) work but forfeit edge caching and per-region performance for your biggest objects. Signed URLs <i>at the CDN</i> put the auth check at the same place as the cache — OAC keeps S3 sealed except to CloudFront. Layered: bucket private, edge authorized, links expiring.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>stale-while-revalidate</code> semantics at the edge: serve the old copy, refresh in the background — the tail-latency killer for API caching; name it.</li>
+        <li>Edge compute (CloudFront Functions/Lambda@Edge) for header rewrites, auth checks, A/B assignment — logic that must run before the cache decision.</li>
+        <li>Cache-Control comes FROM the origin — the CDN obeys your headers; "the CDN is misbehaving" is usually your own max-age (web-platform module's caching grammar, applied).</li>
+        <li>Hit ratio is a business metric: each point of hit ratio is origin load AND egress cost AND latency — the rare slide where ops, cost, and UX agree.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · IAC -->
+<section class="lesson" id="iac">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Infrastructure as code — desired state, diffed</h3>
+      <p class="lvl">advanced → why clicking is a liability, and what plan/apply really do</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Console-clicked infrastructure has three fatal properties: it's <b>unreproducible</b> (staging ≠ prod in ways nobody can list), <b>unreviewable</b> (no diff, no PR, no "who added the 0.0.0.0/0 ingress?"), and <b>undocumented by construction</b>. <b>IaC</b> (Terraform/OpenTofu, CloudFormation, CDK, Pulumi) inverts it: you declare <b>desired state</b> in versioned files; the tool reads <b>actual state</b>, computes a <b>diff</b>, and shows the <b>plan</b> — create this, change that, <i>destroy this</i> — before touching anything. Review the plan like code review, because it is: the plan is the PR diff for your infrastructure.</p>
+    <p><b>Drift</b> is the enemy the workflow guards against: someone hotfixes in the console, reality diverges from the files, and the next apply either reverts their fix or the files lie forever. The discipline: the files are the truth, console changes are incidents.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">mini-plan.js — run it (desired vs actual → a plan)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const desired = {
+  'sg.app':      { ingress: '3000 from alb-sg' },
+  'db.main':     { size: 'db.r6g.large', multiAZ: true },
+  's3.assets':   { versioning: true },
+  'cdn.main':    { origin: 's3.assets' },
+};
+const actual = {
+  'sg.app':      { ingress: '3000 from 0.0.0.0/0' },   // 3am console "fix" — drift!
+  'db.main':     { size: 'db.r6g.large', multiAZ: true },
+  's3.assets':   { versioning: false },                 // never enabled
+  'legacy.ec2':  { size: 't2.micro' },                  // in the account, not in code
+};
+
+console.log('terraform plan:\n');
+for (const key of new Set([...Object.keys(desired), ...Object.keys(actual)])) {
+  const d = desired[key], a = actual[key];
+  if (d &amp;&amp; !a) console.log(`  + create  ${key}  ${JSON.stringify(d)}`);
+  else if (!d &amp;&amp; a) console.log(`  - DESTROY ${key}  ← unmanaged resource: import it or lose it`);
+  else if (JSON.stringify(d) !== JSON.stringify(a))
+    console.log(`  ~ change  ${key}  ${JSON.stringify(a)} → ${JSON.stringify(d)}`);
+  else console.log(`    ok      ${key}`);
+}
+console.log('\ntwo findings tell two stories:');
+console.log('· sg.app drift: someone opened the app to the world in the console — the plan CAUGHT it');
+console.log('· the DESTROY line: why you read plans before applying. Always. Every time.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the security-group drift is the whole argument for IaC in one line</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="aw-iac-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">During an incident, an engineer widened a security group in the console. Post-incident, what's the correct reconciliation?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — the incident is over and the fix worked</button>
+        <button class="mcq-opt" type="button" data-ok>Decide deliberately: either codify the change in a reviewed PR (if it should stay) or run apply to revert it (if it shouldn't) — the drift must not survive as an unrecorded difference</button>
+        <button class="mcq-opt" type="button">Delete the Terraform state so it stops complaining</button>
+        <button class="mcq-opt" type="button">Add the console change to a wiki page</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> unreconciled drift is a time bomb with two triggers — the next routine apply silently reverts a "fix" someone depends on, or the files permanently lie about your security posture (an un-reviewed 0.0.0.0/0 living in prod). Console-in-emergency is fine; <i>unrecorded afterward</i> is the sin. Option C corrupts the tool's memory of reality; option D documents the lie instead of resolving it. "Drift is an open incident until reconciled" is the operating principle.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The tool taxonomy in one pass: Terraform/OpenTofu (declarative HCL, any cloud), CloudFormation (AWS-native), CDK/Pulumi (real languages compiling to declarations) — pick by team, not by fashion; the workflow (plan → review → apply) is the invariant part.</li>
+        <li>State files hold every secret-ish attribute — remote state, encrypted, locked (the S3+lock backend) is table stakes; local state on a laptop is the horror story.</li>
+        <li>Modules make stage-2 a stamp: <code>module "service"</code> per app with the sandwich inside — how orgs make the right architecture the lazy path.</li>
+        <li>"Deploys change code, applies change infrastructure, both through PRs" — one sentence that describes a whole mature engineering culture; end on it.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · OPS -->
+<section class="lesson" id="ops">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
     <div>
       <h3>Running it — knowing before the users tweet</h3>
       <p class="lvl">intermediate → logs, metrics, alarms, and the deploy loop</p>
@@ -969,10 +1546,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 6 · COST -->
+<!-- 14 · COST -->
 <section class="lesson" id="cost">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">14</span>
     <div>
       <h3>The bill — cost as an architecture property</h3>
       <p class="lvl">advanced → the four line items and the classic surprises</p>
@@ -1016,8 +1593,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <tr><td class="mono">02</td><td>the twelve</td><td>Fargate runs it, S3 holds files, RDS holds truth, Redis holds heat, ALB spreads, CloudFront caches, SQS decouples — presigned URLs hand clients scoped passes.</td></tr>
       <tr><td class="mono">03</td><td>architectures</td><td>Stage 1 honest EC2 → stage 2 stateless Fargate+ALB+Multi-AZ (the career default) → stage 3 events and edges. Upgrade on pain, not fashion.</td></tr>
       <tr><td class="mono">04</td><td>IAM</td><td>Roles, never keys; least privilege = the blast radius; deny by default.</td></tr>
-      <tr><td class="mono">05</td><td>ops</td><td>Alarm on symptoms (5xx, p99, queue AGE), dashboard the causes; liveness ≠ readiness; roll back cold.</td></tr>
-      <tr><td class="mono">06</td><td>cost</td><td>Compute, DB, transfer-out, storage — transfer is the ambush; caches are cost tools; billing alarms on day one.</td></tr>
+      <tr><td class="mono">05</td><td>IAM machine</td><td>Explicit deny, then any allow, else implicit deny — and CI federates, never keys.</td></tr>
+      <tr><td class="mono">06</td><td>VPC</td><td>Routes decide where packets go; SGs decide which conversations start; NAT = out but never in.</td></tr>
+      <tr><td class="mono">07</td><td>compute</td><td>Spiky → Lambda, steady → containers, long → batch tasks; cold starts and the crossover bill decide.</td></tr>
+      <tr><td class="mono">08</td><td>S3</td><td>Keys not folders, strong consistency now; lifecycle demotes, presigns move bytes off your boxes.</td></tr>
+      <tr><td class="mono">09</td><td>datastores</td><td>Relational until access patterns are few, known and scale-critical; Dynamo pre-joins by key design.</td></tr>
+      <tr><td class="mono">10</td><td>messaging</td><td>Queue = one consumer pool, topic = copies for all; at-least-once means idempotent handlers + DLQs.</td></tr>
+      <tr><td class="mono">11</td><td>the edge</td><td>The cache key defines "same response" — include exactly what varies it; immutable names beat invalidation.</td></tr>
+      <tr><td class="mono">12</td><td>IaC</td><td>Files are the truth, plans are the PR diff, drift is an open incident until reconciled.</td></tr>
+      <tr><td class="mono">13</td><td>ops</td><td>Alarm on symptoms (5xx, p99, queue AGE), dashboard the causes; liveness ≠ readiness; roll back cold.</td></tr>
+      <tr><td class="mono">14</td><td>cost</td><td>Compute, DB, transfer-out, storage — transfer is the ambush; caches are cost tools; billing alarms on day one.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1032,6 +1617,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <li><b>"How would you deploy this app?"</b> — draw stage 2 from memory, then narrate stage 1 as where you'd actually start and what pain triggers each upgrade. The staging story IS the senior answer.</li>
       <li><b>"EC2 vs ECS vs Lambda?"</b> — the slider + workload shape, with the cattery analogy if the room is friendly. Rapid-fire pairs: <a href="../fullstack.html#aws">Full-Stack in 48 · AWS map</a> and <a href="../fullstack.html#awsops">· scaling &amp; the bill</a>.</li>
       <li><b>"How do you secure service-to-service access?"</b> — roles-not-keys, least privilege, secrets manager, presigned URLs. Four phrases, full marks.</li>
+      <li><b>The advanced band turns "uses AWS" into "operates AWS":</b> the policy judgment (05), the packet walk (06), the Lambda-vs-container crossover (07), at-least-once honesty (10), and a read-the-plan IaC culture (12) — each is a two-minute answer with numbers now.</li>
       <li>Next module: <b>system-design-backend</b> — where these boxes become the vocabulary for designs at whiteboard scale.</li>
     </ul>
   </div>
