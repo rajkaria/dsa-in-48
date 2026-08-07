@@ -77,12 +77,15 @@ updated: 2026-08-06
 
 ## Next steps — specific, actionable
 
-- **Confirm GitHub Pages went green** after the `.nojekyll` fix:
-  `curl -s -o /dev/null -w '%{http_code}' https://rajkaria.github.io/dsa-in-48/learn/`
-  (expect 200; if errored again: `gh api repos/rajkaria/dsa-in-48/pages/builds/latest`).
+- **GitHub Pages: RESOLVED 2026-08-07.** The legacy Jekyll builder kept failing even
+  with `.nojekyll`, so Pages now deploys via `.github/workflows/pages.yml`
+  (`build_type: workflow`, actions/deploy-pages) — 20s deploys, real logs under the
+  Actions tab. All 20 pages verified 200 and byte-identical to the repo on BOTH hosts;
+  full live link-crawl clean (LeetCode 403s are bot-blocking, not breakage — links are
+  API-verified per CLAUDE.md).
 - Optional polish, none blocking: per-module og-images; an aggregate progress bar on the
   hub; a `.soon` placeholder card pattern for any future module 14; hero-meta count
   checks added to `scripts/check_pages.py`.
 - Vercel git auto-deploy is STILL not connected (pushes need manual
   `vercel deploy --prod` from the repo root) — granting the Vercel GitHub app access
-  remains Raj's call.
+  remains Raj's call. GitHub Pages, by contrast, now auto-deploys on every push to main.
