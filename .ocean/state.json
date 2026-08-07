@@ -4,74 +4,74 @@
   "spec_path": ".ocean/SPEC.md",
   "goal": "Expand all 13 Learn modules to 12-15 sections (beginner→advanced) + 3 new modules (typescript, testing, web-platform), rewire counts, verify, deploy",
   "status": "running",
-  "current_sprint": 0,
+  "current_sprint": 10,
   "sprints": [
     {
       "id": 1,
       "title": "js-fundamentals + js-async expansions",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "18329c9"
     },
     {
       "id": 2,
       "title": "dsa-foundations + dsa-structures expansions",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "3641378"
     },
     {
       "id": 3,
       "title": "dsa-trees-graphs + dsa-algorithms expansions",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "8eebf71"
     },
     {
       "id": 4,
       "title": "react-deep-dive + node-backend expansions",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "f38600e"
     },
     {
       "id": 5,
       "title": "postgres-databases + aws-cloud expansions",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "9368bfb"
     },
     {
       "id": 6,
       "title": "system-design-backend + frontend-system-design expansions",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "d0e972a"
     },
     {
       "id": 7,
       "title": "interview-kit expansion + new typescript module",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "1ff647d"
     },
     {
       "id": 8,
       "title": "new testing + web-platform modules",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "c550ece"
     },
     {
       "id": 9,
       "title": "hub + landing + docs wiring, full recount",
-      "status": "todo",
-      "commit": ""
+      "status": "done",
+      "commit": "0284c42"
     },
     {
       "id": 10,
       "title": "full sweep, browser pass, REPORT, deploy",
-      "status": "todo",
+      "status": "in_progress",
       "commit": ""
     }
   ],
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786088026,
-  "heartbeat": 1786088026,
+  "last_checkpoint": 1786127352,
+  "heartbeat": 1786127593,
   "blockers": [],
-  "notes": ""
+  "notes": "Sprints 1-9 done and committed. ONLY SPRINT 10 REMAINS: sprint-start 10, then (1) browser sweep: serve via preview (launch.json in48-static), hub + 2 modules in both themes, 375px, console clean, spot-check a runner; (2) write .ocean/REPORT.md (sprints→commits from state.json, one-way-door decisions from DECISIONS.md, limitations: hidden-pane timer throttling affects timer demos only in background tabs, sdb/fesd/kit have no runners by design); (3) merge branch claude/indepth-module-duration-0f214f to main, git push origin main (Pages auto-deploys via Actions); (4) vercel deploy --prod from repo root (pre-authorized in-session by Raj — chose 'Approve — run it' over manual deploy); (5) verify live: both hosts 200 on /learn + 3 new module URLs; (6) ocean.sh set-status complete."
 }
