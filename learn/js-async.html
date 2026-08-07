@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -675,9 +679,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#loop"><span><i class="dot" data-for="loop"></i> The Event Loop</span></a>
     <a class="side-link" href="#promises"><span><i class="dot" data-for="promises"></i> Callbacks → Promises</span></a>
     <a class="side-link" href="#await"><span><i class="dot" data-for="await"></i> async / await</span></a>
+    <a class="side-link" href="#rejections"><span><i class="dot" data-for="rejections"></i> Rejections &amp; Traps</span></a>
     <a class="side-link" href="#ordering"><span><i class="dot" data-for="ordering"></i> Ordering Puzzles</span></a>
     <a class="side-link" href="#parallel"><span><i class="dot" data-for="parallel"></i> Running Things Together</span></a>
     <a class="side-link" href="#cancel"><span><i class="dot" data-for="cancel"></i> Timeouts &amp; Cancellation</span></a>
+    <a class="side-link" href="#building"><span><i class="dot" data-for="building"></i> Building with Promises</span></a>
+    <a class="side-link" href="#scheduling"><span><i class="dot" data-for="scheduling"></i> The Scheduling Zoo</span></a>
+    <a class="side-link" href="#iterasync"><span><i class="dot" data-for="iterasync"></i> Async Iteration</span></a>
+    <a class="side-link" href="#streams"><span><i class="dot" data-for="streams"></i> Streams &amp; Backpressure</span></a>
+    <a class="side-link" href="#workers"><span><i class="dot" data-for="workers"></i> Workers</span></a>
+    <a class="side-link" href="#patterns"><span><i class="dot" data-for="patterns"></i> Production Patterns</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -695,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -722,14 +733,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: cancellation &amp; combinator judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>8</b> quiz questions</span>
-    <span><b>8</b> runnable panels</span>
+    <span><b>14</b> sections</span>
+    <span><b>15</b> quiz questions</span>
+    <span><b>13</b> runnable panels</span>
     <span><b>1</b> step-through visualizer</span>
-    <span><b>~4h</b> self-paced</span>
+    <span><b>~9.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#why">Start with the why <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the machine, in slow motion</span></div>
 
 <!-- 1 · WHY -->
 <section class="lesson" id="why">
@@ -997,10 +1010,97 @@ riskyOrder().then(v =&gt; console.log('resolved with:', v));</code></pre>
   </div>
 </section>
 
-<!-- 5 · ORDERING -->
-<section class="lesson" id="ordering">
+<div class="band" id="band-intermediate"><span>// intermediate — errors, ordering &amp; orchestration</span></div>
+
+<!-- 5 · REJECTIONS -->
+<section class="lesson" id="rejections">
   <div class="lesson-head">
     <span class="lesson-num">05</span>
+    <div>
+      <h3>Rejections — where async errors actually go</h3>
+      <p class="lvl">intermediate → the propagation rules, and the forgotten-await trap</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A rejected promise is <b>a throw in transit</b>: it travels down the chain, skipping every <code>.then</code> handler, until something catches it — a <code>.catch</code>, or the <code>try/catch</code> wrapped around an <code>await</code>. No catcher anywhere? The runtime fires <b><code>unhandledrejection</code></b> (browser) or crashes the process by default (modern Node) — async errors don't politely disappear, they detonate later, out of context.</p>
+    <p>The bug family to know by name: the <b>floating promise</b>. Call an async function and don't <code>await</code> or <code>.catch</code> it, and its rejection belongs to nobody. The subtle cousin is <code>return promise</code> vs <code>return await promise</code> inside a <code>try</code> — without the <code>await</code>, the rejection happens <i>after</i> your function already left the try block, and your catch never fires.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A complaint letter (the rejection) rides the mail line past every desk labeled <b>"good news only"</b> (<code>.then</code>) until it finds the complaints desk (<code>.catch</code>). Send a cat on an errand and <b>keep no way to hear back</b> — that's a floating promise: when she knocks over a vase across town, the first you hear of it is the city filing a report against the whole shelter (<code>unhandledrejection</code>).</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">complaints-desk.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const errand = (ok) =&gt; ok
+  ? Promise.resolve('vase delivered')
+  : Promise.reject(new Error('vase knocked over'));
+
+// 1 · rejections SKIP then-handlers and find the catch
+await errand(false)
+  .then(() =&gt; console.log('desk 1: never runs'))
+  .then(() =&gt; console.log('desk 2: never runs'))
+  .catch(e =&gt; console.log('complaints desk:', e.message));
+
+// 2 · a .catch RECOVERS — the chain continues on the happy path
+await errand(false)
+  .catch(e =&gt; 'replacement vase')       // handled → fulfilled again
+  .then(v =&gt; console.log('carried on with:', v));
+
+// 3 · try/catch + await is the same machinery in costume
+try { await errand(false); }
+catch (e) { console.log('caught by try/catch:', e.message); }
+
+// 4 · THE TRAP · return vs return await inside try
+async function sneaky() {
+  try {
+    return errand(false);          // no await — leaves try IMMEDIATELY
+  } catch (e) {
+    return 'sneaky caught it';     // NEVER runs
+  }
+}
+await sneaky().catch(e =&gt; console.log('escaped to the caller:', e.message));
+
+async function honest() {
+  try {
+    return await errand(false);    // await keeps it inside the try
+  } catch (e) {
+    return 'honest caught it';
+  }
+}
+console.log(await honest());</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">case 4 is the senior-level trap — same code, one keyword, opposite outcome</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Placement matters as much as presence: <code>a.catch(...).then(b)</code> and <code>a.then(b).catch(...)</code> are different programs — the first only guards <code>a</code>, the second also guards <code>b</code>. The house style that keeps teams sane: <b>catch at the boundary</b> (the route handler, the effect, the event handler — the place that can actually render an error state or return a 500), and let everything below just throw.</p>
+    <div class="mcq" data-qid="asy-rejections-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>async function f() { try { return fetchData(); } catch (e) { log(e); } }</code> — fetchData rejects. What happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>log(e)</code> runs — the try block contains the call</button>
+        <button class="mcq-opt" type="button" data-ok>The catch never runs — without <code>await</code>, f has already returned the pending promise before it rejects; the caller gets the rejection</button>
+        <button class="mcq-opt" type="button">Both — the error is logged AND propagates</button>
+        <button class="mcq-opt" type="button">Deadlock — the promise can never settle</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>return fetchData()</code> hands back a <i>pending</i> promise and exits the try block in the same tick. When the rejection arrives later, the try/catch is long gone — stack frames don't wait around. <code>return await fetchData()</code> parks the function <i>inside</i> the try until settlement, so the catch can do its job. This is the one place where "redundant" <code>return await</code> is load-bearing.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>"A rejection is a throw that travels through time"</b> — same propagation rules as exceptions, shifted to settlement time. Saying it this way shows the model, not memorized API.</li>
+        <li><code>Promise.all</code> rejects with the <i>first</i> error and drops the rest; <code>Promise.any</code> rejects with an <code>AggregateError</code> holding <i>all</i> of them — know where the lost errors go.</li>
+        <li>Node kills the process on unhandled rejections by default (since v15) — "it worked in the browser" is not a defense. Lint rule name-drop: <code>no-floating-promises</code> (TS) catches the whole class at build time.</li>
+        <li>Fire-and-forget is occasionally right (analytics, cache warm) — the honest version is explicit: <code>void track().catch(logQuietly)</code>. Intentional, visible, handled.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · ORDERING -->
+<section class="lesson" id="ordering">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
     <div>
       <h3>Ordering puzzles — the screen question, mechanized</h3>
       <p class="lvl">the exam itself: trace like a machine, out loud</p>
@@ -1060,10 +1160,10 @@ console.log('8: sync done');
   </div>
 </section>
 
-<!-- 6 · PARALLEL -->
+<!-- 7 · PARALLEL -->
 <section class="lesson" id="parallel">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">07</span>
     <div>
       <h3>Running things together — the combinators, with judgment</h3>
       <p class="lvl">intermediate → all / allSettled / race / any, and the loop trap</p>
@@ -1132,10 +1232,10 @@ console.log(report.map(r =&gt; r.status).join(' / '));</code></pre>
   </div>
 </section>
 
-<!-- 7 · CANCEL -->
+<!-- 8 · CANCEL -->
 <section class="lesson" id="cancel">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">08</span>
     <div>
       <h3>Timeouts, cancellation &amp; taming the flood</h3>
       <p class="lvl">advanced → AbortController, debounce/throttle, retries</p>
@@ -1218,6 +1318,506 @@ const lookup = debounce(q =&gt; console.log('🔎 searching:', q), 200);
   </div>
 </section>
 
+<!-- 9 · BUILDING -->
+<section class="lesson" id="building">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Building with promises — promisify, deferred &amp; event interop</h3>
+      <p class="lvl">intermediate → wrapping the callback world, by hand</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>You'll spend years <i>consuming</i> promises and then an interview asks you to <b>construct</b> one. The constructor's shape: <code>new Promise((resolve, reject) =&gt; { … })</code> — the executor runs immediately, and whichever of <code>resolve</code>/<code>reject</code> is called <i>first</i> wins; every later call is silently ignored (settling is one-shot, like the buzzer from section 03).</p>
+    <p>Three build patterns cover ~all of real life: <b>promisify</b> (wrap a callback-style API once, use it cleanly forever), <b>event → promise</b> (turn "the next time X happens" into an awaitable), and the <b>deferred</b> (create the promise here, settle it from somewhere else — the escape hatch for APIs where creation and settlement live in different places).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The old shelter phone system: you call, they promise to <b>call you back</b> on whatever number you shouted (a callback). Promisify is hiring a receptionist who takes those callback-calls and rings <b>one proper buzzer</b> instead. A deferred is ordering the buzzer <i>blank</i> — you hand the button to the vet down the hall, and whenever <i>she</i> decides the results are in, she presses it. Same buzzer; the button just lives somewhere else.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">receptionist.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a 2005-style callback API (error-first, like old Node)
+function fetchCatLegacy(name, cb) {
+  setTimeout(() =&gt; name === 'Mochi'
+    ? cb(null, { name, mood: 'imperious' })
+    : cb(new Error('unknown cat')), 80);
+}
+
+// 1 · promisify — write the adapter ONCE
+const promisify = (fn) =&gt; (...args) =&gt;
+  new Promise((resolve, reject) =&gt;
+    fn(...args, (err, val) =&gt; err ? reject(err) : resolve(val)));
+
+const fetchCat = promisify(fetchCatLegacy);
+console.log(await fetchCat('Mochi'));
+await fetchCat('Rex').catch(e =&gt; console.log('adapter rejects:', e.message));
+
+// 2 · event → promise — await "the next meow"
+function once(target, event) {
+  return new Promise(resolve =&gt;
+    target.addEventListener(event, resolve, { once: true }));
+}
+const door = new EventTarget();
+setTimeout(() =&gt; door.dispatchEvent(new Event('meow')), 100);
+await once(door, 'meow');
+console.log('heard the meow — exactly one, listener auto-removed');
+
+// 3 · deferred — settle from OUTSIDE (now standard: Promise.withResolvers)
+const { promise, resolve } = Promise.withResolvers
+  ? Promise.withResolvers()
+  : (() =&gt; { let r; const p = new Promise(res =&gt; r = res); return { promise: p, resolve: r }; })();
+setTimeout(() =&gt; resolve('vet pressed the button'), 60);
+console.log(await promise);
+
+// 4 · settling is one-shot — later calls are ignored
+const oneShot = new Promise(res =&gt; { res('first'); res('second'); });
+console.log(await oneShot);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the three adapters that connect promise code to everything else</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Two construction rules interviewers watch for. <b>Don't wrap what's already a promise</b> — <code>new Promise((res) =&gt; fetch(url).then(res))</code> is the "explicit construction antipattern"; fetch already returns one. And <b>make errors reject, never throw-async</b>: inside an executor, a synchronous <code>throw</code> becomes a rejection automatically, but a throw inside a <code>setTimeout</code> callback escapes the promise entirely — route it through <code>reject</code>.</p>
+    <div class="mcq" data-qid="asy-building-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">When do you genuinely need <code>new Promise(...)</code> (or a deferred) instead of chaining existing promises?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Whenever you want parallelism — chaining is sequential</button>
+        <button class="mcq-opt" type="button" data-ok>When bridging a non-promise source — callbacks, events, timers — or when settlement happens in different code than creation</button>
+        <button class="mcq-opt" type="button">Never — the constructor is deprecated in favor of async/await</button>
+        <button class="mcq-opt" type="button">Whenever you need to reject — .then can't produce rejections</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the constructor is the <i>boundary tool</i> — it turns not-yet-promise things (a callback API, "next click", "when the worker replies") into promises. Inside promise-land, chaining and async/await compose everything without it. If you're wrapping something that already returns a promise, you're writing the antipattern.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>Promise.withResolvers()</code> (ES2024) is the deferred, standardized — knowing it exists dates your knowledge as current.</li>
+        <li>Node's <code>util.promisify</code> does pattern 1 with edge cases handled; <code>events.once(emitter, 'x')</code> does pattern 2. Write them by hand in interviews, name the built-ins after.</li>
+        <li><code>Promise.resolve(x)</code> is also a coercer: if <code>x</code> is a thenable it adopts its state — that's how await handles third-party promise libraries seamlessly.</li>
+        <li>The executor runs <b>synchronously</b> — <code>new Promise(() =&gt; console.log('now'))</code> logs before the next line. Only the <i>handlers</i> are deferred to microtasks.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · SCHEDULING -->
+<section class="lesson" id="scheduling">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>The scheduling zoo — timers, microtasks &amp; frames</h3>
+      <p class="lvl">intermediate → every way to say "later", and which later you get</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 02 gave you two queues. The full zoo has more cages, each with a different definition of "later": <b><code>queueMicrotask</code></b> (this tick, before anything else — the VIP lounge, explicitly), <b><code>setTimeout(fn, 0)</code></b> (next macrotask — but "0" is a polite fiction), <b><code>requestAnimationFrame</code></b> (right before the next paint — the only correct "just before the user sees it"), and Node adds <b><code>setImmediate</code></b> / <b><code>process.nextTick</code></b> with their own phase rules.</p>
+    <p>The polite fictions matter in production: browsers <b>clamp nested timers</b> (after ~5 levels of setTimeout-inside-setTimeout, the minimum delay becomes ~4ms) and <b>throttle background tabs</b> (timers in a hidden tab may fire once per second or less — the reason "my countdown drifts when I switch tabs" is a bug report that always comes back). Timers promise "no sooner than", never "exactly at".</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Four ways to schedule a cat's snack: <b>"before you do anything else"</b> (microtask — she's already on the counter), <b>"when you next have a free moment"</b> (timer — could be a while, and the kitchen rounds it up), <b>"right before guests arrive"</b> (rAF — tied to the doorbell, not the clock), and the house rule: <b>snacks promised for a hidden room get delivered rarely</b> (background-tab throttling). Same word — "later" — four different contracts.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">four-laters.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · the pecking order in one shot
+setTimeout(() =&gt; console.log('3 · timer (macrotask)'), 0);
+queueMicrotask(() =&gt; console.log('2 · microtask'));
+console.log('1 · sync');
+await null;   // let the microtask queue drain before part 2
+
+// 2 · setTimeout(0) is not 0 — measure the real gap
+const t0 = performance.now();
+await new Promise(r =&gt; setTimeout(r, 0));
+console.log(`"0ms" timer actually waited ${(performance.now() - t0).toFixed(1)}ms`);
+
+// 3 · nested-timer clamping — watch the floor appear (~4ms after depth 5)
+let depth = 0, last = performance.now();
+await new Promise(done =&gt; {
+  function hop() {
+    const now = performance.now();
+    console.log(`hop ${++depth}: gap ${(now - last).toFixed(1)}ms`);
+    last = now;
+    depth &lt; 8 ? setTimeout(hop, 0) : done();
+  }
+  setTimeout(hop, 0);
+});
+console.log('→ the first hops are fast; the clamp kicks in around hop 5');
+
+// 4 · a microtask LOOP starves everything — 10k microtasks, zero timers ran
+let spins = 0;
+await new Promise(done =&gt; {
+  setTimeout(() =&gt; { console.log('timer finally ran after', spins, 'microtasks'); done(); }, 0);
+  (function spin() { if (++spins &lt; 10000) queueMicrotask(spin); })();
+});</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">measure the fictions: the fake 0ms, the 4ms clamp, the starving loop</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Choosing correctly: <b>DOM measurement/mutation before the user sees it</b> → <code>requestAnimationFrame</code> (never setTimeout — you'll land a frame late and flicker). <b>Yield to let the browser breathe during heavy work</b> → <code>setTimeout(0)</code> chunks or, where supported, <code>scheduler.yield()</code>. <b>"After the current operation completes, guaranteed"</b> → microtask. And <b>clocks/countdowns</b> → never accumulate timer ticks; recompute from <code>Date.now()</code> each fire, so throttling can't drift you.</p>
+    <div class="mcq" data-qid="asy-scheduling-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A 10-minute countdown implemented as <code>setInterval(() =&gt; seconds--, 1000)</code> shows 11:23 remaining after the user returns from another tab. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">setInterval is buggy in some browsers</button>
+        <button class="mcq-opt" type="button" data-ok>Background tabs throttle timers — ticks were skipped, and the countdown counts ticks instead of consulting a clock</button>
+        <button class="mcq-opt" type="button">The event loop paused, so time paused</button>
+        <button class="mcq-opt" type="button">Integer overflow in the seconds counter</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> hidden tabs get timers once per second at best, often once per minute — the interval fired far fewer than 60 times per minute, and each miss silently added phantom time. The fix is structural, not a tweak: store the <i>end timestamp</i>, and every tick render <code>endTime - Date.now()</code>. Ticks then only affect refresh rate, never correctness.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The one-line zoo tour: <b>"microtask now, timer later, rAF before paint — and all three are different queues with different starvation rules."</b></li>
+        <li>Node's extras: <code>process.nextTick</code> runs before promise microtasks (and can starve them); <code>setImmediate</code> runs after I/O in the check phase — "setTimeout(0) vs setImmediate ordering is nondeterministic off I/O" is a real Node interview chestnut.</li>
+        <li><code>rAF</code> doesn't fire at all in hidden tabs (not throttled — <i>paused</i>), which is exactly what animations want and polling never should use.</li>
+        <li>Long-task chunking: slice heavy loops with awaited <code>setTimeout(0)</code> (or <code>scheduler.yield()</code>) so input events can interleave — this is the event-loop answer to "the page freezes during import".</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — streams, threads &amp; production patterns</span></div>
+
+<!-- 11 · ITERASYNC -->
+<section class="lesson" id="iterasync">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Async iteration — for await, and generators that fetch</h3>
+      <p class="lvl">advanced → consuming sequences that arrive over time</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Arrays hold values you <i>have</i>; async iterables hold values that are <i>on their way</i> — pages of an API, chunks of a file, messages on a socket. The protocol is the sync one with a promise wrapper: <code>next()</code> returns a <b>promise</b> of <code>{ value, done }</code>, the object advertises itself via <code>Symbol.asyncIterator</code>, and <b><code>for await…of</code></b> is the loop that awaits each step. An <b>async generator</b> (<code>async function*</code>) can both <code>await</code> and <code>yield</code> — which makes it a machine for turning "fetch page, yield items, repeat" into five readable lines.</p>
+    <p>The killer use case is <b>pagination you can stop early</b>: yield item by item, and the moment the consumer <code>break</code>s, no further pages are fetched. Pull-based laziness — the consumer's appetite drives the producer's work.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The shelter's adoption files live in <b>boxes in the basement, one box per year</b>. A sync iterator hands you files from a box already on the table. The async version: you ask for the next file, and sometimes the clerk says <b>"moment — fetching the next box"</b> and disappears downstairs (an await between items). Crucially, if you find your file in box two, <b>boxes three through nine never come up the stairs at all</b>. Laziness isn't a performance trick down there — it's the whole basement staying unfetched.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">basement-boxes.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a fake paginated API — 3 items per page, 60ms per fetch
+async function fetchPage(n) {
+  await new Promise(r =&gt; setTimeout(r, 60));
+  console.log(`  · network: fetched page ${n}`);
+  return {
+    items: ['Mochi', 'Biscuit', 'Beans'].map(c =&gt; `${c}-p${n}`),
+    hasMore: n &lt; 4,
+  };
+}
+
+// the async generator: pagination as a stream of ITEMS
+async function* allCats() {
+  let page = 1, hasMore = true;
+  while (hasMore) {
+    const res = await fetchPage(page++);
+    yield* res.items;                    // hand out one at a time
+    hasMore = res.hasMore;
+  }
+}
+
+// 1 · consume it like an array that arrives over time
+let count = 0;
+for await (const cat of allCats()) {
+  console.log('got:', cat);
+  if (++count === 5) break;   // ← stop early…
+}
+console.log('→ note: pages 3 and 4 were NEVER fetched');
+
+// 2 · async iterables compose — a reusable filter
+async function* only(pattern, source) {
+  for await (const v of source) if (v.includes(pattern)) yield v;
+}
+for await (const m of only('Mochi', allCats())) console.log('filtered:', m);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch the network lines — early break means unfetched pages</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>The sharp edge: <b><code>for await</code> is sequential by contract</b> — one item settles before the next is requested. That's exactly right for ordered streams and rate-limited APIs, and exactly wrong for "fire these 20 independent requests" (that's <code>Promise.all</code> from section 07). The two-question test: does order matter, or does the next step depend on the last? Sequential. Independent jobs? Combinators.</p>
+    <div class="mcq" data-qid="asy-iterasync-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">You need the total size of 200 files from an API that returns them as an async iterable. A colleague writes <code>for await (const f of files) total += await stat(f)</code> and it's slow. What's the honest assessment?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">for await is broken — rewrite with .then chains</button>
+        <button class="mcq-opt" type="button" data-ok>The iteration is inherently sequential — if the stats are independent, collect the files and stat them with a concurrency-limited Promise.all instead</button>
+        <button class="mcq-opt" type="button">Add a second for await inside the first to parallelize</button>
+        <button class="mcq-opt" type="button">Async generators cache pages — the slowness is elsewhere</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each loop turn awaits one stat before requesting the next — 200 × latency, by design. Independent per-item work wants the combinator toolbox (with a pool limit from section 14); <code>for await</code> earns its place when items must arrive in order or the source itself is the bottleneck. Naming <i>which contract you need</i> is the senior move.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The symmetry, in one breath: <b>"sync: <code>Symbol.iterator</code> → <code>{value, done}</code>; async: <code>Symbol.asyncIterator</code> → <code>Promise&lt;{value, done}&gt;</code>; generators implement both for free."</b></li>
+        <li><code>break</code>-ing a <code>for await</code> calls the generator's <code>return()</code> — <code>finally</code> blocks inside the generator run, which is where cleanup (closing the cursor, aborting the fetch) belongs.</li>
+        <li>Real async iterables you already hold: Node streams (<code>for await (const chunk of req)</code>), fetch response bodies, and every paginated SDK worth using.</li>
+        <li>Backpressure preview: pull-based iteration <i>is</i> backpressure — the consumer's pace throttles the producer. The streams section makes that explicit with queues and high-water marks.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · STREAMS -->
+<section class="lesson" id="streams">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Streams — processing data bigger than memory</h3>
+      <p class="lvl">advanced → readable, transform, writable &amp; backpressure</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Everything so far delivered <i>whole values</i>. Streams deliver <b>chunks</b>: a 2GB file as ten thousand pieces, a fetch body as it downloads, a video as it plays. The Web Streams pipeline has three roles — <b>ReadableStream</b> (the source), <b>TransformStream</b> (a worker in the middle), <b>WritableStream</b> (the sink) — snapped together with <code>.pipeThrough()</code> and <code>.pipeTo()</code>.</p>
+    <p>The concept that makes streams <i>streams</i> and not just loops: <b>backpressure</b>. Every stage has a small internal queue with a <b>high-water mark</b>; when a slow consumer's queue fills, the pull signals stop flowing upstream and the fast producer <i>pauses</i>. Speed mismatch is absorbed by design, not by an unbounded buffer eating your memory — which is precisely the bug streams exist to prevent.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Feeding wet food from a huge pot: the ladler (readable) fills bowls, the garnish cat (transform) adds a treat to each, the eater (writable) works at eating speed. Between stations sits a <b>counter with room for three bowls</b> — when it's full, the garnish cat <i>stops ladling requests upstream</i>. Nobody stacks four hundred bowls (that's loading the file into memory); nobody yells "slow down" (that's manual pause/resume). The counter's size <b>is</b> the protocol.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">bowl-pipeline.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// source: a readable that ladles 8 meals
+const pot = new ReadableStream({
+  start(controller) {
+    ['tuna','salmon','chicken','beef','duck','shrimp','liver','egg']
+      .forEach(m =&gt; controller.enqueue(m));
+    controller.close();
+  }
+});
+
+// middle: a transform that garnishes each chunk
+const garnish = new TransformStream({
+  transform(meal, controller) {
+    controller.enqueue(meal.toUpperCase() + ' + treat');
+  }
+});
+
+// sink: a writable eater — 40ms per bowl (the slow stage)
+const eaten = [];
+const eater = new WritableStream({
+  async write(bowl) {
+    await new Promise(r =&gt; setTimeout(r, 40));   // chewing…
+    eaten.push(bowl);
+    console.log('eaten:', bowl);
+  }
+});
+
+await pot.pipeThrough(garnish).pipeTo(eater);
+console.log(`pipeline done — ${eaten.length} bowls, one at a time, bounded memory`);
+
+// bonus: every ReadableStream is async-iterable (section 11 machinery!)
+const numbers = new ReadableStream({
+  start(c) { [1, 2, 3].forEach(n =&gt; c.enqueue(n)); c.close(); }
+});
+for await (const n of numbers) console.log('for-await over a stream:', n);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">a three-stage pipeline with a deliberately slow sink — backpressure in action</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Where you'll actually meet them: <b>fetch bodies are streams</b> — <code>response.body.pipeThrough(new TextDecoderStream())</code> is how you show download progress or process a huge NDJSON export without holding it; <b>compression</b> is one stage (<code>CompressionStream('gzip')</code>); and server-sent AI responses (every chat UI that types word by word) are a ReadableStream being read chunk by chunk. Node's streams are the older cousins — same roles, <code>.pipe()</code> instead of <code>.pipeTo()</code>, and <code>stream/promises</code>' <code>pipeline()</code> as the safe composer.</p>
+    <div class="mcq" data-qid="asy-streams-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A Node service reads 1GB uploads with <code>chunks.push(chunk)</code> then processes the concatenated buffer, and dies with out-of-memory under load. The streams-native fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Raise the heap limit to 4GB</button>
+        <button class="mcq-opt" type="button" data-ok>Pipe the upload through the processing stages chunk by chunk — backpressure keeps memory flat no matter the file size or concurrency</button>
+        <button class="mcq-opt" type="button">Buffer to disk first, then read it back whole</button>
+        <button class="mcq-opt" type="button">Move the concatenation into a worker thread</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> collect-then-process holds <i>every</i> concurrent upload fully in memory — 20 users × 1GB is game over regardless of heap size. A pipeline holds only each stream's small queues (kilobytes), and a slow stage automatically slows the socket read itself. Options A/C/D relocate the problem; the pipeline dissolves it.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The definition to lead with: <b>"backpressure = the consumer's pace propagating upstream through bounded queues"</b> — high-water mark is the queue size, <code>desiredSize</code> is the live reading.</li>
+        <li>A stream is <b>consumed once</b> — <code>response.json()</code> after touching <code>response.body</code> throws. <code>.tee()</code> splits one into two when two consumers genuinely need it.</li>
+        <li>Node trap with manual <code>.pipe()</code>: errors don't propagate across stages (leaked file handles on failure) — <code>pipeline()</code> exists because of that; naming it is the production-experience tell.</li>
+        <li>The judgment line: streams pay off for <b>big, slow, or unbounded</b> data. For a 4KB JSON config, <code>response.json()</code> is correct — streaming it is ceremony.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · WORKERS -->
+<section class="lesson" id="workers">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>Workers — actual parallelism, at the price of a postbox</h3>
+      <p class="lvl">advanced → when one thread isn't enough, and what message passing costs</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Everything in this module so far has been <b>concurrency on one thread</b> — interleaving waits, never computing twice at once. A <b>Web Worker</b> is the real second thread: its own event loop, its own memory, running your heavy computation while the main thread keeps painting at 60fps. The price of that isolation is the API: workers share <i>nothing</i>. You <code>postMessage</code> data over; the browser <b>structured-clones</b> it (the deep copy from JS Fundamentals); results come back the same way. No DOM over there, no shared variables, no races — a postbox, not a shared desk.</p>
+    <p>The decision rule: async/await solves <b>waiting</b> (network, timers, disk) and workers solve <b>working</b> (parsing a 50MB CSV, image processing, crypto, physics). Moving a fetch into a worker buys nothing — the network wasn't blocking your thread. Moving a 2-second parse into one turns a frozen tab into a responsive one.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The front-desk cat greets every visitor (the main thread — she must <i>never</i> be busy long). Shredding two hundred boxes is real work, so it goes to the <b>basement cat</b> — separate room, separate everything. They communicate by <b>photocopies through a mail slot</b>: send the list down (a copy!), shredded confetti summary comes back up. The basement cat can't rearrange the lobby (no DOM), and the front desk never smells cardboard. Slower to coordinate? Slightly. But the lobby never, ever freezes.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">basement-cat.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a worker from a Blob URL — same-origin, no separate file needed
+const workerCode = `
+  self.onmessage = (e) =&gt; {
+    const { upTo } = e.data;              // arrived as a COPY
+    let primes = 0;
+    for (let n = 2; n &lt;= upTo; n++) {     // deliberately brute-force
+      let isPrime = true;
+      for (let d = 2; d * d &lt;= n; d++) if (n % d === 0) { isPrime = false; break; }
+      if (isPrime) primes++;
+    }
+    self.postMessage({ upTo, primes });
+  };
+`;
+const url = URL.createObjectURL(new Blob([workerCode], { type: 'text/javascript' }));
+const worker = new Worker(url);
+
+// wrap the postbox in a promise (section 09's pattern, immediately useful)
+const compute = (upTo) =&gt; new Promise(resolve =&gt; {
+  worker.onmessage = (e) =&gt; resolve(e.data);
+  worker.postMessage({ upTo });
+});
+
+console.log('main thread: sending the heavy job downstairs…');
+const t0 = performance.now();
+
+// main thread stays FREE while the worker grinds — prove it with a heartbeat
+const beat = setInterval(() =&gt; console.log('  ♥ main thread still responsive'), 50);
+const result = await compute(300000);
+clearInterval(beat);
+
+console.log(`worker found ${result.primes} primes ≤ ${result.upTo} ` +
+            `in ${Math.round(performance.now() - t0)}ms — zero jank`);
+worker.terminate();  // basement cat clocks out (always clean up!)
+URL.revokeObjectURL(url);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the heartbeat keeps printing WHILE the primes grind — that's the whole point</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>The cloning tax has an escape hatch: <b>transferables</b>. <code>postMessage(buffer, [buffer])</code> hands an ArrayBuffer across in O(1) — the sender's copy goes dead (neutered) instead of duplicated, which is how you move a 100MB image between threads without paying for it twice. And <b>SharedArrayBuffer</b> + <code>Atomics</code> is genuine shared memory for the rare lock-free ambitions — gated behind cross-origin isolation headers precisely because shared mutable memory is as dangerous as it is fast.</p>
+    <div class="mcq" data-qid="asy-workers-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Search results render in 4s: profiling shows 3.5s inside a synchronous ranking function over 100k items. Moving which thing where fixes the frozen UI?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The fetch into a worker — network is the usual suspect</button>
+        <button class="mcq-opt" type="button" data-ok>The ranking function into a worker — it's CPU-bound; the main thread stays free to paint while ranking runs in parallel</button>
+        <button class="mcq-opt" type="button">Wrap the ranking in async/await so it yields</button>
+        <button class="mcq-opt" type="button">setTimeout(rank, 0) — moving it later unblocks it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>async</code> doesn't create threads — a CPU-bound function blocks identically inside an async wrapper, and setTimeout just freezes the tab <i>slightly later</i>. Workers are the only true "run JS elsewhere" (short of chunking the algorithm itself). The fetch was never the problem: waiting doesn't block; working does. That distinction is the entire question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The rule as one sentence: <b>"async for I/O-bound, workers for CPU-bound"</b> — interviewers ask it exactly that abstractly, and this is the expected shape.</li>
+        <li>Structured clone (not JSON!) crosses the postbox: Maps, Sets, Dates, ArrayBuffers survive; functions and DOM nodes don't. Same algorithm as <code>structuredClone()</code> — one mental model, two features.</li>
+        <li>Node's equivalent is <code>worker_threads</code> (threads, shared memory possible) — distinct from <code>cluster</code> (processes for scaling request handling). Naming which is which is a node-backend module drill.</li>
+        <li>Frameworks ride this too: Comlink turns postMessage into awaitable RPC; the ~50ms round-trip floor means you batch work, not ping-pong per item.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · PATTERNS -->
+<section class="lesson" id="patterns">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Production patterns — pools, dedupe &amp; polite polling</h3>
+      <p class="lvl">advanced → the four async utilities every real codebase reinvents</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every mature codebase contains the same four hand-rolled utilities, and interviews love asking for them because each is ten lines of closures + promises — everything this module built, composed. <b>The concurrency pool</b>: run 500 jobs, but only N in flight (unbounded <code>Promise.all</code> is a self-inflicted DDoS). <b>In-flight dedupe</b>: five components request the same user at once — share one promise instead of five requests. <b>The serial queue</b>: writes to one resource must not interleave. <b>Polling with backoff</b>: ask again politely, at widening intervals, with a give-up point.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Four house rules of a well-run shelter: only <b>three volunteers groom at once</b>, however long the queue (the pool). If someone's already fetching Mochi's file, <b>walk with them</b> — don't send a second runner (dedupe). <b>One cat through the medical room door at a time</b>, in arrival order (serial queue). And checking whether the vet called back: once a minute, then every two, then five — <b>not every ten seconds forever</b> (backoff). None of these are exotic; they're what "someone thought about load" looks like.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">house-rules.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const nap = (ms) =&gt; new Promise(r =&gt; setTimeout(r, ms));
+
+// 1 · THE POOL — N workers pulling one shared queue (the interview classic)
+async function pool(limit, tasks) {
+  const results = new Array(tasks.length);
+  let next = 0;
+  const workers = Array.from({ length: limit }, async () =&gt; {
+    while (next &lt; tasks.length) {
+      const i = next++;                  // single-threaded: no race on this
+      results[i] = await tasks[i]();
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+const t0 = Date.now();
+const jobs = Array.from({ length: 6 }, (_, i) =&gt; async () =&gt; {
+  await nap(100);
+  return `job ${i}`;
+});
+await pool(2, jobs);
+console.log(`6 × 100ms jobs, limit 2 → ${Date.now() - t0}ms (≈300, not 100 or 600)`);
+
+// 2 · IN-FLIGHT DEDUPE — five callers, one request
+const inflight = new Map();
+let hits = 0;
+function fetchCat(id) {
+  if (inflight.has(id)) return inflight.get(id);      // join the walk
+  const p = (async () =&gt; {
+    hits++; await nap(80); return `cat #${id}`;
+  })().finally(() =&gt; inflight.delete(id));            // clean up after landing
+  inflight.set(id, p);
+  return p;
+}
+const five = await Promise.all([1,1,1,2,1].map(fetchCat));
+console.log(`${five.length} callers served by ${hits} actual requests`);
+
+// 3 · SERIAL QUEUE — chain onto a rolling promise tail
+let tail = Promise.resolve();
+const serialize = (job) =&gt; tail = tail.then(job, job);
+['first','second','third'].forEach(name =&gt;
+  serialize(async () =&gt; { await nap(30); console.log('door:', name); }));
+await tail;   // arrival order, guaranteed — even though all queued at once</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">pool math, dedupe hit-count, and a strict one-at-a-time door</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Polling completes the set, and its two rules are judgment, not code: <b>widen the interval</b> (1s → 2s → 4s… capped, plus jitter so a thousand clients don't sync up), and <b>always carry a stop condition</b> — a deadline, an attempt cap, or an AbortSignal from section 08. Then know when to stop polling entirely: past a few requests a minute per client, the answer changes shape — server push via SSE or sockets (the frontend-system-design module's real-time section owns that trade-off).</p>
+    <div class="mcq" data-qid="asy-patterns-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In the pool above, why is <code>const i = next++</code> safe with 2 workers "running at once" — no lock, no race?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It isn't — the pool has a latent race that shows up under load</button>
+        <button class="mcq-opt" type="button">await acquires an implicit mutex around the loop body</button>
+        <button class="mcq-opt" type="button" data-ok>JS is single-threaded — synchronous code between awaits never interleaves, so read-and-increment completes atomically before any other worker resumes</button>
+        <button class="mcq-opt" type="button">Array.from guarantees workers run in creation order</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> workers only swap at <code>await</code> points — between them, each runs uninterrupted (the event-loop contract from section 02, paying rent). <code>next++</code> sits in such a gap, so no two workers can read the same value. This is why JS needs so much less locking than Java — and the same reasoning explains where you <i>would</i> get a race: two awaits between a read and its dependent write.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Pool ≠ batching: <code>all</code> in chunks of N waits for each chunk's slowest job (convoy effect); a true pool starts a new job the instant any slot frees. Explaining that difference is the distinguisher.</li>
+        <li>Dedupe's <code>.finally(delete)</code> is the subtle line — forget it and errors poison the cache: every future caller receives the same stale rejection. (SWR and React Query ship this exact machinery, tuned.)</li>
+        <li>The serial queue's <code>.then(job, job)</code> keeps the chain alive through failures — one rejected write mustn't wedge the door shut forever.</li>
+        <li>Library names to offer after the hand-rolled version: <code>p-limit</code>, <code>p-queue</code>, <code>p-retry</code> — "I can write it, and I know not to maintain my own in production."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1230,9 +1830,16 @@ const lookup = debounce(q =&gt; console.log('🔎 searching:', q), 200);
       <tr><td class="mono">02</td><td>event loop</td><td>Run a task → drain the WHOLE VIP lounge (microtasks) → maybe paint → next task.</td></tr>
       <tr><td class="mono">03</td><td>promises</td><td>A buzzer that buzzes exactly once; .then returns a new promise; rejections ride the highway to the nearest catch.</td></tr>
       <tr><td class="mono">04</td><td>async/await</td><td>await bookmarks the function, never the thread; try/catch replaces .catch.</td></tr>
-      <tr><td class="mono">05</td><td>ordering</td><td>Sync pass → microtasks (FIFO, including new ones) → one macrotask → repeat. Narrate it.</td></tr>
-      <tr><td class="mono">06</td><td>combinators</td><td>all = everything/fail-fast · allSettled = report · race = first settle · any = first success. Loops serialize.</td></tr>
-      <tr><td class="mono">07</td><td>cancellation</td><td>Race abandons, abort cancels; debounce = after the storm, throttle = during it.</td></tr>
+      <tr><td class="mono">05</td><td>rejections</td><td>A rejection is a throw traveling through time; <code>return await</code> keeps it inside the try; float nothing.</td></tr>
+      <tr><td class="mono">06</td><td>ordering</td><td>Sync pass → microtasks (FIFO, including new ones) → one macrotask → repeat. Narrate it.</td></tr>
+      <tr><td class="mono">07</td><td>combinators</td><td>all = everything/fail-fast · allSettled = report · race = first settle · any = first success. Loops serialize.</td></tr>
+      <tr><td class="mono">08</td><td>cancellation</td><td>Race abandons, abort cancels; debounce = after the storm, throttle = during it.</td></tr>
+      <tr><td class="mono">09</td><td>building</td><td>The constructor is the boundary tool — promisify callbacks, await events once, defer with withResolvers.</td></tr>
+      <tr><td class="mono">10</td><td>scheduling</td><td>Microtask now, timer later (clamped &amp; throttled), rAF before paint — clocks recompute from Date.now().</td></tr>
+      <tr><td class="mono">11</td><td>async iteration</td><td>for await pulls one item at a time — break early and the basement stays unfetched.</td></tr>
+      <tr><td class="mono">12</td><td>streams</td><td>Chunks through bounded queues; backpressure is the consumer's pace propagating upstream.</td></tr>
+      <tr><td class="mono">13</td><td>workers</td><td>Async solves waiting, workers solve working — a postbox of structured clones, never a shared desk.</td></tr>
+      <tr><td class="mono">14</td><td>patterns</td><td>Pool N-wide, dedupe in-flight, serialize the door, back off politely — closures + promises, composed.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1244,10 +1851,11 @@ const lookup = debounce(q =&gt; console.log('🔎 searching:', q), 200);
   <p class="sub">This module is the single highest-yield topic in JS screens. Aim it like this:</p>
   <div class="idea" style="margin-top:24px">
     <ul>
-      <li><b>"What order does this log?"</b> is near-guaranteed in any JS screen. Drill the rapid-fire versions in <a href="../fullstack.html#async">Full-Stack in 48 · event loop &amp; async</a> after finishing section 05 here.</li>
-      <li><b>"How would you speed up these API calls?"</b> = section 06. Answer with Promise.all, name the fail-fast tradeoff, volunteer the concurrency limit.</li>
-      <li><b>"How do you time out / cancel a request?"</b> = section 07. "Race abandons, abort cancels" plus the React cleanup line is a complete senior answer.</li>
-      <li><b>Frontend design rounds</b> reuse this constantly: the autocomplete race (<a href="../frontend-system-design.html#data">Frontend SD · data fetching</a>) is sections 05–07 wearing product clothes.</li>
+      <li><b>"What order does this log?"</b> is near-guaranteed in any JS screen. Drill the rapid-fire versions in <a href="../fullstack.html#async">Full-Stack in 48 · event loop &amp; async</a> after finishing section 06 here.</li>
+      <li><b>"How would you speed up these API calls?"</b> = section 07. Answer with Promise.all, name the fail-fast tradeoff, volunteer the concurrency limit.</li>
+      <li><b>"How do you time out / cancel a request?"</b> = section 08. "Race abandons, abort cancels" plus the React cleanup line is a complete senior answer.</li>
+      <li><b>Frontend design rounds</b> reuse this constantly: the autocomplete race (<a href="../frontend-system-design.html#data">Frontend SD · data fetching</a>) is sections 06–08 wearing product clothes.</li>
+      <li><b>Senior screens</b> go straight to the advanced band: implement a concurrency pool (14), explain backpressure (12), or draw the async/workers boundary (13). Section 05's <code>return await</code> trap is a favorite code-review question.</li>
       <li>Next modules: <b>react-deep-dive</b> (stale closures = sections 03–04 meeting components) and <b>node-backend</b> (the loop server-side, where blocking it takes down every user).</li>
     </ul>
   </div>

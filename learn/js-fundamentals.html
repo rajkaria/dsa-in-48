@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -673,11 +677,19 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <h4>// sections</h4>
     <a class="side-link" href="#values"><span><i class="dot" data-for="values"></i> Values &amp; Types</span></a>
     <a class="side-link" href="#coercion"><span><i class="dot" data-for="coercion"></i> Coercion &amp; Equality</span></a>
-    <a class="side-link" href="#closures"><span><i class="dot" data-for="closures"></i> Scope &amp; Closures</span></a>
+    <a class="side-link" href="#scope"><span><i class="dot" data-for="scope"></i> Scope, Hoisting &amp; TDZ</span></a>
+    <a class="side-link" href="#closures"><span><i class="dot" data-for="closures"></i> Closures</span></a>
     <a class="side-link" href="#this"><span><i class="dot" data-for="this"></i> <code>this</code>, Tamed</span></a>
-    <a class="side-link" href="#prototypes"><span><i class="dot" data-for="prototypes"></i> Prototypes &amp; Classes</span></a>
+    <a class="side-link" href="#prototypes"><span><i class="dot" data-for="prototypes"></i> Prototypes &amp; the Chain</span></a>
+    <a class="side-link" href="#classes"><span><i class="dot" data-for="classes"></i> Classes, for Real</span></a>
     <a class="side-link" href="#modules"><span><i class="dot" data-for="modules"></i> Modules</span></a>
     <a class="side-link" href="#iteration"><span><i class="dot" data-for="iteration"></i> Arrays &amp; Iteration</span></a>
+    <a class="side-link" href="#errors"><span><i class="dot" data-for="errors"></i> Errors, Done Right</span></a>
+    <a class="side-link" href="#copying"><span><i class="dot" data-for="copying"></i> Copying &amp; Immutability</span></a>
+    <a class="side-link" href="#regex"><span><i class="dot" data-for="regex"></i> Regular Expressions</span></a>
+    <a class="side-link" href="#generators"><span><i class="dot" data-for="generators"></i> Generators &amp; Iterators</span></a>
+    <a class="side-link" href="#symbols"><span><i class="dot" data-for="symbols"></i> Symbols</span></a>
+    <a class="side-link" href="#memory"><span><i class="dot" data-for="memory"></i> Memory &amp; GC</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -695,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/16</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -722,13 +734,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: interview-grade depth</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>8</b> quiz questions</span>
-    <span><b>9</b> runnable panels</span>
-    <span><b>~4h</b> total, self-paced</span>
+    <span><b>15</b> sections</span>
+    <span><b>16</b> quiz questions</span>
+    <span><b>15</b> runnable panels</span>
+    <span><b>~10h</b> total, self-paced</span>
   </div>
   <a class="btn" href="#values">Start with values <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the mental models</span></div>
 
 <!-- 1 · VALUES -->
 <section class="lesson" id="values">
@@ -853,12 +867,83 @@ console.log(x == null);       // true for null AND undefined — handy guard</co
   </div>
 </section>
 
-<!-- 3 · CLOSURES -->
-<section class="lesson" id="closures">
+<!-- 3 · SCOPE -->
+<section class="lesson" id="scope">
   <div class="lesson-head">
     <span class="lesson-num">03</span>
     <div>
-      <h3>Scope &amp; closures — functions that remember</h3>
+      <h3>Scope, hoisting &amp; the TDZ — where variables live</h3>
+      <p class="lvl">beginner → the machinery closures are built on</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>Scope</b> answers one question: which variables can this line of code see? Modern JS has three kinds — <b>global</b> (everywhere), <b>function</b> (inside the enclosing function), and <b>block</b> (inside the nearest <code>{ }</code>). <code>let</code> and <code>const</code> are block-scoped; <code>var</code> ignores blocks entirely and attaches to the whole function, which is the root of most of its crimes.</p>
+    <p><b>Hoisting</b> is the part everyone half-knows: before running your code, the engine walks it and registers every declaration first. Function declarations are hoisted <i>with their body</i> — you can call them above where they're written. <code>var</code> is hoisted but initialized to <code>undefined</code>. <code>let</code>/<code>const</code> are hoisted too — but left <b>uninitialized</b>, and touching them before their declaration line throws. That forbidden stretch has a name interviewers love: the <b>temporal dead zone</b> (TDZ).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Before adoption day opens, the shelter pins up <b>name tags for every cat that will attend</b>. A function-declaration cat arrives early and sits under her tag — visit any time. A <code>var</code> cat has a tag but the cage is empty (<code>undefined</code>) until she's carried in. A <code>let</code> cat's tag says <b>"DO NOT APPROACH until formally introduced"</b> — walk up early and security throws you out. That roped-off waiting period is the temporal dead zone.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">name-tags.js — predict, then run</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · function declarations: hoisted WITH their body
+console.log(greet('Mochi'));      // works — called above its definition
+function greet(cat) { return `hello, ${cat}`; }
+
+// 2 · var: hoisted, initialized to undefined
+console.log(bowl);                // undefined — tag up, cage empty
+var bowl = 'tuna';
+
+// 3 · let: hoisted but UNINITIALIZED — the TDZ
+try {
+  console.log(treats);            // BOOM
+} catch (e) { console.log('TDZ says:', e.constructor.name); }
+let treats = 3;
+
+// 4 · var ignores blocks; let respects them
+if (true) { var leaked = 'var escapes blocks'; let contained = 'let does not'; }
+console.log(leaked);              // visible — function-scoped
+try { console.log(contained); } catch (e) { console.log('contained is gone:', e.constructor.name); }
+
+// 5 · shadowing: inner declaration hides the outer one
+let cat = 'Mochi';
+{ let cat = 'Biscuit'; console.log('inner:', cat); }
+console.log('outer:', cat);       // untouched</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">five behaviors, one scoreboard — say each answer out loud first</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Why this matters beyond trivia: block scoping is what makes the classic <code>for (let i…)</code> loop create <b>a fresh <code>i</code> per iteration</b> (the fix you'll meet in the closures section), and the TDZ is why <code>const</code> can guarantee "declared before used". Hoisting explains the difference between a function <i>declaration</i> and a function <i>expression</i>: <code>const f = () =&gt; {}</code> hoists the <i>variable</i> into the TDZ, not the function — call it early and you get a TDZ throw, not <code>undefined is not a function</code>.</p>
+    <div class="mcq" data-qid="jsf-scope-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">What does this log? <code>console.log(x); let x = 5;</code></p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>undefined</code> — declarations are hoisted</button>
+        <button class="mcq-opt" type="button"><code>5</code> — the engine reads ahead</button>
+        <button class="mcq-opt" type="button" data-ok>It throws a <code>ReferenceError</code> — <code>x</code> is hoisted but sits in the temporal dead zone</button>
+        <button class="mcq-opt" type="button">It throws a <code>SyntaxError</code> — you can't reference before declaring</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>let</code> IS hoisted — the binding exists at the top of the block — but it's uninitialized until its declaration line runs. Reading an uninitialized binding is a runtime <code>ReferenceError</code>, not a parse-time <code>SyntaxError</code>. Swap <code>let</code> for <code>var</code> and you'd get <code>undefined</code>. That three-way distinction is the whole question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The precise sentence: <b>"<code>let</code> and <code>const</code> are hoisted but not initialized — the gap is the TDZ."</b> Saying "let isn't hoisted" is the common half-truth interviewers probe.</li>
+        <li><code>typeof undeclared</code> is safely <code>'undefined'</code>, but <code>typeof x</code> <i>inside x's TDZ</i> throws — the TDZ even breaks typeof's famous safety.</li>
+        <li>Un-declared assignment (<code>bowl = 'tuna'</code> with no keyword) creates a <b>global</b> in sloppy mode and throws in strict mode — one of the best one-line arguments for <code>'use strict'</code> and modules (which are strict by default).</li>
+        <li>Old code wrapped everything in IIFEs — <code>(function () { … })()</code> — purely to fake block scope before <code>let</code> existed. Recognize the pattern; don't write it new.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · CLOSURES -->
+<section class="lesson" id="closures">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Closures — functions that remember</h3>
       <p class="lvl">the #1 interview topic in all of JavaScript</p>
     </div>
   </div>
@@ -936,10 +1021,10 @@ for (let j = 0; j &lt; 3; j++) {
   </div>
 </section>
 
-<!-- 4 · THIS -->
+<!-- 5 · THIS -->
 <section class="lesson" id="this">
   <div class="lesson-head">
-    <span class="lesson-num">04</span>
+    <span class="lesson-num">05</span>
     <div>
       <h3><code>this</code>, tamed — four rules, zero mystery</h3>
       <p class="lvl">intermediate → the bug class you'll never write again</p>
@@ -1005,10 +1090,12 @@ console.log(biscuit.listFriends());</code></pre>
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
-<!-- 5 · PROTOTYPES -->
+<div class="band" id="band-intermediate"><span>// intermediate — the object model &amp; the toolkit</span></div>
+
+<!-- 6 · PROTOTYPES -->
 <section class="lesson" id="prototypes">
   <div class="lesson-head">
-    <span class="lesson-num">05</span>
+    <span class="lesson-num">06</span>
     <div>
       <h3>Prototypes &amp; classes — inheritance without the theater</h3>
       <p class="lvl">intermediate → what `class` actually compiles down to</p>
@@ -1073,10 +1160,92 @@ console.log(Object.getPrototypeOf(Object.prototype));        // null</code></pre
   </div>
 </section>
 
-<!-- 6 · MODULES -->
+<!-- 7 · CLASSES -->
+<section class="lesson" id="classes">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Classes, for real — fields, <code>#private</code>, static &amp; super</h3>
+      <p class="lvl">intermediate → what the syntax actually creates</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The previous section showed that <code>class</code> is syntax over prototypes. This one covers the parts of the syntax that are <i>genuinely new</i> — because "class is just sugar" stopped being fully true a few years ago. <b>Field declarations</b>, <b>#private fields</b>, and <b>static blocks</b> have no prototype-era equivalent.</p>
+    <p>The one distinction that explains almost every class question: <b>methods live once on the prototype; fields are copied onto every instance.</b> Write <code>meow() {}</code> and a thousand cats share one function. Write <code>meow = () =&gt; {}</code> as a field and a thousand cats carry a thousand private copies — each one closing over its own <code>this</code>, which is exactly why the arrow-field trick fixes callback <code>this</code> (and what it costs).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The shelter's <b>rulebook</b> (the prototype) is written once and every cat consults it — that's a method. Each cat's <b>collar tag</b> is stamped fresh per cat — that's a field. And a <code>#microchip</code> is under the skin: the vet who implanted it (the class's own code) can read it; nobody outside can, not even by shaving the cat (<code>JSON.stringify</code>, <code>Object.keys</code> — nothing reveals it).</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">microchips.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">class Cat {
+  static #population = 0;              // private AND shared by the class
+  static get population() { return Cat.#population; }
+
+  #chipId;                             // instance-private
+  name;                                // public field — per instance
+  constructor(name) {
+    this.name = name;
+    this.#chipId = 'CHIP-' + (++Cat.#population);
+  }
+  identify() { return `${this.name} → ${this.#chipId}`; }   // shared method
+  static isCat(x) { return #chipId in x; }  // brand check — the modern instanceof
+}
+
+class Kitten extends Cat {
+  constructor(name) {
+    super(name);                       // MUST run before touching `this`
+    this.zoomies = true;
+  }
+  identify() { return super.identify() + ' (kitten)'; }
+}
+
+const mochi = new Cat('Mochi');
+const beans = new Kitten('Beans');
+console.log(mochi.identify());
+console.log(beans.identify());
+console.log('population:', Cat.population);
+
+console.log('chip visible from outside?', Object.keys(beans));
+console.log('JSON sees:', JSON.stringify(beans));
+console.log('real cat?', Cat.isCat(beans), '· imposter?', Cat.isCat({ name: 'Dog' }));
+
+// methods are SHARED; fields are PER-INSTANCE:
+console.log(mochi.identify === beans.__proto__.__proto__.identify);  // hmm — walk the chain!</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">private fields, static state, super, and a brand check in 30 lines</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Rules worth knowing cold: a subclass constructor <b>must call <code>super()</code> before using <code>this</code></b> (the parent literally creates the object). <code>#private</code> is enforced by the language, not convention — accessing <code>beans.#chipId</code> outside the class is a <i>syntax</i> error, a stronger guarantee than TypeScript's <code>private</code> (which compiles away) or the <code>_underscore</code> handshake. Getters/setters (<code>get</code>/<code>set</code>) make computed properties read like plain ones — the same mechanism frameworks lean on for reactive state.</p>
+    <div class="mcq" data-qid="jsf-classes-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>class Timer { start = () =&gt; this.tick() }</code> vs <code>class Timer { start() { this.tick() } }</code> — why might the arrow-field version be chosen?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Arrow fields run faster than methods</button>
+        <button class="mcq-opt" type="button" data-ok>Passed as a callback (<code>onClick={t.start}</code>), the arrow field keeps <code>this</code> bound to the instance; the method version loses it</button>
+        <button class="mcq-opt" type="button">Methods can't call other methods via <code>this</code></button>
+        <button class="mcq-opt" type="button">Arrow fields are hoisted; methods are not</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a method extracted from its object is just a function — called bare, its <code>this</code> is undefined (section on <code>this</code>). An arrow <i>field</i> is created per-instance during construction and closes over that instance's <code>this</code> forever. The cost: one function object per instance instead of one shared on the prototype — fine for a handful, worth knowing for ten thousand.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>"Methods go on the prototype; fields are own properties, initialized per instance in declaration order, before the constructor body."</b> That sentence separates syntax users from people who know the object model.</li>
+        <li><code>#x in obj</code> is the modern <b>brand check</b> — it can't be faked the way <code>instanceof</code> can (prototypes are swappable at runtime).</li>
+        <li><code>static</code> members live on the constructor function itself — <code>Cat.population</code>, not <code>mochi.population</code>. Static blocks (<code>static { … }</code>) run once at class definition for multi-step setup.</li>
+        <li>The senior answer to "should this be a class?": classes earn their keep for <b>stateful things with identity</b> (a connection, a game entity); for data + transforms, plain objects and functions compose better. "Composition over inheritance" — one level of <code>extends</code>, rarely two.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · MODULES -->
 <section class="lesson" id="modules">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">08</span>
     <div>
       <h3>Modules — how code finds other code</h3>
       <p class="lvl">intermediate → live bindings, cycles, and the CJS/ESM split</p>
@@ -1135,10 +1304,10 @@ module.exports = { order };</code></pre>
   </div>
 </section>
 
-<!-- 7 · ITERATION -->
+<!-- 9 · ITERATION -->
 <section class="lesson" id="iteration">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">09</span>
     <div>
       <h3>Arrays, objects &amp; iteration — the daily toolkit, sharpened</h3>
       <p class="lvl">beginner → the fluency layer: destructuring, spread, the big five</p>
@@ -1229,6 +1398,481 @@ console.log(byAge);</code></pre>
   </div>
 </section>
 
+<!-- 10 · ERRORS -->
+<section class="lesson" id="errors">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Errors done right — throw, catch, cause &amp; custom types</h3>
+      <p class="lvl">intermediate → the difference between failing and failing usefully</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Error handling has a small surface — <code>throw</code>, <code>try/catch/finally</code>, the <code>Error</code> family — and a large skill gap. The gap is knowing <b>what to throw, where to catch, and what to do there</b>. The mechanics first: <code>throw</code> can hurl any value, but you always throw <code>Error</code> objects (or subclasses), because only they carry a <b>stack trace</b> and a <code>message</code>. <code>finally</code> runs on every exit path — return, throw, or fall-through — which makes it the home for cleanup.</p>
+    <p>The modern upgrade most engineers haven't met: <b><code>cause</code></b>. Since ES2022, <code>new Error('save failed', { cause: originalError })</code> lets you wrap a low-level error in a high-level one <i>without losing the original</i> — a chain of custody instead of a cover-up.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>When a cat knocks a vase off the shelf, a bad shelter files the report as <b>"vase broken"</b> — cause unknown, cat unfindable. A good shelter files <b>"vase broken (report attached: Mochi, 3:07 pm, zoomies)"</b>. Wrapping an error with <code>cause</code> is stapling the original incident report to the new one. And <code>finally</code> is the staff member who locks the supply room on the way out <i>whatever</i> happened during the shift.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">incident-reports.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">class CatNotFoundError extends Error {
+  constructor(name) {
+    super(`no cat named ${name}`);
+    this.name = 'CatNotFoundError';   // otherwise it reports as "Error"
+    this.catName = name;              // structured data for handlers
+  }
+}
+
+const shelter = { Mochi: { hungry: true } };
+
+function findCat(name) {
+  const cat = shelter[name];
+  if (!cat) throw new CatNotFoundError(name);
+  return cat;
+}
+
+function feed(name) {
+  try {
+    findCat(name).hungry = false;
+    return `${name} fed`;
+  } catch (err) {
+    if (err instanceof CatNotFoundError) {
+      return `skipped: ${err.message}`;        // expected — handle it
+    }
+    throw new Error(`feed(${name}) blew up`, { cause: err });  // unexpected — wrap &amp; rethrow
+  } finally {
+    console.log(`· log: feed(${name}) attempted`);  // runs on BOTH paths
+  }
+}
+
+console.log(feed('Mochi'));
+console.log(feed('Biscuit'));
+
+// the cause chain in action:
+try {
+  try { JSON.parse('{oops'); }
+  catch (low) { throw new Error('settings unreadable', { cause: low }); }
+} catch (high) {
+  console.log(high.message, '&lt;-caused by-', high.cause.constructor.name);
+}</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">expected errors handled, unexpected ones wrapped — the whole discipline</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>The design rule underneath: <b>catch only what you can handle, exactly where you can handle it.</b> A catch block that logs and continues turns a loud failure into a silent lie — the most expensive bug class in production. If you can't recover, don't catch; let it propagate to a boundary (Express error middleware, a React error boundary) that turns it into a 500 or a fallback UI once, in one place.</p>
+    <div class="mcq" data-qid="jsf-errors-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">What does this return? <code>function f() { try { return 'try'; } finally { console.log('cleanup'); } }</code></p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>'try'</code>, and <code>cleanup</code> never logs — return exits immediately</button>
+        <button class="mcq-opt" type="button" data-ok><code>'try'</code>, and <code>cleanup</code> logs first — finally runs on the way out, even past a return</button>
+        <button class="mcq-opt" type="button"><code>undefined</code> — finally swallows the return value</button>
+        <button class="mcq-opt" type="button">It's a syntax error — try needs a catch</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>finally</code> intercepts every exit — return, throw, break. The return value is computed, <i>then</i> finally runs, then the value leaves. (And <code>try/finally</code> with no catch is legal — it means "I don't handle errors, but I do clean up.") The trap for extra credit: a <code>return</code> <i>inside</i> finally overrides the original — never do that.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>Never throw strings.</b> <code>throw 'oops'</code> has no stack, no type to check, and <code>instanceof</code> can't route it. Errors are data — subclass and attach fields.</li>
+        <li>Name the built-ins and what they signal: <code>TypeError</code> (wrong kind of value), <code>RangeError</code> (right kind, bad magnitude), <code>ReferenceError</code> (unknown binding), <code>SyntaxError</code> (unparseable code).</li>
+        <li>"Errors for the exceptional, values for the expected" — a lookup that often finds nothing should return <code>null</code>/<code>undefined</code>, not throw. Throwing on every miss makes control flow out of exceptions.</li>
+        <li>Async changes the plumbing, not the philosophy — rejected promises are throws in transit. The js-async module's rejections section picks up exactly here.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · COPYING -->
+<section class="lesson" id="copying">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Copying &amp; immutability — shallow, deep, frozen</h3>
+      <p class="lvl">intermediate → the bug class React made everyone confront</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 01 established that objects copy by reference. This section is about actually copying them — and the three-way choice every "copy" hides: <b>share it, copy one level, or copy everything</b>. Spread (<code>{...cat}</code>) and <code>Object.assign</code> copy <b>one level</b> — every nested object inside is still the original, shared. That's a <b>shallow copy</b>, and forgetting it is the classic "my state changed by itself" bug.</p>
+    <p>For a true deep copy, the platform finally has a real answer: <b><code>structuredClone(value)</code></b> — handles nesting, <code>Date</code>, <code>Map</code>, <code>Set</code>, cycles. The old folk remedy, <code>JSON.parse(JSON.stringify(x))</code>, silently mangles data: drops <code>undefined</code> and functions, turns Dates into strings, and explodes on cycles. Know it to recognize it, and know exactly what it breaks.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Photocopying a cat's adoption folder copies the <b>cover page</b> — but the vet-history booklet inside is the <i>same physical booklet</i>, slipped into both folders. Scribble in one, the other has the scribble. That's spread. <code>structuredClone</code> is the intern who re-photocopies <b>every page of every booklet, all the way down</b>. And <code>Object.freeze</code> laminates the cover page only — the booklets inside are still very writable.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">photocopies.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const mochi = {
+  name: 'Mochi',
+  vet: { lastVisit: new Date('2026-01-15'), shots: ['rabies'] },
+};
+
+// 1 · spread: one level deep — the booklet is SHARED
+const copy = { ...mochi };
+copy.vet.shots.push('flu');
+console.log('original grew a shot:', mochi.vet.shots);   // ['rabies','flu'] 😱
+console.log('same booklet?', copy.vet === mochi.vet);    // true
+
+// 2 · structuredClone: the real deep copy
+const clone = structuredClone(mochi);
+clone.vet.shots.push('experimental');
+console.log('original untouched:', mochi.vet.shots);
+console.log('Date survived as:', clone.vet.lastVisit.constructor.name);
+
+// 3 · the JSON round-trip mangles:
+const mangled = JSON.parse(JSON.stringify({
+  when: new Date(), note: undefined, greet() { return 'hi'; },
+}));
+console.log('JSON version:', mangled);      // date → string; note &amp; greet GONE
+
+// 4 · freeze is shallow — and STRICT mode throws where sloppy stays silent
+const frozen = Object.freeze({ name: 'Biscuit', bowl: { food: 'tuna' } });
+try { frozen.name = 'Beans'; }           // strict (this sandbox): throws
+catch (e) { console.log('frozen top level:', e.constructor.name); }
+frozen.bowl.food = 'salmon';  // WORKS — nested object unfrozen
+console.log(frozen.name, frozen.bowl.food);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">four copy behaviors — the first one is the production bug</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>The immutable-update idiom this all serves: <b>copy the path you're changing, share the rest.</b> <code>{ ...state, user: { ...state.user, name: 'X' } }</code> re-creates only the spine from root to the changed field — cheap, and reference checks (React's whole change-detection model) see exactly which branches changed. When state nests deep enough that the spines get painful, that's the signal to flatten the state shape — or reach for a library like Immer that writes the spines for you.</p>
+    <div class="mcq" data-qid="jsf-copying-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">After <code>const b = { ...a }</code>, which change to <code>b</code> is visible through <code>a</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>b.name = 'X'</code> — top-level fields stay linked</button>
+        <button class="mcq-opt" type="button" data-ok><code>b.address.city = 'X'</code> — nested objects are still shared references</button>
+        <button class="mcq-opt" type="button">Both — spread only copies the variable, not the object</button>
+        <button class="mcq-opt" type="button">Neither — spread is a deep copy</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> spread creates a new top-level object, so writing <code>b.name</code> writes the copy. But <code>b.address</code> and <code>a.address</code> hold the <i>same reference</i> — one booklet, two folders. Mutating through either path is visible through both. "Spread is shallow" is the two-word summary worth saying out loud in any React interview.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>structuredClone</code> can't clone functions, DOM nodes, or class instances' <i>prototypes</i> (own data survives; methods don't). "Clone the data, not the behavior" is the mental model.</li>
+        <li><code>Object.freeze</code> fails <b>silently</b> outside strict mode and throws inside it — same code, two behaviors, one more argument for modules (always strict).</li>
+        <li>Arrays got non-mutating verbs in ES2023: <code>toSorted / toReversed / toSpliced / with</code>. <code>items.with(3, newItem)</code> is an immutable index write in one call.</li>
+        <li>Immutability isn't free — naive deep-copy-everything is O(n) per update. The senior framing: <b>structural sharing</b> (copy the spine, share the branches) is what makes immutable updates affordable.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · REGEX -->
+<section class="lesson" id="regex">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Regular expressions — read them, write them, know when not to</h3>
+      <p class="lvl">intermediate → from line noise to a tool you reach for calmly</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A regex is a <b>pattern for text</b>: literals match themselves, and a small set of operators mean "kinds of characters" (<code>\d</code> digit, <code>\w</code> word char, <code>\s</code> whitespace, <code>.</code> almost anything), "how many" (<code>*</code> 0+, <code>+</code> 1+, <code>?</code> 0-1, <code>{2,4}</code> a range), and "where" (<code>^</code> start, <code>$</code> end, <code>\b</code> word boundary). Wrap part of a pattern in <code>( )</code> and you've made a <b>group</b> you can extract — name it with <code>(?&lt;name&gt;…)</code> and the match comes back labeled.</p>
+    <p>The one behavior that separates people who <i>read</i> regexes from people who squint: quantifiers are <b>greedy</b> — they grab as much as possible, then give back only if the rest can't match. Add <code>?</code> to make one <b>lazy</b> (grab as little as possible). <code>&lt;.+&gt;</code> against <code>&lt;a&gt;&lt;b&gt;</code> matches the whole thing; <code>&lt;.+?&gt;</code> matches just <code>&lt;a&gt;</code>.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A greedy cat at the buffet piles <b>everything</b> onto the plate, then puts items back one by one only if the kitchen complains. A lazy cat takes <b>one bite</b>, and returns for more only if forced. Both end up "full" (a valid match) — but what's on the plate differs completely. When your regex captures way more than intended, you've sent the greedy cat.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">pattern-practice.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// named groups: extraction that reads like code
+const chip = 'CHIP-2026-00412 (Mochi)';
+const m = chip.match(/CHIP-(?&lt;year&gt;\d{4})-(?&lt;serial&gt;\d+) \((?&lt;cat&gt;\w+)\)/);
+console.log(m.groups);                        // { year, serial, cat }
+
+// greedy vs lazy — same string, wildly different plates
+const tags = '&lt;name&gt;Mochi&lt;/name&gt;&lt;age&gt;2&lt;/age&gt;';
+console.log(tags.match(/&lt;.+&gt;/)[0]);           // greedy: the WHOLE string
+console.log(tags.match(/&lt;.+?&gt;/)[0]);          // lazy: just &lt;name&gt;
+
+// replace with a callback — regex as a transformer
+const snake = 'cat_name_first';
+console.log(snake.replace(/_(\w)/g, (_, c) =&gt; c.toUpperCase()));  // camelCase
+
+// matchAll: every match, with groups, lazily
+const log = 'fed Mochi 3x, fed Biscuit 1x, fed Beans 2x';
+for (const f of log.matchAll(/fed (\w+) (\d+)x/g)) {
+  console.log(`${f[1]} ate ${f[2]} times`);
+}
+
+// boundaries beat contains: /\bcat\b/ won't match "category"
+console.log(/\bcat\b/.test('my cat sleeps'), /\bcat\b/.test('category'));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">named groups, laziness, replace-with-function — the working set</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Flags you'll actually use: <code>g</code> (all matches, required for <code>matchAll</code>/global replace), <code>i</code> (case-insensitive), <code>m</code> (<code>^$</code> per line), <code>s</code> (<code>.</code> also matches newlines), <code>u</code> (real Unicode handling — always safe to add). And the honest boundary: regexes are for <b>regular</b> text — tokens, IDs, log lines. For nested structures (HTML, JSON, code), reach for a parser; the famous Stack Overflow answer about parsing HTML with regex is famous because it's right.</p>
+    <div class="mcq" data-qid="jsf-regex-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Against <code>'aaa'</code>, what does <code>/a+?/</code> match?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>'aaa'</code> — <code>+</code> always takes everything</button>
+        <button class="mcq-opt" type="button" data-ok><code>'a'</code> — the lazy quantifier takes the minimum that still satisfies <code>+</code></button>
+        <button class="mcq-opt" type="button">Nothing — <code>+?</code> is invalid syntax</button>
+        <button class="mcq-opt" type="button"><code>'aa'</code> — lazy means one less than greedy</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>+</code> requires at least one <code>a</code>; the <code>?</code> suffix makes it stop there unless the rest of the pattern forces more. There is no rest, so one <code>a</code> wins. Greedy and lazy find the same <i>set</i> of valid matches — they differ in which one they settle on first.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><b>Catastrophic backtracking is a real outage class</b>: nested quantifiers like <code>(a+)+$</code> against a non-matching string go exponential — a crafted input pins a CPU (ReDoS). Linear-time guarantee: avoid nested quantifiers, or use the <code>v</code>/RE2-style engines where available.</li>
+        <li><code>.test()</code> for yes/no, <code>.match()</code>/<code>.matchAll()</code> for extraction, <code>.replace()</code> with a function for transformation — naming the right tool is half the answer.</li>
+        <li>A <code>g</code>-flagged regex object is <b>stateful</b> (<code>lastIndex</code> advances between <code>.test()</code> calls) — the classic "why does my regex match every other time" bug. Recreate the regex or use <code>matchAll</code>.</li>
+        <li>Email validation: the pragmatic answer is <code>/^\S+@\S+\.\S+$/</code> plus a confirmation email — not the 6,000-character RFC monster. Knowing <i>when to stop</i> is the senior signal.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the depth interviewers use to separate seniors</span></div>
+
+<!-- 13 · GENERATORS -->
+<section class="lesson" id="generators">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>Generators &amp; the iterator protocol — functions that pause</h3>
+      <p class="lvl">advanced → lazy sequences, and the machinery under for…of</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 09 used iterables; this section builds them. The <b>iterator protocol</b> is just a handshake: an object is an <i>iterator</i> if it has <code>next()</code> returning <code>{ value, done }</code>; it's an <i>iterable</i> if it has a <code>[Symbol.iterator]()</code> method that returns an iterator. Everything that "just works" in a <code>for…of</code>, a spread, or destructuring is speaking this protocol.</p>
+    <p>Writing <code>next()</code> by hand is bookkeeping, so the language gives you <b>generators</b>: <code>function*</code> plus <code>yield</code>. Call one and <i>nothing runs</i> — you get back an iterator. Each <code>next()</code> runs the body to the next <code>yield</code> and <b>pauses there</b>, stack frame intact, locals alive. It's the only place in synchronous JS where a function can stop mid-body and resume later — the same trick <code>await</code> is built on.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A normal function is a cat that eats the <b>whole bowl</b> in one sitting. A generator is a cat that takes <b>one bite, walks away mid-chew</b>, and — this is the strange part — resumes from the exact same bite when it returns, even hours later. The bowl (local variables) waits, untouched. Nobody refills it; nobody resets it. The nap <i>is</i> the feature.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">one-bite-at-a-time.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// an INFINITE sequence — fine, because it's lazy
+function* catNames() {
+  const bases = ['Mochi', 'Biscuit', 'Beans'];
+  let n = 1;
+  while (true) {
+    for (const b of bases) yield `${b} ${'I'.repeat(n)}`;
+    n++;
+  }
+}
+
+// take(k): consume only what you need
+function* take(k, iterable) {
+  for (const v of iterable) { if (k-- &lt;= 0) return; yield v; }
+}
+console.log([...take(5, catNames())]);
+
+// two-way: next(value) SENDS data to the paused yield
+function* feeder() {
+  const first = yield 'who is hungry?';
+  const second = yield `${first} fed. who else?`;
+  return `${second} fed. kitchen closed.`;
+}
+const f = feeder();
+console.log(f.next().value);          // runs to the first yield
+console.log(f.next('Mochi').value);   // 'Mochi' becomes `first`
+console.log(f.next('Beans').value);   // return value, done: true
+
+// yield* delegates to another iterable
+function* all() { yield* ['a', 'b']; yield* catNames(); }
+console.log([...take(4, all())]);
+
+// any object can join for…of — implement the protocol
+const clowder = {
+  cats: ['Mochi', 'Biscuit'],
+  *[Symbol.iterator]() { yield* this.cats; },
+};
+console.log([...clowder]);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">infinite-but-lazy, two-way yield, delegation, and a custom iterable</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>When do you actually reach for one? <b>Lazy pipelines</b> (process a million-line file one line at a time, not one array at a time), <b>custom iteration order</b> for your own data structures (walk a tree in-order with five lines), and <b>resumable processes</b> (pagination cursors, state machines that advance one step per call). If you've used Redux-Saga, or <code>for await</code> in the async module — those are this protocol wearing different jackets.</p>
+    <div class="mcq" data-qid="jsf-generators-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>function* g() { yield 1; yield 2; }</code> — what does <code>g()</code> return?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>1</code> — the first yield runs immediately</button>
+        <button class="mcq-opt" type="button"><code>[1, 2]</code> — generators collect their yields</button>
+        <button class="mcq-opt" type="button" data-ok>A paused iterator — no body code has run yet; the first <code>next()</code> runs to the first yield</button>
+        <button class="mcq-opt" type="button">A promise resolving to 1</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> calling a generator function executes <i>zero</i> lines of its body — it returns a generator object (an iterator that's also iterable). Execution is entirely demand-driven: each <code>next()</code> buys you one segment, up to the next <code>yield</code>. That "call runs nothing" behavior is the #1 surprise interviewers test.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The crisp definition: <b>"iterable has <code>Symbol.iterator</code>; iterator has <code>next()</code> → <code>{value, done}</code>; generators are both."</b></li>
+        <li>Generators are <b>not</b> threads and not async — they're cooperative pauses in synchronous code. (Async generators + <code>for await</code> add promises on top; see js-async.)</li>
+        <li><code>yield</code> is an <i>expression</i> — <code>next(v)</code>'s argument becomes the value the paused yield evaluates to. Two-way flow is what made generator-based coroutine libraries (co, redux-saga) possible before async/await shipped.</li>
+        <li>Spread, destructuring, <code>Array.from</code>, <code>for…of</code>, <code>new Map(pairs)</code> — all consume the same protocol. Implement <code>Symbol.iterator</code> once and every one of those works on your type for free.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · SYMBOLS -->
+<section class="lesson" id="symbols">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Symbols — the language's hidden hooks</h3>
+      <p class="lvl">advanced → the seventh primitive, and why libraries adore it</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>symbol</b> is a primitive whose only job is to be <b>unique</b>: <code>Symbol('id') !== Symbol('id')</code>, always — the string is just a debugging label. Use one as a property key and it can never collide with anyone else's key, which makes symbols the language's mechanism for <b>metadata that stays out of the way</b>: symbol-keyed properties are skipped by <code>for…in</code>, <code>Object.keys</code>, and <code>JSON.stringify</code>.</p>
+    <p>The deeper story is the <b>well-known symbols</b> — slots the language itself checks on your objects. You met <code>Symbol.iterator</code> in the generators section; its siblings customize other built-in behavior: <code>Symbol.toPrimitive</code> (how your object coerces), <code>Symbol.toStringTag</code> (what <code>Object.prototype.toString</code> reports), <code>Symbol.hasInstance</code> (what <code>instanceof</code> means for your class). They're the official override points for machinery that used to be magic.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Every shelter uses name tags, and two cats named Mochi collide constantly. A symbol is a <b>tamper-proof microchip number issued once in the universe</b> — even chips labeled "Mochi" are different chips. Regular visitors (<code>Object.keys</code>, JSON) don't even have the scanner: they walk past chipped data without seeing it. Only someone holding <i>that exact chip</i> (the symbol reference) can read what's stored under it.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">hidden-hooks.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// uniqueness — the entire point
+console.log(Symbol('id') === Symbol('id'));           // false, always
+
+// symbol keys hide from normal enumeration
+const SECRET = Symbol('vetNotes');
+const mochi = { name: 'Mochi', [SECRET]: 'scared of vacuum' };
+console.log(Object.keys(mochi));                      // ['name'] only
+console.log(JSON.stringify(mochi));                   // {"name":"Mochi"}
+console.log(mochi[SECRET]);                           // holders of the symbol read it
+console.log(Object.getOwnPropertySymbols(mochi).map(String));  // …but not truly secret
+
+// Symbol.toPrimitive — YOU write the coercion rules from section 02
+const weight = {
+  kg: 4.2,
+  [Symbol.toPrimitive](hint) {
+    return hint === 'number' ? this.kg : `${this.kg} kg`;
+  },
+};
+console.log(weight * 2);        // number hint → 8.4
+console.log(`Mochi: ${weight}`); // string hint → "4.2 kg"
+
+// Symbol.for — the global registry (same key → SAME symbol)
+console.log(Symbol.for('app.cache') === Symbol.for('app.cache'));  // true
+
+// Symbol.toStringTag — rebrand the default [object Object]
+class Clowder { get [Symbol.toStringTag]() { return 'Clowder'; } }
+console.log(Object.prototype.toString.call(new Clowder()));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">unique keys, invisible metadata, and custom coercion — all symbol tricks</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Where you've already touched this without knowing: React elements carry <code>$$typeof: Symbol.for('react.element')</code> so a JSON payload from a compromised API can't smuggle in a fake element (JSON can't produce symbols — that's the security property doing real work). Node marks objects for custom console output with a symbol; polyfills detect each other through <code>Symbol.for</code> registry keys. It's the standard way libraries write on your objects without ever colliding with your data.</p>
+    <div class="mcq" data-qid="jsf-symbols-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does React tag elements with <code>$$typeof: Symbol.for('react.element')</code> instead of a string like <code>"react.element"</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Symbols compare faster than strings</button>
+        <button class="mcq-opt" type="button" data-ok>JSON can't encode symbols — so data arriving from a server can never impersonate a React element</button>
+        <button class="mcq-opt" type="button">Strings would show up in DevTools</button>
+        <button class="mcq-opt" type="button">Symbols use less memory</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> if the tag were a string, a malicious API response <code>{"$$typeof":"react.element", …}</code> would pass the "is this a React element" check and could inject markup. <code>JSON.parse</code> can produce strings, numbers, booleans, nulls, arrays, objects — <b>never symbols</b> — so the check can only pass for objects created in your own JS runtime. A primitive's <i>absence</i> from JSON as a security boundary: peak JavaScript.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Symbol-keyed ≠ private: <code>Object.getOwnPropertySymbols</code> reveals them. For enforcement, that's what <code>#private</code> fields (section 07) are for — symbols are about <b>collision-free</b>, not secret.</li>
+        <li><code>Symbol()</code> is unique per call; <code>Symbol.for(key)</code> is the <b>global registry</b> — same key, same symbol, even across module copies. That's why cross-package protocols use <code>Symbol.for</code>.</li>
+        <li>Well-known symbols worth naming: <code>iterator</code>, <code>asyncIterator</code>, <code>toPrimitive</code>, <code>toStringTag</code>, <code>hasInstance</code>. Just listing them signals you know where the language's extension sockets are.</li>
+        <li>The seven primitives, complete: string, number, boolean, undefined, null, bigint, <b>symbol</b> — interviewers still ask, and symbol is the one people forget.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 15 · MEMORY -->
+<section class="lesson" id="memory">
+  <div class="lesson-head">
+    <span class="lesson-num">15</span>
+    <div>
+      <h3>Memory &amp; garbage collection — why leaks happen in a GC'd language</h3>
+      <p class="lvl">advanced → reachability, the four classic leaks, and the Weak family</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>JavaScript frees memory for you, so how do JS apps leak? Because the garbage collector's rule is not "free what you're done with" — it's <b>"free what can no longer be reached."</b> Anything findable by walking references from the <b>roots</b> (globals, the current stack, active closures, live timers, DOM event listeners) stays alive. A leak is simply memory that is <i>reachable</i> but <i>useless</i> — the GC can't read your intentions, only your references.</p>
+    <p>The four classics, responsible for nearly every real leak: <b>1)</b> forgotten timers/subscriptions (the callback's closure pins everything it captured), <b>2)</b> ever-growing caches (a <code>Map</code> you add to and never evict), <b>3)</b> detached DOM (a removed node still referenced from JS keeps its whole subtree), <b>4)</b> accidental globals (sloppy-mode assignment, module-level accumulators).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The shelter only rehomes a cat when <b>no one holds its leash</b>. It doesn't matter that you finished playing with Mochi an hour ago — if the leash is still looped around your wrist (a reference), she stays. A leak is a wall of leashes hooked to cats nobody visits. A <b>WeakMap</b> leash is different: it's enchanted — the moment <i>every other</i> leash is gone, it unclips itself, and the cat goes home.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">leashes.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// LEAK SHAPE 1 · the immortal cache
+const chipCache = new Map();
+function register(cat) { chipCache.set(cat, 'CHIP-' + chipCache.size); }
+let visitor = { name: 'Mochi', photos: '(imagine 50 MB)' };
+register(visitor);
+visitor = null;   // we're done with her…
+console.log('Map still holds:', chipCache.size, 'entry — 50 MB pinned');
+
+// THE FIX · WeakMap holds keys weakly — no leash of its own
+const weakCache = new WeakMap();
+let guest = { name: 'Biscuit' };
+weakCache.set(guest, 'CHIP-W1');
+console.log('readable while alive:', weakCache.get(guest));
+guest = null;     // last real leash gone → entry is NOW collectible
+// (we can't PRINT the collection happening — GC runs on its own schedule,
+//  and that's the point: WeakMap has no .size and no iteration.)
+
+// LEAK SHAPE 2 · the forgotten timer — the closure pins `bigLog`
+function watchBowl() {
+  const bigLog = new Array(1000).fill('meal record');
+  const id = setInterval(() =&gt; { bigLog.length; }, 60_000);
+  return () =&gt; clearInterval(id);   // the unsubscribe — KEEP and CALL this
+}
+const stop = watchBowl();
+stop();
+console.log('timer cleared — bigLog is unreachable, collectible');
+
+// LEAK SHAPE 4 · the accidental global (strict mode saves you)
+try { orphan = 'no keyword, no home'; }
+catch (e) { console.log('strict mode blocks it:', e.constructor.name); }</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">two leaks, two fixes — and why WeakMap can't show you its size</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>The Weak family in one line each: <b>WeakMap/WeakSet</b> associate data with objects without extending their lifetime (keys must be objects — a weakly-held number makes no sense); <b>WeakRef</b> is a leash that might be empty when you check (<code>.deref()</code>); <b>FinalizationRegistry</b> asks for a callback after collection. The last two are for caches and resource bookkeeping — the docs themselves say "avoid if you can", and interviewers respect you for quoting that.</p>
+    <div class="mcq" data-qid="jsf-memory-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A React app adds <code>window.addEventListener('resize', onResize)</code> in a component but never removes it. What leaks when the component unmounts?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — React cleans up listeners automatically</button>
+        <button class="mcq-opt" type="button">Only the tiny listener function itself</button>
+        <button class="mcq-opt" type="button" data-ok>The listener AND everything its closure reaches — component state, props, and any DOM it references — for the life of the page</button>
+        <button class="mcq-opt" type="button">Nothing, because <code>window</code> is garbage-collected on navigation</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>window</code> is a root that lives as long as the page; the listener is reachable from it; the listener's closure is reachable from the listener; the unmounted component's state and captured DOM are reachable from the closure. One forgotten leash, whole cat pinned. This is exactly why <code>useEffect</code> returns a cleanup function — and why "what does the cleanup return do?" is really a garbage-collection question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The definition that wins: <b>"GC frees what's unreachable, not what's unused — a leak is reachable-but-useless memory."</b> Mentioning mark-and-sweep and "generational: most objects die young" is ample depth.</li>
+        <li>Closures keep captured variables alive — usually the feature (section 04's treat jar), occasionally the leak (a huge array captured by a long-lived callback). Same mechanism, both directions.</li>
+        <li>Diagnosis workflow, one breath: DevTools Memory panel → heap snapshot → interact → second snapshot → compare, and look for "detached" nodes and growing retainer counts. Naming the workflow beats theorizing.</li>
+        <li><code>delete obj.key</code> removes a property (and can deoptimize the object's hidden class); it does <b>not</b> "free memory" directly — setting the reference to <code>null</code> where appropriate is usually what people mean.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1239,11 +1883,19 @@ console.log(byAge);</code></pre>
     <tbody>
       <tr><td class="mono">01</td><td>values &amp; references</td><td>Primitives copy the value; objects copy the reference — the paper vs the cat.</td></tr>
       <tr><td class="mono">02</td><td>coercion</td><td>Always ===, except <code>x == null</code>; eight falsy values, everything else truthy.</td></tr>
-      <tr><td class="mono">03</td><td>closures</td><td>A function keeps a live link to the scope it was born in — the button carries its treat jar.</td></tr>
-      <tr><td class="mono">04</td><td><code>this</code></td><td>Decided at call time — whose lap is it sitting on? Arrows never change laps.</td></tr>
-      <tr><td class="mono">05</td><td>prototypes</td><td>Objects linked to objects; lookups walk the chain; class is syntax for the links.</td></tr>
-      <tr><td class="mono">06</td><td>modules</td><td>Private file scope + a service window; ESM's window is glass (live bindings), and static — hence tree shaking.</td></tr>
-      <tr><td class="mono">07</td><td>iteration</td><td>map transforms, filter keeps, reduce collapses — and never mutate what React is watching.</td></tr>
+      <tr><td class="mono">03</td><td>scope &amp; TDZ</td><td><code>let</code>/<code>const</code> are hoisted but uninitialized — the TDZ; <code>var</code> ignores blocks.</td></tr>
+      <tr><td class="mono">04</td><td>closures</td><td>A function keeps a live link to the scope it was born in — the button carries its treat jar.</td></tr>
+      <tr><td class="mono">05</td><td><code>this</code></td><td>Decided at call time — whose lap is it sitting on? Arrows never change laps.</td></tr>
+      <tr><td class="mono">06</td><td>prototypes</td><td>Objects linked to objects; lookups walk the chain; class is syntax for the links.</td></tr>
+      <tr><td class="mono">07</td><td>classes</td><td>Methods live once on the prototype; fields are stamped per instance — and <code>#private</code> is real.</td></tr>
+      <tr><td class="mono">08</td><td>modules</td><td>Private file scope + a service window; ESM's window is glass (live bindings), and static — hence tree shaking.</td></tr>
+      <tr><td class="mono">09</td><td>iteration</td><td>map transforms, filter keeps, reduce collapses — and never mutate what React is watching.</td></tr>
+      <tr><td class="mono">10</td><td>errors</td><td>Throw <code>Error</code> objects, catch only what you can handle, wrap the rest with <code>cause</code>.</td></tr>
+      <tr><td class="mono">11</td><td>copying</td><td>Spread copies one level; <code>structuredClone</code> copies all of them; freeze laminates the cover only.</td></tr>
+      <tr><td class="mono">12</td><td>regex</td><td>Greedy grabs then gives back, lazy nibbles — and HTML gets a parser, not a regex.</td></tr>
+      <tr><td class="mono">13</td><td>generators</td><td><code>yield</code> pauses with locals alive; the protocol is <code>next()</code> → <code>{value, done}</code>.</td></tr>
+      <tr><td class="mono">14</td><td>symbols</td><td>Collision-proof keys and the language's extension sockets — invisible to JSON, which is a feature.</td></tr>
+      <tr><td class="mono">15</td><td>memory</td><td>GC frees the unreachable, not the unused — a leak is a leash nobody uses.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1255,10 +1907,11 @@ console.log(byAge);</code></pre>
   <p class="sub">This module is the foundation layer. Here's exactly where it surfaces, and which page to drill next.</p>
   <div class="idea" style="margin-top:24px">
     <ul>
-      <li><b>Tech screens</b> open with sections 03 and 04 almost verbatim — "what's a closure", "what does this log". Drill the rapid-fire versions in <a href="../fullstack.html#jscore">Full-Stack in 48 · JS under the hood</a>.</li>
-      <li><b>The loop-with-setTimeout question</b> (section 03's runner) is the single most-asked JS puzzle in existence. Practice narrating it out loud until it's boring.</li>
-      <li><b>DSA rounds</b> lean on section 07 — Map/Set fluency and non-mutating array habits are assumed from line one. Warm up with <a href="../dsa.html#hash">DSA in 48 · hash maps</a>.</li>
-      <li><b>React interviews</b> are secretly sections 01+03+07: reference equality (why memo works), stale closures (why effects lie), immutable updates (why spread everywhere). The react-deep-dive module builds directly on this one.</li>
+      <li><b>Tech screens</b> open with sections 04 and 05 almost verbatim — "what's a closure", "what does this log". Drill the rapid-fire versions in <a href="../fullstack.html#jscore">Full-Stack in 48 · JS under the hood</a>.</li>
+      <li><b>The loop-with-setTimeout question</b> (section 04's runner) is the single most-asked JS puzzle in existence. Practice narrating it out loud until it's boring.</li>
+      <li><b>DSA rounds</b> lean on section 09 — Map/Set fluency and non-mutating array habits are assumed from line one. Warm up with <a href="../dsa.html#hash">DSA in 48 · hash maps</a>.</li>
+      <li><b>React interviews</b> are secretly sections 01+04+09: reference equality (why memo works), stale closures (why effects lie), immutable updates (why spread everywhere). The react-deep-dive module builds directly on this one.</li>
+      <li><b>Senior screens</b> escalate into the advanced band — implement an iterable (13), explain why React uses a symbol tag (14), find the leak in this component (15). That's the band that separates “uses JS” from “knows JS”.</li>
       <li>Next module in the track: <b>js-async</b> — the event loop, promises, and async/await, with a visualizer. Everything here about closures carries straight in.</li>
     </ul>
   </div>
