@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How the Web Actually Works</title>
+<meta name="description" content="Browsers, HTTP, TLS, DNS, caching, CORS, web security and auth flows — the platform layer every frontend and backend question secretly assumes you know.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="How the Web Actually Works">
+<meta property="og:description" content="Browsers, HTTP, TLS, DNS, caching, CORS, web security and auth flows — the platform layer every frontend and backend question secretly assumes you know.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How the Web Actually Works">
+<meta name="twitter:description" content="Browsers, HTTP, TLS, DNS, caching, CORS, web security and auth flows — the platform layer every frontend and backend question secretly assumes you know.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%2394A3B8'%3EWP%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#94A3B8;
+  --mark-deep:#475569;
+  --mark-soft:rgba(148,163,184,.16);
+  --on-mark:#141B22;
+  --on-ink:#94A3B8;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#64748B;
+  --mark-soft:rgba(148,163,184,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#64748B;
+  --mark-soft:rgba(148,163,184,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(148,163,184,0) 0%, rgba(148,163,184,.95) 6%, rgba(148,163,184,.8) 94%, rgba(148,163,184,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(148,163,184,0) 0%, rgba(148,163,184,.95) 5%, rgba(148,163,184,.78) 95%, rgba(148,163,184,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(148,163,184,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(148,163,184,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(148,163,184,0) 0%, rgba(148,163,184,.9) 6%, rgba(148,163,184,.7) 94%, rgba(148,163,184,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· web platform</em></div>
+      <div class="brand-sub">module 16 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#browser"><span><i class="dot" data-for="browser"></i> How Browsers Render</span></a>
+    <a class="side-link" href="#urls"><span><i class="dot" data-for="urls"></i> URLs &amp; Encoding</span></a>
+    <a class="side-link" href="#http"><span><i class="dot" data-for="http"></i> HTTP/1.1 → 2 → 3</span></a>
+    <a class="side-link" href="#dns"><span><i class="dot" data-for="dns"></i> DNS</span></a>
+    <a class="side-link" href="#tls"><span><i class="dot" data-for="tls"></i> TLS &amp; Certificates</span></a>
+    <a class="side-link" href="#caching"><span><i class="dot" data-for="caching"></i> HTTP Caching Grammar</span></a>
+    <a class="side-link" href="#storage"><span><i class="dot" data-for="storage"></i> Cookies &amp; Storage</span></a>
+    <a class="side-link" href="#cors"><span><i class="dot" data-for="cors"></i> CORS, the Whole Dance</span></a>
+    <a class="side-link" href="#forms"><span><i class="dot" data-for="forms"></i> Forms &amp; Uploads</span></a>
+    <a class="side-link" href="#security"><span><i class="dot" data-for="security"></i> XSS · CSRF · CSP</span></a>
+    <a class="side-link" href="#auth"><span><i class="dot" data-for="auth"></i> Web Auth Flows</span></a>
+    <a class="side-link" href="#realtime"><span><i class="dot" data-for="realtime"></i> Polling · SSE · Sockets</span></a>
+    <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Platform Gauntlet</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./frontend-system-design.html"><span>Frontend SD, Deeply</span><span class="t">←</span></a>
+    <a class="side-link" href="./node-backend.html"><span>Node &amp; Backend</span><span class="t">←</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 16 <b>the layer every other module stands on</b></p>
+  <h1>How the web <span class="hl hl-anim" data-d="0">actually</span> <span class="hl hl-anim" data-d="1">works</span>.</h1>
+  <p class="lede">Between "user types a URL" and "pixels appear" sit a dozen systems you use daily and explain rarely: DNS, TLS, HTTP's three generations, the render pipeline, cache grammar, cookie attributes, the CORS dance. This module makes each one explainable in ninety seconds — because "walk me through what happens when you hit enter" remains the single most-asked systems warm-up in interviews.</p>
+  <p class="lede">Everything here is provider-neutral platform knowledge — it powers the aws module's edge, the node module's servers, and the frontend module's budgets. The cats will be traversing some protocol layers. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: the pipeline &amp; the packet</span>
+    <span class="level-chip i">middle: caching, cookies &amp; CORS</span>
+    <span class="level-chip a">ends at: security &amp; auth fluency</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>13</b> sections</span>
+    <span><b>15</b> quiz questions</span>
+    <span><b>5</b> runnable panels</span>
+    <span><b>~8.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#browser">Start at the pixels <span class="arrow">↓</span></a>
+</header>
+
+<div class="band" id="band-beginner"><span>// beginner — the pipeline &amp; the protocol</span></div>
+
+<!-- 1 · BROWSER -->
+<section class="lesson" id="browser">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>How browsers render — parse to pixels, five stages</h3>
+      <p class="lvl">beginner → and which CSS/JS moves re-trigger which stage</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>HTML bytes become pixels through a pipeline: <b>parse</b> (HTML → DOM tree; CSS → CSSOM — and a <code>&lt;script&gt;</code> without defer <i>pauses parsing</i>, which is the entire "scripts at the bottom / use defer" folklore, explained), <b>style</b> (match rules to nodes), <b>layout</b> (compute every box's geometry), <b>paint</b> (fill in pixels per layer), <b>composite</b> (GPU stacks the layers). The stages re-run <i>from the point you dirty</i>: change <code>width</code> → layout + paint + composite (expensive, everything downstream); change <code>color</code> → paint + composite; change <code>transform</code>/<code>opacity</code> → <b>composite only</b> — which is why performant animations use transforms: they skip the geometry math entirely (the fesd perf budgets, mechanically justified).</p>
+    <p>The other famous consequence: <b>layout thrashing</b> — JS that alternates reads (<code>offsetHeight</code>) and writes (style changes) forces a synchronous layout per pair (the browser must answer the read <i>correctly</i>, so it flushes). Batch reads, then writes — or let rAF (js-async §10) sequence them before the next paint.</p>
+    <div class="mcq" data-qid="wp-browser-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Two ways to animate a cat sliding across the screen: <code>left: 0 → 500px</code> vs <code>transform: translateX(0 → 500px)</code>. Why is the second dramatically smoother on weak devices?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">transform has better easing functions built in</button>
+        <button class="mcq-opt" type="button" data-ok>left dirties LAYOUT every frame — geometry recomputes for the page 60×/sec; transform is composite-only — the GPU moves an already-painted layer, no layout, no paint, and it even runs off the main thread while JS is busy</button>
+        <button class="mcq-opt" type="button">left doesn't work on absolutely-positioned elements</button>
+        <button class="mcq-opt" type="button">No real difference — both hit 60fps on modern hardware</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the pipeline position determines the per-frame bill: layout properties re-run the three expensive stages; compositor properties re-run approximately none. "Animate transform and opacity; everything else is a performance decision" is the one-line rule — and knowing it's about <i>which pipeline stage gets dirtied</i> (not vibes) is what the question screens for. The off-main-thread bonus explains why compositor animations stay smooth even while JS jank happens.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The critical rendering path in one sentence: "HTML and CSS both block first paint; JS blocks parsing unless deferred — hence: inline critical CSS, defer everything else."</li>
+        <li><code>will-change</code>/layer promotion is a trade (memory per layer) — promoting everything is a real mobile OOM pattern; name the cost, not just the trick.</li>
+        <li><code>content-visibility: auto</code> skips rendering offscreen sections — the platform's own virtualization (fesd's list lesson, one CSS property).</li>
+        <li>DevTools Performance panel's purple (layout) vs green (paint) bars map exactly to this section — "I read the flame chart by stage" is the practical flex.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · URLS -->
+<section class="lesson" id="urls">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>URLs &amp; encoding — anatomy, and the two escape functions</h3>
+      <p class="lvl">beginner → the address format everything else parses</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Anatomy, left to right: <code>scheme://user@host:port/path?query#fragment</code> — with three details that decide real bugs: the <b>origin</b> is scheme+host+port exactly (the security boundary §08 and cookies §07 both hang off it), the <b>fragment never leaves the browser</b> (servers never see <code>#…</code> — why SPAs used hash routing, and why tokens-in-fragments was the implicit flow's trick), and <b>query strings are percent-encoded</b> — where the two escape functions earn their names: <code>encodeURIComponent</code> escapes everything reserved (use for VALUES going into a query), <code>encodeURI</code> preserves URL structure (use for whole URLs, rarely). Mixing them up either breaks the URL or injects into it.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">url-anatomy.js — run it (the URL API does the parsing)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const u = new URL('https://shelter.example.com:8443/cats/search?name=mochi&amp;tags=tabby%20cat#results');
+for (const part of ['origin', 'protocol', 'host', 'port', 'pathname', 'search', 'hash'])
+  console.log(part.padEnd(9), '→', u[part]);
+
+// searchParams: the RIGHT way to build queries (encoding handled)
+const q = new URL('https://shelter.example.com/search');
+q.searchParams.set('name', 'Mr. Whiskers & Co');       // spaces, &, . — all hostile
+q.searchParams.set('mood', '100% feral');
+console.log('\nbuilt safely:', q.toString());
+
+// the two escape functions, compared on the same hostile value
+const v = 'tuna&salmon=yes/no?';
+console.log('\nencodeURIComponent(v):', encodeURIComponent(v), ' ← value-safe');
+console.log('encodeURI(v):         ', encodeURI(v), ' ← &amp; = ? survive: STRUCTURE preserved');
+console.log('naive concat: ?food=' + v, ' ← just injected two fake params');
+
+// origin comparisons — the security boundary, precisely
+for (const other of ['https://shelter.example.com/x', 'https://api.shelter.example.com/',
+                     'http://shelter.example.com/', 'https://shelter.example.com:9000/'])
+  console.log(new URL(other).origin === 'https://shelter.example.com' ? '  same origin:' : '  DIFFERENT:  ', other);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">subdomain, scheme and port each break same-origin — the exact boundary §07/§08 use</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="wp-urls-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A search for "tuna&amp;mood=feral" built as <code>'/search?q=' + input</code> returns results filtered by a mood nobody chose. What happened, and the class of bug?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The server has a parsing bug — & should be literal in values</button>
+        <button class="mcq-opt" type="button" data-ok>The unencoded &amp; ended the q parameter and injected mood=feral as a second one — parameter injection via string concatenation; URLSearchParams/encodeURIComponent exists precisely so values can't restructure the URL</button>
+        <button class="mcq-opt" type="button">Browsers auto-encode & — the bug is elsewhere</button>
+        <button class="mcq-opt" type="button">The fragment swallowed part of the query</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> it's the same shape as SQL injection (pg's parameterized queries) and XSS (§10): <b>data concatenated into a structured language becomes structure</b>. The fix is the same everywhere — an API that separates structure from values (URLSearchParams here, placeholders there, textContent in §10). Naming the family, not just the fix, is what turns this from trivia into a principle you'll re-apply.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>URL state is real state (fesd's forgotten category): filters/tabs/pagination in searchParams are shareable, back-button-friendly, and survive refresh — "put it in the URL" is often the whole state answer.</li>
+        <li>Trailing-slash and case sensitivity are SERVER decisions (paths are case-sensitive by spec, hosts aren't) — the redirect-for-canonical-URL pattern exists because of it.</li>
+        <li>punycode (<code>xn--</code>) hosts and homograph attacks: аdopt.com with a Cyrillic а is a different origin — one sentence of it flags phishing literacy.</li>
+        <li>Never build URLs by hand in 2026 — the URL API round-trips, validates, and encodes; string concat is the bug generator (the runner just proved it).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · HTTP -->
+<section class="lesson" id="http">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>HTTP/1.1 → 2 → 3 — three fixes for one bottleneck</h3>
+      <p class="lvl">beginner → head-of-line blocking, chased down the stack</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>HTTP's evolution is one bottleneck being chased through three layers. <b>HTTP/1.1</b>: text protocol, one request <i>at a time</i> per connection — a slow response blocks everyone behind it (<b>head-of-line blocking</b> at the HTTP layer). Browsers coped with ~6 parallel connections per host, and we coped with sprite sheets, bundling, domain sharding — an entire folk-engineering era. <b>HTTP/2</b>: binary framing <b>multiplexes</b> many streams over ONE connection — HTTP-level HoL solved, and the old hacks became anti-patterns (bundle-splitting got cheap). But TCP underneath guarantees ordered delivery: one lost packet stalls <i>every</i> stream until retransmission — HoL moved down a layer. <b>HTTP/3</b>: replace TCP with <b>QUIC over UDP</b> — streams are independent at the transport level (a lost packet stalls only its stream), plus 0-RTT reconnection and connection migration (WiFi→5G without re-handshaking). Same verbs, same headers, same semantics — the fixes are all plumbing.</p>
+    <div class="mcq" data-qid="wp-http-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why did HTTP/2 make "bundle everything into one giant JS file" LESS optimal than it was under HTTP/1.1?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">HTTP/2 has per-file compression that beats bundling</button>
+        <button class="mcq-opt" type="button" data-ok>Bundling existed to amortize scarce connections/requests; multiplexing made requests cheap — so granular files win back better caching (one changed module ≠ one invalidated megabundle) without the old per-request penalty</button>
+        <button class="mcq-opt" type="button">HTTP/2 caps individual file sizes</button>
+        <button class="mcq-opt" type="button">It didn't — bundling is still strictly better</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> every performance folk-practice encodes an era's constraints — bundling, spriting and sharding were all "requests are expensive" workarounds. Multiplexing deleted the constraint, so the trade rebalanced toward cache granularity (the immutable-hashed-chunks pattern from fesd/aws-edge). The honest coda: request <i>count</i> still isn't free (headers, scheduling), so the answer is "fewer, cache-aligned chunks", not "a thousand tiny files". Reasoning about WHY a practice existed is the senior move the question invites.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The "what happens when you hit enter" answer now has its spine: DNS (§04) → TCP or QUIC → TLS (§05) → HTTP request → render pipeline (§01) — five sections of this module in one breath.</li>
+        <li>Verbs + idempotency (GET safe, PUT/DELETE idempotent, POST neither) is HTTP <i>semantics</i> — unchanged across all three versions; the sd idempotency section builds on exactly this.</li>
+        <li>Status code fluency: 301 vs 302 (caching!), 304 (§06's revalidation), 401 vs 403, 429 (node's limiter), 503 + Retry-After — each code is a protocol-level contract.</li>
+        <li>HTTP/2 Server Push is deprecated/dead — replaced by 103 Early Hints and preload; knowing what DIDN'T survive dates your knowledge as current.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — names, trust, caches &amp; cookies</span></div>
+
+<!-- 4 · DNS -->
+<section class="lesson" id="dns">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>DNS — the phonebook, its caches &amp; its deploy lever</h3>
+      <p class="lvl">intermediate → resolution walk, record types, TTL strategy</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Resolution walks a hierarchy: stub resolver (your OS) → recursive resolver (ISP or 1.1.1.1/8.8.8.8) → root servers ("ask .com") → TLD servers ("ask example.com's nameservers") → <b>authoritative</b> nameservers (the actual answer) — with <b>caching at every hop</b>, governed by each record's <b>TTL</b>. Records you'll actually touch: <b>A/AAAA</b> (name → IPv4/v6), <b>CNAME</b> (name → another name — how <code>www</code> and CDN onboarding work; illegal at the zone apex, hence ALIAS/ANAME workarounds), <b>MX</b> (mail), <b>TXT</b> (proofs: domain verification, SPF/DKIM), <b>NS</b> (delegation itself).</p>
+    <p>The operational insight: <b>TTL is a deploy lever</b>. Migrating providers? Drop TTL to 60s a day <i>ahead</i> (the old long-TTL answers must expire first!), flip the record, verify, raise TTL back. Forget the pre-drop and your "instant" cutover takes as long as the old TTL — a day of two-provider limbo. DNS is also availability's first domino: it's how failover actually redirects (health-checked DNS, low TTLs), and the sd multi-region section's traffic-shifting is mostly this record-flip, productized.</p>
+    <div class="mcq" data-qid="wp-dns-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">You flip an A record to the new server; your machine sees it instantly, but users report the old site for hours. The mechanism, and what SHOULD have happened yesterday?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">DNS "propagation" is a broadcast that takes 24-48h to push out</button>
+        <button class="mcq-opt" type="button" data-ok>Nothing propagates — resolvers worldwide hold the OLD answer until each one's cached TTL expires (staggered, hence "hours, randomly"); yesterday's move was lowering the TTL so those caches would have been short-lived by flip time</button>
+        <button class="mcq-opt" type="button">The registrar processes changes in daily batches</button>
+        <button class="mcq-opt" type="button">Users' browsers need a restart to re-resolve</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "propagation" is a misleading word for <b>expiry</b> — DNS pushes nothing; a million independent caches simply count down TTLs they fetched at different moments. That reframe makes the whole playbook obvious: control the countdown (pre-drop TTL), don't wait on a myth. It also explains the long tail: a few resolvers ignore TTLs (misbehaving corporate caches) — why old-IP traffic trickles for days and you keep the old server answering during the overlap.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>DNS is the first latency in "hit enter" — and why <code>dns-prefetch</code>/<code>preconnect</code> hints exist for third-party origins (fesd perf, platform edition).</li>
+        <li>DoH/DoT (DNS over HTTPS/TLS) encrypt the query — the privacy story; and DNS is also an attack surface (spoofed answers) — DNSSEC signs records, adoption is honest-to-say patchy.</li>
+        <li>Round-robin DNS is the poor man's load balancer with no health checks — name why real LBs (aws §traffic) sit behind one stable record instead.</li>
+        <li><code>dig +trace</code> walks the whole hierarchy visibly — the debugging tool that turns this section from theory into practice in five minutes.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · TLS -->
+<section class="lesson" id="tls">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>TLS &amp; certificates — what the padlock actually proves</h3>
+      <p class="lvl">intermediate → the handshake, the chain of trust &amp; the ops around it</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>TLS gives three guarantees: <b>confidentiality</b> (encrypted), <b>integrity</b> (tamper-evident), and <b>authenticity</b> (you're talking to who the certificate names — the one people forget, and the one that stops man-in-the-middle). The modern handshake (TLS 1.3, one round trip): client hello (supported ciphers + key share) → server hello (chosen cipher, its key share, <b>its certificate</b>) → both derive the same symmetric session key via ephemeral Diffie-Hellman — asymmetric crypto to <i>agree on a secret over a public channel</i>, then fast symmetric crypto for the actual data. Ephemeral keys buy <b>forward secrecy</b>: yesterday's recorded traffic stays unreadable even if the server's long-term key leaks later.</p>
+    <p>The <b>chain of trust</b>: the site's certificate is signed by an intermediate CA, signed by a root CA that ships <i>in your OS/browser trust store</i> — the padlock means "a CA your vendor trusts vouched that whoever controls this domain requested this cert" (domain validation — usually an ACME challenge proving DNS/HTTP control; Let's Encrypt automated it to free-and-90-days). It does NOT mean the site is honest — phishing sites have valid padlocks; the padlock authenticates the <i>name</i>, not the <i>intent</i>.</p>
+    <div class="mcq" data-qid="wp-tls-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Corporate laptops see no certificate warnings, but the security team can read employees' HTTPS traffic. How, and what does it teach about the trust model?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Impossible — TLS 1.3 cannot be intercepted</button>
+        <button class="mcq-opt" type="button" data-ok>IT installed a corporate root CA in the device trust stores; the proxy re-signs every site on the fly and devices accept it — the padlock's meaning is exactly "signed by something in YOUR trust store", so whoever controls the store controls the truth</button>
+        <button class="mcq-opt" type="button">They crack the symmetric keys with enough hardware</button>
+        <button class="mcq-opt" type="button">Browsers send plaintext copies to enterprise endpoints</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> TLS interception proxies are routine enterprise kit, and they work by the trust model's own rules — no math is broken; a new root is trusted, so freshly-minted certs for any domain verify. The lesson generalizes: the trust store is the root of everything (why malware wants to install CAs, why cert pinning exists for high-stakes apps, and why "valid cert" ≠ "no eavesdropper" on managed devices). Understanding the model's edges beats reciting the handshake.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Cert expiry is a top-five outage cause — automation (ACME renewal + monitoring days-remaining) is the answer; "we renew manually" is the confession.</li>
+        <li>HSTS (the header, §nb-11) pins HTTPS at the browser so the first insecure hop disappears; preload lists bake it into browsers themselves.</li>
+        <li>SNI is why one IP serves many certificates (the hostname travels in the client hello) — and Encrypted Client Hello is the current work to hide even that.</li>
+        <li>mTLS (client certificates both ways) is service-to-service auth in zero-trust setups — one sentence connects it to the aws IAM story.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · CACHING -->
+<section class="lesson" id="caching">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>HTTP caching grammar — Cache-Control, parsed like a compiler</h3>
+      <p class="lvl">intermediate → the five directives that matter, and 304's little dance</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The grammar: <code>max-age=N</code> (fresh for N seconds — no request at all while fresh), <code>no-cache</code> (store, but <b>revalidate every use</b> — the misnamed one), <code>no-store</code> (never write to disk — the actually-private one), <code>private/public</code> (may shared caches — CDNs — keep it?), <code>immutable</code> (skip revalidation even on refresh), <code>stale-while-revalidate=N</code> (serve stale instantly, refresh behind — the latency-hider fesd loves). Revalidation is the <b>304 dance</b>: response carried <code>ETag: "abc"</code> → later, browser sends <code>If-None-Match: "abc"</code> → server answers <b>304 Not Modified, empty body</b> — one cheap round trip instead of a re-download. The canonical pairing (every module keeps meeting it): <b>hashed assets → max-age=1yr + immutable; HTML → no-cache</b> — immutable content forever, one always-checked pointer.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">cache-decider.js — run it (the browser's freshness algorithm)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// what the HTTP cache decides per request — the actual state machine
+function decide(entry, now) {
+  if (!entry) return 'MISS → full network request';
+  const age = now - entry.storedAt;
+  const cc = entry.cacheControl;
+  if (cc.includes('no-store')) return 'never stored (how did we get here?)';
+  if (cc.includes('no-cache')) return `stored but always revalidates → If-None-Match ${entry.etag}`;
+  const maxAge = Number((cc.match(/max-age=(\d+)/) || [])[1] ?? 0);
+  if (age &lt;= maxAge) return `FRESH (${age}s ≤ ${maxAge}s) → served from disk, ZERO network`;
+  const swr = Number((cc.match(/stale-while-revalidate=(\d+)/) || [])[1] ?? 0);
+  if (age &lt;= maxAge + swr) return `STALE-BUT-USABLE → serve stale NOW, revalidate in background`;
+  return `STALE (${age}s &gt; ${maxAge}s) → revalidate: If-None-Match ${entry.etag} (hope for 304)`;
+}
+
+const scenarios = [
+  ['app.3f9c2.js (hashed)', { storedAt: 0, etag: '"x1"', cacheControl: 'public, max-age=31536000, immutable' }, 86400 * 30],
+  ['index.html',            { storedAt: 0, etag: '"h7"', cacheControl: 'no-cache' },                             60],
+  ['/api/cats',             { storedAt: 0, etag: '"c3"', cacheControl: 'private, max-age=30' },                  10],
+  ['/api/cats (later)',     { storedAt: 0, etag: '"c3"', cacheControl: 'private, max-age=30, stale-while-revalidate=60' }, 45],
+  ['first ever visit',      null, 0],
+];
+for (const [name, entry, now] of scenarios)
+  console.log(name.padEnd(22), '→', decide(entry, now));
+console.log('\nthe whole system: freshness answers "may I skip the network?",');
+console.log('ETags answer "may I skip the DOWNLOAD?" — two different savings.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">five headers, five behaviors — this decision runs for every resource you ship</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="wp-caching-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">An API sets <code>Cache-Control: no-cache</code> believing responses won't be stored, and a shared machine's disk cache turns out to contain users' account data. What went wrong?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A browser bug — no-cache forbids storage</button>
+        <button class="mcq-opt" type="button" data-ok>no-cache means "store freely, revalidate before use" — the directive for never-writing-to-disk is no-store (and private keeps shared caches out); the names are the trap, and sensitive responses want no-store explicitly</button>
+        <button class="mcq-opt" type="button">The ETag header overrode the cache policy</button>
+        <button class="mcq-opt" type="button">HTTPS responses can't be disk-cached anyway</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the two worst-named directives in the platform: <code>no-cache</code> = cache-but-verify; <code>no-store</code> = what everyone thinks no-cache means. For authenticated/sensitive responses the belt-and-suspenders line is <code>Cache-Control: no-store</code> (+ legacy <code>Pragma</code> if you must support antiques). This exact confusion appears in real audits — knowing it cold is cheap insurance and a great interview beat.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>Vary</code> is the cache-key modifier (Vary: Accept-Language = per-locale copies) — the edge module's cache-key design, expressed as a header; a wrong Vary is either wrong-content-served or hit-ratio-zero.</li>
+        <li>ETag vs Last-Modified: hashes beat timestamps (sub-second edits, clock skew) — and strong vs weak ETags (W/) matter once compression middlewares mangle bytes.</li>
+        <li>Heuristic caching: NO headers ≠ no caching — browsers guess (10% of Last-Modified age); always be explicit or be surprised.</li>
+        <li>The layered answer ties it together: this section is layer 1 of fesd's cake — same grammar the CDN (aws edge) obeys, because the CDN is just a shared cache reading your headers.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · STORAGE -->
+<section class="lesson" id="storage">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Cookies &amp; storage — attributes that are security decisions</h3>
+      <p class="lvl">intermediate → HttpOnly, Secure, SameSite: three flags, three attack classes</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A cookie is a small key=value the browser <b>attaches automatically</b> to matching requests — that automation is both its power (sessions just work) and its danger (§10's CSRF is literally "the automation, abused"). Its attributes are security decisions, one attack each: <b>HttpOnly</b> — JS can't read it → stolen-by-XSS-script is off the table (the reason session tokens live in HttpOnly cookies, node §auth's rule); <b>Secure</b> — HTTPS only → no plaintext leak on hostile WiFi; <b>SameSite</b> — <code>Lax</code> (default: not sent on cross-site subrequests/POSTs; sent on top-level navigation) vs <code>Strict</code> vs <code>None</code> (sent always — third-party/embedded use, must pair with Secure) → CSRF's mitigation-by-default; plus <b>Domain</b> (share across subdomains — the wider, the riskier), <b>Path</b>, and <b>Max-Age/Expires</b> (session vs persistent).</p>
+    <p>The rest of the storage menu, priced: <b>localStorage</b> — synchronous (blocks the main thread!), ~5MB, string-only, per-origin, readable by any JS on the page (never tokens — XSS reads it trivially, the exact hole HttpOnly closes); <b>sessionStorage</b> — same but per-tab; <b>IndexedDB</b> — async, big, structured (the offline module's outbox lives here); and the fesd rule of thumb: cookies for what the SERVER needs on every request, storage for what the CLIENT needs between visits.</p>
+    <div class="mcq" data-qid="wp-storage-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A teammate moves the JWT from an HttpOnly cookie to localStorage "so the SPA can read the expiry". Grade the trade.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Fine — localStorage is per-origin, which is the same protection</button>
+        <button class="mcq-opt" type="button" data-ok>A security downgrade: one XSS anywhere (any dependency, any injected script) exfiltrates the token silently; HttpOnly made that impossible. Read the expiry from a parallel non-sensitive value (or decode a second unsigned copy) — never by exposing the credential itself</button>
+        <button class="mcq-opt" type="button">An upgrade — cookies are vulnerable to CSRF, storage isn't</button>
+        <button class="mcq-opt" type="button">Neutral — tokens expire anyway</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the threat model decides: XSS-steals-token (catastrophic, silent, works offline) vs CSRF-rides-cookie (mitigated by SameSite=Lax + CSRF tokens, §10). Option C isn't wrong about the CSRF asymmetry — it's wrong about the exchange rate: trading a mitigated risk for an unmitigated worse one. The pattern that keeps both: HttpOnly cookie for the credential + a readable "session info" blob (expiry, username) for the UI. Needing app-visible expiry never requires app-visible secrets.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>__Host-</code> cookie name prefix = Secure + no Domain + Path=/ enforced by the browser — the modern hardened session cookie; naming it is rare and lands.</li>
+        <li>Cookies travel on EVERY matching request (upload bandwidth per image request!) — why asset domains/CDN subdomains historically went cookieless; HTTP/2 header compression softened it, habit remains.</li>
+        <li>Third-party cookie deprecation reshaped the embedded world (CHIPS/partitioned cookies as the successor) — an honest "still settling" is the current answer.</li>
+        <li>localStorage is synchronous — a 2MB read during interaction is a main-thread stall (fesd's INP budget); IndexedDB or async wrappers for anything bulky.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · CORS -->
+<section class="lesson" id="cors">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>CORS, the whole dance — who's protected, who consents</h3>
+      <p class="lvl">intermediate → same-origin policy, preflights &amp; the debugging playbook</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Get the direction right and CORS stops being mysterious: the <b>same-origin policy</b> protects <i>users</i> — evil.com's JS must not read your bank's API using your cookies — so browsers block cross-origin <i>reads</i> by default. <b>CORS is the server's consent mechanism</b>: response headers (<code>Access-Control-Allow-Origin</code> et al.) telling the browser "this origin may read me". It protects nothing server-side (curl ignores it entirely — authorization is still your job, node §auth); it's the browser refusing to hand YOUR credentialed responses to OTHER people's pages.</p>
+    <p>The <b>preflight</b>: requests beyond "simple" (methods beyond GET/POST-with-simple-content-types, custom headers like <code>Authorization</code>, JSON content-type) trigger an <code>OPTIONS</code> ask-first — "may this origin send DELETE with these headers?" — answered with Allow-Methods/-Headers/<code>Max-Age</code> (cache the permission!). Credentialed requests tighten everything: <code>credentials: 'include'</code> requires <code>Allow-Credentials: true</code> AND an exact (never <code>*</code>) Allow-Origin.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">preflight-decider.js — run it (the browser's CORS logic)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">function cors(req, res) {
+  const simpleMethod = ['GET', 'HEAD', 'POST'].includes(req.method);
+  const simpleCT = !req.contentType || ['text/plain', 'application/x-www-form-urlencoded', 'multipart/form-data'].includes(req.contentType);
+  const preflight = !(simpleMethod &amp;&amp; simpleCT &amp;&amp; !req.customHeaders);
+  const steps = [preflight ? `preflight: OPTIONS first (Max-Age caches the yes)` : 'simple: request goes straight out'];
+  const originOk = res.allowOrigin === req.origin || (res.allowOrigin === '*' &amp;&amp; !req.credentials);
+  if (!originOk) steps.push(`✗ BLOCKED reading: Allow-Origin is ${res.allowOrigin ?? 'missing'}${req.credentials &amp;&amp; res.allowOrigin === '*' ? ' (wildcard + credentials = forbidden combo)' : ''}`);
+  else if (req.credentials &amp;&amp; !res.allowCreds) steps.push('✗ BLOCKED: credentials sent but no Allow-Credentials: true');
+  else steps.push('✓ response readable');
+  return steps.join('  →  ');
+}
+
+const api = { allowOrigin: 'https://app.example.com', allowCreds: true };
+console.log('same-app JSON POST w/ cookie:\n ',
+  cors({ origin: 'https://app.example.com', method: 'POST', contentType: 'application/json', credentials: true }, api));
+console.log('form POST, no custom headers (the "simple" carve-out):\n ',
+  cors({ origin: 'https://app.example.com', method: 'POST', contentType: 'application/x-www-form-urlencoded' }, api));
+console.log('evil.com tries to read with the victim\'s cookie:\n ',
+  cors({ origin: 'https://evil.example.net', method: 'GET', credentials: true }, api));
+console.log('public API, wildcard, anonymous:\n ',
+  cors({ origin: 'https://anyone.dev', method: 'GET' }, { allowOrigin: '*' }));
+console.log('wildcard + credentials (the config that never works):\n ',
+  cors({ origin: 'https://app.example.com', method: 'GET', credentials: true }, { allowOrigin: '*' }));
+console.log('\nnote the form POST skipping preflight — that legacy carve-out is WHY CSRF (§10) exists.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">five configs, five verdicts — including the wildcard trap and the CSRF-shaped hole</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="wp-cors-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"CORS error in the console — so I'll bypass it by proxying through my own backend." When is that legitimate vs a smell?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Never legitimate — proxying defeats a security control</button>
+        <button class="mcq-opt" type="button" data-ok>Legitimate for third-party APIs that don't (and shouldn't) allow your origin — the proxy adds YOUR auth/rate limits and hides THEIR keys server-side; a smell when it's your own API, where the right fix is one line of CORS config, not a forwarding layer</button>
+        <button class="mcq-opt" type="button">Always the professional solution — CORS is browser-only anyway</button>
+        <button class="mcq-opt" type="button">Only acceptable in development</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> CORS guards the <i>user's browser credentials</i>, not the API — your server fetching a third-party API is the normal integration pattern (their key stays server-side, node §security's secrets rule). But proxying your OWN api-to-frontend gap means you didn't understand whose consent was missing — configure Allow-Origin for your known origins and keep the architecture flat. The question tests whether you know WHAT CORS protects; the answer's shape follows from that alone.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The debugging playbook, in order: is the browser blocking SEND (preflight failed) or READ (missing Allow-Origin)? → check the OPTIONS response in the network tab → check for the credential/wildcard combo → only then touch server config.</li>
+        <li>Errors say "CORS" but often mean "your API 500'd on OPTIONS" — error middleware that doesn't handle OPTIONS is the classic self-inflicted CORS bug.</li>
+        <li><code>Access-Control-Max-Age</code> caches preflights — without it, every JSON POST is two round trips (fesd's latency budget bleeding invisibly).</li>
+        <li>The two-sentence summary that wins: "SOP protects users from cross-origin reads; CORS is the server opting sites in. It never protected the server — auth does that."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 9 · FORMS -->
+<section class="lesson" id="forms">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Forms &amp; uploads — the platform's original POST</h3>
+      <p class="lvl">intermediate → encodings, multipart &amp; the upload path</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A native form POST sends one of two encodings: <code>application/x-www-form-urlencoded</code> (key=value&amp;… — §02's percent-encoding as a body) or <code>multipart/form-data</code> (the one that carries <b>files</b>: each field its own part with headers, separated by a boundary string — inspect one in devtools once and uploads stop being magic). The modern JS side speaks the same language: <code>new FormData(formEl)</code> harvests a form (files included), <code>fetch</code> sends it — and the classic bug: <i>manually setting</i> <code>Content-Type</code> on a FormData fetch destroys the auto-generated boundary; let the browser write that header.</p>
+    <p>The upload path at scale is an architecture decision you've already met from two sides: small files can transit your server (multer-style streaming — node §backpressure applies); big files go <b>direct-to-storage with a presigned URL</b> (aws §s3 — your server issues the pass, bytes bypass it entirely), with resumable/chunked protocols (tus, multipart-upload) once networks get hostile. And native form behaviors worth keeping: a plain form POST works before JS loads (progressive enhancement — react §forms' actions lean into exactly this), and <code>enctype</code>/validation attributes are free behavior you'd otherwise rebuild.</p>
+    <div class="mcq" data-qid="wp-forms-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>fetch('/upload', { method: 'POST', headers: { 'Content-Type': 'multipart/form-data' }, body: formData })</code> — the server says "no boundary" and parses nothing. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">multipart requires XMLHttpRequest, not fetch</button>
+        <button class="mcq-opt" type="button" data-ok>The manual header overwrote the one the browser generates — which includes the unique boundary= parameter the parser needs to split parts; delete the header line and FormData sets it correctly</button>
+        <button class="mcq-opt" type="button">FormData must be JSON.stringified first</button>
+        <button class="mcq-opt" type="button">The server needs Transfer-Encoding: chunked enabled</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> multipart's Content-Type is <code>multipart/form-data; boundary=----Web…{random}</code> — the boundary is generated per-request alongside the body; writing the header by hand ships a body whose separator the header doesn't name. It's the single most-Googled upload bug, and its lesson generalizes: some headers are <i>owned by the payload encoder</i> (Content-Length from node §buffers is the same family) — set the data, not the bookkeeping.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Upload UX needs progress — fetch can't report upload progress (streams landed partially); XHR's upload.onprogress or chunked uploads are still the honest answers.</li>
+        <li>Validate uploads server-side by CONTENT (magic bytes), never by extension or client MIME — the security module's boundary rule with a file-shaped payload.</li>
+        <li>File inputs are uncontrolled always (react §forms said it) — the platform forbids JS setting file values; a security boundary you design around, not against.</li>
+        <li>The "simple request" CORS carve-out (§08) exists BECAUSE forms could always POST cross-origin — the web's backward compatibility is the origin story of half its security quirks (§10 completes this thought).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — attacks, identity &amp; live wires</span></div>
+
+<!-- 10 · SECURITY -->
+<section class="lesson" id="security">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>XSS, CSRF &amp; CSP — the web's three-body security problem</h3>
+      <p class="lvl">advanced → each attack, its mechanism, its layered defense</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>XSS</b> — attacker's script runs in YOUR page's origin (reading storage, riding sessions, §07's nightmare). Mechanism: user data concatenated into HTML becomes markup (§02's injection family, HTML edition). Defenses in layers: <b>output encoding by default</b> (textContent, framework escaping — React does this unless you invoke the honestly-named dangerouslySetInnerHTML), sanitization (DOMPurify) for rich content, and <b>CSP</b> as the backstop: <code>Content-Security-Policy: script-src 'self'</code> means even injected <code>&lt;script&gt;</code> won't execute — the blast-radius cap for the day the first layers miss. <b>CSRF</b> — evil.com auto-submits a form to your bank; the browser attaches the session cookie (§07's automation, §09's legacy carve-out — the attack is the platform's own features composed). Defenses: SameSite=Lax (the default now — most CSRF died with it), CSRF tokens for what remains, and never mutating on GET. </p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">escape-or-execute.js — run it (XSS mechanics, safely inert)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a "comment" from a hostile user
+const comment = '&lt;img src=x onerror="stealCookies()"&gt; nice cat!';
+
+// PATH 1 · innerHTML-style: data becomes MARKUP (simulated parse)
+function naiveRender(html) {
+  const tags = [...html.matchAll(/&lt;(\w+)[^&gt;]*?(onerror|onload|onclick)=/g)];
+  return tags.length
+    ? `parsed: &lt;${tags[0][1]}&gt; element WITH ${tags[0][2]} handler → attacker code runs in YOUR origin`
+    : 'parsed: no executable content';
+}
+console.log('innerHTML path:  ', naiveRender(comment));
+
+// PATH 2 · escape at output — the five characters that end XSS
+const escapeHtml = (s) =&gt; s.replace(/[&amp;&lt;&gt;"']/g, (c) =&gt;
+  ({ '&amp;': '&amp;amp;', '&lt;': '&amp;lt;', '&gt;': '&amp;gt;', '"': '&amp;quot;', "'": '&amp;#39;' })[c]);
+const escaped = escapeHtml(comment);
+console.log('escaped output:  ', escaped);
+console.log('re-parsed:       ', naiveRender(escaped), '(it renders as TEXT — the picture of an attack)');
+
+// PATH 3 · CSP as the backstop, simulated
+function csp(policy, scriptOrigin) {
+  const allowed = policy['script-src'] ?? [];
+  return allowed.includes(scriptOrigin) ? 'executes' : `BLOCKED by CSP (script-src ${allowed.join(' ')})`;
+}
+console.log('\ninjected inline script under CSP:', csp({ 'script-src': ["'self'"] }, "'unsafe-inline'"));
+console.log('your own bundle under CSP:       ', csp({ 'script-src': ["'self'"] }, "'self'"));
+console.log('\nlayered: escape by default, sanitize rich input, CSP for the miss you didn\'t see.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the same string as markup vs text vs CSP-blocked — three layers, one attack</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="wp-sec-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">With SameSite=Lax as the browser default, is CSRF "solved"? What's the honest residual?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Solved — cross-site cookie attachment is dead</button>
+        <button class="mcq-opt" type="button" data-ok>Mostly mitigated, with named residuals: Lax still sends cookies on top-level GET navigations (so GET-that-mutates remains exploitable), SameSite=None APIs opt back out, subdomain takeovers are same-SITE, and old browsers linger — hence tokens on state-changing routes as the second layer</button>
+        <button class="mcq-opt" type="button">Unchanged — SameSite is advisory only</button>
+        <button class="mcq-opt" type="button">Solved for POST, and GET requests can't mutate anyway</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Lax's carve-out (cookies ride top-level navigations) is exactly why "GET /transfer?to=evil" is still a link away — the old "never mutate on GET" rule became a security invariant, not a style point. Defense-in-depth thinking (default + explicit token + method discipline) is what the question grades; "the browser fixed it" and "nothing changed" both fail it. Naming same-site vs same-origin as different boundaries is the bonus point.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>CSP rollout like a pro: <code>Content-Security-Policy-Report-Only</code> first, watch violation reports, then enforce — the flag-rollout pattern (fesd §10) for a header.</li>
+        <li>Clickjacking gets one line: <code>frame-ancestors 'none'</code> (CSP's successor to X-Frame-Options) — the invisible-iframe-over-the-button attack, deleted.</li>
+        <li>DOM XSS (source → sink inside JS: location.hash into innerHTML) never touches the server — Trusted Types is the platform's answer; naming it is current.</li>
+        <li>The unifying theory, once more: XSS = data becoming code (HTML), SQLi = data becoming code (SQL), param injection = data becoming code (URL) — "keep data and structure in separate channels" is the whole genre's cure.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · AUTH -->
+<section class="lesson" id="auth">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Web auth flows — sessions, OAuth &amp; passkeys, drawn once</h3>
+      <p class="lvl">advanced → the platform view of who-are-you</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The platform's auth story in three eras, each solving the previous one's weakness. <b>Sessions</b> (the workhorse): credentials → server-side session → HttpOnly+Secure+SameSite cookie carries the id → §07's attributes ARE the security model (node §auth owns the server half). <b>OAuth 2 + OIDC</b> (delegation): "let Google vouch" — the authorization-code + PKCE dance (node §authplus walks it step by step); the platform-level insight is WHERE tokens may safely exist: codes in URLs (one-time, §02's fragment lesson), tokens in POST responses, credentials in HttpOnly cookies — each artifact placed by its leak-resistance. <b>Passkeys/WebAuthn</b> (the current shift): a keypair per site, private key in the device's secure enclave, login = signing a server challenge — <b>phishing-resistant by construction</b> (the signature binds to the origin §02 — a lookalike domain gets a useless signature; no shared secret exists to steal or reuse). Password reuse, credential stuffing (node §security's attack), and phishing all target the shared-secret model; passkeys delete the shared secret.</p>
+    <div class="mcq" data-qid="wp-auth-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why can't a pixel-perfect phishing site at <code>shelter-login.example.net</code> steal a passkey login the way it steals passwords?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Passkeys require biometrics phishers can't fake</button>
+        <button class="mcq-opt" type="button" data-ok>The credential is scoped to the ORIGIN — the browser only offers (and the authenticator only signs for) the origin that registered it; the fake domain either shows no passkey at all, or produces a signature the real site rejects. There's no secret the user CAN type into the wrong box</button>
+        <button class="mcq-opt" type="button">The private key is encrypted with the site's TLS cert</button>
+        <button class="mcq-opt" type="button">They can — passkeys only stop database breaches</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> passwords fail because humans authenticate the site by LOOKS while secrets work anywhere they're typed. WebAuthn moves the origin check from human eyes to the browser+authenticator (which never lie about §02's origin) — the phishing site can render anything it wants; it cannot make your device sign for an origin it didn't register. Biometrics (A) only unlock the local key — the anti-phishing property is the origin binding. This is THE modern auth question; the origin-scoping answer is the whole point.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The placement table, recited: session id → HttpOnly cookie; OAuth code → URL (once, short-lived); access token → memory; refresh token → HttpOnly cookie with rotation (node §authplus's tripwire). Every artifact, one home, one reason.</li>
+        <li>SSO ≠ OAuth: OIDC is the identity layer; SAML is its enterprise ancestor — one sentence each places you in bigger orgs.</li>
+        <li>Logout is a real design problem: cookie cleared ≠ session dead (server-side revocation), and OIDC single-logout is famously messy — honesty here reads as experience.</li>
+        <li>Password guidance is now boring on purpose: length over complexity rules, breach-list checks, rate limits (node §security) — and "we're rolling out passkeys alongside" is the 2026 answer.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · REALTIME -->
+<section class="lesson" id="realtime">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Polling, SSE &amp; WebSockets — the live-data decision, priced</h3>
+      <p class="lvl">advanced → pick by direction, frequency &amp; infrastructure tax</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The decision inputs: <b>direction</b> (server→client only, or both?), <b>frequency</b> (updates per minute or per second?), and <b>infrastructure tax</b> (what do proxies/LBs/serverless make hard?). The menu: <b>polling</b> — dumb, robust, cache-friendly, latency = interval (fine for "check every 30s"); <b>long-polling</b> — hold the request until data exists (low latency without new protocols — the compatibility champion); <b>SSE</b> — one HTTP response that never ends, <code>text/event-stream</code>, auto-reconnect with <code>Last-Event-ID</code> built into the browser's EventSource (server→client done RIGHT: notifications, feeds, AI token streams — the chat-UI standard); <b>WebSockets</b> — full duplex over one upgraded TCP connection (§nb-13 owns the server half: heartbeats, fan-out, per-connection memory) — earned only by bidirectional + frequent (chat typing, games, collaborative cursors).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">transport-picker.js — run it (cost model per pattern)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// requests/hour + worst-case staleness per transport, for one client
+function price(updatesPerHour, pollSeconds) {
+  const polls = 3600 / pollSeconds;
+  return {
+    polling:  { reqPerHr: Math.round(polls), worstLagSec: pollSeconds, conns: 0 },
+    longPoll: { reqPerHr: updatesPerHour + Math.ceil(updatesPerHour * .1), worstLagSec: '~0', conns: '1 held' },
+    sse:      { reqPerHr: 1, worstLagSec: '~0', conns: '1 held' },
+    ws:       { reqPerHr: 1, worstLagSec: '~0', conns: '1 held (duplex)' },
+  };
+}
+console.log('scenario: order-status page, ~2 real updates/hour, 30s polling:');
+Object.entries(price(2, 30)).forEach(([k, v]) =&gt; console.log(' ', k.padEnd(9), JSON.stringify(v)));
+
+console.log('\n120 polls/hr to learn about 2 changes — 98% waste, but ZERO special infra.');
+console.log('SSE: 1 connection, instant, auto-reconnecting — and it is "just HTTP" (CDN/proxy friendly-ish).');
+console.log('WS earns its §nb-13 operational tax only when the CLIENT also talks constantly.');
+console.log('\nthe senior answer names the escalation: poll → SSE when latency matters → WS when duplex does.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">98% waste vs 1 held connection — the whole trade in two numbers</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="wp-rt-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">An AI chat UI streams tokens server→client. The team reaches for WebSockets "because it's real-time". The calibrated pushback?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">None — token streaming is exactly what WS is for</button>
+        <button class="mcq-opt" type="button" data-ok>The flow is one-directional per response — SSE (or a fetch-readable stream) does it over plain HTTP: no upgrade dance, free auto-reconnect with resume, serverless/proxy friendly; WS adds §nb-13's operational tax (heartbeats, sticky infra, fan-out brokers) for a duplex nobody's using</button>
+        <button class="mcq-opt" type="button">Polling at 100ms — simpler and equivalent</button>
+        <button class="mcq-opt" type="button">HTTP/3 makes all of them identical</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "real-time" isn't one requirement — direction and frequency are. Chat COMPLETIONS are a server monologue: the request goes up once (normal POST), tokens flow down (a stream) — which is why every major AI API ships SSE/readable streams, not sockets. Choosing the cheapest transport that satisfies the actual arrows is the fesd real-time lesson; knowing the industry converged the same way is the receipt.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>SSE's fine print: text-only, one direction, and (pre-HTTP/2) the 6-connection-per-host limit bit multi-tab apps — multiplexing (§03) mostly retired that footnote.</li>
+        <li>Resumability is the under-asked follow-up: Last-Event-ID (SSE) vs sequence numbers over WS (the fesd/chat catch-up pattern) — missed-message strategy IS the design.</li>
+        <li>Serverless changes the answer: held connections and function timeouts fight — managed layers (or SSE with re-request) are the workaround; naming the tension is the ops-aware move.</li>
+        <li>Escalation as architecture: ship polling day one, SSE when users notice lag, WS when the product grows a second direction — the "upgrade on pain" doctrine, transport edition.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · PRACTICE -->
+<section class="lesson" id="practice">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>The platform gauntlet — three cross-layer questions</h3>
+      <p class="lvl">advanced → the module's layers, composed like the real interview asks</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Platform questions in the wild cross layers — that's what makes "what happens when you hit enter" hard: it's every section at once. Three composed drills; answer before revealing.</p>
+    <div class="mcq" data-qid="wp-prac-1">
+      <p class="mcq-tag">// gauntlet 1 of 3</p>
+      <p class="mcq-q">User reports: "first visit each morning is slow, the rest of the day is fast." Which layers plausibly explain it? (pick the BEST composite)</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Just server cold starts — everything else is constant</button>
+        <button class="mcq-opt" type="button" data-ok>Morning = every cache cold at once: DNS TTLs expired overnight (§04), TLS session tickets stale (full handshake, §05), HTTP cache past max-age revalidating en masse (§06), CDN edge caches evicted (aws) — plus maybe compute cold starts. Layered caches share one failure mode: time</button>
+        <button class="mcq-opt" type="button">The user's WiFi warms up with use</button>
+        <button class="mcq-opt" type="button">Browsers throttle the first page load of a session</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each layer keeps its own countdown, and overnight is when they all reach zero together — the "morning slowness" signature is caches expiring in chorus, and the fix menu maps per layer (longer TTLs where safe, session resumption, stale-while-revalidate §06, CDN warming). Diagnosing by ENUMERATING THE LAYERS instead of guessing one is the skill this module exists to build.</p>
+    </div>
+    <div class="mcq" data-qid="wp-prac-2">
+      <p class="mcq-tag">// gauntlet 2 of 3</p>
+      <p class="mcq-q">Marketing adds a third-party widget via one script tag. Enumerate the actual risk surface. (best composite again)</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Just page weight — scripts slow the load</button>
+        <button class="mcq-opt" type="button" data-ok>Full XSS-equivalent power: same-origin JS reads storage/DOM/cookies-sans-HttpOnly (§07, §10), can exfiltrate anywhere, plus render-blocking potential (§01) and a supply-chain channel (their compromise = yours). Mitigations: SRI hashes, CSP allowlisting, sandboxed iframes for untrusted, and the node-module's lockfile skepticism aimed at the browser</button>
+        <button class="mcq-opt" type="button">None if it's from a reputable CDN over HTTPS</button>
+        <button class="mcq-opt" type="button">CORS blocks third-party scripts from your data</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a script tag doesn't "embed" code — it RUNS code as your origin, full stop; CORS (D) governs reads BY your JS, not powers OF loaded JS — the most common confusion in the whole module. HTTPS (C) authenticates the delivery, not the intent — and the biggest widget breaches were reputable vendors compromised. The layered mitigations map one-per-threat, which is how the answer should be delivered.</p>
+    </div>
+    <div class="mcq" data-qid="wp-prac-3">
+      <p class="mcq-tag">// gauntlet 3 of 3</p>
+      <p class="mcq-q">"Walk me through hitting enter on shelter.example.com" — which 20-second skeleton do you hang details on?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Browser → internet → server → HTML appears</button>
+        <button class="mcq-opt" type="button" data-ok>Resolve (cache-walk → DNS §04) → connect (TCP/QUIC + TLS handshake, cert chain §05, §03) → request (HTTP + cookies §07, maybe cached-skip §06) → respond (headers steer caches) → render (parse → style → layout → paint §01, scripts deferring §01, subresources looping this list) — then go DEEP wherever the interviewer leans</button>
+        <button class="mcq-opt" type="button">Recite the OSI model's seven layers in order</button>
+        <button class="mcq-opt" type="button">Focus only on the render pipeline — the rest is networking trivia</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the question is a breadth-scan with depth-probes — the skeleton proves the map, and the interviewer picks a room ("what's in the TLS handshake?" → §05; "when does JS block?" → §01). Resolve-connect-request-respond-render is five words you can't forget under pressure, each unfolding into a section of this module. That IS the module: sixteen ninety-second explanations, one spine.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — where to go from here</h6>
+      <ul>
+        <li>Open devtools' Network tab on any site and narrate three requests end to end — headers, cache verdicts, timings. Fluency is narration practice.</li>
+        <li>This module + node-backend = both ends of every request; + frontend-system-design = the budgets those requests live under. The track's arcs all cross here.</li>
+        <li>The drill pairing: <a href="../fullstack.html#api">Full-Stack in 48 · HTTP &amp; APIs</a> for rapid-fire, <a href="../frontend-system-design.html">Frontend SD in 48</a> for the design-round version.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any "how does the web work" conversation. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>rendering</td><td>Parse → style → layout → paint → composite; animate transform/opacity to skip the expensive stages.</td></tr>
+      <tr><td class="mono">02</td><td>URLs</td><td>Origin = scheme+host+port exactly; encode values or they become structure.</td></tr>
+      <tr><td class="mono">03</td><td>HTTP</td><td>Three generations chasing head-of-line blocking down the stack; semantics never changed.</td></tr>
+      <tr><td class="mono">04</td><td>DNS</td><td>Nothing propagates — caches expire; TTL is a lever you pull the day BEFORE.</td></tr>
+      <tr><td class="mono">05</td><td>TLS</td><td>The padlock means "signed by something in your trust store" — authenticity of the name, not the intent.</td></tr>
+      <tr><td class="mono">06</td><td>caching</td><td>no-cache stores; no-store doesn't — freshness skips the network, ETags skip the download.</td></tr>
+      <tr><td class="mono">07</td><td>cookies</td><td>HttpOnly vs XSS, Secure vs wiretaps, SameSite vs CSRF — attributes are the security model.</td></tr>
+      <tr><td class="mono">08</td><td>CORS</td><td>SOP protects users; CORS is the server's consent to be READ — it never protected the server.</td></tr>
+      <tr><td class="mono">09</td><td>forms</td><td>multipart's boundary belongs to the browser; big uploads bypass your server entirely.</td></tr>
+      <tr><td class="mono">10</td><td>security</td><td>Data becoming code is the whole genre — escape, sanitize, CSP; SameSite left GET-mutations exposed.</td></tr>
+      <tr><td class="mono">11</td><td>auth</td><td>Each artifact has one safe home; passkeys bind to the origin so there's no secret to phish.</td></tr>
+      <tr><td class="mono">12</td><td>realtime</td><td>Pick by direction and frequency: poll → SSE → WS; AI streams are SSE for a reason.</td></tr>
+      <tr><td class="mono">13</td><td>the gauntlet</td><td>Resolve → connect → request → respond → render — five words, sixteen rooms behind them.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">Platform knowledge is the quiet differentiator — it surfaces in every round without being its own round.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"What happens when you hit enter"</b> — §13's five-word spine, then depth on demand. Rehearse it out loud twice.</li>
+      <li><b>Frontend rounds</b> lean on §01 (why transform), §06 (cache headers), §12 (which transport) — the fesd module's designs assume all three.</li>
+      <li><b>Security probes</b> (§07/§08/§10) separate "uses the web" from "understands it" faster than any algorithm question.</li>
+      <li><b>Backend rounds</b> borrow §04-05 constantly — cert expiry, DNS failover and TLS termination are ops-question staples (node + aws modules complete them).</li>
+      <li>This is module 16 — the last one. The <a href="./interview-kit.html">interview kit</a> schedules everything you've built here into a plan.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Narrate three network-tab requests today.</b> The web stops being magic the day you can explain any request end to end — and that day is a devtools session away.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a> and <a href="../frontend-system-design.html">Frontend SD in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>five words: resolve, connect, request, respond, render. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'web-platform';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

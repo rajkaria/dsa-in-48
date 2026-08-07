@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testing JavaScript, Properly</title>
+<meta name="description" content="Jest, React Testing Library, mocking, e2e and the judgment of what to test — with assertions that actually run on the page. For engineers who ship untested code and feel bad about it.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Testing JavaScript, Properly">
+<meta property="og:description" content="Jest, React Testing Library, mocking, e2e and the judgment of what to test — with assertions that actually run on the page. For engineers who ship untested code and feel bad about it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Testing JavaScript, Properly">
+<meta name="twitter:description" content="Jest, React Testing Library, mocking, e2e and the judgment of what to test — with assertions that actually run on the page. For engineers who ship untested code and feel bad about it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23F87171'%3ETQ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#F87171;
+  --mark-deep:#DC2626;
+  --mark-soft:rgba(248,113,113,.16);
+  --on-mark:#141B22;
+  --on-ink:#F87171;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#EF4444;
+  --mark-soft:rgba(248,113,113,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#EF4444;
+  --mark-soft:rgba(248,113,113,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(248,113,113,0) 0%, rgba(248,113,113,.95) 6%, rgba(248,113,113,.8) 94%, rgba(248,113,113,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(248,113,113,0) 0%, rgba(248,113,113,.95) 5%, rgba(248,113,113,.78) 95%, rgba(248,113,113,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(248,113,113,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(248,113,113,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(248,113,113,0) 0%, rgba(248,113,113,.9) 6%, rgba(248,113,113,.7) 94%, rgba(248,113,113,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· testing</em></div>
+      <div class="brand-sub">module 15 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#why"><span><i class="dot" data-for="why"></i> Why Test — and What</span></a>
+    <a class="side-link" href="#anatomy"><span><i class="dot" data-for="anatomy"></i> Anatomy of a Test</span></a>
+    <a class="side-link" href="#jest"><span><i class="dot" data-for="jest"></i> Jest, Oriented</span></a>
+    <a class="side-link" href="#mocking"><span><i class="dot" data-for="mocking"></i> Mocks, Spies &amp; Fakes</span></a>
+    <a class="side-link" href="#async"><span><i class="dot" data-for="async"></i> Testing Async</span></a>
+    <a class="side-link" href="#rtl"><span><i class="dot" data-for="rtl"></i> Testing React</span></a>
+    <a class="side-link" href="#hooks"><span><i class="dot" data-for="hooks"></i> Hooks &amp; Context</span></a>
+    <a class="side-link" href="#api"><span><i class="dot" data-for="api"></i> API Integration Tests</span></a>
+    <a class="side-link" href="#db"><span><i class="dot" data-for="db"></i> Tests &amp; the Database</span></a>
+    <a class="side-link" href="#e2e"><span><i class="dot" data-for="e2e"></i> End-to-End</span></a>
+    <a class="side-link" href="#coverage"><span><i class="dot" data-for="coverage"></i> Coverage, Honestly</span></a>
+    <a class="side-link" href="#tdd"><span><i class="dot" data-for="tdd"></i> TDD, Demystified</span></a>
+    <a class="side-link" href="#ci"><span><i class="dot" data-for="ci"></i> Flakes &amp; CI</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./react-deep-dive.html"><span>React, Deeply</span><span class="t">←</span></a>
+    <a class="side-link" href="./node-backend.html"><span>Node &amp; Backend</span><span class="t">←</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 15 <b>the skill everyone claims and few practice</b></p>
+  <h1>Testing, without the <span class="hl hl-anim" data-d="0">guilt</span> or the <span class="hl hl-anim" data-d="1">dogma</span>.</h1>
+  <p class="lede">You know you "should test more". This module replaces the guilt with judgment: what tests actually buy, which kinds pay rent at which layer, how to mock without mocking away the truth — and the parts nobody teaches: databases, flakes, and what coverage numbers really mean.</p>
+  <p class="lede">The assertion runners here <b>actually execute</b> — a tiny hand-rolled <code>expect</code> lives on this page, because understanding a test framework starts with seeing how small one really is. Jest/RTL/Playwright panels are marked for the terminal. The cats remain skeptical of your untested code. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "what do I even test?"</span>
+    <span class="level-chip i">middle: mocks, React &amp; APIs</span>
+    <span class="level-chip a">ends at: coverage judgment &amp; CI</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>13</b> sections</span>
+    <span><b>13</b> quiz questions</span>
+    <span><b>5</b> runnable panels</span>
+    <span><b>~8.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#why">Start with why <span class="arrow">↓</span></a>
+</header>
+
+<div class="band" id="band-beginner"><span>// beginner — what tests buy, and their shape</span></div>
+
+<!-- 1 · WHY -->
+<section class="lesson" id="why">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>Why test — and what to test first</h3>
+      <p class="lvl">beginner → tests as insurance, priced per layer</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Tests buy exactly three things: <b>confidence to change code</b> (the big one — a refactor with tests is an edit; without, a prayer), <b>executable documentation</b> (the test says what the code promises, and unlike the README it can't go stale silently), and <b>design pressure</b> (hard-to-test code is usually badly-shaped code — the test is the first consumer telling you the API is awkward). What tests do NOT buy: proof of correctness (they check the cases you thought of) or a substitute for types (TypeScript §09 catches shape errors for free; tests earn their keep on <i>behavior</i>).</p>
+    <p>The classic <b>pyramid</b> (many unit, some integration, few e2e — priced by speed and stability) vs the <b>trophy</b> (bulk in integration — where mocks are few and behavior is real). The pragmatic resolution isn't tribal: <b>test where the risk lives</b>. Pure logic (money math, date handling, the dsa-style algorithms) → unit. Wiring (routes + DB + auth) → integration. The three flows the business dies without → e2e. UI cosmetics → mostly nothing, and that's a choice, not a failure.</p>
+    <div class="mcq" data-qid="tq-why-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A pricing function full of discount edge cases, and a settings page of toggles. Same test budget. Where does it go?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Split evenly — fairness across features</button>
+        <button class="mcq-opt" type="button" data-ok>Overwhelmingly to pricing — high logic density, high cost-of-wrong, cheap to unit test; the toggles are low-logic wiring where a single integration test (or the type system) covers the risk</button>
+        <button class="mcq-opt" type="button">To the settings page — UI breaks more often</button>
+        <button class="mcq-opt" type="button">Neither — e2e tests cover both from the outside</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> test ROI = (chance of bug × cost of bug) ÷ cost of test. Pricing: combinatorial branches, real money, pure function — maximal on all three. Toggles: the framework renders them, the type system checks the wiring, and a bug is visible and cheap. Budgeting tests by risk instead of by module is the judgment interviewers actually probe with this question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The regression rule: every bug that reaches production becomes a test before the fix — the suite grows exactly where reality proved it thin.</li>
+        <li>"What's your testing strategy?" wants layers + reasons, not a coverage number: "unit for logic, integration for wiring, e2e for the checkout path, and types doing the shape-checking."</li>
+        <li>Tests as documentation implies naming discipline: <code>it('rejects expired coupons at the second application')</code> reads as spec; <code>it('works')</code> reads as noise.</li>
+        <li>The anti-signal to avoid: testing implementation details (asserting a private was called) — §06 makes it concrete.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · ANATOMY -->
+<section class="lesson" id="anatomy">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Anatomy of a test — arrange, act, assert (and a framework in 20 lines)</h3>
+      <p class="lvl">beginner → the whole machinery, demystified by building it</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every test everywhere is three moves: <b>Arrange</b> (build the world: inputs, fixtures, doubles), <b>Act</b> (call the one thing under test — <i>one</i>), <b>Assert</b> (compare reality to expectation). A test framework is barely more: a registry of named functions, an <code>expect</code> that throws on mismatch, and a reporter that counts. Watch — the runner below IS a working test framework, and every Jest concept you'll meet is this plus ergonomics.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">microtest.js — run it (a real test framework, 20 lines)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// ---- the entire framework ----
+const tests = [];
+const it = (name, fn) =&gt; tests.push({ name, fn });
+const expect = (got) =&gt; ({
+  toBe: (want) =&gt; { if (!Object.is(got, want)) throw new Error(`expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`); },
+  toEqual: (want) =&gt; { const g = JSON.stringify(got), w = JSON.stringify(want);
+    if (g !== w) throw new Error(`expected ${w}, got ${g}`); },
+  toThrow: () =&gt; { try { got(); } catch { return; } throw new Error('expected it to throw'); },
+});
+
+// ---- code under test: shelter pricing ----
+const adoptionFee = (cat) =&gt; {
+  if (cat.age &lt; 0) throw new Error('time-traveling cat');
+  const base = cat.age &lt; 1 ? 5000 : 2000;            // kittens cost more
+  return cat.bonded ? base * 2 * 0.8 : base;          // bonded pairs: 20% off the pair
+};
+
+// ---- the tests: arrange / act / assert ----
+it('prices an adult cat at base rate', () =&gt; {
+  const fee = adoptionFee({ age: 3, bonded: false });   // arrange + act
+  expect(fee).toBe(2000);                                // assert
+});
+it('charges kitten premium', () =&gt; expect(adoptionFee({ age: 0.5, bonded: false })).toBe(5000));
+it('discounts bonded pairs 20%', () =&gt; expect(adoptionFee({ age: 2, bonded: true })).toBe(3200));
+it('rejects impossible ages', () =&gt; expect(() =&gt; adoptionFee({ age: -1 })).toThrow());
+it('THIS ONE FAILS on purpose — read the report', () =&gt; expect(adoptionFee({ age: 3, bonded: false })).toBe(9999));
+
+// ---- the reporter ----
+let pass = 0;
+for (const t of tests) {
+  try { t.fn(); pass++; console.log('  ✓', t.name); }
+  catch (e) { console.log('  ✗', t.name, '\n      →', e.message); }
+}
+console.log(`\n${pass}/${tests.length} passed — and that is genuinely all a test runner is.`);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">real assertions, real failure output — the framework fits in your head now</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="tq-anat-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A teammate's test: act, assert, then MORE acting and asserting, five rounds deep in one <code>it()</code>. What's actually lost?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — fewer test functions run faster</button>
+        <button class="mcq-opt" type="button" data-ok>Failure isolation and diagnosis: the first failing assert aborts the rest (hiding their status), the name can't say what broke, and shared mutations between rounds create order-dependence — split into focused its sharing an arrange helper</button>
+        <button class="mcq-opt" type="button">It's invalid — frameworks allow one expect per test</button>
+        <button class="mcq-opt" type="button">Style only; CI treats them identically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a test's job on failure is to point at the crime scene — "✗ discounts bonded pairs" beats "✗ pricing works (assertion 3 of 11)". Multiple asserts on ONE act are fine (checking several fields of one result); multiple <i>acts</i> are separate behaviors wearing one name. The refactor is mechanical: the arrange block becomes a helper, each act+assert becomes an it. This is the most common review comment in test code — knowing the WHY behind it is the point.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>toBe</code> is Object.is (reference for objects — js-fundamentals §01!); <code>toEqual</code> is structural. Knowing which comparison you're invoking is half of assertion fluency.</li>
+        <li>Test names as specs: the "it + verb phrase" convention exists so a failing run reads as a broken requirement list.</li>
+        <li>beforeEach exists to reset the world — shared mutable fixtures across tests is the #1 cause of order-dependent flakes (§13's opening suspect).</li>
+        <li>"Write me a test framework" is a real interview prompt — you just read the answer; being able to sketch it from memory is a disproportionate flex.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · JEST -->
+<section class="lesson" id="jest">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Jest, oriented — matchers, lifecycle &amp; snapshots appraised</h3>
+      <p class="lvl">beginner → the 20% of the API that is 95% of usage</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Jest (and Vitest — same API, faster engine, the modern default for Vite-shaped projects) is §02's microtest plus: <b>matchers</b> beyond toBe/toEqual — <code>toMatchObject</code> (subset — assert what matters, ignore noise), <code>toContain</code>, <code>toBeCloseTo</code> (floats! js-fundamentals' 0.1+0.2), <code>rejects/resolves</code> for promises; <b>lifecycle</b> — <code>describe</code> blocks scoping <code>beforeEach</code> resets; <b>discovery</b> — <code>*.test.ts</code> colocated next to the code it tests (imports stay honest, orphaned tests visible).</p>
+    <p><b>Snapshots</b>, appraised honestly: the first run records the output, later runs diff against it. Cheap regression nets for <i>stable, reviewable</i> output (an error message, a config object) — and a trap for volatile trees (every UI tweak "fails" the snapshot, everyone reflexively presses update, the net now catches nothing). The tell that a snapshot went bad: nobody reads the diff before updating. Inline snapshots (small, in-file, code-reviewed) age far better than 400-line <code>.snap</code> files.</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">pricing.test.ts — read it (terminal-flavored, the shape to copy)</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">import { describe, it, expect, beforeEach } from 'vitest';
+import { adoptionFee, Cart } from './pricing';
+
+describe('adoptionFee', () =&gt; {
+  it('prices adult cats at base rate', () =&gt; {
+    expect(adoptionFee({ age: 3, bonded: false })).toBe(2000);
+  });
+  it('rejects impossible ages', () =&gt; {
+    expect(() =&gt; adoptionFee({ age: -1, bonded: false })).toThrow(/time-traveling/);
+  });
+});
+
+describe('Cart', () =&gt; {
+  let cart: Cart;
+  beforeEach(() =&gt; { cart = new Cart(); });        // fresh world per test
+
+  it('totals fees with the bonded discount applied once', () =&gt; {
+    cart.add({ age: 2, bonded: true });
+    expect(cart.summary()).toMatchObject({          // subset assert — resilient
+      total: 3200, discounts: ['bonded-pair'],
+    });                                             // (createdAt etc: not asserted)
+  });
+});</code></pre>
+    </div>
+    <div class="mcq" data-qid="tq-jest-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A test asserts the ENTIRE api response with toEqual, including timestamps and ids. It fails randomly. The durable fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Sort the object keys before comparing</button>
+        <button class="mcq-opt" type="button" data-ok>Assert what the test is ABOUT with toMatchObject (or pick fields) and check volatile fields by shape (expect.any(String)) — over-assertion couples the test to noise it never meant to check</button>
+        <button class="mcq-opt" type="button">Freeze time and seed the id generator globally, forever</button>
+        <button class="mcq-opt" type="button">Retry the test three times in CI</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the failure isn't randomness — it's an assertion claiming more than the test cares about. <code>toMatchObject</code> + <code>expect.any</code>/<code>expect.stringMatching</code> encode "these fields matter, those exist" — the test now fails only for reasons its name describes. (C isn't wrong — fake timers have their place, §05 — but as a fix for over-assertion it's treating the symptom with infrastructure. D is how flake cultures start, §13.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>test.each</code> tables for the pricing-matrix genre — one behavior, N cases, no copy-paste; reads like the spec's own table.</li>
+        <li>Watch mode is the actual dev loop (run-on-save, filtered to changed files) — "tests I run once a day" and "tests that drive my editing" are different tools psychologically.</li>
+        <li>Vitest vs Jest in a sentence: same assertions, native ESM/TS, shares Vite config — "Jest for legacy, Vitest for new" is the 2026 default answer.</li>
+        <li>The snapshot rule worth quoting: "a snapshot you wouldn't read in review is a snapshot that shouldn't exist."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — doubles, React &amp; the wiring</span></div>
+
+<!-- 4 · MOCKING -->
+<section class="lesson" id="mocking">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Mocks, spies &amp; fakes — doubles without self-deception</h3>
+      <p class="lvl">intermediate → replace the world carefully; it's easy to test a fantasy</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The vocabulary, precisely: a <b>spy</b> wraps a real function and records calls (behavior unchanged — you're observing); a <b>stub</b> returns canned answers ("the API says 404 today"); a <b>mock</b> is a stub with expectations about how it's called; a <b>fake</b> is a working lightweight implementation (in-memory repository — the star of §09). The discipline that keeps doubles honest: <b>mock at the boundary you don't own</b> (network, clock, randomness, third-party SDKs) and keep YOUR code real — every internal module you mock is a place the test stops testing your actual wiring.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">spies-from-scratch.js — run it (what jest.fn() actually is)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// jest.fn(), hand-rolled: a callable that remembers
+function fn(impl = () =&gt; undefined) {
+  const f = (...args) =&gt; { f.calls.push(args); return f.impl(...args); };
+  f.calls = [];
+  f.impl = impl;
+  f.mockReturnValue = (v) =&gt; { f.impl = () =&gt; v; return f; };
+  return f;
+}
+
+// code under test: notify adopters, politely rate-limited
+async function notifyAdopters(adopters, send, clock) {
+  const sent = [];
+  for (const a of adopters) {
+    if (clock.hour() &lt; 8) { sent.push([a, 'queued-for-morning']); continue; }
+    await send(a, 'your cat misses you (allegedly)');
+    sent.push([a, 'sent']);
+  }
+  return sent;
+}
+
+// the test: SPY on send, STUB the clock — network + time are boundaries
+const send = fn(async () =&gt; {});                 // spy (records) + stub (resolves)
+const nightClock = { hour: fn().mockReturnValue(3) };
+const result = await notifyAdopters(['raj', 'prachi'], send, nightClock);
+console.log('at 3am →', JSON.stringify(result));
+console.log('send called', send.calls.length, 'times (correct: 0 — nobody texts at 3am)');
+
+const dayClock = { hour: fn().mockReturnValue(14) };
+await notifyAdopters(['raj', 'prachi'], send, dayClock);
+console.log('at 2pm → send called', send.calls.length, 'times, first args:', JSON.stringify(send.calls[0]));
+console.log('\nthe spy answered "did we text at night?" WITHOUT sending a single real text.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">jest.fn in 8 lines — calls recorded, behavior injected, boundaries controlled</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="tq-mock-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">To test <code>OrderService</code>, a teammate mocks its internal <code>PricingCalculator</code>, <code>DiscountEngine</code> AND <code>TaxHelper</code>. All tests pass. What do the passing tests prove?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">That OrderService is correct — its dependencies are isolated</button>
+        <button class="mcq-opt" type="button" data-ok>Only that OrderService calls its collaborators in the way the mocks expect — the actual pricing math, discount rules and their integration are all UNTESTED, and a refactor of internals breaks every test while behavior stays right</button>
+        <button class="mcq-opt" type="button">Full coverage — mocked lines count as executed</button>
+        <button class="mcq-opt" type="button">Nothing wrong — that's standard unit isolation</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> mocking internals welds the test to the <i>implementation structure</i>: rename a method, tests fail (false alarm); break the discount math inside the real DiscountEngine, tests pass (false confidence) — the worst of both. These three classes are YOUR code with no awkward boundary — test OrderService with real collaborators and mock only what's slow/external. "Mock the boundary, not the org chart" — the single most valuable sentence in this module.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Module-mocking (<code>vi.mock('./mailer')</code>) hoists above imports — the confusing magic is the bundler rewriting your imports; DI (passing send in, like the runner) needs no magic at all. Testability IS the design pressure from §01.</li>
+        <li>Clock and randomness are boundaries too: fake timers (§05) and injected/seeded RNG — any test that reads the real clock is a future flake (§13).</li>
+        <li>For HTTP, prefer network-level interception (msw-style: your real fetch code runs, the wire is fake) over mocking your own api module — one layer more honest.</li>
+        <li>The smell heuristic: if the mock setup is longer than the assertions, the unit under test is probably cut at the wrong joint.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · ASYNC -->
+<section class="lesson" id="async">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Testing async — awaited asserts &amp; the fake clock</h3>
+      <p class="lvl">intermediate → deterministic tests for time-dependent code</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Rule one: <b>the test must await what it asserts</b> — an un-awaited async assertion passes vacuously (the test ends before the expect runs; js-async §05's floating promise, now silently green). Frameworks help: return/await the promise, use <code>await expect(p).rejects.toThrow()</code> for failure paths — asserting rejections is where "the sad path is a requirement" (fesd) meets machinery. Rule two: <b>never test time with real time</b> — a test that <code>setTimeout</code>s 3 seconds is slow forever and flaky under load; <b>fake timers</b> swap the clock for a lever you crank: install, run the code, <code>advanceTimersByTime(3000)</code>, assert — three simulated seconds in zero real ones.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">fake-clock.js — run it (fake timers, hand-rolled + a debounce tested)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a controllable clock — what jest.useFakeTimers() installs
+function makeClock() {
+  let now = 0; const queue = [];
+  return {
+    setTimeout: (fn, ms) =&gt; queue.push({ at: now + ms, fn }),
+    advance: (ms) =&gt; {
+      now += ms;
+      queue.sort((a, b) =&gt; a.at - b.at);
+      while (queue.length &amp;&amp; queue[0].at &lt;= now) queue.shift().fn();
+    },
+  };
+}
+
+// code under test: debounce (js-async §08's), clock injected
+function debounce(fn, ms, clock) {
+  let timer = null;
+  return (...args) =&gt; {
+    timer = { cancelled: timer ? (timer.cancelled = true, false) : false };
+    const mine = timer;
+    clock.setTimeout(() =&gt; { if (!mine.cancelled) fn(...args); }, ms);
+  };
+}
+
+// the test — three simulated seconds, zero real ones
+const clock = makeClock();
+const calls = [];
+const search = debounce((q) =&gt; calls.push(q), 200, clock);
+
+search('m'); clock.advance(100);       // typing…
+search('mo'); clock.advance(100);      // still typing…
+search('mochi');
+console.log('before quiet period: calls =', JSON.stringify(calls), '(correct: none yet)');
+clock.advance(200);                    // the quiet period elapses
+console.log('after 200ms quiet:   calls =', JSON.stringify(calls), '(exactly one, the last)');
+console.log('\ndeterministic, instant, and it tested TIMING LOGIC — no sleeps, no flakes.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the clock is a parameter — advance() replaces waiting; this is all fake timers are</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="tq-async-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>it('rejects bad cats', () =&gt; { expect(validateCat(badCat)).rejects.toThrow() })</code> — this passes even when validateCat resolves happily. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">rejects only works with arrow-function arguments</button>
+        <button class="mcq-opt" type="button" data-ok>The rejects assertion is itself a promise nobody awaited — the test returns undefined and completes "green" before the assertion settles; add await (and the async keyword), or return it</button>
+        <button class="mcq-opt" type="button">toThrow can't be combined with rejects</button>
+        <button class="mcq-opt" type="button">validateCat needs a try/catch wrapper first</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>expect(p).rejects.toThrow()</code> evaluates to a promise; unawaited, its verdict arrives after the test already reported success — the floating-promise bug (js-async §05) in its most expensive habitat, because a vacuously-green failure-path test is worse than none (you believe the sad path is covered). Lint saves you here: <code>expect(expect)</code>-style rules and TS's no-floating-promises flag both catch it — say the lint names.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Fake timers + promises interleave (the js-async §10 zoo in test form): after advancing, microtasks still need a tick — <code>await advanceTimersByTimeAsync</code> exists because of exactly this.</li>
+        <li>Retry/backoff logic (js-async §14) is THE fake-timer showcase: assert attempt counts at t=1s, 3s, 7s without waiting seven seconds.</li>
+        <li>Waiting on conditions beats waiting on time: "advance until the queue drains" (or RTL's findBy, §06) — asserting after a fixed sleep is the flake template (§13).</li>
+        <li>AbortController paths are testable async too: abort mid-flight, assert the cleanup — the cancellation section's promises, kept under test.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · RTL -->
+<section class="lesson" id="rtl">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Testing React — queries, user-event &amp; what not to assert</h3>
+      <p class="lvl">intermediate → test what the user sees, not what the component hides</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>React Testing Library's whole philosophy is one sentence: <b>"the more your tests resemble the way your software is used, the more confidence they give"</b> — so you find things the way a user (or screen reader) would. The query priority IS the API: <code>getByRole('button', {name: /adopt/i})</code> first (roles + accessible names — your a11y and your tests share one contract; fesd's mechanisms argument, enforced), then <code>getByLabelText</code> (forms), <code>getByText</code>, and <code>getByTestId</code> as the documented last resort. Interactions go through <code>user-event</code> (<code>await user.click(...)</code> — real event sequences: pointer, focus, keyboard), not <code>fireEvent</code> (a bare dispatch).</p>
+    <p>The async side: <code>findByText</code> = getBy + waiting (for the post-fetch UI), <code>waitFor</code> for arbitrary conditions — never a sleep (§05). And the discipline of NOT asserting: no reaching into state, no counting renders, no snapshot of the whole tree (§03) — if the user can't perceive it, the test doesn't claim it. That's what keeps tests green through refactors that don't change behavior — the exact property §04's over-mocked tests lost.</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">AdoptButton.test.tsx — read it (the canonical shape)</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+it('adopts a cat and disables further clicks', async () =&gt; {
+  const user = userEvent.setup();
+  const onAdopt = vi.fn().mockResolvedValue(undefined);
+  render(&lt;AdoptButton cat="Mochi" onAdopt={onAdopt} /&gt;);
+
+  await user.click(screen.getByRole('button', { name: /adopt mochi/i }));
+
+  expect(onAdopt).toHaveBeenCalledWith('Mochi');            // the contract out
+  expect(await screen.findByText(/adopted!/i)).toBeInTheDocument();  // the UI in
+  expect(screen.getByRole('button', { name: /adopted/i })).toBeDisabled();
+});
+
+// note what is NOT here: no component internals, no state peeking,
+// no "expect(setLoading).toHaveBeenCalled" — a rewrite from useState to
+// useReducer to a store changes NOTHING above. That's the durability.</code></pre>
+    </div>
+    <div class="mcq" data-qid="tq-rtl-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>getByRole('button')</code> throws "unable to find role" but the clickable thing is right there — it's a <code>&lt;div onClick&gt;</code>. What did the test just catch?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">An RTL bug — divs with handlers should match button role</button>
+        <button class="mcq-opt" type="button" data-ok>A real accessibility defect: the "button" is invisible to keyboards and screen readers too — fix the component (&lt;button&gt; or role+tabindex+key handlers), not the test; the failing query was doing its job</button>
+        <button class="mcq-opt" type="button">Nothing — switch to getByTestId and move on</button>
+        <button class="mcq-opt" type="button">A timing issue — wrap it in waitFor</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> role queries fail for clickable divs because <i>assistive tech fails for clickable divs</i> — the test simulated your least-served user and reported honestly. Escaping to testId (C) ships the a11y bug with a green checkmark. This is the deepest version of "tests resemble usage": the query priority is an accessibility audit running on every commit. The fesd resilience section made the argument; RTL is its enforcement arm.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Wrap providers once: a custom <code>render</code> with theme/router/query providers — test files stay about behavior, not plumbing.</li>
+        <li><code>getBy</code> throws now, <code>queryBy</code> for asserting absence, <code>findBy</code> awaits appearance — the trio maps to present/absent/eventually; misusing them is the most common RTL review comment.</li>
+        <li>Mock the network (msw), not the component's fetch logic — loading → success → error states all testable through the UI they produce (§04's boundary rule, React edition).</li>
+        <li>What about the RSC/server components? Rendering runs server-side (react §14) — component tests cover client islands; server components get integration/e2e coverage. Current, honest, rarely said.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · HOOKS -->
+<section class="lesson" id="hooks">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Hooks &amp; context under test — renderHook and friends</h3>
+      <p class="lvl">intermediate → custom hooks are units; test them as such (usually via UI)</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The default remains: test hooks <b>through a component that uses them</b> — that's the real contract. <code>renderHook</code> earns its place when a hook is a <i>reusable library</i> (your useDebounce, useCart, usePagination — consumed by many components, deserving direct coverage of its edge cases): it renders an invisible host component and hands you <code>result.current</code>. The rules that follow from React's model: state updates inside tests wrap in <code>act()</code> (flush the render — RTL's user-event does this for you, which is why renderHook tests see act() more), and rerenders with new props via <code>rerender(...)</code> test the hook's response to changing inputs — the dependency-array behaviors (react §05) made assertable.</p>
+    <p><b>Context under test</b> is a wrapper concern: <code>renderHook(() =&gt; useCart(), { wrapper: CartProvider })</code> — and testing "throws a helpful error outside its provider" is a real test (the DX your teammates will actually hit). For context-heavy apps, the §06 custom-render-with-providers pattern covers components; renderHook's wrapper option covers the hooks.</p>
+    <div class="mcq" data-qid="tq-hooks-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Testing useCounter: <code>result.current.increment(); expect(result.current.count).toBe(1)</code> fails — count is 0. The React-model explanation?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">renderHook can't test setters — use a component</button>
+        <button class="mcq-opt" type="button" data-ok>The setState happened but no render flushed — result.current still points at the pre-update snapshot (react §03's "state is a snapshot"); wrap the call in act(() =&gt; …) so the update commits and current refreshes</button>
+        <button class="mcq-opt" type="button">increment is async and needs await</button>
+        <button class="mcq-opt" type="button">The hook must be wrapped in a Provider</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> hooks don't mutate variables — they schedule renders (the react module's core model, resurfacing in test form). <code>act()</code> is "run this, then flush everything React queued", after which <code>result.current</code> is the fresh snapshot. The reason you rarely write act() in component tests: user-event and findBy wrap it internally. Seeing an act() warning = something updated outside those wrappers — it's a smell detector, not a formality.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Fake timers + renderHook test useDebounce completely: change input, advance clock, assert the settle — §05's machinery composed with this section's.</li>
+        <li>Testing an external-store hook (react §13): assert that two hosts see one update — the selector/subscription logic is exactly what unit tests catch early.</li>
+        <li>"Should I export the hook's internals to test them?" — no: test through the public surface; wanting internals is §04's boundary smell again.</li>
+        <li>Custom hooks returning cleanup behavior (subscriptions): unmount() in the test + assert the unsubscribe spy — the leak-prevention lessons, verified.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · API -->
+<section class="lesson" id="api">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>API integration tests — the request-in, response-out contract</h3>
+      <p class="lvl">intermediate → supertest-style: real routes, real middleware, controlled edges</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Unit tests can't catch a route wired to the wrong middleware order (node §06's lesson) — <b>integration tests</b> exercise the HTTP surface: boot the app (not the network listener — supertest drives the handler directly), send a request, assert <b>status + body shape + side effects</b>. The sweet spot per endpoint: the happy path, each interesting failure (401 unauthenticated, 403 wrong-owner, 400 validation with a helpful message, 404), and the business-rule edge — five-ish tests that pin the CONTRACT while implementation stays free underneath (the same durability argument as §06, one layer down).</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">adoptions.test.ts — read it (the five-test contract)</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">import request from 'supertest';
+import { makeApp } from '../app';                 // app factory: DI for the win (§04)
+
+const app = makeApp({ db: testDb, clock: fixedClock });
+
+describe('POST /adoptions', () =&gt; {
+  it('creates an adoption for an available cat', async () =&gt; {
+    const res = await request(app)
+      .post('/adoptions').set(auth('raj')).send({ catId: 'mochi' });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ catId: 'mochi', status: 'pending' });
+    expect(await testDb.adoptions.count()).toBe(1);          // the side effect
+  });
+  it('401s without a session', async () =&gt; {
+    expect((await request(app).post('/adoptions').send({ catId: 'mochi' })).status).toBe(401);
+  });
+  it('400s with a NAMED field error on bad input', async () =&gt; {
+    const res = await request(app).post('/adoptions').set(auth('raj')).send({});
+    expect(res.status).toBe(400);
+    expect(res.body.errors[0].field).toBe('catId');           // error SHAPE is contract
+  });
+  it('409s when the cat is already adopted', async () =&gt; { /* the business edge */ });
+  it('does not leak stack traces in errors', async () =&gt; { /* node §10's promise, pinned */ });
+});</code></pre>
+    </div>
+    <div class="mcq" data-qid="tq-api-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Where should the external payment provider sit in these integration tests?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Real sandbox API — maximum realism every run</button>
+        <button class="mcq-opt" type="button" data-ok>Faked at YOUR client boundary (or network-intercepted) with both success and decline scripted — it's the §04 boundary you don't own; its real behavior gets a handful of separate contract tests against the sandbox, run on a schedule, not per-commit</button>
+        <button class="mcq-opt" type="button">Mocked along with your own PaymentService internals</button>
+        <button class="mcq-opt" type="button">Skipped — payment paths are e2e's job alone</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> sandbox-per-commit (A) makes CI hostage to someone else's uptime and rate limits (§13's flake source #2); mocking your own service too (C) is §04's fantasy-testing. The split that works: fast deterministic fakes for every commit + a small scheduled contract suite that proves the fake still matches reality. That two-tier answer — and the word "contract tests" — is what the question is fishing for.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The app-factory pattern (makeApp taking deps) is what makes all of this possible — testability driving design (§01's third benefit) at the architecture level.</li>
+        <li>Auth in tests: a helper that mints real session tokens through your real auth code — stubbing auth middleware out means the 401/403 tests test nothing.</li>
+        <li>Assert error <i>shapes</i>, not just statuses — clients parse those bodies; the error envelope is API contract (node §07).</li>
+        <li>These tests double as living API docs — new teammates read the test file before the route file; write them like you know that.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 9 · DB -->
+<section class="lesson" id="db">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Tests &amp; the database — real Postgres, isolated fast</h3>
+      <p class="lvl">intermediate → the fake-vs-real decision, and transaction rollback</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The eternal question: fake the DB or use a real one? The modern answer leans <b>real</b> — a throwaway Postgres in Docker/testcontainers — because the things worth testing (constraints firing, transactions, the actual SQL your query builder emits, pg §06's isolation behaviors) <i>only exist in the real engine</i>; an in-memory fake repository (§04) stays useful for pure-logic units that just need "a thing that stores". SQLite-as-test-double is the tempting middle that lies: different types, different constraint behavior, no RETURNING quirks — passing tests against an engine you don't deploy.</p>
+    <p><b>Isolation strategies</b>, priced: (1) <b>transaction-per-test</b> — BEGIN in beforeEach, ROLLBACK in afterEach: fastest, perfect isolation, but code under test that manages its own transactions collides; (2) <b>truncate between tests</b> — slower, honest with transactional code; (3) <b>schema/db-per-worker</b> for parallel runners (Jest's default parallelism will otherwise interleave two tests' rows — the mystery-flake factory). Seed with <b>factories</b> (<code>makeCat({overrides})</code>) instead of shared fixture dumps — each test states what it needs, and the "why does test 41 depend on fixture row 7?" archaeology never starts.</p>
+    <div class="mcq" data-qid="tq-db-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The unique-email constraint test passes locally, flakes in CI. Tests run in parallel; the suite truncates tables in beforeEach. The mechanism?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">CI's Postgres is an older version with different constraints</button>
+        <button class="mcq-opt" type="button" data-ok>Parallel workers share one database — worker B's truncate wipes worker A's arranged rows mid-test (or B's insert collides with A's) — give each worker its own schema/db, or serialize DB suites</button>
+        <button class="mcq-opt" type="button">Truncation is async and needs an await</button>
+        <button class="mcq-opt" type="button">Unique constraints can't be tested reliably</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "passes alone, flakes together" is the signature of shared mutable state between parallel workers — and the DB is the biggest shared state there is. Per-worker schemas (cheap in Postgres: <code>CREATE SCHEMA worker_3</code>) restore isolation without giving up parallelism. The general law, third appearance (§02 fixtures, node §12 replicas, now this): <b>parallel things sharing mutable state will eventually interleave</b> — in tests, "eventually" means the Friday deploy.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Run migrations in test setup — testing against a hand-built schema drifts from production's; the migration files (pg §14) are the single truth.</li>
+        <li>Factories with realistic defaults + explicit overrides read as arrange-blocks: <code>makeCat({ adopted: true })</code> — the test names exactly its relevant state.</li>
+        <li>Test the pg module's races on purpose: two concurrent updates in a test proving your FOR UPDATE actually serializes — the lost-update lesson, pinned forever.</li>
+        <li>Data-layer tests are where N+1 regressions get caught cheaply: assert query COUNT with a counting pool wrapper — "this endpoint makes 3 queries, not 51".</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the browser, the numbers &amp; the pipeline</span></div>
+
+<!-- 10 · E2E -->
+<section class="lesson" id="e2e">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>End-to-end — Playwright's model, and when e2e earns its cost</h3>
+      <p class="lvl">advanced → few, critical, trusted: the top of the pyramid, kept honest</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>E2E drives a real browser against your real (or realistically-staged) stack — maximum truth, maximum cost: slowest to run, most machinery to break, most sensitive to timing. The modern tooling (Playwright) removed the classic pain: <b>locators auto-wait</b> (<code>page.click</code> retries until actionable — the sleep-riddled Selenium era is over), <b>web-first assertions</b> retry until timeout (<code>await expect(page.getByText('Adopted!')).toBeVisible()</code>), and the <b>trace viewer</b> records DOM+network+console per step, so a CI failure replays like a film instead of a screenshot and a shrug.</p>
+    <p>The discipline is portfolio-sizing (§01's risk budget at its most expensive tier): <b>the flows the business dies without</b> — signup, login, checkout/adopt, the money path — a dozen-ish journeys, not a re-implementation of the unit suite through a browser. Auth via a shared setup project (log in once, reuse storage state) keeps runs fast; test data via API seeding (not UI clicking through setup — the slowest possible arrange block); and selectors via roles/labels (§06's priority — e2e and component tests share the same "find it like a user" contract).</p>
+    <div class="mcq" data-qid="tq-e2e-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A team has 400 e2e tests, 40 minutes, ~5 random failures per run that pass on retry. Everyone auto-retries and merges. What has the suite become, and the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A thorough suite with acceptable noise — retries are standard</button>
+        <button class="mcq-opt" type="button" data-ok>A broken alarm nobody believes — real failures hide inside expected noise; shrink to the critical journeys, push the bulk down the pyramid (§08's integration layer covers most of it faster), quarantine + actually fix flakes (§13), and make a red run mean something again</button>
+        <button class="mcq-opt" type="button">An infrastructure problem — bigger CI runners fix it</button>
+        <button class="mcq-opt" type="button">Fine, if retries are capped at three</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a test suite's entire value is that red means broken — 5 expected-random failures means red means "shrug", and the day checkout actually breaks, it ships inside the noise. 400 browser tests usually re-test what integration tests prove in seconds; the e2e tier should be small enough that flakes are INCIDENTS. "I'd rather have 15 e2e tests everyone trusts than 400 everyone retries" is the sentence that ends the question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Playwright vs Cypress in one line: multi-browser + parallel + trace viewer vs the nicer interactive dev UX — both fine; the portfolio discipline matters more than the logo.</li>
+        <li>Run e2e against preview deploys (per-PR environments) — testing the real build artifact catches the "works in dev server" class nothing else can.</li>
+        <li>Visual regression (screenshot diffing) is a separate, deliberately-small suite — pixel-noise management (fonts, antialiasing) is its whole job; know it exists, don't bolt it onto every journey.</li>
+        <li>The staging-data problem is the real e2e boss fight: tests that create their own data via API and clean up after are the only ones that survive shared environments.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · COVERAGE -->
+<section class="lesson" id="coverage">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Coverage, honestly — what the number measures and misses</h3>
+      <p class="lvl">advanced → line vs branch, and why 100% proves nothing</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Coverage counts which code <b>executed during tests</b> — nothing about whether anything was <i>asserted</i>. The tiers: <b>line</b> coverage (weakest — the line ran), <b>branch</b> (each if/else arm — the one worth watching: 100% lines can hide an untested else), <b>function</b>, and the ceiling truth: a test suite of <code>it('runs', () =&gt; { doEverything() })</code> with zero expects can score 90%+. Coverage answers exactly one question well — <b>"what did we definitely NOT test?"</b> — and that reading (hunting the red files that matter) is genuinely useful; the inverse reading ("87% = quality") is the cargo cult.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">coverage-lies.js — run it (100% covered, 0% tested)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// instrument a function the way coverage tools do — count branch hits
+const hits = { adult: 0, kitten: 0, bonded: 0, single: 0 };
+function fee(cat) {
+  let base;
+  if (cat.age &lt; 1) { hits.kitten++; base = 5000; }
+  else { hits.adult++; base = 2000; }
+  if (cat.bonded) { hits.bonded++; return base * 2 * 0.8; }
+  else { hits.single++; return base; }
+}
+
+// "test suite" A: hits every branch, asserts NOTHING
+fee({ age: 0.5, bonded: true });
+fee({ age: 3, bonded: false });
+const covered = Object.values(hits).filter(h =&gt; h &gt; 0).length;
+console.log(`suite A: ${covered}/4 branches covered — 100% branch coverage, ZERO assertions`);
+console.log('  fee could return -Infinity and this "suite" stays green.\n');
+
+// suite B: 50% coverage, but the covered half is PROVEN
+Object.keys(hits).forEach(k =&gt; hits[k] = 0);
+const expectEq = (got, want, name) =&gt;
+  console.log(`  ${Object.is(got, want) ? '✓' : '✗'} ${name} (got ${got})`);
+expectEq(fee({ age: 3, bonded: false }), 2000, 'adult single = base');
+expectEq(fee({ age: 3, bonded: true }), 3200, 'bonded pair discounts correctly');
+console.log(`suite B: ${Object.values(hits).filter(h =&gt; h &gt; 0).length}/4 branches — lower number, real knowledge`);
+console.log('\ncoverage measures EXECUTION. only assertions measure CORRECTNESS.');
+console.log('(mutation testing closes the gap: mutate the code, expect tests to notice.)');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">suite A's 100% vs suite B's 50% — which codebase would you deploy?</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="tq-cov-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Leadership mandates 90% coverage, gated in CI. Predict the second-order effects, honestly.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Quality rises to match the number — incentives work</button>
+        <button class="mcq-opt" type="button" data-ok>Goodhart's law arrives: assertion-free tests, snapshot spam and trivial-getter tests appear to feed the gate, while the untested-by-choice code (§01's toggles) gets padded instead of the risky logic; better: ratchet coverage on CHANGED lines + review test quality like code quality</button>
+        <button class="mcq-opt" type="button">CI becomes slower but the codebase safer</button>
+        <button class="mcq-opt" type="button">Nothing changes — engineers ignore coverage gates</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> when a measure becomes a target it stops measuring (Goodhart) — and coverage is maximally gameable because execution ≠ verification (the runner you just ran). The usable versions: per-PR diff coverage ("new code arrives tested" — a ratchet, like the TS migration), coverage as a <i>map</i> for review attention, and mutation testing where correctness truly matters. Saying "coverage is a flashlight, not a scoreboard" earns the nod.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Mutation testing (Stryker) in one line: "it breaks your code on purpose and checks a test notices — the only tool that measures assertion quality." Slow; aim it at the money modules.</li>
+        <li>Exclude the right things (generated code, config) so the number describes decisions, not boilerplate — a 60% honest number beats an 85% padded one.</li>
+        <li>Branch coverage on error paths is where real gaps hide — the catch blocks and 4xx arms (§08's sad-path tests) are the classic red zones.</li>
+        <li>The interview framing: "what's your coverage?" → answer with the strategy (§01) first, the number second, and the diff-ratchet as how you keep it real.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · TDD -->
+<section class="lesson" id="tdd">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>TDD, demystified — red, green, refactor on a real kata</h3>
+      <p class="lvl">advanced → a design technique that emits tests, used when it fits</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>TDD's loop: <b>red</b> (write one failing test — smallest next behavior), <b>green</b> (dumbest code that passes — resist generality), <b>refactor</b> (clean up under the safety net you just built). The part evangelists undersell: the red step is a <b>design act</b> — you write the CALL before the implementation, so awkward APIs get caught while they're one line old (§01's design pressure, systematized). The part skeptics miss: "dumbest thing that passes" isn't stupidity — it's forcing the NEXT test to justify every generalization, which is how you avoid speculative complexity.</p>
+    <p>The honest applicability map: TDD shines on <b>specifiable logic</b> — parsers, pricing, validation, algorithm-shaped problems (every dsa drill is secretly a TDD kata: examples first, code second). It fights you on <b>exploratory UI and unclear requirements</b> — spiking first, then testing what survived, is not a failure of virtue. "I TDD the core, test-after the edges, and always regression-test bugs (§01)" is a real practice, defensible in any interview.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">tdd-kata.js — run it (three loops of red-green, narrated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// kata: parse "3 tuna, 2 salmon" into meal counts. Watch the API get designed.
+const expectEq = (got, want, name) =&gt; {
+  const g = JSON.stringify(got), w = JSON.stringify(want);
+  console.log(`  ${g === w ? '✓ GREEN' : '✗ RED  '} ${name}${g === w ? '' : `  (got ${g}, want ${w})`}`);
+};
+
+console.log('LOOP 1 · red: simplest behavior — empty order');
+let parseOrder = undefined;                        // no code yet: the test comes first
+try { parseOrder(''); } catch { console.log('  ✗ RED   parseOrder is not even a function'); }
+console.log('        green: dumbest passing code');
+parseOrder = () =&gt; ({});
+expectEq(parseOrder(''), {}, 'empty order → empty counts');
+
+console.log('LOOP 2 · red: one item — the dumb version must fail');
+expectEq(parseOrder('3 tuna'), { tuna: 3 }, 'single item parses');
+console.log('        green: generalize JUST enough');
+parseOrder = (s) =&gt; {
+  if (!s.trim()) return {};
+  const [n, food] = s.trim().split(' ');
+  return { [food]: Number(n) };
+};
+expectEq(parseOrder('3 tuna'), { tuna: 3 }, 'single item parses');
+
+console.log('LOOP 3 · red: multiple items force the real shape');
+expectEq(parseOrder('3 tuna, 2 salmon'), { tuna: 3, salmon: 2 }, 'multiple items');
+console.log('        green + refactor: the loop earns its generality');
+parseOrder = (s) =&gt; Object.fromEntries(
+  s.split(',').map(p =&gt; p.trim()).filter(Boolean)
+   .map(p =&gt; { const [n, food] = p.split(' '); return [food, Number(n)]; }));
+expectEq(parseOrder('3 tuna, 2 salmon'), { tuna: 3, salmon: 2 }, 'multiple items');
+expectEq(parseOrder(''), {}, 'empty STILL works — the net held during refactor');
+console.log('\nthree behaviors, three tests, zero speculative code — that is the whole method.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch each red demand exactly one generalization — no more</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="tq-tdd-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In loop 1, writing <code>parseOrder = () =&gt; ({})</code> — obviously "wrong" — instead of the full parser. What's the actual argument for it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Speed — less typing per loop</button>
+        <button class="mcq-opt" type="button" data-ok>It keeps the tests in charge: every line of generality must be DEMANDED by a failing test, so untested speculative behavior never exists — if the dumb version passes everything, your test list is what's incomplete, and now you know</button>
+        <button class="mcq-opt" type="button">Irony — TDD rituals are performative</button>
+        <button class="mcq-opt" type="button">It avoids merge conflicts on long branches</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "fake it till the tests force you" inverts the usual failure mode (code that does more than anyone verified). If <code>() =&gt; ({})</code> survives your suite, the suite is silent about everything — a fact better learned in loop 1 than in production. It's the same ratchet logic as coverage-on-diff and TS migration: progress only by evidence. That through-line — evidence-driven increments — is this whole module wearing three costumes.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>In live-coding interviews, lightweight TDD is a visible superpower: state the examples first (that's the red), code to them, run often — the interviewer watches your process, and this IS a process.</li>
+        <li>"Transformation priority" in one line: constants → variables → conditionals → loops — the green steps escalate in tiny, principled jumps.</li>
+        <li>Test-after is fine when honest — the sin isn't sequence, it's tests written to pass the code instead of specify it (they assert what IS, not what SHOULD be).</li>
+        <li>TDD's real product is the safety net at refactor time — the react/node modules' "refactor with confidence" claims all cash out here.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · CI -->
+<section class="lesson" id="ci">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>Flakes &amp; CI — keeping red meaningful at team scale</h3>
+      <p class="lvl">advanced → the sociology of test suites, engineered</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>flake</b> is a test whose verdict varies without code changes, and every flake has a real cause: <b>shared state</b> (parallel workers, module-level mutables — §09's DB, §02's fixtures), <b>real time</b> (sleeps, today's date, timezone — §05's clock), <b>unawaited async</b> (the §05 vacuous pass, or its cousin: asserting before settlement), <b>order dependence</b> (test B needs A's leftovers — run with random order to flush these on purpose), and <b>external services</b> (§08's sandbox). "Flaky" is a diagnosis-pending label, not a category of weather — every one is a bug in test OR code (a race your test found first is a GIFT, node §12 would remind you).</p>
+    <p>The CI machinery that keeps trust: <b>quarantine</b> (a failing-flaky test moves to a non-blocking lane with an owner and a deadline — never deleted silently, never retried into invisibility), <b>ordered stages</b> (lint+types → unit → integration → e2e: cheapest verdicts first, fail fast), <b>parallelism with isolation</b> (per-worker DBs; §09), and the cultural rule that outranks all tooling: <b>a red main is everyone's now-problem</b> — the broken-windows dynamics of a suite are faster than any migration: two weeks of "ignore the red one" and the suite is decoration.</p>
+    <div class="mcq" data-qid="tq-ci-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A test fails every day around 05:30 UTC and passes on rerun. Rank the hypotheses.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Cosmic rays — rerun and move on</button>
+        <button class="mcq-opt" type="button" data-ok>Time-dependence first: a "today ± N days" boundary crossing midnight in SOME timezone (05:30 UTC = midnight-ish in the Americas), then a daily cron colliding with shared state — the clock pattern in the failure time IS the stack trace; freeze time in the test and the guess becomes provable</button>
+        <button class="mcq-opt" type="button">CI hardware is slower at night</button>
+        <button class="mcq-opt" type="button">The test is unlucky — quarantine it permanently</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> flakes that correlate with WHEN are time bugs; with PARALLELISM, shared state; with ORDER, leftovers — the correlation is the diagnostic (the observability module's whole method, aimed at your own suite). 05:30 UTC screams date-boundary: some assertion about "orders from today" straddling a day flip. Fix = fake the clock (§05) and add the boundary as an explicit case — the flake becomes the suite's best regression test. Permanent quarantine (D) is where test suites go to die.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Flake RATE is a trackable metric (reruns-to-green per week) — teams that chart it fix it; teams that don't, normalize it.</li>
+        <li>Random test order locally, fixed seed on failure for reproduction — flushing order-dependence continuously beats discovering it during an incident freeze.</li>
+        <li>"Retries: 1, with logged shame" is defensible for e2e ONLY — retried unit tests are always hiding a real bug; the tier changes the policy.</li>
+        <li>The closing sentence for any testing interview: "my goal is a suite where green means ship and red means stop — everything in this module is in service of keeping those two words true."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any "how do you test" question. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>why</td><td>Confidence, documentation, design pressure — budgeted by risk, not by fairness.</td></tr>
+      <tr><td class="mono">02</td><td>anatomy</td><td>Arrange, act, assert — one behavior per it; a framework is 20 lines plus ergonomics.</td></tr>
+      <tr><td class="mono">03</td><td>jest</td><td>Assert what the test is about; a snapshot nobody reads in review shouldn't exist.</td></tr>
+      <tr><td class="mono">04</td><td>doubles</td><td>Mock the boundary, not the org chart — internals mocked is a fantasy tested.</td></tr>
+      <tr><td class="mono">05</td><td>async</td><td>Await what you assert; never test time with real time — the clock is a parameter.</td></tr>
+      <tr><td class="mono">06</td><td>react</td><td>Find things like a user would — the failing role query is an a11y audit, passing.</td></tr>
+      <tr><td class="mono">07</td><td>hooks</td><td>State is a snapshot in tests too — act() flushes; test hooks through their consumers.</td></tr>
+      <tr><td class="mono">08</td><td>api</td><td>Five tests pin the contract: happy, 401, 400-with-shape, the edge, no-leaks.</td></tr>
+      <tr><td class="mono">09</td><td>database</td><td>Real Postgres, isolated per worker; factories over fixtures; SQLite doubles lie.</td></tr>
+      <tr><td class="mono">10</td><td>e2e</td><td>Few, critical, trusted — 15 journeys everyone believes beat 400 everyone retries.</td></tr>
+      <tr><td class="mono">11</td><td>coverage</td><td>Execution ≠ verification — a flashlight for gaps, never a scoreboard; ratchet the diff.</td></tr>
+      <tr><td class="mono">12</td><td>TDD</td><td>Red designs the API, green earns each generalization, refactor spends the net.</td></tr>
+      <tr><td class="mono">13</td><td>flakes &amp; CI</td><td>Every flake has a cause; the failure's correlation is the stack trace; keep red meaning stop.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">Testing questions are seniority x-rays — juniors list tools, seniors describe budgets and trust.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"How do you decide what to test?"</b> — §01's risk budget, with the pricing-vs-toggles example ready.</li>
+      <li><b>"Mocks?"</b> — §04's boundary rule, plus the over-mocked OrderService story as the cautionary tale.</li>
+      <li><b>"What's your coverage?"</b> — §11's flashlight-not-scoreboard, diff-ratchet as the practice.</li>
+      <li><b>Live coding:</b> §12's examples-first loop is visible process — state cases, code to them, run often.</li>
+      <li>This module braids with everything: js-async (§05's clock), react (§06-07), node (§08), postgres (§09) — testing is where the whole track's lessons get load-tested.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Run the microtest framework until it's boring. Then go write five real tests for your riskiest module.</b> Testing skill is judgment plus reps — this page gave you the judgment; the reps are yours.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>green means ship, red means stop — guard those words. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'testing';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
