@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -672,11 +676,19 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   <nav class="side-group" aria-label="Sections">
     <h4>// sections</h4>
     <a class="side-link" href="#runtime"><span><i class="dot" data-for="runtime"></i> How Node Runs Code</span></a>
-    <a class="side-link" href="#streams"><span><i class="dot" data-for="streams"></i> Streams &amp; Backpressure</span></a>
+    <a class="side-link" href="#phases"><span><i class="dot" data-for="phases"></i> The Loop's Phases</span></a>
+    <a class="side-link" href="#streams"><span><i class="dot" data-for="streams"></i> Streams</span></a>
+    <a class="side-link" href="#backpressure"><span><i class="dot" data-for="backpressure"></i> Backpressure, Measured</span></a>
+    <a class="side-link" href="#buffers"><span><i class="dot" data-for="buffers"></i> Buffers &amp; Encodings</span></a>
     <a class="side-link" href="#express"><span><i class="dot" data-for="express"></i> Express, From Scratch</span></a>
     <a class="side-link" href="#rest"><span><i class="dot" data-for="rest"></i> REST API Design</span></a>
     <a class="side-link" href="#auth"><span><i class="dot" data-for="auth"></i> Auth, Decided</span></a>
+    <a class="side-link" href="#authplus"><span><i class="dot" data-for="authplus"></i> OAuth &amp; Rotation</span></a>
     <a class="side-link" href="#robust"><span><i class="dot" data-for="robust"></i> Errors &amp; Validation</span></a>
+    <a class="side-link" href="#security"><span><i class="dot" data-for="security"></i> Hardening</span></a>
+    <a class="side-link" href="#clustering"><span><i class="dot" data-for="clustering"></i> Clustering &amp; Threads</span></a>
+    <a class="side-link" href="#websockets"><span><i class="dot" data-for="websockets"></i> WebSockets</span></a>
+    <a class="side-link" href="#observability"><span><i class="dot" data-for="observability"></i> Observability</span></a>
     <a class="side-link" href="#ship"><span><i class="dot" data-for="ship"></i> Testing &amp; Shipping</span></a>
   </nav>
 
@@ -695,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -722,13 +734,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: auth &amp; production judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>7</b> quiz questions</span>
-    <span><b>5</b> runnable simulations</span>
-    <span><b>~4h</b> self-paced</span>
+    <span><b>15</b> sections</span>
+    <span><b>15</b> quiz questions</span>
+    <span><b>13</b> runnable simulations</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#runtime">Into the engine room <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the engine room</span></div>
 
 <!-- 1 · RUNTIME -->
 <section class="lesson" id="runtime">
@@ -800,10 +814,85 @@ console.log(at(), `→ serialized: ~${Date.now() - t1}ms — everyone waited`);<
   </div>
 </section>
 
-<!-- 2 · STREAMS -->
-<section class="lesson" id="streams">
+<!-- 2 · PHASES -->
+<section class="lesson" id="phases">
   <div class="lesson-head">
     <span class="lesson-num">02</span>
+    <div>
+      <h3>The event loop's phases — libuv's actual schedule</h3>
+      <p class="lvl">beginner → timers, poll, check: where callbacks really queue</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 01 gave you the one-chef model; here's the chef's actual rota. Node's loop (provided by <b>libuv</b>) cycles through <b>phases</b>, each with its own queue: <b>timers</b> (expired setTimeout/setInterval) → <b>poll</b> (I/O callbacks: sockets, files — and where the loop <i>waits</i> when idle) → <b>check</b> (<code>setImmediate</code> callbacks) → close callbacks, then around again. Two queues jump ALL of it: <b><code>process.nextTick</code></b> and then <b>promise microtasks</b> drain completely after <i>every single callback</i>, whatever the phase.</p>
+    <p>Why care? Three production behaviors fall out. <code>setImmediate</code> vs <code>setTimeout(0)</code> ordering is <i>guaranteed</i> only inside an I/O callback (you're in poll; check comes next — setImmediate wins). A recursive <code>process.nextTick</code> <b>starves the entire loop</b> (I/O included — worse than the browser's microtask loop). And "the loop is blocked" has a number: <b>event-loop lag</b>, the delay between a timer's due time and its firing — the first metric any Node dashboard should chart.</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">phase-order.js — read it, run it in a terminal (Node-only APIs)</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// inside an I/O callback, the order is deterministic — narrate why:
+const fs = require('fs');
+fs.readFile(__filename, () =&gt; {          // ← we're in the POLL phase
+  setTimeout(() =&gt; console.log('4 · timeout'), 0);     // waits for next TIMERS phase
+  setImmediate(() =&gt; console.log('3 · immediate'));    // CHECK phase — right after poll!
+  process.nextTick(() =&gt; console.log('1 · nextTick')); // jumps everything
+  Promise.resolve().then(() =&gt; console.log('2 · promise'));
+});
+// prints 1, 2, 3, 4 — nextTick → microtasks → check → (wrap around) → timers
+
+// off I/O (top level), setTimeout-vs-setImmediate order is a COIN FLIP —
+// the loop may or may not reach timers before 1ms elapses. Famous trivia.</code></pre>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">loop-lag.js — run it (the metric, simulated here in the browser)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// event-loop lag: schedule a 10ms timer, measure when it ACTUALLY fires
+async function measureLag(blockMs) {
+  const due = performance.now() + 10;
+  const fired = await new Promise(r =&gt; {
+    setTimeout(() =&gt; r(performance.now()), 10);
+    const t0 = performance.now();               // meanwhile: block the loop
+    while (performance.now() - t0 &lt; blockMs) {} // (sync spin = CPU work on the loop)
+  });
+  return Math.max(0, fired - due).toFixed(1);
+}
+console.log('lag with  0ms of blocking work:', await measureLag(0), 'ms');
+console.log('lag with 60ms of blocking work:', await measureLag(60), 'ms');
+console.log('lag with 150ms of blocking work:', await measureLag(150), 'ms');
+console.log('\nthe timer was "due" — the loop was busy. In Node, EVERY user request');
+console.log('queued behind that spin. Chart this number; alert on it.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">lag ≈ the blocking work — the one Node metric that predicts outages</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-ph-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A teammate "yields to the event loop" inside a heavy job with recursive <code>process.nextTick</code>. What actually happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Works — nextTick hands control back to pending I/O</button>
+        <button class="mcq-opt" type="button" data-ok>Starvation — the nextTick queue drains fully before ANY phase runs, so recursive nextTick locks out timers and I/O entirely; setImmediate is the yielding version</button>
+        <button class="mcq-opt" type="button">Deadlock — nextTick can't be called recursively</button>
+        <button class="mcq-opt" type="button">Same as setImmediate, just older syntax</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> nextTick's contract is "before anything else, always" — recursing on it means "before anything else, forever". <code>setImmediate</code> queues in the check <i>phase</i>, so each iteration lets poll (your users' requests) run between chunks. The names are backwards (nextTick is immediate; setImmediate is next-tick) — saying that out loud is a beloved Node interview beat.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Phase order in six words: "timers, poll, check — nextTick between everything."</li>
+        <li>The poll phase <i>blocks when idle</i> — that's why an idle Node process uses ~0% CPU; the loop is parked in epoll/kqueue, not spinning.</li>
+        <li>Monitor lag with <code>perf_hooks.monitorEventLoopDelay()</code> — name the API and the alert threshold instinct (p99 &gt; ~100ms = users feel it).</li>
+        <li>Chunk CPU work with awaited <code>setImmediate</code> between slices — or skip to the honest fix: worker threads (§12), because chunking shares the chef, it doesn't hire one.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — data in motion, requests in shape</span></div>
+
+<!-- 3 · STREAMS -->
+<section class="lesson" id="streams">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
     <div>
       <h3>Streams &amp; backpressure — process the river, don't drink it</h3>
       <p class="lvl">intermediate → the memory model that saves your RAM</p>
@@ -874,10 +963,141 @@ console.log('now imagine chunks are 64KB and the file is 2GB…');
   </div>
 </section>
 
-<!-- 3 · EXPRESS -->
+<!-- 4 · BACKPRESSURE -->
+<section class="lesson" id="backpressure">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Backpressure, measured — highWaterMark &amp; the pause signal</h3>
+      <p class="lvl">intermediate → what §03 promised, with the queue levels visible</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 03 said "backpressure pauses the producer"; this section shows the machinery. Every stream stage owns a small buffer with a <b>highWaterMark</b> (default 64KB for bytes, 16 objects in object mode). Writing returns a boolean: <code>writable.write(chunk)</code> says <b><code>false</code></b> when the buffer crossed the mark — "I'll take it, but <i>stop sending</i>". A disciplined producer pauses and resumes on the <code>'drain'</code> event. <code>pipe()</code>/<code>pipeline()</code> wire that pause/resume automatically, which is why hand-rolled <code>.on('data', write)</code> loops (which ignore the boolean) are the classic memory-blowup.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">water-levels.js — run it (Web Streams, same physics as Node's)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// producer: instant. consumer: 25ms per bowl. queue: capacity 3.
+// watch desiredSize — positive = "send more", ≤0 = backpressure engaged
+const results = [];
+const sink = new WritableStream(
+  { async write(chunk) {
+      await new Promise(r =&gt; setTimeout(r, 25));      // slow eater
+      results.push(chunk);
+    } },
+  new CountQueuingStrategy({ highWaterMark: 3 })       // the water mark
+);
+
+const writer = sink.getWriter();
+for (let i = 1; i &lt;= 8; i++) {
+  console.log(`offer meal ${i} — desiredSize ${writer.desiredSize}` +
+              (writer.desiredSize &lt;= 0 ? '  ← full: producer must WAIT' : ''));
+  await writer.ready;                                  // ← the pause, honored
+  writer.write(`meal-${i}`);
+}
+await writer.close();
+console.log(`\nall ${results.length} meals eaten; queue never exceeded 3.`);
+console.log('writer.ready is the polite producer; ignoring it is the RAM spike.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">desiredSize hits 0 and the producer waits — backpressure, observed live</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-bp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A Node service reads a fast socket and writes to a slow disk with <code>src.on('data', c =&gt; dst.write(c))</code>. Under load, memory climbs until the process dies. The mechanism?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A memory leak — the data listeners are never removed</button>
+        <button class="mcq-opt" type="button" data-ok>write() has been returning false for ages — ignored — so every chunk buffers inside the writable; the fix is pipeline(src, dst), which honors the pause protocol</button>
+        <button class="mcq-opt" type="button">The disk driver holds the chunks, not Node</button>
+        <button class="mcq-opt" type="button">Sockets emit faster than GC can run</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>write()</code> never rejects work — it buffers and <i>signals</i>. Ignore the signal and the writable's internal queue becomes an unbounded array of Buffers (reachable, so GC is helpless — js-fundamentals' leak definition, server edition). <code>pipe/pipeline</code> exist because the protocol is easy to describe and tedious to honor by hand; <code>pipeline</code> also propagates errors and cleanup, which raw <code>pipe</code> famously doesn't.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>highWaterMark is a <i>hint</i>, not a cap — write() above it still buffers; the mark only flips the boolean. "Soft limit + honor system" is the accurate description.</li>
+        <li>Async iteration (<code>for await (const c of src)</code>) gets backpressure free — the pull model can't outrun the consumer (js-async §11's point, now on the server).</li>
+        <li>Tuning: bigger marks = throughput (fewer pauses), smaller = memory ceiling × concurrent streams. The multiplication by concurrency is the part juniors miss.</li>
+        <li>The interview sentence: "backpressure is flow control — TCP has it, streams have it, and any queue without it is an outage postponed" (system-design's queues section says the same about SQS).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · BUFFERS -->
+<section class="lesson" id="buffers">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Buffers &amp; encodings — bytes, honestly</h3>
+      <p class="lvl">intermediate → what a Buffer is, and the multibyte traps</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Everything on the wire is bytes; a <b>Buffer</b> is Node's fixed-length byte array (a <code>Uint8Array</code> subclass — the browser code below uses the parent and everything transfers). An <b>encoding</b> is the contract for turning text into bytes: UTF-8 spends 1 byte on ASCII, 2–4 on everything else. The traps all come from forgetting which side you're on: <b>string length ≠ byte length</b> (<code>"🐈".length</code> is 2 JS code units, 4 UTF-8 bytes — Content-Length bugs live here), and <b>chunk boundaries don't respect characters</b> — a multibyte cat can be sliced mid-byte by the network, so decoding chunk-by-chunk corrupts; stream decoders hold partial characters until complete.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">bytes-honestly.js — run it (TextEncoder = Buffer.from's browser twin)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const enc = new TextEncoder(), dec = new TextDecoder();
+
+// 1 · string length vs BYTE length — the Content-Length bug
+for (const s of ['cat', 'café', '🐈']) {
+  console.log(`"${s}" — .length ${s.length}, UTF-8 bytes ${enc.encode(s).length}`);
+}
+
+// 2 · bytes are just numbers — read the cat
+const bytes = enc.encode('🐈');
+console.log('the cat, as bytes:', [...bytes].map(b =&gt; b.toString(16)).join(' '));
+
+// 3 · THE SPLIT-CHARACTER TRAP: a chunk boundary lands mid-cat
+const chunk1 = bytes.slice(0, 2), chunk2 = bytes.slice(2);
+console.log('naive per-chunk decode:',
+  JSON.stringify(dec.decode(chunk1) + dec.decode(chunk2)), '← corrupted');
+
+// the fix: a STREAMING decoder holds incomplete sequences
+const sdec = new TextDecoder();
+const out = sdec.decode(chunk1, { stream: true })    // "" — waiting for the rest
+          + sdec.decode(chunk2);                     // completes the cat
+console.log('streaming decode:  ', JSON.stringify(out), '← intact');
+console.log('\nNode twin: string_decoder / TextDecoder — same reason, same fix.');
+
+// 4 · base64: bytes dressed for text-only channels (+33% size)
+console.log('cat in base64:', btoa(String.fromCharCode(...bytes)),
+  '— JWTs, data URLs, email attachments all pay this tax');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the corrupted cat in part 3 is a real production bug class — chunked JSON logs</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-buf-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">An API sets <code>Content-Length: body.length</code> (JS string length) and clients report truncated responses — but only for some users. Who, and why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Users on slow connections — the socket times out</button>
+        <button class="mcq-opt" type="button" data-ok>Users whose responses contain non-ASCII (names, emoji) — UTF-8 bytes &gt; string length there, so the declared length undercounts and clients stop reading early</button>
+        <button class="mcq-opt" type="button">Users behind proxies that rewrite headers</button>
+        <button class="mcq-opt" type="button">All users equally — string length never equals bytes</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> ASCII-only bodies have length == bytes, so the bug hides until Renée or 🐈 shows up — the worst kind of intermittent. <code>Buffer.byteLength(body)</code> (or letting the framework set the header) is the fix. The pattern to name: "works in dev, breaks on real names" is almost always an encoding assumption — same family as the é-vs-e&#769; normalization traps.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>Buffer.allocUnsafe</code> hands you <i>recycled memory</i> — fast, but unwritten regions can leak other requests' old data. Naming that risk is a real security signal (it's a CVE pattern).</li>
+        <li>Binary protocol work is <code>DataView</code>/<code>readUInt32BE</code> territory — endianness gets one sentence: "network order is big-endian".</li>
+        <li>String concatenation of chunks (<code>body += chunk</code>) both corrupts multibyte AND is the O(n²) trap — collect Buffers, <code>Buffer.concat</code> once, decode once.</li>
+        <li>JWTs are base64url, not base64 — the <code>+/</code>→<code>-_</code> swap; decoding one by hand in an interview (auth §08's tamper demo) is a two-minute flex.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · EXPRESS -->
 <section class="lesson" id="express">
   <div class="lesson-head">
-    <span class="lesson-num">03</span>
+    <span class="lesson-num">06</span>
     <div>
       <h3>Express, from scratch — the middleware machine</h3>
       <p class="lvl">intermediate → app.use, demystified in 20 lines</p>
@@ -953,10 +1173,10 @@ console.log(await app.handle({ method: 'GET', path: '/naps', headers: { token: '
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
-<!-- 4 · REST -->
+<!-- 7 · REST -->
 <section class="lesson" id="rest">
   <div class="lesson-head">
-    <span class="lesson-num">04</span>
+    <span class="lesson-num">07</span>
     <div>
       <h3>REST API design — a contract, not a vibe</h3>
       <p class="lvl">intermediate → resources, verbs, and the decisions that age well</p>
@@ -1012,10 +1232,10 @@ status honesty cheat-line:
   </div>
 </section>
 
-<!-- 5 · AUTH -->
+<!-- 8 · AUTH -->
 <section class="lesson" id="auth">
   <div class="lesson-head">
-    <span class="lesson-num">05</span>
+    <span class="lesson-num">08</span>
     <div>
       <h3>Auth, decided — sessions, JWTs, and the hybrid everyone ships</h3>
       <p class="lvl">the interview classic, resolved properly</p>
@@ -1088,10 +1308,81 @@ console.log('tampered:', await verify(evil + '.' + token.split('.')[1]));
   </div>
 </section>
 
-<!-- 6 · ROBUST -->
+<!-- 9 · AUTH PLUS -->
+<section class="lesson" id="authplus">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>OAuth &amp; token lifecycles — the flows, finally drawn</h3>
+      <p class="lvl">intermediate → "Login with Google" step by step, plus rotation done right</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 08 decided sessions-vs-JWT for <i>your</i> users; this section covers borrowing someone else's login. <b>OAuth 2 + OIDC, the authorization-code flow</b>: (1) you redirect to Google with your <code>client_id</code>, requested scopes, and a <code>redirect_uri</code>; (2) the user consents <i>on Google's page</i> — their password never touches you; (3) Google redirects back with a one-time <b>code</b>; (4) your <b>server</b> exchanges code + <code>client_secret</code> for tokens — an <b>ID token</b> (a JWT proving who they are — that's the OIDC part) and an <b>access token</b> (permission to call Google's APIs). The code hop exists so tokens never transit the browser URL; <b>PKCE</b> (a hashed one-time secret) protects the exchange for apps that can't hold a client_secret — and is now recommended for everyone.</p>
+    <p>The other half is <b>refresh rotation</b>: every refresh issues a <i>new</i> refresh token and retires the old one. The payoff is <b>reuse detection</b> — if a retired token ever comes back, someone was cloned (the user has the new one, so who's replaying the old?): revoke the whole family, force re-login.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">rotation-tripwire.js — run it (reuse detection, simulated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a token family: each refresh rotates; reuse of a RETIRED token = alarm
+function makeFamily(user) {
+  let current = 1, revoked = false;
+  const issued = () =&gt; `${user}.rt${current}`;
+  return {
+    refresh(presented) {
+      if (revoked) return '⛔ family revoked — login required';
+      if (presented === issued()) {
+        current++;                                   // rotate: old one retires
+        return `✓ new pair issued (access + ${issued()})`;
+      }
+      if (presented.startsWith(user + '.rt')) {      // an OLD token replayed!
+        revoked = true;
+        return `🚨 RETIRED token replayed → thief or victim has it — revoking the ENTIRE family`;
+      }
+      return '⛔ unknown token';
+    },
+  };
+}
+
+const mochi = makeFamily('mochi');
+console.log('legit refresh:   ', mochi.refresh('mochi.rt1'));
+console.log('legit refresh:   ', mochi.refresh('mochi.rt2'));
+// meanwhile an attacker exfiltrated rt2 earlier and replays it:
+console.log('attacker replays:', mochi.refresh('mochi.rt2'));
+console.log('victim tries rt3:', mochi.refresh('mochi.rt3'));
+console.log('\nboth locked out → one re-login for the victim, nothing for the thief.');
+console.log('without rotation, the stolen refresh token worked for 30 silent days.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the replay trips the wire — rotation turns theft into a detectable event</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-authp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does the authorization-code flow bother with the code → token exchange, instead of Google just redirecting back with the tokens directly?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Codes are shorter, so redirects stay under URL limits</button>
+        <button class="mcq-opt" type="button" data-ok>Redirect URLs leak (history, logs, Referer headers) — the code is one-time, short-lived, and useless without the client_secret/PKCE verifier, which never leave the server</button>
+        <button class="mcq-opt" type="button">Legacy — modern providers do return tokens in the redirect</button>
+        <button class="mcq-opt" type="button">The exchange lets Google bill per token request</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> URLs are the leakiest channel in the stack. The code's only power is "may be exchanged once, quickly, by whoever holds the second secret" — a leaked code is a dud. The flow that DID put tokens in the redirect (the implicit flow) is deprecated for exactly this reason; saying "implicit is dead, code+PKCE for everything" dates your knowledge as current, which is the point of auth questions.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>ID token vs access token in one line: "ID token is a statement <i>about the user</i>, for you; access token is a capability <i>for calling APIs</i> — never authorize with the ID token."</li>
+        <li>Always validate the ID token's signature, issuer, audience, and expiry against the provider's JWKS — the "aud check" is the one everyone forgets and attackers love.</li>
+        <li>The <code>state</code> parameter is CSRF armor for the redirect; PKCE guards the code — two different attacks, two different fields; conflating them is the common stumble.</li>
+        <li>Refresh-token storage: httpOnly cookie on your domain (§08's rules apply); rotation windows ~long, access tokens ~minutes. Numbers show you've operated it, not just diagrammed it.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · ROBUST -->
 <section class="lesson" id="robust">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">10</span>
     <div>
       <h3>Errors &amp; validation — the boundary is the law</h3>
       <p class="lvl">intermediate → trust nothing that crossed the network</p>
@@ -1155,10 +1446,273 @@ console.log(validate({ name: 'Chonk', age: 900, email: 'c@cafe.cat', role: 'admi
   </div>
 </section>
 
-<!-- 7 · SHIP -->
+<!-- 11 · SECURITY -->
+<section class="lesson" id="security">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Hardening Express — headers, rate limits &amp; the OWASP hits</h3>
+      <p class="lvl">intermediate → the defense checklist, with a working limiter</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 10 validated inputs; this section defends the perimeter. The checklist that covers most audits: <b>security headers</b> (what helmet sets: <code>Content-Security-Policy</code>, <code>Strict-Transport-Security</code>, <code>X-Content-Type-Options: nosniff</code>, frame denial) · <b>rate limiting</b> (below) · <b>injection discipline</b> — parameterized queries only (the postgres module's hill to die on), never string-built shell commands · <b>secrets hygiene</b> — env/secret manager, never the repo, and different keys per environment · <b>dependency posture</b> — lockfiles, <code>npm audit</code> in CI, and knowing that most Node breaches arrive via a compromised package, not your code.</p>
+    <p>The <b>token bucket</b> is the rate limiter worth knowing cold: each client owns a bucket of N tokens; requests spend one; tokens refill at R/sec. Bursts up to N pass instantly (good UX), sustained abuse drains to a trickle (R/sec) — which is exactly the shape you want and why it beats fixed windows (burst-at-the-boundary problem) in one sentence.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">token-bucket.js — run it (the limiter, complete)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">function makeBucket(capacity, refillPerSec) {
+  let tokens = capacity, last = 0;                 // simulated clock (ms)
+  return (now) =&gt; {
+    tokens = Math.min(capacity, tokens + (now - last) / 1000 * refillPerSec);
+    last = now;
+    if (tokens &gt;= 1) { tokens--; return { ok: true,  left: tokens.toFixed(1) }; }
+    return { ok: false, retryAfter: ((1 - tokens) / refillPerSec).toFixed(1) };
+  };
+}
+
+const limit = makeBucket(5, 1);                    // burst 5, refill 1/sec
+console.log('burst of 7 at t=0 (capacity 5):');
+for (let i = 1; i &lt;= 7; i++) {
+  const r = limit(0);
+  console.log(`  req ${i}: ${r.ok ? '200 (tokens left ' + r.left + ')' : '429 — Retry-After ' + r.retryAfter + 's'}`);
+}
+console.log('patient client returns at t=2500ms:');
+console.log('  req 8:', JSON.stringify(limit(2500)));
+console.log('\nper-key buckets (ip / user / api-key) live in Redis in production —');
+console.log('in-memory buckets reset per instance and per deploy: fine for one box, a lie behind a load balancer.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">burst absorbed, abuse throttled, honest Retry-After — the whole limiter</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-sec-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Login rate limiting: key the bucket by IP, by username, or both?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">By IP — that's where the requests come from</button>
+        <button class="mcq-opt" type="button">By username — that's what's being attacked</button>
+        <button class="mcq-opt" type="button" data-ok>Both, with different budgets — IP limits stop one box spraying many accounts; username limits stop a botnet converging on one account; either alone leaves the other attack open</button>
+        <button class="mcq-opt" type="button">Neither — lockouts after 3 failures are stronger</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> credential-stuffing (one IP, thousands of usernames) sails past per-username limits; a distributed attack on one account (thousands of IPs, one username) sails past per-IP. Two dimensions, two buckets. And hard lockouts (option D) hand attackers a denial-of-service button for any account they can name — throttling + step-up (captcha, email verify) degrades gracefully instead. Attack-shaped thinking is the entire question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>CSP is the anti-XSS backstop (frontend-system-design's security topic owns the details) — the server's job is <i>sending</i> it, and <code>nosniff</code> + HSTS cost one middleware line.</li>
+        <li>429 must carry <code>Retry-After</code> — clients that back off politely (js-async §14's polling) only exist if servers tell them how long.</li>
+        <li>Sliding-window counters are the Redis-friendly cousin (two window counts, weighted) — name it as the "smooth" alternative when asked to compare.</li>
+        <li>The supply-chain sentence: "I trust my code less than my lockfile, and my lockfile less than provenance — pin, audit, and update on a cadence, not on panic."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — scale, sockets &amp; sight</span></div>
+
+<!-- 12 · CLUSTERING -->
+<section class="lesson" id="clustering">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Clustering &amp; worker threads — more chefs, chosen correctly</h3>
+      <p class="lvl">advanced → processes for traffic, threads for math</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>One Node process uses one core; your box has eight. Two multipliers, often confused. <b><code>cluster</code></b> (or PM2/container replicas — same idea, better ops): fork N <i>processes</i>, share the listening port, each with its own event loop and memory — this scales <b>request throughput</b> and adds crash isolation. <b><code>worker_threads</code></b>: extra <i>threads inside</i> one process, sharing memory via transfer/SharedArrayBuffer — this rescues the event loop from <b>CPU work</b> (the js-async workers section, server-side). The decision is the §01 diagnosis reapplied: many concurrent requests → processes; one heavy computation → threads.</p>
+    <p>The trap that gets everyone: with replicas, <b>in-process state becomes a lie</b>. In-memory sessions "randomly" log users out (each replica has its own Map); the §11 rate limiter counts per-replica; a global cache multiplies. The rule: replicate the compute, <b>externalize the state</b> (Redis, DB) — which is also why stateless services (system-design module) scale by photocopier.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">more-chefs.js — run it (throughput vs blocking, simulated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 12 requests: eleven quick (10ms) + one CPU-heavy (200ms), round-robin dispatch
+function simulate(workers) {
+  const done = [];                     // [finishTime, label]
+  const free = new Array(workers).fill(0);          // when each worker frees up
+  const jobs = Array.from({ length: 12 }, (_, i) =&gt;
+    i === 2 ? ['report-gen', 200] : [`req-${i}`, 10]);   // the heavy one arrives 3rd
+  jobs.forEach(([label, cost], i) =&gt; {
+    const arrival = i * 5;
+    const w = i % workers;                           // round-robin (like SO_REUSEPORT)
+    const start = Math.max(arrival, free[w]);
+    free[w] = start + cost;
+    done.push([free[w], label, w]);
+  });
+  const p95 = done.map(d =&gt; d[0]).sort((a, b) =&gt; a - b)[Math.floor(done.length * .95) - 1];
+  return { p95, worst: Math.max(...done.map(d =&gt; d[0])) };
+}
+console.log('1 process: ', JSON.stringify(simulate(1)), ' ← everyone queues behind report-gen');
+console.log('4 replicas:', JSON.stringify(simulate(4)), ' ← only worker 2\'s lane suffers');
+console.log('\nreplicas contain the blast radius; a worker THREAD for report-gen');
+console.log('removes it entirely — different tools, and the interview wants both named.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">p95 tells the story — one blocked lane vs a blocked service</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-clu-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">After scaling to 4 replicas behind a load balancer, users report being "randomly logged out". The diagnosis?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The load balancer is dropping session cookies</button>
+        <button class="mcq-opt" type="button" data-ok>Sessions live in each replica's memory — a request landing on a different replica finds no session; externalize to Redis (or go stateless tokens) rather than pinning users to replicas</button>
+        <button class="mcq-opt" type="button">Node's cluster module can't share ports</button>
+        <button class="mcq-opt" type="button">The JWT secret differs per replica</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the login wrote to replica 2's Map; the next request hit replica 4. Sticky sessions "fix" it while breaking even scaling and deploys (drain = logout) — mention them as the known-bad workaround, then externalize. Note option D is the same disease for token auth (per-replica secrets) — config drift instead of state drift. "Replicas share nothing unless you make them" is the transferable law.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Modern ops replaced <code>cluster</code> with container replicas — same architecture, the orchestrator owns forking. Saying "cluster is how we did it pre-Kubernetes" places you in time correctly.</li>
+        <li>Graceful shutdown matters ×N: SIGTERM → stop accepting → drain in-flight → close pools → exit. One replica always deploys while others serve — that's zero-downtime's whole trick.</li>
+        <li>Thread pools for repeated CPU work (piscina), not worker-per-request — spawning costs; pooling amortizes (dsa/js pool logic, third appearance).</li>
+        <li>libuv already has a hidden thread pool (fs, dns, crypto — <code>UV_THREADPOOL_SIZE=4</code>) — slow crypto under load is often that pool saturating, not the event loop. Naming it is rare and lands hard.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · WEBSOCKETS -->
+<section class="lesson" id="websockets">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>WebSockets server-side — lifecycles, heartbeats &amp; fan-out</h3>
+      <p class="lvl">advanced → long-lived connections change every assumption</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>HTTP handlers borrow the server for milliseconds; a WebSocket <b>occupies</b> it — one open TCP connection per user, for hours. Three server-side consequences. <b>Liveness is your problem</b>: TCP won't tell you about a vanished phone; you ping every ~30s and terminate silent connections (the <b>heartbeat</b>), or half-dead sockets accumulate forever. <b>Memory is per-connection</b>: 50k idle users = 50k sockets + their buffers — capacity planning shifts from req/sec to concurrent connections. <b>Fan-out crosses replicas</b>: user A on replica 1 messages user B on replica 3 — replicas must gossip through a broker (Redis pub/sub is the standard answer), the same externalize-the-state law as §12, now for <i>connections</i>.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">heartbeat-ledger.js — run it (dead-connection reaping, simulated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// server pings every 30s; a client missing 2 pongs is presumed dead
+const clients = new Map();     // name → last pong time
+['mochi-phone', 'biscuit-laptop', 'beans-tablet'].forEach(c =&gt; clients.set(c, 0));
+
+function sweep(now) {
+  console.log(`t=${now}s — ping all (${clients.size} connections)`);
+  for (const [name, lastPong] of clients) {
+    if (now - lastPong &gt; 60) {
+      clients.delete(name);
+      console.log(`  ⚰️  ${name}: no pong for ${now - lastPong}s → terminate, free buffers`);
+    }
+  }
+}
+// beans' tablet goes through a tunnel at t=10 (no clean close — just silence)
+const pong = (name, t) =&gt; clients.set(name, t);
+for (const t of [30, 60, 90]) {
+  pong('mochi-phone', t); pong('biscuit-laptop', t);      // healthy pongs
+  if (t &lt;= 0) pong('beans-tablet', t);                     // beans went silent
+  sweep(t);
+}
+console.log('\nsurvivors:', [...clients.keys()].join(', '));
+console.log('without the reaper, beans\' socket lives forever — RAM leak shaped like a user.');
+
+// reconnect etiquette (client side, for symmetry): backoff + jitter
+let delay = 1;
+const backoff = [];
+for (let i = 0; i &lt; 5; i++) { backoff.push(delay); delay = Math.min(delay * 2, 30); }
+console.log('client reconnect schedule (s):', backoff.join(' → '), '+ jitter — never a synchronized stampede');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the tunnel scenario — TCP never says goodbye; the heartbeat does</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-ws-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Chat works on one server; after scaling to 3 replicas, messages "randomly" fail to arrive. Why, and the standard fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">WebSockets can't pass through load balancers</button>
+        <button class="mcq-opt" type="button" data-ok>Sender and recipient hold sockets on DIFFERENT replicas — replica 1 can't write to replica 3's socket; publish every message to a broker (Redis pub/sub) all replicas subscribe to, and each delivers to its own sockets</button>
+        <button class="mcq-opt" type="button">The heartbeat interval is too long at scale</button>
+        <button class="mcq-opt" type="button">Each replica needs its own subdomain</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a socket is process-local — the one resource you can't put in Redis. So you externalize the <i>messages</i> instead: broker in the middle, replicas as delivery agents for whoever's connected to them. This is the system-design fan-out pattern at module scale, and "works on one box, breaks on three" is exactly how it's asked. (Sticky sessions don't fix cross-replica delivery — only reconnect affinity.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Do you even need the socket? Server→client only → SSE (auto-reconnect free); occasional checks → polling. Bidirectional + frequent is the socket's actual niche — frontend-system-design's real-time topic prices the three.</li>
+        <li>The upgrade handshake is HTTP first (<code>Upgrade: websocket</code>) — which is why auth happens there (cookie/token on the upgrade request), BEFORE the protocol switch.</li>
+        <li>Backpressure returns: a slow client's <code>bufferedAmount</code> grows server-side — drop, coalesce, or disconnect; never buffer unboundedly (§04's law, per-connection now).</li>
+        <li>Deploys terminate every socket at once — clients with jittered backoff make that a non-event; without it, your own restart is a self-inflicted thundering herd.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · OBSERVABILITY -->
+<section class="lesson" id="observability">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Observability — logs, metrics &amp; traces that answer questions</h3>
+      <p class="lvl">advanced → structured events, the four golden signals, one request's story</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Three instruments, three questions. <b>Logs</b> answer "what happened?" — but only if they're <b>structured</b>: one JSON object per event, machine-queryable (<code>level=error AND route=/checkout AND userId=…</code>), instead of prose you grep and pray over. <b>Metrics</b> answer "how are we doing?" — cheap aggregates over time; the four golden signals (latency, traffic, errors, saturation) plus Node's own vitals: event-loop lag (§02's number), heap used, open handles. <b>Traces</b> answer "where did this request spend its time?" — a <b>request id</b> minted at the edge and carried through every log line and downstream call, so one slow checkout becomes a waterfall you can read instead of four services' logs you can't correlate.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">structured-story.js — run it (logs you can query, then the waterfall)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// structured logging: events, not sentences
+const logs = [];
+const log = (fields) =&gt; logs.push({ ts: logs.length * 7, ...fields });
+
+// one request's story, requestId carried everywhere
+const reqId = 'req-7f3a';
+log({ level: 'info',  reqId, event: 'request',  route: 'POST /adopt', userId: 'u42' });
+log({ level: 'info',  reqId, event: 'db.query', table: 'cats', ms: 12 });
+log({ level: 'warn',  reqId, event: 'cache.miss', key: 'cat:mochi' });
+log({ level: 'info',  reqId, event: 'db.query', table: 'adoptions', ms: 148 });
+log({ level: 'error', reqId, event: 'email.send', err: 'TIMEOUT', ms: 3000 });
+log({ level: 'info',  reqId, event: 'response', status: 502, totalMs: 3171 });
+// noise from other requests:
+log({ level: 'info', reqId: 'req-9c1d', event: 'request', route: 'GET /cats' });
+
+// the query a human runs at 3am: "why did u42's checkout 502?"
+const story = logs.filter(l =&gt; l.reqId === reqId);
+console.log(`SELECT * WHERE reqId="${reqId}" → ${story.length} events:\n`);
+story.forEach(l =&gt; console.log(
+  `  +${String(l.ts).padStart(3)}ms  ${l.level.padEnd(5)} ${l.event.padEnd(10)}` +
+  (l.ms ? ` ${l.ms}ms` : '') + (l.err ? ` ← ${l.err}` : '')));
+console.log('\nthe 3-second email timeout IS the 502 — visible in one filtered read.');
+console.log('now the fix writes itself: email goes async via a queue (system-design §queues).');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">one WHERE clause replaces an hour of grep — that's the whole pitch</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="nb-obs-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your p50 latency is 40ms and p99 is 4 seconds. Which claim is right?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The service is fine — the median is what most users see</button>
+        <button class="mcq-opt" type="button" data-ok>1% of requests are pathological — and heavy users hit many requests per session, so a large share of USERS meet the 4s tail; find what that 1% shares (a query, a route, GC pauses, loop lag)</button>
+        <button class="mcq-opt" type="button">The average of ~80ms is the honest number to report</button>
+        <button class="mcq-opt" type="button">p99 is statistical noise below 10k req/s</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> tails compound: a session making 30 calls has a ~26% chance of hitting the p99 at least once — the "rare" 4 seconds is a common user experience. Averages bury bimodal truths (fast path + timeout path). The follow-up instinct: slice p99 by route/replica/query — tails are usually one cause, not general slowness. Percentile literacy is the fastest way to sound like you've been on call.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The request id is minted at the edge, propagated in a header (<code>traceparent</code> is the W3C standard), and attached to every log via child loggers (pino idiom) — "correlation is a discipline, not a product".</li>
+        <li>Name the Node vitals worth alerting on: event-loop lag p99, heap trending up across GCs (the leak signature), pool saturation (waiting DB connections).</li>
+        <li>Logs are the expensive one at scale — sample the happy path, keep every error, and never log secrets/PII (the audit finding that writes itself).</li>
+        <li>OpenTelemetry is the vendor-neutral answer to "how would you add tracing" — one name, no tool war.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 15 · SHIP -->
 <section class="lesson" id="ship">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">15</span>
     <div>
       <h3>Testing &amp; shipping — confidence, then repetition</h3>
       <p class="lvl">intermediate → the pyramid that fits APIs, and the deploy shape</p>
@@ -1231,12 +1785,20 @@ describe('POST /v1/cats', () =&gt; {
     <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
     <tbody>
       <tr><td class="mono">01</td><td>runtime</td><td>One chef, many ovens: I/O concurrency is free, CPU on the loop stalls EVERYONE — offload it.</td></tr>
-      <tr><td class="mono">02</td><td>streams</td><td>Process the river in chunks; backpressure pauses the producer so slow consumers can't flood RAM.</td></tr>
-      <tr><td class="mono">03</td><td>express</td><td>A chain of (req, res, next) functions; order matters; async errors need forwarding (until Express 5).</td></tr>
-      <tr><td class="mono">04</td><td>REST</td><td>Nouns in URLs, verbs in methods, honest statuses, cursor pages, one error envelope, actions as created resources.</td></tr>
-      <tr><td class="mono">05</td><td>auth</td><td>Short-lived access + rotating refresh, both httpOnly — stateless checks with a revocation point.</td></tr>
-      <tr><td class="mono">06</td><td>robustness</td><td>Validate at the boundary (allowlist the shape); typed errors → one middleware; stack traces never leave.</td></tr>
-      <tr><td class="mono">07</td><td>shipping</td><td>Real-DB integration tests, mock only unowned edges; build once, promote; liveness ≠ readiness.</td></tr>
+      <tr><td class="mono">02</td><td>phases</td><td>Timers, poll, check — nextTick between everything; event-loop lag is the metric that predicts outages.</td></tr>
+      <tr><td class="mono">03</td><td>streams</td><td>Process the river in chunks; backpressure pauses the producer so slow consumers can't flood RAM.</td></tr>
+      <tr><td class="mono">04</td><td>backpressure</td><td>write() returning false is a plea — honor writer.ready or buffer RAM until it dies; pipeline honors it for you.</td></tr>
+      <tr><td class="mono">05</td><td>buffers</td><td>String length ≠ byte length; chunk edges slice characters — streaming decoders hold the fragment.</td></tr>
+      <tr><td class="mono">06</td><td>express</td><td>A chain of (req, res, next) functions; order matters; async errors need forwarding (until Express 5).</td></tr>
+      <tr><td class="mono">07</td><td>REST</td><td>Nouns in URLs, verbs in methods, honest statuses, cursor pages, one error envelope, actions as created resources.</td></tr>
+      <tr><td class="mono">08</td><td>auth</td><td>Short-lived access + rotating refresh, both httpOnly — stateless checks with a revocation point.</td></tr>
+      <tr><td class="mono">09</td><td>oauth</td><td>The code hop keeps tokens out of URLs; PKCE guards the exchange; rotation turns theft into detection.</td></tr>
+      <tr><td class="mono">10</td><td>robustness</td><td>Validate at the boundary (allowlist the shape); typed errors → one middleware; stack traces never leave.</td></tr>
+      <tr><td class="mono">11</td><td>security</td><td>Helmet headers, parameterize everything, token buckets keyed twice — by IP and by username.</td></tr>
+      <tr><td class="mono">12</td><td>clustering</td><td>Processes for traffic, threads for math — replicated compute means externalized state.</td></tr>
+      <tr><td class="mono">13</td><td>websockets</td><td>Heartbeat the silent, budget per-connection memory, fan out through a broker.</td></tr>
+      <tr><td class="mono">14</td><td>observability</td><td>Structured events + golden signals + one request id through everything; p99 is a user, not noise.</td></tr>
+      <tr><td class="mono">15</td><td>shipping</td><td>Real-DB integration tests, mock only unowned edges; build once, promote; liveness ≠ readiness.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1249,8 +1811,9 @@ describe('POST /v1/cats', () =&gt; {
   <div class="idea" style="margin-top:24px">
     <ul>
       <li><b>"Explain the event loop in Node"</b> — tell it server-side: one loop per process serving all users, CPU work is the enemy, and name event-loop lag as the metric. Drill pairs: <a href="../fullstack.html#node">Full-Stack in 48 · Node internals</a>.</li>
-      <li><b>"Sessions or JWT?"</b> — never pick a side first; give the hybrid + the hacked-account story from §05. It converts a trivia question into an architecture answer.</li>
-      <li><b>"Design an endpoint for X"</b> — walk §04's contract: resource naming, status codes, pagination, idempotency, error envelope. Structure beats speed.</li>
+      <li><b>"Sessions or JWT?"</b> — never pick a side first; give the hybrid + the hacked-account story from §08, then rotation's tripwire from §09. It converts a trivia question into an architecture answer.</li>
+      <li><b>"Design an endpoint for X"</b> — walk §07's contract: resource naming, status codes, pagination, idempotency, error envelope. Structure beats speed.</li>
+      <li><b>The advanced band is the on-call interview:</b> "users randomly logged out after scaling" (12), "chat broke on three replicas" (13), "p50 fine, p99 four seconds" (14) — each is a war story with a named fix now.</li>
       <li>Next modules: <b>postgres-databases</b> (the other half of every backend question) and <b>aws-cloud</b> (where all of this runs).</li>
     </ul>
   </div>
