@@ -12,12 +12,13 @@ updated: 2026-08-07
 
 ## Current state — what's working, deployed, broken
 
-- **DEPLOYED TO PROD 2026-08-06.** Vercel: merged to main (`0c4f4a7`), deployed
-  (`dpl_EcXu1ky6Zo6TALRyqkxWpKVivVBf`, aliased to dsa-in-48.vercel.app) — all URLs
-  verified 200 with correct titles. GitHub Pages: first build **errored** (Jekyll choked
-  on JSX `{{ }}` inside code panels) — fixed with a root `.nojekyll` (`c4c9afb`);
-  rebuild was in flight at save time. Ocean run `ocean-20260806-150637` complete
-  (9/9 sprints); full report in `.ocean/REPORT.md`.
+- **DEPLOYED TO PROD 2026-08-08** (depth-expansion run `ocean-20260807-130307`, 10/10
+  sprints; report in `.ocean/REPORT.md`, previous run archived under `.ocean/archive/`).
+  Vercel: merged to main (`dddfa54`), deployed `dpl_FaYkGBCgziZhLCGKC3CM75m61WF7`,
+  aliased to dsa-in-48.vercel.app — landing, hub, and all 16 modules verified live with
+  correct titles. GitHub Pages: Actions workflow deploy green (~20s), hub + modules
+  verified live. Browser sweep: 23 pages, zero console errors, zero horizontal overflow
+  at 375px, widget/persistence checks green in both themes.
 
 ## Current state — what's shipped
 
