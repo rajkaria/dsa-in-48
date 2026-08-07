@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -676,8 +680,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#components"><span><i class="dot" data-for="components"></i> Component APIs</span></a>
     <a class="side-link" href="#state"><span><i class="dot" data-for="state"></i> State Architecture</span></a>
     <a class="side-link" href="#data"><span><i class="dot" data-for="data"></i> Data &amp; Caching</span></a>
+    <a class="side-link" href="#caching"><span><i class="dot" data-for="caching"></i> The Caching Layer Cake</span></a>
+    <a class="side-link" href="#offline"><span><i class="dot" data-for="offline"></i> Offline &amp; Service Workers</span></a>
     <a class="side-link" href="#perf"><span><i class="dot" data-for="perf"></i> Performance Budgets</span></a>
+    <a class="side-link" href="#i18n"><span><i class="dot" data-for="i18n"></i> Internationalization</span></a>
+    <a class="side-link" href="#flags"><span><i class="dot" data-for="flags"></i> Flags &amp; Experiments</span></a>
     <a class="side-link" href="#resilience"><span><i class="dot" data-for="resilience"></i> Resilience &amp; A11y</span></a>
+    <a class="side-link" href="#rum"><span><i class="dot" data-for="rum"></i> Frontend Observability</span></a>
+    <a class="side-link" href="#designsystem"><span><i class="dot" data-for="designsystem"></i> Design Systems</span></a>
+    <a class="side-link" href="#collab"><span><i class="dot" data-for="collab"></i> Multiplayer UI</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -695,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -721,13 +732,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: full-prompt fluency under a clock</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>7</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>14</b> quiz questions</span>
     <span><b>1</b> decision-tree widget</span>
-    <span><b>~4h</b> self-paced</span>
+    <span><b>~9.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#radio">To the practice field <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the round &amp; its rubric</span></div>
 
 <!-- 1 · RADIO -->
 <section class="lesson" id="radio">
@@ -801,6 +814,8 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — the load-bearing layers</span></div>
 
 <!-- 3 · COMPONENTS -->
 <section class="lesson" id="components">
@@ -904,10 +919,82 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 6 · PERF -->
-<section class="lesson" id="perf">
+<!-- 6 · CACHING -->
+<section class="lesson" id="caching">
   <div class="lesson-head">
     <span class="lesson-num">06</span>
+    <div>
+      <h3>The caching layer cake — HTTP, SW, memory &amp; state</h3>
+      <p class="lvl">intermediate → four caches, one invalidation story, told in order</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A browser request can be answered from four caches, and a design answer that names them <b>in order</b> sounds instantly senior. <b>(1) HTTP cache</b> — the browser's, governed by Cache-Control headers: <code>immutable</code> + hashed filenames for assets (cache forever, deploy new names — the CDN lesson's client half); <code>no-cache</code> (revalidate with ETag → 304) for HTML. <b>(2) Service worker cache</b> — programmable (§07 owns it). <b>(3) In-memory app cache</b> — your data layer's Map: React Query/SWR keyed by query, with <b>staleness</b> semantics (§05's layers, zoomed in): serve stale instantly, revalidate behind it, swap silently. <b>(4) State itself</b> — normalized entities already fetched (the "we have this user from the list page" case — cache by entity id, not by URL).</p>
+    <p>The design question is always <b>invalidation scope</b>: a mutation must invalidate <i>exactly</i> the affected keys across the layers it touched — the edit-profile call invalidates <code>user:42</code> (memory), maybe a SW cache entry, never the immutable JS bundle. "Every cache in the stack answers two questions: what key, and who invalidates it" — say that sentence, then walk the cake.</p>
+    <div class="mcq" data-qid="fd-cache-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">After deploy, users report the old UI until a hard refresh. Assets use hashed names with long max-age. What's actually stale?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The hashed JS bundles — long max-age was the mistake</button>
+        <button class="mcq-opt" type="button" data-ok>The HTML document (or SW precache) that references the bundles — it was cached too aggressively; HTML must be no-cache/revalidate so it always points at the newest hashed names</button>
+        <button class="mcq-opt" type="button">The CDN — invalidation takes 24 hours</button>
+        <button class="mcq-opt" type="button">DNS — the TTL pins users to old servers</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> hashed bundles can't be stale — a new deploy is a new URL. The entry point that <i>names</i> them is the only mutable link in the chain, and giving it a long max-age freezes the whole app. The pattern generalizes: immutable content cached forever + one tiny always-fresh pointer — it's how CDNs, SWs, and even Docker layers work. (If a service worker is involved, the update lifecycle in §07 is the second suspect.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>stale-while-revalidate</code> exists at BOTH the HTTP layer (a Cache-Control extension) and the data layer (SWR's whole name) — same philosophy, two altitudes.</li>
+        <li>Cache keys must include what varies the response: auth state, locale (§09), variant flags (§10) — the CDN cache-key discipline, applied client-side.</li>
+        <li>Memory caches die on refresh — persisting the query cache (localStorage/IndexedDB) buys instant warm starts and buys the "how fresh is too stale?" conversation.</li>
+        <li>The interview close: draw the waterfall of one product screen and annotate which layer answers each request on a warm visit — 60 seconds, very few candidates can.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · OFFLINE -->
+<section class="lesson" id="offline">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Offline-first &amp; service workers — the app that survives a tunnel</h3>
+      <p class="lvl">intermediate → SW strategies, the update trap &amp; the sync queue</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>service worker</b> is a programmable proxy between your app and the network — every fetch can be answered from its cache, the network, or a blend. The strategy menu, chosen <i>per resource type</i>: <b>cache-first</b> (app shell, fonts — instant, update in background), <b>network-first with cache fallback</b> (API data — fresh when online, stale beats blank offline), <b>stale-while-revalidate</b> (avatars, non-critical data). PWA = SW + manifest: installable, offline-capable, push-capable — "app-like" as a set of checkboxes rather than a vibe.</p>
+    <p>Two traps carry the interview. <b>The update lifecycle</b>: a new SW installs but <b>waits</b> until every tab from the old one closes — users can run week-old code despite your deploys ("why is the fix not live?" — it is; their SW isn't). The pattern: detect the waiting worker, show "update available", <code>skipWaiting</code> on click. <b>Writes while offline</b>: reads come from cache, but a POST needs a <b>sync queue</b> — persist the mutation (IndexedDB), show it optimistically (§04's optimistic state), replay on reconnection with idempotency keys (the backend module's §08 — the two halves of one contract), and design for the replay <i>conflicting</i> (server state moved on: last-write-wins, merge, or surface to the user — say which).</p>
+    <div class="mcq" data-qid="fd-off-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A field-sales app must let reps edit customer notes in dead zones. The architecture sentence that covers it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Cache all GETs cache-first; block edits until online with a clear banner</button>
+        <button class="mcq-opt" type="button" data-ok>SW caches the shell + data reads; edits write to a local outbox (IndexedDB) and render optimistically; a replayer drains the outbox on reconnect with idempotency keys and a declared conflict policy</button>
+        <button class="mcq-opt" type="button">Poll aggressively so the app is rarely actually offline</button>
+        <button class="mcq-opt" type="button">Store everything in localStorage and sync nightly</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the requirement is offline <i>writes</i> — blocking them (A) fails the brief. The outbox is the queue pattern from system design, living in the browser: durable, ordered, replayable, idempotent. The conflict policy is what separates a real answer from a happy-path one — two reps editing the same note offline WILL happen; "LWW with an audit trail, surface conflicts above N minutes of divergence" is a defensible line. localStorage (D) is synchronous, tiny, and string-only — name IndexedDB for anything structural.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>SWs are killable between events — no in-memory state survives; everything durable lives in Cache Storage/IndexedDB. "Stateless worker over durable stores" — the serverless mental model, in the browser.</li>
+        <li>Never cache-first the API without a freshness story — the support ticket is "my dashboard is from Tuesday". Reads: network-first or SWR; shell: cache-first. Per-type, always.</li>
+        <li>Background Sync API exists (replay even after tab close) but is Chromium-only — the honest answer replays on next open too.</li>
+        <li>Scope note: an SW only controls its scope path, HTTPS only, and the first visit is uncontrolled — three facts that date-stamp real experience.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · PERF -->
+<section class="lesson" id="perf">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
     <div>
       <h3>Performance budgets — numbers you commit to</h3>
       <p class="lvl">turning "make it fast" into an engineering plan</p>
@@ -938,10 +1025,82 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 7 · RESILIENCE -->
+<!-- 9 · I18N -->
+<section class="lesson" id="i18n">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Internationalization — architecture, not string files</h3>
+      <p class="lvl">intermediate → locale as a first-class dimension of the system</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>i18n in a design round is an <b>architecture dimension</b>, not a library choice. The load-bearing decisions: <b>locale detection &amp; routing</b> (URL-based <code>/de/…</code> beats cookie-sniffing: shareable, cacheable — the locale is part of the cache key everywhere, §06); <b>bundle strategy</b> (never ship all locales — lazy-load the active locale's messages as their own chunk; 40 locales in the main bundle is a perf-budget kill from §08); and <b>message format</b> (ICU MessageFormat, because <b>pluralization is not <code>count + "s"</code></b> — Polish has four plural categories, Arabic six; the format encodes per-language rules your string-concatenation can't).</p>
+    <p>The layout half is what juniors miss: <b>RTL</b> (Arabic, Hebrew) is a mirrored world — CSS logical properties (<code>margin-inline-start</code>, not <code>margin-left</code>) make it nearly free if adopted early and a rewrite if not; <b>text expansion</b> (German labels run ~30% longer, Finnish worse) means fixed-width buttons truncate — design reviews need a long-locale pass; and dates/numbers/currency go through <code>Intl.*</code> (the platform already knows), never hand-formatting.</p>
+    <div class="mcq" data-qid="fd-i18n-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The string <code>"You have " + count + " item" + (count === 1 ? "" : "s")</code> ships to 12 locales. What breaks, structurally?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — translators translate the fragments</button>
+        <button class="mcq-opt" type="button" data-ok>Word order and plural rules are per-language — many languages reorder the sentence and have 3-6 plural forms; concatenated fragments can't be reordered or plural-branched by translators. ICU messages ("{count, plural, …}") exist precisely for this</button>
+        <button class="mcq-opt" type="button">Only performance — string concat is slow at scale</button>
+        <button class="mcq-opt" type="button">It works if every fragment gets its own translation key</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> concatenation hard-codes English's grammar into the code. A translator given "You have ", "item", "s" cannot produce correct Polish (which needs different noun forms for 1, 2-4, 5+, and fractions) or reorder for Japanese. The ICU message is a tiny per-locale <i>program</i> — the translator owns the whole sentence including its branches. "Strings are per-locale functions, not fragments" is the mental model shift the question tests.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Locale is a cache-key dimension end to end: CDN (Vary/key on locale), SW caches, query caches — miss one layer and German users get cached English (the §06/edge lesson, recurring).</li>
+        <li>Translation ops is a pipeline: keys extracted at build, missing-key reports, pseudo-localization in CI (l̂ön̂ĝ t̂ex̂t̂ catches truncation before Finnish users do).</li>
+        <li>SSR + i18n: the server must render the user's locale (detection before render) or hydration mismatches (react §14's bug) appear in translated text.</li>
+        <li>Scope honesty: "true i18n includes addresses, name order, phone formats, and legal text — I'd stage: UI strings → formats → RTL" — a rollout plan beats a library name.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · FLAGS -->
+<section class="lesson" id="flags">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Feature flags &amp; experiments — shipping dark, deciding with data</h3>
+      <p class="lvl">intermediate → decouple deploy from release; kill switches &amp; A/B rigor</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Flags exist to <b>decouple deploy from release</b>: code ships dark (merged, deployed, off), then turns on by audience — internal → 1% → 50% → all — with a <b>kill switch</b> that reverts in seconds without a deploy (the cheapest incident response that exists). Architecture requirements the round expects: flags evaluate <b>fast and local</b> (bootstrap the user's flag set at page load / edge-inject it — a blocking flag-service call on the render path is a new SPOF), <b>consistently</b> (same user, same answer across pages and sessions: hash userId+flagName deterministically — no coin flips per render), and <b>observably</b> (every evaluation logged with the §12 telemetry, or you can't debug "which variant did this user see?").</p>
+    <p><b>Experiments</b> are flags plus statistics: an A/B test is a flag whose variants are assigned by stable hash, exposure-logged, and judged on a <b>pre-registered metric</b>. The rigor that separates real answers: assignment ≠ exposure (only count users who actually <i>saw</i> the variant), don't peek-and-stop at the first significant wiggle, and mind the flicker bug — client-side flag resolution after first paint shows variant A for 200ms, then swaps to B: both branded into the user's retina and your metrics. SSR/edge evaluation kills the flicker.</p>
+    <div class="mcq" data-qid="fd-flag-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Checkout error rates spike 20 minutes after enabling a new payment-form flag at 50%. Walk the response.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Deploy a revert of the payment-form code</button>
+        <button class="mcq-opt" type="button" data-ok>Kill switch: flag to 0% — seconds, no deploy; errors should fall immediately (and the flag-tagged telemetry proves the variant caused it); then debug offline with the dark code still deployed</button>
+        <button class="mcq-opt" type="button">Raise to 100% to get clean data on the failure</button>
+        <button class="mcq-opt" type="button">Restart the frontend pods to clear flag caches</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> this is the entire ROI of flags condensed: rollback = a config change, blast radius was already capped at 50%, and telemetry segmented by variant (the observability requirement) turns "is it the flag?" from a debate into a graph. A code revert (A) costs a deploy cycle during an incident and un-ships code that was never the problem — the <i>flag state</i> was. "Deploys move code, flags move risk" is the sentence to leave behind.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Flag debt is real: every flag is a fork in your test matrix — expiry dates, owners, and a cleanup ritual are part of the architecture answer, not ops trivia.</li>
+        <li>Long-lived flags are a cache-key dimension (§06, again): variant belongs in the key or users get each other's UI from the CDN.</li>
+        <li>Types of flags deserve different machinery: release flags (temporary), ops kill-switches (permanent, tested like circuit breakers), entitlements (billing — not flags at all, don't conflate).</li>
+        <li>The stats one-liner that lands: "I pre-register the metric and the sample size; the dashboard going green early is exactly when I don't stop."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · RESILIENCE -->
 <section class="lesson" id="resilience">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">11</span>
     <div>
       <h3>Resilience &amp; a11y — the requirements that upgrade your level</h3>
       <p class="lvl">designing the unhappy paths first</p>
@@ -972,6 +1131,116 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
+<div class="band" id="band-advanced"><span>// advanced — measurement, systems &amp; multiplayer</span></div>
+
+<!-- 12 · RUM -->
+<section class="lesson" id="rum">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Frontend observability — RUM, error tracking &amp; session context</h3>
+      <p class="lvl">advanced → the client is a fleet of production servers you don't control</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 08 said "field decides, lab explains"; this section builds the field half. <b>RUM</b> (real-user monitoring) collects Web Vitals (LCP, INP, CLS) from actual sessions via <code>PerformanceObserver</code>, beaconed home (<code>sendBeacon</code> — survives tab close) and <b>segmented</b>: p75 by device class, country, connection — because your median MacBook user hides your p75 Android-on-3G reality, and Google's ranking reads the p75. <b>Error tracking</b> is the browser's version of the backend's structured logging: window.onerror + unhandledrejection, <b>sourcemapped</b> stacks (minified line 1 col 48291 is noise), grouped by fingerprint, with <b>release + flag context</b> attached — "did 2.3.1 introduce this? only under variant B?" is a query, not an investigation (the flags section's observability requirement, cashed in).</p>
+    <p>The discipline that makes it usable: <b>sample</b> (100% of errors, ~10% of session telemetry — volume is cost and privacy), <b>scrub PII</b> at the SDK level (URLs and breadcrumbs leak emails), and tie every beacon to a <b>session id</b> so one user's complaint becomes a replayable timeline — the nb request-id lesson, with the id living in the browser.</p>
+    <div class="mcq" data-qid="fd-rum-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Lighthouse scores 98 in CI, but conversion-critical pages feel slow to users in India. Where's the truth, and what do you instrument?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Lighthouse is right — perception is not measurable</button>
+        <button class="mcq-opt" type="button" data-ok>Lab runs on your hardware and network; RUM p75 segmented by geo/device/connection will show the real LCP/INP for that cohort — instrument vitals with segmentation, then use lab to reproduce the diagnosed condition</button>
+        <button class="mcq-opt" type="button">Re-run Lighthouse with 10x CPU throttling until it agrees</button>
+        <button class="mcq-opt" type="button">Move the CI runners to Mumbai</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> lab is a controlled experiment (great for regressions, CI budgets); the field is the population (great for truth). The workflow is a loop: RUM finds the cohort and metric (LCP p75 = 6s on Android/4G in India — likely CDN distance §edge, image weight, or JS on the critical path), lab reproduces under those conditions, the fix ships behind a flag, and RUM confirms the p75 moved. "Field decides, lab explains" — now with the machinery attached.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>INP replaced FID (2024) — a stale metric name dates the whole answer; INP = worst interaction latency, the metric concurrent React (react §12) exists to improve.</li>
+        <li>Session replay is the heavy tool: powerful for "can't reproduce", radioactive for privacy — mask-by-default, consent-gated, sampled. Saying the caveats IS the answer.</li>
+        <li>Error budgets meet frontend: alert on error-<i>rate</i> per release (not raw counts — traffic varies), auto-halt rollouts (§10) when the canary cohort's rate diverges.</li>
+        <li>The closing move in any design: "and the observability section — vitals p75 by segment, error rate by release, one dashboard per critical journey" — 15 seconds, rarely said, always noticed.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · DESIGN SYSTEM -->
+<section class="lesson" id="designsystem">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>Design systems at scale — tokens, theming &amp; versioned UI</h3>
+      <p class="lvl">advanced → the component library as infrastructure with consumers</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>"Design a component library for 40 teams" is an <b>infrastructure</b> question wearing UI clothes. The layer cake: <b>design tokens</b> at the bottom — named decisions (<code>--color-surface</code>, <code>--space-3</code>) published as CSS variables, THE theming mechanism: dark mode/white-labeling = swap token values, zero component changes (this very page works that way — one <code>--tint</code> flip). Above them, <b>primitives</b> (Button, Input — a11y baked in: the resilience section's "mechanisms" argument for why a11y lives in the system, not in each product team's backlog). Above those, <b>patterns</b> (DatePicker, DataTable) composed from primitives, with the component-API lessons from §03 governing their props.</p>
+    <p>The at-scale part is <b>versioning and migration</b>: the system is a dependency with 40 consumers — semver religiously, breaking changes ship with <b>codemods</b> (a migration script beats a migration document), deprecations warn for N versions before removal, and adoption is <i>measured</i> (which teams, which versions, which raw-HTML escapes) because a design system nobody upgrades is a museum. Governance in one line: contribution RFC process + a core team — "product teams propose, the system curates" — or it forks into five dialects within a year.</p>
+    <div class="mcq" data-qid="fd-ds-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Marketing needs the whole product white-labeled per enterprise customer (colors, logos, radii). The design-system answer?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A CSS override file per customer, loaded last</button>
+        <button class="mcq-opt" type="button" data-ok>Components consume only semantic tokens; a customer theme is a token-value set (validated for contrast), applied at the root — no component knows theming exists, and new customers are a config file, not a CSS project</button>
+        <button class="mcq-opt" type="button">Fork the component library per major customer</button>
+        <button class="mcq-opt" type="button">Rebuild the app with styled-components' theme prop everywhere</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> override stylesheets (A) fight specificity forever and break on every library update; forks (C) are five museums. The token indirection is the whole trick: components bind to <i>meaning</i> (surface, accent, danger), themes bind meaning to <i>values</i> — the same indirection as env-config for backends. The senior details: semantic tokens (not <code>--blue-500</code> — you can't theme a color named blue), and automated contrast validation per theme because customer-chosen yellows will fail WCAG (a11y as a mechanism again).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Two token tiers: primitive (<code>--gray-90</code>) → semantic (<code>--color-text</code>) — themes remap the semantic tier; the primitive palette is shared vocabulary.</li>
+        <li>Distribution reality: tree-shakeable package, SSR-safe styles, and versioned docs with live examples (Storybook-class) — docs ARE the product; an undocumented system loses to copy-paste.</li>
+        <li>Measure "system health" like a platform: adoption %, version spread, override frequency (high overrides = the API is wrong — §03's listening-to-consumers lesson).</li>
+        <li>The one-liner: "a design system is an API with a visual surface — version it, deprecate it, and treat its consumers like customers."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · COLLAB -->
+<section class="lesson" id="collab">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Collaborative &amp; multiplayer UI — presence, OT &amp; CRDTs, honestly</h3>
+      <p class="lvl">advanced → the "design Figma/Docs" round, from the client side</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Multiplayer features stack in difficulty, and pricing each tier correctly IS the interview. <b>Tier 1 — presence</b> (avatars, cursors): ephemeral state over the socket (async module's transport), throttled (cursor at ~30 msg/s max), interpolated for smoothness, expired by heartbeat — no persistence, no conflicts, ship it in a week. <b>Tier 2 — live-updating shared data</b> (dashboards, kanban): server-authoritative + optimistic local updates + last-write-wins per field — conflicts resolved by "someone wins", acceptable when edits rarely collide on the same field. <b>Tier 3 — concurrent text editing</b>: the hard one, because two people inserting at the same position must <b>converge without losing either edit</b>.</p>
+    <p>The two Tier-3 machines, one line each: <b>OT</b> (operational transforms) rewrites operations against concurrent ones ("your insert-at-5 becomes insert-at-9 because I inserted 4 chars before you") — needs a central sequencing server, powers Google Docs. <b>CRDTs</b> give every character a stable identity (fractional/tree positions) so concurrent inserts merge <i>commutatively</i> — order of arrival stops mattering, offline merges free, at the price of metadata overhead. The senior sentence: <b>"I would not build either — Yjs/Automerge for the engine; my design work is the integration"</b>: local echo (§04 optimistic), the socket fan-out (backend's chat), snapshot + op-log persistence, undo that undoes <i>my</i> ops only (collaborative undo is famously its own problem).</p>
+    <div class="mcq" data-qid="fd-collab-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">PM asks for "Google-Docs-style commenting" on report pages: threaded comments appearing live, occasionally two people editing the same comment draft. Which tier, and what do you NOT build?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Tier 3 — comments are text, text means CRDTs</button>
+        <button class="mcq-opt" type="button" data-ok>Tier 2 — live comment lists are shared data (socket + optimistic append + server order); a draft is single-author 99% of the time, so a soft lock/"X is typing" beats concurrent-merge machinery. No OT/CRDT unless simultaneous same-draft editing is a real requirement</button>
+        <button class="mcq-opt" type="button">Tier 1 — comments are just presence with text attached</button>
+        <button class="mcq-opt" type="button">Build a CRDT engine — libraries can't be trusted for core features</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the feature description says "live", not "co-edited" — appending distinct comments never conflicts (server assigns order; optimistic UI makes it feel instant). The one edge (two people in one draft) is cheaper to <i>prevent</i> (advisory lock, presence hint) than to <i>merge</i>. Jumping to CRDTs is résumé-driven architecture — and the interviewer set that trap on purpose. Right-sizing the tier, then naming the escalation path if requirements grow, is the entire answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Presence engineering has real numbers: throttle + batch cursor updates, interpolate between frames, expire on heartbeat loss (the nb websockets reaper, client-visible).</li>
+        <li>Optimistic + authoritative = client predicts, server sequences, client reconciles — say "local echo with server-assigned order" and both sides of the stack nod.</li>
+        <li>Offline + collaborative is where CRDTs genuinely earn it (merging divergent histories is their superpower) — tie to §07's outbox and the multiplayer story completes.</li>
+        <li>Collaborative undo: "undo MY last op, not the document's" — one sentence that proves you've actually thought about multiplayer editing.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -985,8 +1254,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <tr><td class="mono">03</td><td>components</td><td>Mechanism in the system, meaning in the product; render props are the extensibility valve.</td></tr>
       <tr><td class="mono">04</td><td>state</td><td>The two-minute audit: every piece of state, homed, with a reason. Machines for multi-step flows.</td></tr>
       <tr><td class="mono">05</td><td>data</td><td>Five layers (contract → transport → cache → mutations → persistence); normalize entities — the database argument, one layer up.</td></tr>
-      <tr><td class="mono">06</td><td>performance</td><td>Budgets with numbers, defended in CI, watched in RUM; field decides, lab explains.</td></tr>
-      <tr><td class="mono">07</td><td>resilience</td><td>Unhappy paths as requirements; degrade the smallest region; a11y raised at requirements, honored in mechanisms.</td></tr>
+      <tr><td class="mono">06</td><td>caching</td><td>Four layers, one question each: what key, who invalidates — immutable content + one fresh pointer.</td></tr>
+      <tr><td class="mono">07</td><td>offline</td><td>SW strategies per resource type; writes go to an outbox and replay with idempotency keys.</td></tr>
+      <tr><td class="mono">08</td><td>performance</td><td>Budgets with numbers, defended in CI, watched in RUM; field decides, lab explains.</td></tr>
+      <tr><td class="mono">09</td><td>i18n</td><td>Locale is routing + cache key + bundle split; strings are per-locale functions, never fragments.</td></tr>
+      <tr><td class="mono">10</td><td>flags</td><td>Deploys move code, flags move risk — stable hashing, kill switches, exposure-logged experiments.</td></tr>
+      <tr><td class="mono">11</td><td>resilience</td><td>Unhappy paths as requirements; degrade the smallest region; a11y raised at requirements, honored in mechanisms.</td></tr>
+      <tr><td class="mono">12</td><td>RUM</td><td>Field decides, lab explains — vitals p75 by segment, errors by release, one session id through it all.</td></tr>
+      <tr><td class="mono">13</td><td>design system</td><td>Semantic tokens → primitives → patterns; version it and treat consumers like customers.</td></tr>
+      <tr><td class="mono">14</td><td>multiplayer</td><td>Price the tier: presence → LWW shared data → OT/CRDT text — and rent the engine, never build it.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1000,6 +1276,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <ul>
       <li><b>The week-of sequence:</b> this module for depth → <a href="../frontend-system-design.html">the course</a> for drills and the night-before read → three timed RADIO passes out loud.</li>
       <li><b>Cross-module ammunition:</b> races (async §07), re-render discipline (react §06), normalization (postgres §02 + here §05), the systems half of feed/chat (<a href="./system-design-backend.html">system-design §07</a>). You hold both sides of every full-stack prompt.</li>
+      <li><b>The advanced band answers the follow-ups that decide levels:</b> the caching waterfall (06), offline writes (07), the flicker-free experiment (10), p75-by-cohort (12), tokens-as-API (13), and right-sizing multiplayer (14).</li>
       <li>Last stop on the track: <b>the interview kit</b> — stories, run sheets, and the planner that schedules all of this.</li>
     </ul>
   </div>

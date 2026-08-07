@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -677,6 +681,13 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#twopointers"><span><i class="dot" data-for="twopointers"></i> Two Pointers</span></a>
     <a class="side-link" href="#window"><span><i class="dot" data-for="window"></i> Sliding Window</span></a>
     <a class="side-link" href="#prefix"><span><i class="dot" data-for="prefix"></i> Prefix Sums</span></a>
+    <a class="side-link" href="#recursion"><span><i class="dot" data-for="recursion"></i> Recursion &amp; Complexity</span></a>
+    <a class="side-link" href="#hashing"><span><i class="dot" data-for="hashing"></i> Hashing Under the Hood</span></a>
+    <a class="side-link" href="#windowplus"><span><i class="dot" data-for="windowplus"></i> Window, Advanced</span></a>
+    <a class="side-link" href="#prefix2d"><span><i class="dot" data-for="prefix2d"></i> Diff Arrays &amp; 2D Prefix</span></a>
+    <a class="side-link" href="#matrix"><span><i class="dot" data-for="matrix"></i> Matrix Patterns</span></a>
+    <a class="side-link" href="#bits"><span><i class="dot" data-for="bits"></i> Bit Manipulation</span></a>
+    <a class="side-link" href="#math"><span><i class="dot" data-for="math"></i> Interview Math</span></a>
     <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Practice Ladder</span></a>
   </nav>
 
@@ -695,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -722,14 +733,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: pattern-picking under pressure</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>8</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>14</b> quiz questions</span>
     <span><b>1</b> growth explorer</span>
-    <span><b>18</b> verified LeetCode problems</span>
-    <span><b>~4h</b> self-paced</span>
+    <span><b>41</b> verified LeetCode problems</span>
+    <span><b>~9.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#bigo">Start with growth <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the vocabulary</span></div>
 
 <!-- 1 · BIG O -->
 <section class="lesson" id="bigo">
@@ -934,6 +947,8 @@ console.log('visit counts:', Object.fromEntries(counts));</code></pre>
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+<div class="band" id="band-intermediate"><span>// intermediate — the pattern toolkit</span></div>
+
 <!-- 4 · TWO POINTERS -->
 <section class="lesson" id="twopointers">
   <div class="lesson-head">
@@ -1149,10 +1164,568 @@ console.log('subarrays summing to 6:', countSubarrays([3, 1, 4, 1, 5, -4, 6], 6)
   </div>
 </section>
 
-<!-- 7 · PRACTICE -->
-<section class="lesson" id="practice">
+<!-- 7 · RECURSION -->
+<section class="lesson" id="recursion">
   <div class="lesson-head">
     <span class="lesson-num">07</span>
+    <div>
+      <h3>Recursion &amp; complexity — counting the call tree</h3>
+      <p class="lvl">intermediate → derive the O() instead of memorizing it</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every recursive function's cost is a tree-counting exercise: <b>how many calls happen, times the work per call.</b> Two shapes cover almost everything. <b>Branching</b>: a function that calls itself twice per level (naive Fibonacci) doubles the calls each level — 2<sup>n</sup> calls, exponential, dead on arrival past n≈40. <b>Halving</b>: a function that discards half the input per call (binary search, fast power) makes log n calls total. Branch factor and depth — that's the whole analysis.</p>
+    <p>The rescue for branching trees is <b>memoization</b>: cache results by argument, and the call tree collapses from "every path" to "every <i>distinct</i> subproblem" — Fibonacci drops from 2<sup>n</sup> to n calls with a five-line cache. That collapse is the entire secret of dynamic programming, previewed here and starred in the dsa-algorithms module.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Ask a cat her ancestry: she asks both parents, each parent asks <i>their</i> two parents… ten generations back you've disturbed 1,024 naps — and mostly asked the <b>same famous grandcat</b> hundreds of times. Memoization is the family notebook: first answer gets written down; every later asker reads the notebook instead of waking grandma. Same tree, but every cat answers <b>once</b>.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">call-counter.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// naive fib: 2 branches per call — watch the call count explode
+let calls = 0;
+function fibNaive(n) {
+  calls++;
+  return n &lt;= 1 ? n : fibNaive(n - 1) + fibNaive(n - 2);
+}
+for (const n of [10, 20, 28]) {
+  calls = 0;
+  const v = fibNaive(n);
+  console.log(`fib(${n}) = ${v} — ${calls.toLocaleString()} calls`);
+}
+
+// memoized: every distinct subproblem answered ONCE → n calls
+function fibMemo(n, memo = new Map()) {
+  calls++;
+  if (n &lt;= 1) return n;
+  if (memo.has(n)) return memo.get(n);
+  const v = fibMemo(n - 1, memo) + fibMemo(n - 2, memo);
+  memo.set(n, v);
+  return v;
+}
+calls = 0;
+console.log(`fibMemo(28) = ${fibMemo(28)} — ${calls} calls (was 1,028,457)`);
+
+// halving: fast power does log2(n) multiplications, not n
+function power(base, exp, depth = 0) {
+  console.log(`${'  '.repeat(depth)}power(${base}, ${exp})`);
+  if (exp === 0) return 1;
+  const half = power(base, Math.floor(exp / 2), depth + 1);
+  return exp % 2 === 0 ? half * half : half * half * base;
+}
+console.log('2^10 =', power(2, 10), '— 4 levels, not 10');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">832,040 calls vs 55 — the memo collapse, measured live</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <p>Two production notes. JS has no tail-call optimization in practice — recursion deeper than ~10,000 frames throws <code>RangeError: Maximum call stack size exceeded</code>; any recursion can be rewritten with an explicit stack (an array you push/pop), which is the standard fix and a favorite follow-up. And the master-theorem cases you'll actually meet: halve-and-do-constant-work → O(log n); halve-both-sides-and-merge → O(n log n) (merge sort); branch-twice-full-depth → O(2<sup>n</sup>).</p>
+    <div class="mcq" data-qid="dsf-rec-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Merge sort splits the array in half (recursing on both) and does O(n) merge work per level. Why is it O(n log n) and not O(n²)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Two recursive calls always mean O(2ⁿ)</button>
+        <button class="mcq-opt" type="button" data-ok>The tree is log n levels deep, and each LEVEL does O(n) total merge work across all its calls — n work × log n levels</button>
+        <button class="mcq-opt" type="button">Sorting is always O(n log n) by definition</button>
+        <button class="mcq-opt" type="button">The halves are sorted in parallel by the engine</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> count per <i>level</i>, not per call: level 0 merges n items in one call, level 1 merges n across two calls, level k merges n across 2ᵏ calls — always n per level. Halving means ~log₂n levels. Total: n·log n. This "sum the work per level of the call tree" move is how you derive any divide-and-conquer bound instead of reciting it.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>State the recursion contract before coding: <b>base case, smaller subproblem, combine</b> — interviewers listen for the base case <i>first</i> (it's the line everyone forgets).</li>
+        <li>"I'd memoize on the argument that defines the subproblem" — and know the cache key must capture <i>all</i> varying arguments, or the cache lies.</li>
+        <li>Stack-depth escape hatch: convert to iteration with an explicit array-stack. Same order, same complexity, no RangeError — say it before they ask.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/climbing-stairs/" target="_blank" rel="noopener noreferrer">70 · Climbing Stairs</a> · <a href="https://leetcode.com/problems/fibonacci-number/" target="_blank" rel="noopener noreferrer">509 · Fibonacci Number</a> · <a href="https://leetcode.com/problems/powx-n/" target="_blank" rel="noopener noreferrer">50 · Pow(x, n)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · HASHING -->
+<section class="lesson" id="hashing">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Hashing under the hood — why O(1) is (usually) true</h3>
+      <p class="lvl">intermediate → buckets, collisions &amp; the set-membership superpower</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 03 used maps as magic. Here's the trick: a <b>hash function</b> turns any key into a number, and <code>number % bucketCount</code> picks a shelf. Lookup jumps straight to that shelf — no searching. Two keys landing on one shelf is a <b>collision</b>; the shelf holds a little list you scan. With a decent hash and enough shelves (implementations resize at ~75% full), those lists stay ~1 item long — that's the "average O(1)". A terrible hash puts everything on one shelf and lookups degrade to O(n): "O(1) average, O(n) worst" is the honest full sentence.</p>
+    <p>The pattern this unlocks beyond counting: <b>membership as a primitive</b>. Longest Consecutive Sequence looks like sorting (O(n log n)) until you realize a Set answers "does x+1 exist?" in O(1) — walk each run from its start and you're O(n). Converting "search for it" into "ask the set" is the single most common optimization move in interviews.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">cubby-internals.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a tiny hash map from scratch — buckets, collisions and all
+class CubbyWall {
+  constructor(shelves = 8) { this.shelves = Array.from({ length: shelves }, () =&gt; []); }
+  hash(key) {                       // djb2-ish string hash
+    let h = 5381;
+    for (const c of key) h = (h * 33 + c.charCodeAt(0)) &gt;&gt;&gt; 0;
+    return h % this.shelves.length;
+  }
+  set(key, val) {
+    const shelf = this.shelves[this.hash(key)];
+    const hit = shelf.find(e =&gt; e[0] === key);
+    hit ? hit[1] = val : shelf.push([key, val]);
+  }
+  get(key) { return this.shelves[this.hash(key)].find(e =&gt; e[0] === key)?.[1]; }
+}
+const wall = new CubbyWall();
+['Mochi','Biscuit','Beans','Clawdia','Tuna','Salem'].forEach((c, i) =&gt; wall.set(c, i));
+console.log('Beans lives in cubby', wall.hash('Beans'), '→', wall.get('Beans'));
+console.log('shelf loads:', wall.shelves.map(s =&gt; s.length).join(' '), '(collisions share a shelf)');
+
+// the superpower: Longest Consecutive Sequence in O(n), no sort
+function longestRun(nums) {
+  const set = new Set(nums);
+  let best = 0;
+  for (const x of set) {
+    if (set.has(x - 1)) continue;        // not a run START — skip
+    let len = 1;
+    while (set.has(x + len)) len++;       // walk the run once, ever
+    best = Math.max(best, len);
+  }
+  return best;
+}
+console.log('longest consecutive run:', longestRun([100, 4, 200, 1, 3, 2, 101, 102, 103, 104]));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">a real hash map in 15 lines, then the set trick that beats sorting</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-hashing-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In <code>longestRun</code>, the while-loop sits inside a for-loop. Why is the whole thing O(n) and not O(n²)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Set.has is so fast the inner loop doesn't count</button>
+        <button class="mcq-opt" type="button" data-ok>The <code>set.has(x−1)</code> guard means only run-STARTS walk — every number is visited by a walk at most once across the entire execution</button>
+        <button class="mcq-opt" type="button">It is O(n²) — but n is small in interviews</button>
+        <button class="mcq-opt" type="button">JS Sets iterate in sorted order, so runs are contiguous</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> without the guard, a 1000-long run gets re-walked from every member — O(n²). With it, only <code>1</code> starts the walk of 1..1000; the other 999 members skip instantly. Total walking across ALL iterations ≤ n. Same amortized argument as the sliding window (section 05) — the budget belongs to the input, not the loop. Interviewers ask this exact "but isn't that nested?" follow-up.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Two-way mapping traps: Isomorphic Strings needs <b>both directions</b> checked (a→b AND nobody-else→b) — one map is the classic wrong answer.</li>
+        <li>Canonical-form keys: group anagrams by sorted word, dedupe boards by serialized state — "hash a <i>normalization</i> of the thing, not the thing".</li>
+        <li>JS specifics worth saying: object keys coerce to strings; <code>Map</code> keeps insertion order and takes any key type; a plain object inherits <code>toString</code> et al — <code>Object.create(null)</code> or Map for honest dictionaries.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/longest-consecutive-sequence/" target="_blank" rel="noopener noreferrer">128 · Longest Consecutive Sequence</a> · <a href="https://leetcode.com/problems/isomorphic-strings/" target="_blank" rel="noopener noreferrer">205 · Isomorphic Strings</a> · <a href="https://leetcode.com/problems/contains-duplicate-ii/" target="_blank" rel="noopener noreferrer">219 · Contains Duplicate II</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the variations that separate offers</span></div>
+
+<!-- 9 · WINDOW PLUS -->
+<section class="lesson" id="windowplus">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Sliding window, advanced — budgets, minimums &amp; exactly-K</h3>
+      <p class="lvl">advanced → the three variations that cover the rest of the family</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 05's window <i>maximized</i> under a hard rule. The family has three more shapes. <b>Budget windows</b>: the rule allows K violations (K distinct types, K zero-flips) — track spend, contract when over budget. <b>Minimum windows</b>: flip the logic — stretch until valid, then contract <i>while still valid</i>, recording the smallest. <b>Exactly-K</b>: don't write a new window at all — <code>exactly(K) = atMost(K) − atMost(K−1)</code>, two calls to a window you already have. That subtraction is a genuinely famous trick; producing it unprompted reads as deep fluency.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">window-variations.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · BUDGET: longest stretch with at most K distinct treat types (LC 904 shape)
+function atMostKDistinct(treats, k) {
+  const count = new Map();
+  let left = 0, best = 0;
+  for (let right = 0; right &lt; treats.length; right++) {
+    count.set(treats[right], (count.get(treats[right]) ?? 0) + 1);
+    while (count.size &gt; k) {                       // over budget → contract
+      const t = treats[left++];
+      count.get(t) === 1 ? count.delete(t) : count.set(t, count.get(t) - 1);
+    }
+    best = Math.max(best, right - left + 1);
+  }
+  return best;
+}
+const bowl = ['tuna','tuna','salmon','tuna','beef','beef','salmon'];
+console.log('longest with ≤2 types:', atMostKDistinct(bowl, 2));
+
+// 2 · MINIMUM: shortest run summing ≥ target (LC 209) — contract WHILE valid
+function minWindowSum(nums, target) {
+  let left = 0, sum = 0, best = Infinity;
+  for (let right = 0; right &lt; nums.length; right++) {
+    sum += nums[right];
+    while (sum &gt;= target) {                        // valid → try to shrink
+      best = Math.min(best, right - left + 1);
+      sum -= nums[left++];
+    }
+  }
+  return best === Infinity ? 0 : best;
+}
+console.log('shortest ≥ 7:', minWindowSum([2,3,1,2,4,3], 7));
+
+// 3 · EXACTLY-K, by subtraction — no third window needed
+function countAtMost(nums, k) {          // count subarrays with ≤ k distinct
+  const count = new Map();
+  let left = 0, total = 0;
+  for (let right = 0; right &lt; nums.length; right++) {
+    count.set(nums[right], (count.get(nums[right]) ?? 0) + 1);
+    while (count.size &gt; k) {
+      const t = nums[left++];
+      count.get(t) === 1 ? count.delete(t) : count.set(t, count.get(t) - 1);
+    }
+    total += right - left + 1;           // every window ending at right
+  }
+  return total;
+}
+const exactlyK = (nums, k) =&gt; countAtMost(nums, k) - countAtMost(nums, k - 1);
+console.log('subarrays with EXACTLY 2 distinct:', exactlyK([1,2,1,2,3], 2));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">three variations, one chassis — note what changed in each while-condition</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-winp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"Longest substring where you may replace at most 2 characters" — which variation, and what's the budget?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Minimum window — shrink while valid</button>
+        <button class="mcq-opt" type="button" data-ok>Budget window — spend = windowLength − countOfMostFrequentChar; contract when spend exceeds 2</button>
+        <button class="mcq-opt" type="button">Exactly-K via the subtraction trick</button>
+        <button class="mcq-opt" type="button">Prefix sums — replacements are range updates</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> that's Longest Repeating Character Replacement (LC 424): a window is fixable iff the non-majority characters inside it — <code>len − maxFreq</code> — fit the replacement budget. The generalizable insight: budget windows always reduce to "define what a violation costs, contract when the bill exceeds K". Wording → cost function is the entire solve.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The <code>total += right − left + 1</code> line in <code>countAtMost</code> counts <i>every valid window ending at right</i> in O(1) — the counting idiom that turns windows from "find best" into "count all".</li>
+        <li>Permutation-in-String (fixed-size window + frequency compare) is the fourth cousin: slide a size-|p| window and diff two count arrays.</li>
+        <li>Say the boundary out loud: windows need <b>monotonic validity</b> (growing can only break it, shrinking can only fix it). Negatives under a sum target break that — the escape hatch is prefix sums (06) or deque tricks (dsa-structures).</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/minimum-size-subarray-sum/" target="_blank" rel="noopener noreferrer">209 · Min Size Subarray Sum</a> · <a href="https://leetcode.com/problems/fruit-into-baskets/" target="_blank" rel="noopener noreferrer">904 · Fruit Into Baskets</a> · <a href="https://leetcode.com/problems/max-consecutive-ones-iii/" target="_blank" rel="noopener noreferrer">1004 · Max Consecutive Ones III</a> · <a href="https://leetcode.com/problems/permutation-in-string/" target="_blank" rel="noopener noreferrer">567 · Permutation in String</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · PREFIX 2D -->
+<section class="lesson" id="prefix2d">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Difference arrays &amp; 2D prefix sums — ranges, upgraded</h3>
+      <p class="lvl">advanced → batch range updates, and the integral-image formula</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Prefix sums (06) answered range <i>reads</i>. The <b>difference array</b> is its mirror for range <i>writes</i>: to add v to every day in [i..j], write <code>diff[i] += v; diff[j+1] −= v</code> — two writes, O(1), however wide the range. After all updates, one prefix-sum pass materializes the final array. A thousand seat-booking updates become 2,000 writes + one pass, instead of a thousand loops.</p>
+    <p>The <b>2D prefix sum</b> (the "integral image" in graphics) extends read-ranges to rectangles: precompute <code>P[r][c]</code> = sum of everything above-and-left, then any rectangle is <b>four lookups with inclusion-exclusion</b> — add the big corner, subtract the two overhangs, add back the doubly-subtracted corner. Same "pay once, answer forever" economics, one dimension up.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">ranges-upgraded.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · DIFFERENCE ARRAY: nap-room bookings (add cats to day ranges)
+const days = 10;
+const diff = new Array(days + 1).fill(0);
+const book = (from, to, cats) =&gt; { diff[from] += cats; diff[to + 1] -= cats; };
+book(0, 4, 2);    // 2 cats, days 0–4
+book(3, 7, 3);    // 3 more, days 3–7
+book(6, 9, 1);
+// materialize with ONE prefix pass:
+const occupancy = [];
+let cur = 0;
+for (let d = 0; d &lt; days; d++) { cur += diff[d]; occupancy.push(cur); }
+console.log('occupancy per day:', occupancy.join(' '));
+console.log('(three range updates → six writes + one pass, not three loops)');
+
+// 2 · 2D PREFIX: adoption counts on a floor grid
+const g = [
+  [1, 2, 0, 3],
+  [0, 1, 4, 1],
+  [2, 0, 1, 0],
+];
+const R = g.length, C = g[0].length;
+const P = Array.from({ length: R + 1 }, () =&gt; new Array(C + 1).fill(0));
+for (let r = 1; r &lt;= R; r++)
+  for (let c = 1; c &lt;= C; c++)
+    P[r][c] = g[r-1][c-1] + P[r-1][c] + P[r][c-1] - P[r-1][c-1];
+
+// rectangle (r1,c1)..(r2,c2) inclusive — four lookups:
+const rect = (r1, c1, r2, c2) =&gt;
+  P[r2+1][c2+1] - P[r1][c2+1] - P[r2+1][c1] + P[r1][c1];
+console.log('middle 2×2 block:', rect(0, 1, 1, 2));   // 2+0+1+4
+console.log('whole grid:', rect(0, 0, 2, 3));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the +1 sentinel row/column is what keeps the formula branch-free</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-pre2-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">An airline processes 100,000 "add k seats to flights i..j" updates, then reads final counts once. The difference array wins because…</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It compresses the data, using less memory</button>
+        <button class="mcq-opt" type="button" data-ok>Each update is O(1) regardless of range width — total O(updates + n) instead of O(updates × range)</button>
+        <button class="mcq-opt" type="button">It keeps the array sorted for binary search</button>
+        <button class="mcq-opt" type="button">It parallelizes the updates across workers</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a naive loop pays for every cell touched — 100k updates × 1k-wide ranges = 10⁸ writes. The diff array pays 2 writes per update plus one n-length pass at the end: ~200k + n. The catch to name: reads <i>between</i> updates force a materialize each time — diff arrays shine for <b>batch updates, then read</b>. (Interleaved reads+updates at scale is Fenwick-tree territory — dsa-trees-graphs.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>LC 1109 Corporate Flight Bookings is the difference array verbatim; Range Addition (premium) likewise — say the pattern name and interviewers hear "seen it, generalized it".</li>
+        <li>The 2D build and the 2D query use the <b>same inclusion-exclusion</b> — one formula to memorize, applied twice in mirror.</li>
+        <li>Matrix Block Sum (1314) = 2D prefix + clamping indices at the borders — the clamp is the whole difficulty.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/range-sum-query-immutable/" target="_blank" rel="noopener noreferrer">303 · Range Sum Query</a> · <a href="https://leetcode.com/problems/range-sum-query-2d-immutable/" target="_blank" rel="noopener noreferrer">304 · Range Sum 2D</a> · <a href="https://leetcode.com/problems/matrix-block-sum/" target="_blank" rel="noopener noreferrer">1314 · Matrix Block Sum</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · MATRIX -->
+<section class="lesson" id="matrix">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Matrix patterns — spirals, rotations &amp; in-place tricks</h3>
+      <p class="lvl">advanced → the 2D traversals every screen recycles</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Matrix questions look scary and are secretly bookkeeping. Three reusable machines: <b>the directions array</b> — <code>[[−1,0],[1,0],[0,−1],[0,1]]</code> turns "check all neighbors" into a four-iteration loop with one bounds guard (this exact loop reappears in every grid-BFS problem in dsa-trees-graphs). <b>Four shrinking bounds</b> — <code>top/bottom/left/right</code> walk a spiral: peel the top row, right column, bottom row, left column, shrink, repeat. <b>Decomposition</b> — a 90° clockwise rotation is <i>transpose, then reverse each row</i>: two trivial passes replacing one impossible-to-index formula.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>A cat inspecting a room of boxes doesn't invent a new route — she walks the <b>walls first, spiraling inward</b>, one lap per layer (the four bounds). And when you rotate her favorite blanket 90°, you don't move every tuft along some diagonal arc: <b>flip it over the diagonal, then flip left-to-right</b>. Two simple flips she'd approve of — composed, they're the rotation.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">grid-machines.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · SPIRAL — four bounds, peel and shrink
+function spiral(m) {
+  const out = [];
+  let top = 0, bottom = m.length - 1, left = 0, right = m[0].length - 1;
+  while (top &lt;= bottom &amp;&amp; left &lt;= right) {
+    for (let c = left; c &lt;= right; c++) out.push(m[top][c]);
+    top++;
+    for (let r = top; r &lt;= bottom; r++) out.push(m[r][right]);
+    right--;
+    if (top &lt;= bottom) { for (let c = right; c &gt;= left; c--) out.push(m[bottom][c]); bottom--; }
+    if (left &lt;= right) { for (let r = bottom; r &gt;= top; r--) out.push(m[r][left]); left++; }
+  }
+  return out;
+}
+const grid = [[1,2,3,4],[5,6,7,8],[9,10,11,12]];
+console.log('spiral:', spiral(grid).join(' '));
+
+// 2 · ROTATE 90° CW in place — transpose, then reverse rows
+function rotate(m) {
+  const n = m.length;
+  for (let r = 0; r &lt; n; r++)
+    for (let c = r + 1; c &lt; n; c++)
+      [m[r][c], m[c][r]] = [m[c][r], m[r][c]];   // transpose (swap across diagonal)
+  m.forEach(row =&gt; row.reverse());
+  return m;
+}
+console.log('rotated:', JSON.stringify(rotate([[1,2,3],[4,5,6],[7,8,9]])));
+
+// 3 · DIRECTIONS ARRAY — every neighbor loop you'll ever write
+const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+function neighbors(m, r, c) {
+  const out = [];
+  for (const [dr, dc] of DIRS) {
+    const nr = r + dr, nc = c + dc;
+    if (nr &gt;= 0 &amp;&amp; nr &lt; m.length &amp;&amp; nc &gt;= 0 &amp;&amp; nc &lt; m[0].length)
+      out.push(m[nr][nc]);
+  }
+  return out;
+}
+console.log('neighbors of center:', neighbors([[1,2,3],[4,5,6],[7,8,9]], 1, 1).join(' '));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">three machines — the DIRS loop returns in every graph problem you'll meet</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-mat-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Set Matrix Zeroes asks: zero out every row/column containing a 0 — in O(1) extra space. The standard trick?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Recurse so the call stack holds the state</button>
+        <button class="mcq-opt" type="button" data-ok>Use the matrix's own first row and column as the marker arrays, with two booleans remembering their own original state</button>
+        <button class="mcq-opt" type="button">It's impossible — O(m+n) markers are required</button>
+        <button class="mcq-opt" type="button">Zero cells immediately as you find them</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> you need per-row/per-column flags; the insight is the matrix already <i>contains</i> a row and a column you can sacrifice as flag storage (their own fate is tracked in two scalars). Zeroing immediately (option D) contaminates cells you haven't scanned. "Store the metadata inside the data" is a recurring in-place move — worth naming as a pattern, not a one-off.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Rotations compose: 90° CCW = transpose + reverse <i>columns</i>; 180° = reverse rows + reverse columns. Derive, don't memorize — say "transpose plus a flip, let me check which" out loud.</li>
+        <li>Spiral's two <code>if</code> guards protect single-row/single-column layers from double-visiting — the bug every first attempt has; mentioning it preempts the interviewer's test case.</li>
+        <li>Valid Sudoku is pure bookkeeping: 9 row-sets, 9 column-sets, 9 box-sets, one pass — box index is <code>3·⌊r/3⌋ + ⌊c/3⌋</code> (the only line worth pre-memorizing).</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/spiral-matrix/" target="_blank" rel="noopener noreferrer">54 · Spiral Matrix</a> · <a href="https://leetcode.com/problems/rotate-image/" target="_blank" rel="noopener noreferrer">48 · Rotate Image</a> · <a href="https://leetcode.com/problems/set-matrix-zeroes/" target="_blank" rel="noopener noreferrer">73 · Set Matrix Zeroes</a> · <a href="https://leetcode.com/problems/valid-sudoku/" target="_blank" rel="noopener noreferrer">36 · Valid Sudoku</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · BITS -->
+<section class="lesson" id="bits">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Bit manipulation — six tricks, not sixty</h3>
+      <p class="lvl">advanced → masks, XOR magic &amp; the n&amp;(n−1) family</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Bit questions feel like a foreign language until you learn that interviews recycle <b>six moves</b>. The mask toolkit: check bit i (<code>n &amp; (1&lt;&lt;i)</code>), set it (<code>n | (1&lt;&lt;i)</code>), clear it (<code>n &amp; ~(1&lt;&lt;i)</code>), toggle it (<code>n ^ (1&lt;&lt;i)</code>). Then the two celebrities: <b>XOR is a self-canceling pairing machine</b> — <code>x^x = 0</code>, <code>x^0 = x</code>, order irrelevant, so XOR-ing a whole array leaves exactly the unpaired element. And <b><code>n &amp; (n−1)</code> deletes the lowest set bit</b> — loop it to count bits in O(set bits), or test power-of-two in one expression (<code>n &gt; 0 &amp;&amp; (n &amp; (n−1)) === 0</code>).</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>XOR is the shelter's <b>pair-matching game</b>: every cat entering the room with a twin cancels out — poof, both leave. Whoever is <b>left standing at the end never had a twin</b>. It works regardless of entry order, and nobody needed a clipboard (no Set, no counts — O(1) space). That's Single Number, and it's why interviewers adore it: two lines if you know the game, unsolvable-looking if you don't.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">six-moves.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const b = (n) =&gt; (n &gt;&gt;&gt; 0).toString(2).padStart(8, '0');
+
+// the mask toolkit on one byte
+let flags = 0b01001010;
+console.log('start:   ', b(flags));
+console.log('check 3: ', !!(flags &amp; (1 &lt;&lt; 3)));
+flags |= (1 &lt;&lt; 0);  console.log('set 0:   ', b(flags));
+flags &amp;= ~(1 &lt;&lt; 6); console.log('clear 6: ', b(flags));
+flags ^= (1 &lt;&lt; 7);  console.log('toggle 7:', b(flags));
+
+// XOR pairing: the cat without a twin
+const room = [4, 7, 2, 7, 4, 9, 2];
+console.log('unpaired:', room.reduce((acc, x) =&gt; acc ^ x, 0));
+
+// n & (n-1): delete lowest set bit → popcount in O(set bits)
+function popcount(n) {
+  let count = 0;
+  while (n) { n &amp;= n - 1; count++; }
+  return count;
+}
+console.log('bits in 202 =', b(202), '→', popcount(202));
+const isPow2 = (n) =&gt; n &gt; 0 &amp;&amp; (n &amp; (n - 1)) === 0;
+console.log('powers of two in 1..17:',
+  Array.from({length: 17}, (_, i) =&gt; i + 1).filter(isPow2).join(' '));
+
+// shifts are ×2 / ÷2 — and JS bitwise ops work on SIGNED 32-bit ints
+console.log('5 &lt;&lt; 2 =', 5 &lt;&lt; 2, '· 40 &gt;&gt; 3 =', 40 &gt;&gt; 3);
+console.log('the JS trap: (2**31) | 0 =', (2 ** 31) | 0, ' (wrapped negative!)');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch the byte change per operation — the last line is the JS-specific trap</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-bits-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Every number in an array appears exactly twice except one. Why is XOR-reduce strictly better here than the (also correct) Set approach?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It's O(n) while the Set is O(n log n)</button>
+        <button class="mcq-opt" type="button" data-ok>Same O(n) time, but O(1) space — no auxiliary structure — and it can't miss: pairs annihilate algebraically regardless of order</button>
+        <button class="mcq-opt" type="button">XOR works on unsorted input; Sets require sorted</button>
+        <button class="mcq-opt" type="button">It isn't better — XOR fails on negative numbers</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> both are one pass; the Set holds up to n/2 entries while XOR holds one running integer. The follow-up interviewers keep ready: "every number appears <i>three</i> times except one" — XOR alone can't do it (pairs cancel, triples don't); the answer is per-bit counting mod 3. Knowing where the trick's boundary sits is worth more than the trick.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>JS-specific: bitwise operators coerce to <b>signed 32-bit</b> — fine ≤ 2³¹−1, silently wrong past it (<code>&gt;&gt;&gt;</code> for unsigned view; BigInt beyond). One sentence of this is a strong JS-fluency signal.</li>
+        <li>Counting Bits (338) in O(n): <code>bits[n] = bits[n &gt;&gt; 1] + (n &amp; 1)</code> — DP meeting bits; derive it by asking "what does shifting off the last bit preserve?"</li>
+        <li>XOR swap and add-without-plus (371) are carry-propagation curiosities — recognize them, don't volunteer them in real code.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/single-number/" target="_blank" rel="noopener noreferrer">136 · Single Number</a> · <a href="https://leetcode.com/problems/number-of-1-bits/" target="_blank" rel="noopener noreferrer">191 · Number of 1 Bits</a> · <a href="https://leetcode.com/problems/counting-bits/" target="_blank" rel="noopener noreferrer">338 · Counting Bits</a> · <a href="https://leetcode.com/problems/reverse-bits/" target="_blank" rel="noopener noreferrer">190 · Reverse Bits</a> · <a href="https://leetcode.com/problems/sum-of-two-integers/" target="_blank" rel="noopener noreferrer">371 · Sum of Two Integers</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · MATH -->
+<section class="lesson" id="math">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>Interview math — gcd, primes, mod &amp; the JS number trap</h3>
+      <p class="lvl">advanced → the four tools, and where JS numbers betray you</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Interview math is four tools, not a curriculum. <b>Euclid's gcd</b>: <code>gcd(a,b) = gcd(b, a%b)</code> until b hits 0 — three lines, O(log) time, and lcm falls out as <code>a/gcd·b</code>. <b>The sieve of Eratosthenes</b>: to find primes below n, cross off multiples of each prime — O(n log log n), effectively linear, always beats trial-dividing each candidate. <b>Modular arithmetic</b>: when answers overflow, problems say "return mod 10⁹+7" — the rule is mod after <i>every</i> add/multiply, because <code>(a·b) % m === ((a%m)·(b%m)) % m</code>. <b>Digit manipulation</b>: <code>n % 10</code> peels the last digit, <code>Math.floor(n/10)</code> drops it — the loop behind palindromes, digit sums, and happy numbers.</p>
+    <p>And the JS-specific landmine: numbers are doubles, exact only to <code>Number.MAX_SAFE_INTEGER</code> (2⁵³−1 ≈ 9×10¹⁵). Two large safe numbers multiplied can silently lose digits — <i>before</i> your <code>% m</code> runs. The fixes: mod early and often to keep values small, or switch the arithmetic to <code>BigInt</code>.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">four-tools.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · EUCLID — three lines, log time
+const gcd = (a, b) =&gt; b === 0 ? a : gcd(b, a % b);
+const lcm = (a, b) =&gt; a / gcd(a, b) * b;
+console.log('gcd(48, 18) =', gcd(48, 18), '· lcm =', lcm(48, 18));
+
+// 2 · SIEVE — primes below 50, crossing off multiples
+function sieve(n) {
+  const isPrime = new Array(n).fill(true);
+  isPrime[0] = isPrime[1] = false;
+  for (let p = 2; p * p &lt; n; p++)
+    if (isPrime[p])
+      for (let m = p * p; m &lt; n; m += p) isPrime[m] = false;  // start at p²!
+  return isPrime.reduce((acc, ok, i) =&gt; (ok &amp;&amp; acc.push(i), acc), []);
+}
+console.log('primes &lt; 50:', sieve(50).join(' '));
+
+// 3 · MOD DISCIPLINE — same computation, three ways
+const M = 1_000_000_007n;
+let exact = 1n;
+for (let i = 1n; i &lt;= 25n; i++) exact = (exact * i) % M;   // BigInt, mod each step
+console.log('25! mod 1e9+7 (BigInt, correct):', exact.toString());
+
+let sloppy = 1;
+for (let i = 1; i &lt;= 25; i++) sloppy = sloppy * i;          // overflows silently…
+console.log('25! as a double, THEN mod:', sloppy % 1_000_000_007, ' ← garbage');
+console.log('(25! has 26 digits; doubles hold ~16 — the mod came too late)');
+
+// 4 · DIGITS — palindrome check without strings
+function isPalindromeNum(n) {
+  let rev = 0, x = n;
+  while (x &gt; 0) { rev = rev * 10 + (x % 10); x = Math.floor(x / 10); }
+  return rev === n;
+}
+console.log('12321 palindrome?', isPalindromeNum(12321), '· 12331?', isPalindromeNum(12331));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">tool 3's garbage line is the trap — the overflow happened before the mod</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dsf-math-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does the sieve's inner loop start at <code>p·p</code> instead of <code>2·p</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Starting lower would cross off primes by mistake</button>
+        <button class="mcq-opt" type="button" data-ok>Every composite below p² has a prime factor smaller than p — so it was already crossed off in an earlier round</button>
+        <button class="mcq-opt" type="button">It prevents integer overflow in the multiplication</button>
+        <button class="mcq-opt" type="button">It's a micro-optimization with no correctness meaning</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> take 3: 6 was killed by 2's round; 3's first <i>new</i> victim is 9 = 3². In general any composite &lt; p² factors through some prime &lt; p. It's still just an optimization (2·p start is correct, slower) — but <i>explaining why it's safe</i> is the part that reads as understanding rather than recitation. Same energy as knowing trial division only needs to check up to √n.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>gcd shows up disguised: rotating arrays by k, gear/cycle problems, "when do two schedules align" (lcm). Name Euclid and move on — deriving it live is a flex nobody asked for.</li>
+        <li>Happy Number's loop-detection twist: repeated digit-square-sums either hit 1 or cycle — detect the cycle with a Set, or with Floyd's tortoise-and-hare for the O(1)-space encore (dsa-structures covers the hare).</li>
+        <li><code>Math.sqrt</code> is floating-point; for integer sqrt under interview rules, binary search the answer space (69 · Sqrt(x)) — which is secretly a preview of binary-search-on-answer in dsa-algorithms.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/count-primes/" target="_blank" rel="noopener noreferrer">204 · Count Primes</a> · <a href="https://leetcode.com/problems/happy-number/" target="_blank" rel="noopener noreferrer">202 · Happy Number</a> · <a href="https://leetcode.com/problems/sqrtx/" target="_blank" rel="noopener noreferrer">69 · Sqrt(x)</a> · <a href="https://leetcode.com/problems/factorial-trailing-zeroes/" target="_blank" rel="noopener noreferrer">172 · Factorial Trailing Zeroes</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · PRACTICE -->
+<section class="lesson" id="practice">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
     <div>
       <h3>The practice ladder — how to actually get good</h3>
       <p class="lvl">method → the 20-minute rule and pattern-first drilling</p>
@@ -1203,7 +1776,14 @@ console.log('subarrays summing to 6:', countSubarrays([3, 1, 4, 1, 5, -4, 6], 6)
       <tr><td class="mono">04</td><td>two pointers</td><td>Sorted pairs: each comparison PROVES one end can't win — retire it, step inward.</td></tr>
       <tr><td class="mono">05</td><td>sliding window</td><td>Contiguous best-run: stretch right, contract left, both only move forward — amortized O(n).</td></tr>
       <tr><td class="mono">06</td><td>prefix sums</td><td>Precompute running totals; any range is a subtraction; + a map, it counts exact-sum ranges.</td></tr>
-      <tr><td class="mono">07</td><td>practice</td><td>Pattern-first, 20-minute rule, rebuild from memory, re-solve in two days. Be like cat.</td></tr>
+      <tr><td class="mono">07</td><td>recursion</td><td>Count the call tree — branch factor × depth; memo collapses paths into distinct subproblems.</td></tr>
+      <tr><td class="mono">08</td><td>hashing</td><td>Buckets + collisions is all a map is; membership-as-a-primitive turns searches into lookups.</td></tr>
+      <tr><td class="mono">09</td><td>window, adv.</td><td>Budgets contract when overspent; minimums shrink while valid; exactly-K = atMost(K) − atMost(K−1).</td></tr>
+      <tr><td class="mono">10</td><td>diff &amp; 2D</td><td>Two writes per range update, one pass to materialize; any rectangle is four lookups.</td></tr>
+      <tr><td class="mono">11</td><td>matrix</td><td>The DIRS loop, four shrinking bounds, and rotate = transpose + reverse each row.</td></tr>
+      <tr><td class="mono">12</td><td>bits</td><td>XOR cancels pairs; n&amp;(n−1) deletes the lowest bit; JS bitwise is signed 32-bit — mind the wrap.</td></tr>
+      <tr><td class="mono">13</td><td>math</td><td>Euclid, sieve from p², mod at every step (or BigInt) — doubles lose digits past 2⁵³.</td></tr>
+      <tr><td class="mono">14</td><td>practice</td><td>Pattern-first, 20-minute rule, rebuild from memory, re-solve in two days. Be like cat.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1218,6 +1798,7 @@ console.log('subarrays summing to 6:', countSubarrays([3, 1, 4, 1, 5, -4, 6], 6)
       <li><b>Hear "find a pair / duplicate / count things"</b> → hash map or set, almost reflexively. Say the O(n) time / O(n) space trade unprompted.</li>
       <li><b>Hear "longest/shortest contiguous…"</b> → sliding window; <b>"sorted array + pairs"</b> → two pointers; <b>"many range queries / exact subarray sums"</b> → prefix sums. This trigger-phrase→pattern mapping is the whole game — <a href="../dsa.html#patterns">DSA in 48's pattern matcher</a> is the drill version.</li>
       <li><b>Always narrate complexity</b> as you code: "this pass is O(n), the sort dominates at O(n log n)". It's free points and it steers you away from accidental n².</li>
+      <li><b>Senior screens</b> reach into the advanced band: the exactly-K subtraction (09), an O(1)-space matrix trick (11), or “why is that O(n)?” amortized arguments (05, 08). Bits and math (12–13) are rarer but instant differentiators when they land.</li>
       <li>Next modules: <b>dsa-structures</b> (linked lists, stacks, queues, heaps — the machinery) then <b>dsa-trees-graphs</b>. The patterns here reappear inside both.</li>
     </ul>
   </div>

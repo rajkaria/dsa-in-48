@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 
 .ws-grid{display:grid;gap:16px;margin-top:20px}
@@ -684,9 +688,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <h4>// sections</h4>
     <a class="side-link" href="#stories"><span><i class="dot" data-for="stories"></i> The Story Bank</span></a>
     <a class="side-link" href="#pitch"><span><i class="dot" data-for="pitch"></i> The 90-Second Pitch</span></a>
+    <a class="side-link" href="#resume"><span><i class="dot" data-for="resume"></i> The Resume Pass</span></a>
+    <a class="side-link" href="#outreach"><span><i class="dot" data-for="outreach"></i> The Pipeline</span></a>
     <a class="side-link" href="#mockloop"><span><i class="dot" data-for="mockloop"></i> Mock-Loop Run Sheets</span></a>
     <a class="side-link" href="#questions"><span><i class="dot" data-for="questions"></i> Questions, Both Ways</span></a>
+    <a class="side-link" href="#sdrubric"><span><i class="dot" data-for="sdrubric"></i> The SD Rubric</span></a>
+    <a class="side-link" href="#takehome"><span><i class="dot" data-for="takehome"></i> Take-Homes</span></a>
     <a class="side-link" href="#offer"><span><i class="dot" data-for="offer"></i> The Offer</span></a>
+    <a class="side-link" href="#comp"><span><i class="dot" data-for="comp"></i> Comp Literacy</span></a>
+    <a class="side-link" href="#decision"><span><i class="dot" data-for="decision"></i> The Decision Matrix</span></a>
     <a class="side-link" href="#planner"><span><i class="dot" data-for="planner"></i> The 4-Week Planner</span></a>
     <a class="side-link" href="#rituals"><span><i class="dot" data-for="rituals"></i> Day-Before Rituals</span></a>
   </nav>
@@ -700,11 +710,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/2</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
     </div>
     <p class="progress-note">progress, worksheets + theme save in this browser.</p>
   </div>
@@ -726,13 +736,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">output: a filled-in, reusable kit</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>12</b> saved worksheets</span>
+    <span><b>13</b> sections</span>
+    <span><b>18</b> saved worksheets</span>
     <span><b>1</b> study planner</span>
-    <span><b>~3h</b> + ongoing</span>
+    <span><b>~6.5h</b> + ongoing</span>
   </div>
   <a class="btn" href="#stories">Open the workbook <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// before the loop — the paper trail</span></div>
 
 <!-- 1 · STORIES -->
 <section class="lesson" id="stories">
@@ -798,10 +810,90 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 3 · MOCK LOOP -->
-<section class="lesson" id="mockloop">
+<!-- 3 · RESUME -->
+<section class="lesson" id="resume">
   <div class="lesson-head">
     <span class="lesson-num">03</span>
+    <div>
+      <h3>The resume pass — six seconds, then the robot</h3>
+      <p class="lvl">before the loop → the document that decides if there IS a loop</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Two readers, neither of them careful: an ATS keyword-matcher, then a human giving it <b>six seconds</b>. Format for both at once: one page (two if 10+ years), no columns/graphics/photos (ATS parsers shred them), reverse-chronological, and the skills the JD names appearing <i>verbatim</i> where true — the robot matches strings, not synonyms. The human's six seconds land on: current title, company, first bullet of the top role. Those four things ARE the first impression; engineer them.</p>
+    <p>The bullet formula that survives both readers: <b>strong verb + what you built + measurable outcome</b> — "Built idempotent payment-webhook processing (Node, SQS), cutting duplicate charges to zero across 40k orders/mo." Not responsibilities ("responsible for backend services") — <b>receipts</b>. Numbers anchor credibility even when approximate: latency shaved, revenue touched, users served, incidents prevented. One rewrite drill below; the standard is "could a stranger verify this in the interview by asking one follow-up?" — because a good interviewer will.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-bullets">The bullet rewrite drill <span>paste your three weakest bullets; rewrite each as verb + built-what + outcome-number</span></label><textarea id="ws-bullets" data-wskey="resume-bullets" rows="7" placeholder="BEFORE: responsible for maintaining the API layer&#10;AFTER: Rebuilt the orders API's N+1-riddled endpoints (Express + Postgres), taking p95 from 2.1s to 180ms for 30k daily users&#10;&#10;BEFORE: …&#10;AFTER: …"></textarea></div>
+    </div>
+    <div class="mcq" data-qid="ik-res-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">JD says "experience with Kubernetes". You've run ECS for three years, touched k8s in a side project. The resume move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">List Kubernetes prominently — close enough, and the robot needs it</button>
+        <button class="mcq-opt" type="button" data-ok>List it truthfully-scoped ("container orchestration: ECS 3yr production; Kubernetes: personal projects") — the string matches for the ATS, and the scoping survives the follow-up question you WILL get</button>
+        <button class="mcq-opt" type="button">Omit it — never list anything below expert level</button>
+        <button class="mcq-opt" type="button">List it and cram a k8s course before the interview</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the resume's claims get load-tested live — "tell me about your k8s setup" against an inflated bullet is how strong loops die in round one. Truthful scoping passes the keyword filter AND converts the follow-up into an honest strength ("deep on ECS, conversant in k8s, orchestration concepts transfer"). Omitting (C) fails the robot for no reason. The principle generalizes: every line is a question you're inviting; only invite the ones you want.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what actually moves the needle</h6>
+      <ul>
+        <li>Tailoring is 15 minutes, not a rewrite: reorder bullets so the JD-relevant ones lead, and mirror the JD's vocabulary where true.</li>
+        <li>LinkedIn is the inbound half: same headline formula, "open to work" (recruiters-only mode exists), and the About section is your 90-second pitch (§02) in writing.</li>
+        <li>Projects section earns its space only with receipts (users, stars, "this page you're reading") — otherwise cut for whitespace; recruiters read density as desperation.</li>
+        <li>The file itself: <code>FirstLast_Role.pdf</code>, text-selectable (parse-test it by copy-pasting into a text editor — what garbles for you garbles for the ATS).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 4 · OUTREACH -->
+<section class="lesson" id="outreach">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>The pipeline — referrals, recruiters &amp; parallel timing</h3>
+      <p class="lvl">before the loop → job search as a funnel you operate, not a lottery you enter</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Cold applications convert at ~1-2%; <b>referrals</b> at 10x that — so the search is a pipeline problem: top of funnel (referrals first: former colleagues, alumni, meetup contacts — the ask is small and specific: "would you be comfortable referring me for [exact role]? two-line blurb attached"), middle (recruiter screens — the 90-second pitch's home turf), bottom (loops). Operate it with a tracker (worksheet below): company, stage, next action, dates — because the search's real killer is dropped threads, not rejections.</p>
+    <p>The strategic layer is <b>timing</b>: offers expire, so loops must land <i>together</i>. Sequence: warm-up loops first (companies you're lukewarm on — free mock interviews with real stakes), targets second, and batch the applications so on-sites cluster inside two weeks. One live offer is the strongest possible accelerant for every other pipeline ("I have an offer with a deadline" moves recruiters like nothing else) — and that only works if the funnel was parallel, not serial.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-pipeline">The pipeline tracker <span>one line per company: stage, next action, dates — update after every touch</span></label><textarea id="ws-pipeline" data-wskey="outreach-pipeline" rows="8" placeholder="CompanyA · referral (Raj K) · recruiter screen 8/12 · WARM-UP&#10;CompanyB · applied 8/6 · follow up 8/13 if silent · TARGET&#10;CompanyC · referral pending (asked Priya 8/5) · nudge 8/9&#10;…"></textarea></div>
+    </div>
+    <div class="mcq" data-qid="ik-out-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Dream-company recruiter calls TODAY, but you haven't interviewed anywhere in two years. Take the loop now?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — momentum beats preparation; you might not get another shot</button>
+        <button class="mcq-opt" type="button" data-ok>Express strong interest and negotiate 3-4 weeks of runway ("wrapping a project; can we schedule for the week of X?") — then spend it on the planner + two warm-up loops. Recruiters grant this routinely; rusty at your dream company is the expensive mistake</button>
+        <button class="mcq-opt" type="button">Decline until fully prepared — six months of grinding first</button>
+        <button class="mcq-opt" type="button">Take it cold as a scouting run and plan to reapply</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> scheduling is soft — recruiters juggle calendars for weeks as a matter of course, and "excited, need three weeks" costs nothing. Burning the real target as a warm-up (D) is backwards sequencing (cooldown periods are 6-12 months); infinite delay (C) is fear wearing a plan. The meta-lesson is that the funnel has <i>controls</i> — dates are negotiable, order is choosable — and operators use them.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what actually moves the needle</h6>
+      <ul>
+        <li>The referral ask that works: specific role + link + two-line blurb + explicit out ("totally fine to say no"). You're drafting their internal message for them.</li>
+        <li>Follow-up cadence: one polite nudge after 7 quiet days, then move on — the tracker's "next action" column exists so silence never dangles.</li>
+        <li>Rejections are data: screen-stage rejections → resume problem (§03); post-loop → drill the cracked round (the debrief log, §05). Route the signal, skip the grief.</li>
+        <li>Keep the pipeline warm even when happy: a coffee chat per month costs nothing and turns the next search from cold-start into warm-start. (The planner's "ongoing" column, socialized.)</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-intermediate"><span>// the loop — rehearsal &amp; rubrics</span></div>
+
+<!-- 5 · MOCK LOOP -->
+<section class="lesson" id="mockloop">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
     <div>
       <h3>Mock-loop run sheets — rehearse the whole day</h3>
       <p class="lvl">simulate the loop before the loop simulates you</p>
@@ -828,10 +920,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 4 · QUESTIONS -->
+<!-- 6 · QUESTIONS -->
 <section class="lesson" id="questions">
   <div class="lesson-head">
-    <span class="lesson-num">04</span>
+    <span class="lesson-num">06</span>
     <div>
       <h3>Questions, both ways — the banks and the reversal</h3>
       <p class="lvl">what they'll ask, and the questions YOU ask</p>
@@ -847,10 +939,87 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 5 · OFFER -->
+<!-- 7 · SD RUBRIC -->
+<section class="lesson" id="sdrubric">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>The system-design rubric — what the grader's sheet actually says</h3>
+      <p class="lvl">the loop → score yourself the way they score you</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Design interviewers file structured feedback, and the axes barely vary across companies: <b>problem navigation</b> (did you scope requirements and drive, or wait to be steered?), <b>quantitative grounding</b> (the envelope — numbers before architecture), <b>breadth</b> (a complete skeleton: client → edge → service → data → async), <b>depth on demand</b> (two layers deeper wherever probed — this is where the sd/fesd modules' advanced bands pay), <b>tradeoff articulation</b> (every choice priced against its alternative), and <b>seniority signals</b> (failure modes volunteered, operability mentioned, right-sized solutions — the "I would NOT build" sentences). Juniors present architectures; seniors <b>narrate decisions</b> — same boxes, different soundtrack, and the rubric only hears the soundtrack.</p>
+    <p>Self-scoring after every mock (worksheet below) converts the rubric from trivia into a training loop: score 1-5 per axis, drill the lowest axis before the next mock, re-score. Two mocks of targeted repair beat ten of general rehearsal.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-sdrubric">Rubric self-scores <span>after each mock design: 1-5 per axis + the one drill for the lowest</span></label><textarea id="ws-sdrubric" data-wskey="sd-rubric" rows="7" placeholder="8/09 · design a rate limiter&#10;navigation 4 · numbers 2 (!) · breadth 4 · depth 3 · tradeoffs 3 · seniority 2&#10;drill: open EVERY design with the envelope — no architecture before arithmetic&#10;&#10;8/16 · design chat …"></textarea></div>
+    </div>
+    <div class="mcq" data-qid="ik-sdr-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Two candidates draw identical feed architectures. A explains as: "posts go to the queue, then fan out to feed lists in Redis." B: "reads outnumber writes 100:1 here, so I precompute feeds at write time — the cost is write amplification for big accounts, which I'd cap with a hybrid pull for celebrities." Who levels higher, and which axes?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Equal — the architecture is what's graded</button>
+        <button class="mcq-opt" type="button" data-ok>B, decisively — quantitative grounding (the ratio drove the choice), tradeoff articulation (cost named), and seniority (the failure case pre-empted with a mitigation). A described plumbing; B defended a decision</button>
+        <button class="mcq-opt" type="button">A — concise answers score above elaborated ones</button>
+        <button class="mcq-opt" type="button">B, but only because celebrity-handling is a memorized trick</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the drawing is maybe a third of the grade; the rubric's other axes live entirely in the narration. B's three sentences hit three axes A left blank — with the <i>same design</i>. This is why rubric-aware practice compounds: you're not learning more architecture, you're learning to emit the evidence the sheet is listening for. (And D's cynicism inverts: tricks become judgment precisely when you attach the reasoning.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what the graders talk about after</h6>
+      <ul>
+        <li>The strongest single habit: close every component with its failure story unprompted — "if Redis dies here, we degrade to…" hits depth + seniority in one breath (the sd module's closing ritual, now explained by WHY it works).</li>
+        <li>Level calibration in one line: mid = completes the design when steered; senior = drives and prices tradeoffs; staff = questions the requirements and right-sizes ("do we need multi-region for this?").</li>
+        <li>Silence reads as absence: unsaid reasoning scores zero — narrate even the obvious ("SQL here, nothing exotic — access patterns are relational and scale is modest").</li>
+        <li>Ask your mock partner to grade THE AXES, not vibes — "was I quantitative?" gets actionable answers where "how did I do?" gets kindness.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · TAKE-HOME -->
+<section class="lesson" id="takehome">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Take-homes — scope like a senior, README like a marketer</h3>
+      <p class="lvl">the loop → the assignment is "how do you work?", answer THAT</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A take-home isn't graded on features shipped — it's a proxy for "what's this person like as a colleague?" The winning shape: <b>a small core, executed excellently</b> — working happy path, honest error handling on the paths that matter, a few well-chosen tests (the judgment of WHICH things you tested is itself graded), clean naming, and <b>zero half-finished stretch goals</b>. Six polished hours beat sixteen sprawling ones; reviewers smell scope-creep as poor judgment, not ambition.</p>
+    <p>The <b>README is half the grade</b>: how to run it in two commands, what you built, and — the section that levels you — <b>decisions and tradeoffs</b>: "SQLite over Postgres for reviewer-runs-it-in-one-command; the repository layer makes swapping trivial. Skipped auth per the brief; here's where it would slot. With another day: X, then Y." That paragraph does what the design-round soundtrack does (§07): it converts your code from an artifact into a narrated decision. Timebox honestly (if it says 4 hours, spend ≤6 and <i>say so</i>), and make it run first try — a reviewer who can't <code>npm i && npm start</code> stops reading.</p>
+    <div class="mcq" data-qid="ik-th-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Four hours into a "build a URL shortener API" take-home, you have a clean core. Two remaining hours: which spend wins?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Add auth, rate limiting AND analytics — breadth shows drive</button>
+        <button class="mcq-opt" type="button" data-ok>Tests on the core (collision handling, the redirect, one edge case), error-path polish, and the README's decisions section — depth on what exists beats stubs of what doesn't</button>
+        <button class="mcq-opt" type="button">A React frontend — full-stack impresses</button>
+        <button class="mcq-opt" type="button">Dockerize + deploy it live with CI</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> reviewers run the happy path, poke one error, read the tests, read the README — your two hours should land exactly where their twenty minutes go. Three half-features (A) read as "starts things"; an unrequested frontend (C) reads as "ignores briefs". Deploy/CI (D) is the one defensible alternative <i>if</i> the role is infra-flavored — knowing the audience decides the tiebreak, which is the actual skill under test.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what reviewers notice in the first five minutes</h6>
+      <ul>
+        <li>Commit history tells your story too: small, described commits read as method; one "final" commit reads as chaos survived.</li>
+        <li>Seed data + a <code>.env.example</code> + an http file/curl block = a reviewer productive in 90 seconds. Friction is failure.</li>
+        <li>If you exceed the timebox, say so in the README ("brief said 4h; I spent 6 — the extra went to tests") — honesty about time is itself a signal.</li>
+        <li>The follow-up call walks YOUR code — re-read it the morning of, and be ready to extend it live ("add expiring links") in your own architecture. Home-turf advantage only helps if you still know the turf.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// after the loop — money &amp; the decision</span></div>
+
+<!-- 9 · OFFER -->
 <section class="lesson" id="offer">
   <div class="lesson-head">
-    <span class="lesson-num">05</span>
+    <span class="lesson-num">09</span>
     <div>
       <h3>The offer — the ten minutes worth lakhs</h3>
       <p class="lvl">negotiation basics nobody teaches engineers</p>
@@ -866,10 +1035,85 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 6 · PLANNER -->
+<!-- 10 · COMP -->
+<section class="lesson" id="comp">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Comp literacy — reading an offer like a balance sheet</h3>
+      <p class="lvl">after the loop → base, bonus, equity: what each is actually worth</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 09 armed your numbers; this section makes sure you're pricing the right thing. <b>Total comp = base + bonus + equity/year</b>, and the three are different animals: base is certain and compounds (raises/bonuses percent off it); bonus is "target %" — ask what the team actually hit the last two years; equity is <i>maybe</i>-money whose value depends on what the company is. <b>Public company RSUs</b>: shares × price, real money on a <b>vesting schedule</b> (4 years, often a 1-year cliff — leave at month 11, get nothing). <b>Startup options</b>: a <i>strike price</i> to buy shares that are illiquid until an exit — price them honestly by asking: latest 409A vs strike (the spread is today's paper value), preferred vs common (investors exit first), exercise window if you leave (90 days to pay cash for paper is the classic trap). The one-line calibration: RSUs at FAANG ≈ salary; options at a seed startup ≈ a lottery ticket you should value near zero when comparing against certain money.</p>
+    <p>The scripts that do the work: on being asked expectations first — "I'd like to understand the full picture before naming numbers; what's the range for this level?" (they have a range; anchoring first against yourself is the classic loss). On the offer — gratitude + "I'd like a few days" (never accept live), then the counter with a reason attached: "Company B is at X total / levels.fyi shows Y for this level — can we close the gap on equity or base?" Recruiters expect the counter; the first number is almost never the last.</p>
+    <div class="mcq" data-qid="ik-comp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Offer A: ₹45L base + ₹15L/yr public-company RSUs. Offer B: ₹48L base + options "worth ₹30L/yr" at a Series-B startup. How do you compare them?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">B wins — 78L beats 60L</button>
+        <button class="mcq-opt" type="button" data-ok>Compare certain money first (A: ~60L real; B: 48L real + a call option) — then price B's upside consciously: ask strike vs 409A, preference stack, exercise window, and decide how much lottery you're buying WITH EYES OPEN. Either choice can be right; pricing options at face value never is</button>
+        <button class="mcq-opt" type="button">A wins — startup equity is always worthless</button>
+        <button class="mcq-opt" type="button">Take whichever has the higher title</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "worth ₹30L/yr" is the company's own projection of its own success — RSUs you can sell on vest day are a different asset class from options behind a preference stack and an exit that may never come. The adult version isn't cynicism (C) — startups mint real fortunes — it's <i>informed</i> risk: know the four numbers, decide your lottery budget, and negotiate B's base up precisely because its equity is uncertain. That last move — "your equity is risky, so certain comp must carry more" — is the negotiation sentence this section exists to teach.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — the details that change outcomes</h6>
+      <ul>
+        <li><b>Level beats percent:</b> a level bump moves every future number; if the offer is maxed for the level, negotiate the level (or the review date: "L+1 review at 6 months, in writing").</li>
+        <li>Sign-on bonuses are the gap-closer companies prefer (one-time, doesn't compound) — take it knowingly, and check the clawback period.</li>
+        <li>Ask about refreshers: initial grants deplete after year 4 (the "vesting cliff" of year-5 comp) — companies with strong refresh cultures compound; ones without quietly cut your pay in year five.</li>
+        <li>Everything in writing before resigning anywhere — verbal comp promises are weather.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · DECISION -->
+<section class="lesson" id="decision">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>The decision matrix — choosing when both offers are good</h3>
+      <p class="lvl">after the loop → decide with your weights, not your recency bias</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Two good offers is a champagne problem that still ruins sleep, because comp is the <i>easiest</i> axis to compare and rarely the one that decides your next two years. The matrix (worksheet below): list YOUR axes — growth (who will you learn from? seniors above you or a title with no mentors?), scope (what will you own?), manager (the interview was them interviewing too — what did you observe?), team health (ask THEM: on-call load, last incident, attrition), comp (from §10, priced honestly), stability/risk appetite, commute/remote, mission-if-you-care. <b>Weight the axes first</b> (before scoring! — weights chosen after peeking are rationalizations), score each offer 1-5, multiply, sum.</p>
+    <p>Then the honest part: the matrix's job is usually to <b>reveal</b> your decision, not make it — if the total says A and your stomach sinks, the weights were wrong; fix them and notice <i>which</i> weight you moved (that's the real priority talking). Timing collisions get the §04 playbook: ask A for a week citing an in-flight process ("I want to decide with complete information — deadlines this tight usually flex"), tell B a decision date exists. Exploding offers that truly won't flex are themselves data about the company.</p>
+    <div class="ws-grid">
+      <div class="ws"><label for="ws-decision">The decision matrix <span>axes × weights first, then scores — and note which weight your gut corrected</span></label><textarea id="ws-decision" data-wskey="offer-decision" rows="8" placeholder="axis (weight) · offer A · offer B&#10;growth/mentors (30%) · 4 · 2&#10;scope (20%) · 3 · 5&#10;manager signal (20%) · 4 · 3&#10;comp, honest (20%) · 3 · 4&#10;stability (10%) · 4 · 2&#10;totals: …&#10;gut-check: wanted B until I weighted mentorship honestly…"></textarea></div>
+    </div>
+    <div class="mcq" data-qid="ik-dec-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Offer A explodes Friday; dream-company B's onsite is next Wednesday. The strongest play?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Accept A, keep interviewing at B, renege if B lands</button>
+        <button class="mcq-opt" type="button" data-ok>Work both clocks: tell A you're finishing a committed process and ask for late-next-week (citing another offer, deadlines usually stretch); tell B you have an exploding offer and ask to compress — recruiters expedite for exactly this. If A truly won't move, decide A on its own merits by Friday</button>
+        <button class="mcq-opt" type="button">Withdraw from B — an offer in hand ends the search</button>
+        <button class="mcq-opt" type="button">Let A expire — dream companies deserve clean shots</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> both deadlines are softer than they present — A's recruiter would rather extend than lose a yes, and B's would rather expedite than lose you to a deadline; you're the only party not using the phone. Accept-then-renege (A) burns a network you'll meet again (do it only with real justification and open eyes — it happens, it costs). The worksheet's role: if A-won't-budge arrives, you decide A against your <i>weights</i>, not against a fantasy of B — "would I take A if B didn't exist?" is the question that cuts through.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — the questions that out-predict the matrix</h6>
+      <ul>
+        <li>Ask every prospective manager: "what did the last person in this role do next?" — trajectory of predecessors beats any pitch.</li>
+        <li>Attrition question, phrased answerable: "how many of the team were here a year ago?" — hesitation IS the answer.</li>
+        <li>The two-years test: "which offer makes the BEST possible version of 2028-me?" — comp differences fade; compounding skill/scope gaps don't.</li>
+        <li>Decline the loser warmly and specifically — "chose more mentorship-heavy" — recruiters remember gracious no's; the pipeline (§04) is forever.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · PLANNER -->
 <section class="lesson" id="planner">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">12</span>
     <div>
       <h3>The 4-week planner — the whole track, scheduled</h3>
       <p class="lvl">from "where do I start" to a calendar</p>
@@ -912,10 +1156,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 7 · RITUALS -->
+<!-- 13 · RITUALS -->
 <section class="lesson" id="rituals">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">13</span>
     <div>
       <h3>Day-before &amp; day-of — the rituals</h3>
       <p class="lvl">boring on purpose; boring is what works under adrenaline</p>
@@ -938,11 +1182,17 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <tbody>
       <tr><td class="mono">01</td><td>six STAR+ stories</td><td>every behavioral question, mapped via the Behavioral course</td></tr>
       <tr><td class="mono">02</td><td>the 90-second pitch</td><td>the opening of every single round</td></tr>
-      <tr><td class="mono">03</td><td>mock-loop run sheets + debriefs</td><td>weekly during prep; the reset ritual mid-loop for real</td></tr>
-      <tr><td class="mono">04</td><td>question routing + your question set</td><td>night-before (theirs) and last-five-minutes (yours)</td></tr>
-      <tr><td class="mono">05</td><td>numbers decided in advance</td><td>the offer call — gratitude, delay, negotiate total + level</td></tr>
-      <tr><td class="mono">06</td><td>the 4-week planner</td><td>today</td></tr>
-      <tr><td class="mono">07</td><td>the rituals</td><td>every day-before and day-of, forever</td></tr>
+      <tr><td class="mono">03</td><td>a resume that survives both readers</td><td>before anything else — it decides if there IS a loop</td></tr>
+      <tr><td class="mono">04</td><td>the pipeline tracker</td><td>weekly — referrals first, loops batched to land together</td></tr>
+      <tr><td class="mono">05</td><td>mock-loop run sheets + debriefs</td><td>weekly during prep; the reset ritual mid-loop for real</td></tr>
+      <tr><td class="mono">06</td><td>question routing + your question set</td><td>night-before (theirs) and last-five-minutes (yours)</td></tr>
+      <tr><td class="mono">07</td><td>rubric self-scores</td><td>after every mock design — drill the lowest axis</td></tr>
+      <tr><td class="mono">08</td><td>the take-home playbook</td><td>small core, tests on what exists, README with decisions</td></tr>
+      <tr><td class="mono">09</td><td>numbers decided in advance</td><td>the offer call — gratitude, delay, negotiate total + level</td></tr>
+      <tr><td class="mono">10</td><td>comp literacy</td><td>the offer call — price equity honestly, negotiate the level</td></tr>
+      <tr><td class="mono">11</td><td>the decision matrix</td><td>two good offers — weights before scores, gut as auditor</td></tr>
+      <tr><td class="mono">12</td><td>the 4-week planner</td><td>today</td></tr>
+      <tr><td class="mono">13</td><td>the rituals</td><td>every day-before and day-of, forever</td></tr>
     </tbody>
   </table></div>
 </section>

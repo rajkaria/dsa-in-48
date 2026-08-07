@@ -5,7 +5,7 @@ globs:
   - frontend-system-design.html
   - scripts/**
   - .ocean/templates/**
-updated: 2026-08-06
+updated: 2026-08-07
 ---
 
 # The Learn track + Frontend System Design in 48 — the Aug 2026 expansion
@@ -26,27 +26,42 @@ updated: 2026-08-06
   security, observability), **141 reveal Q&As** (93 in topics + 48 bank), 36 drills
   (18/18), walkthrough script, question matcher, cheat tables, skip list. Rose accent
   `#F472B6`, keys `fesd48:*`.
-- **The Learn track** (`learn/`): hub + 13 self-paced modules, all live. Built for Prachi
+- **The Learn track** (`learn/`): hub + 16 self-paced modules, all live. Every module is
+  now expanded to 13–15 sections with band dividers (`// beginner` / `// intermediate` /
+  `// advanced`). Totals: **221 sections / ~145h / ~225 quizzes**. Built for Prachi
   (cat-themed examples, Professor Whiskers callouts) but general-audience safe. Shelves:
-  - *Learn JavaScript*: `js-fundamentals` (amber), `js-async` (sky — event-loop stepper)
-  - *Learn DSA*: `dsa-foundations` (yellow — growth explorer, 18 verified LC links),
-    `dsa-structures` (lime — pointer-surgery stepper, MinHeap, 14 LC), `dsa-trees-graphs`
-    (emerald — BFS grid flood, trie, Kahn's, union-find, 14 LC), `dsa-algorithms` (cyan —
-    sorting race, answer-space binary search, DP call-counter, 16 LC)
+  - *Learn JavaScript*: `js-fundamentals` (amber), `js-async` (sky — event-loop stepper),
+    `typescript` (purple `#C084FC` — predict-the-compiler-error gauntlet) **(new)**
+  - *Learn DSA*: `dsa-foundations` (yellow — growth explorer, 41 verified LC links),
+    `dsa-structures` (lime — pointer-surgery stepper, MinHeap, 34 LC), `dsa-trees-graphs`
+    (emerald — BFS grid flood, trie, Kahn's, union-find, 29 LC), `dsa-algorithms` (cyan —
+    sorting race, answer-space binary search, DP call-counter, 37 LC)
   - *Build the stack*: `react-deep-dive` (blue — cascade sim, hook slots), `node-backend`
     (green — 20-line Express, tamperable HMAC-JWT), `postgres-databases` (indigo — in-page
     SQL + join engines, lost-update race, N+1 demo), `aws-cloud` (orange — staged
-    architectures)
-  - *Think in systems*: `system-design-backend` (teal — envelope calculator, 5 worked
-    designs), `frontend-system-design` (rose — rendering decision tree, annotated RADIO)
-  - *Ace the interview*: `interview-kit` (violet — 12 persisted worksheets, 4-week planner)
+    architectures), `testing` (red `#F87171` — 20-line test framework on the page) **(new)**
+  - *Think in systems*: `system-design-backend` (teal — envelope calculator, 8 worked
+    designs), `frontend-system-design` (rose — rendering decision tree, annotated RADIO),
+    `web-platform` (slate `#94A3B8` — freshness-decider runner) **(new)**
+  - *Ace the interview*: `interview-kit` (violet — 18 persisted worksheets, 4-week planner)
 - **Wiring**: landing page has the course-05 card + a Learn-track section/topbar/footer/
   picker rows; all five course pages cross-link the track (series nav + footer); README +
   CLAUDE.md updated.
 - **Verify harness**: `scripts/verify.sh` → `scripts/check_pages.py` (stdlib Python) —
   tag balance, unique data-keys, anchor resolution incl. cross-file, external-request
   allowlist (fonts + hljs only, `<a href>` navigation exempt), hljs integrity, namespace
-  hygiene. All 20 pages green.
+  hygiene, and (new) `data-qid` uniqueness. All 23 pages green.
+
+### Aug 2026 depth expansion (ocean-20260807-130307)
+
+- Expansion was **in-place**: existing section ids and quiz qids were never renamed, so
+  reader progress in localStorage is preserved. New sections were appended or interleaved
+  around the originals.
+- Three new modules added (`typescript`, `testing`, `web-platform`); every existing
+  module deepened to 13–15 sections with beginner/intermediate/advanced band dividers.
+- Hub cards recounted (sections, quizzes, runners, durations, `data-total`/pcount).
+- Deploy state will be updated after sprint 10 — the live hosts still serve the
+  pre-expansion track until then.
 
 ## Conventions the modules follow (beyond CLAUDE.md)
 

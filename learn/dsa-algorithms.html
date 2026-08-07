@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -674,8 +678,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#sorting"><span><i class="dot" data-for="sorting"></i> Sorting (the race)</span></a>
     <a class="side-link" href="#binsearch"><span><i class="dot" data-for="binsearch"></i> Binary Search</span></a>
     <a class="side-link" href="#recursion"><span><i class="dot" data-for="recursion"></i> Recursion &amp; Backtracking</span></a>
+    <a class="side-link" href="#backtrackplus"><span><i class="dot" data-for="backtrackplus"></i> Pruning</span></a>
     <a class="side-link" href="#dp"><span><i class="dot" data-for="dp"></i> Dynamic Programming</span></a>
     <a class="side-link" href="#greedy"><span><i class="dot" data-for="greedy"></i> Greedy</span></a>
+    <a class="side-link" href="#exchange"><span><i class="dot" data-for="exchange"></i> The Exchange Argument</span></a>
+    <a class="side-link" href="#bsanswer"><span><i class="dot" data-for="bsanswer"></i> BS on the Answer</span></a>
+    <a class="side-link" href="#dpgrid"><span><i class="dot" data-for="dpgrid"></i> DP in 2D</span></a>
+    <a class="side-link" href="#dpadvanced"><span><i class="dot" data-for="dpadvanced"></i> DP, Advanced</span></a>
+    <a class="side-link" href="#quickselect"><span><i class="dot" data-for="quickselect"></i> Quickselect</span></a>
+    <a class="side-link" href="#strings"><span><i class="dot" data-for="strings"></i> String Algorithms</span></a>
     <a class="side-link" href="#choosing"><span><i class="dot" data-for="choosing"></i> Choosing the Weapon</span></a>
   </nav>
 
@@ -694,11 +705,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/6</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -721,14 +732,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: DP + greedy judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>6</b> sections</span>
-    <span><b>7</b> quiz questions</span>
+    <span><b>13</b> sections</span>
+    <span><b>13</b> quiz questions</span>
     <span><b>1</b> sorting race</span>
-    <span><b>16</b> verified LeetCode problems</span>
-    <span><b>~4.5h</b> self-paced</span>
+    <span><b>37</b> verified LeetCode problems</span>
+    <span><b>~8.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#sorting">Start the race <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — sort &amp; search instincts</span></div>
 
 <!-- 1 · SORTING -->
 <section class="lesson" id="sorting">
@@ -852,6 +865,8 @@ console.log('min speed for piles [30,11,23,4,20] in 6h:',
   </div>
 </section>
 
+<div class="band" id="band-intermediate"><span>// intermediate — the decision toolkit</span></div>
+
 <!-- 3 · RECURSION & BACKTRACKING -->
 <section class="lesson" id="recursion">
   <div class="lesson-head">
@@ -929,10 +944,102 @@ console.log('sum to 7 from [2,3,5]:',
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
-<!-- 4 · DP -->
-<section class="lesson" id="dp">
+<!-- 4 · BACKTRACK PLUS -->
+<section class="lesson" id="backtrackplus">
   <div class="lesson-head">
     <span class="lesson-num">04</span>
+    <div>
+      <h3>Pruning — backtracking that finishes before lunch</h3>
+      <p class="lvl">intermediate → constraint sets, same-level dedupe &amp; honest complexity</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 03's choose-explore-unchoose visits the whole possibility tree; <b>pruning</b> is refusing to enter subtrees that provably contain nothing. Three techniques carry the whole genre. <b>Constraint sets</b>: N-Queens doesn't scan the board for conflicts — it keeps three Sets (columns, both diagonal directions) so "is this square safe?" is O(1), and every unsafe branch dies at depth 1 of its subtree. <b>Sort + break</b>: with candidates sorted, the moment one exceeds the remaining budget, <i>break</i> — every later sibling is bigger too. <b>Same-level dedupe</b>: for duplicate candidates (Permutations II), skip a value you already tried <i>at this level</i> — identical siblings produce identical subtrees.</p>
+    <p>The honesty part interviewers probe: pruning changes real-world speed, <b>not the worst-case class</b>. Permutations stay O(n!), subsets O(2ⁿ) — say the true bound, then say "pruning collapses the practical tree", and demonstrate you know those are different claims.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">queens-with-bouncers.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// N-Queens with and without constraint-set pruning — count the visits
+function queens(n, prune) {
+  let solutions = 0, visits = 0;
+  const cols = new Set(), diag1 = new Set(), diag2 = new Set(), rows = [];
+  function place(r) {
+    visits++;
+    if (r === n) { solutions++; return; }
+    for (let c = 0; c &lt; n; c++) {
+      if (prune) {
+        if (cols.has(c) || diag1.has(r - c) || diag2.has(r + c)) continue;  // O(1) veto
+      } else {
+        let clash = false;                       // naive: rescan every placed queen
+        for (let pr = 0; pr &lt; r; pr++) {
+          const pc = rows[pr];
+          if (pc === c || pr - pc === r - c || pr + pc === r + c) { clash = true; break; }
+        }
+        if (clash) continue;
+      }
+      rows[r] = c; cols.add(c); diag1.add(r - c); diag2.add(r + c);   // choose
+      place(r + 1);                                                    // explore
+      cols.delete(c); diag1.delete(r - c); diag2.delete(r + c);        // unchoose
+    }
+  }
+  place(0);
+  return { solutions, visits };
+}
+for (const n of [6, 8]) {
+  const p = queens(n, true);
+  console.log(`${n}-queens: ${p.solutions} solutions — ${p.visits} nodes visited`);
+}
+
+// sort + break: combination sum with a budget
+function combosUnder(candidates, budget) {
+  const sorted = [...candidates].sort((a, b) =&gt; a - b);
+  let explored = 0, found = 0;
+  function go(start, remaining, path) {
+    explored++;
+    if (remaining === 0) { found++; console.log('  ✓', path.join('+')); return; }
+    for (let i = start; i &lt; sorted.length; i++) {
+      if (sorted[i] &gt; remaining) break;          // ← the prune: all later are bigger
+      path.push(sorted[i]);
+      go(i, remaining - sorted[i], path);        // reuse allowed → i, not i+1
+      path.pop();
+    }
+  }
+  go(0, budget, []);
+  console.log(`combination sum to ${budget}: ${found} ways, ${explored} nodes`);
+}
+combosUnder([2, 3, 5, 7], 10);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the three Sets ARE the algorithm — the recursion is just scaffolding</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-btp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Permutations of <code>[1, 1, 2]</code> without duplicates (LC 47): after sorting, the rule is "skip <code>nums[i]</code> if it equals <code>nums[i−1]</code> and <code>nums[i−1]</code> is unused". What does that condition actually prevent?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Using the same array element twice in one permutation</button>
+        <button class="mcq-opt" type="button" data-ok>Two identical values being tried in the SAME position at the same tree level — which would generate the same subtree twice</button>
+        <button class="mcq-opt" type="button">Stack overflow on long duplicate runs</button>
+        <button class="mcq-opt" type="button">Permutations that start with the largest value</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the used-array already prevents element reuse (option A's job). The subtle bug is <i>cross-branch</i> duplication: first 1 in position 0 explores a whole tree; second 1 in position 0 would explore an identical tree. The rule enforces "equal values enter a level in order" — the second 1 may only follow the first. Dedupe-at-the-level, not dedupe-in-the-path: confusing those two is the #1 wrong answer on this famous question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The diagonal encoding <code>r−c</code> / <code>r+c</code> is worth memorizing verbatim — it's the difference between "knows N-Queens" and "derives it under pressure".</li>
+        <li>Restore IP Addresses: pruning by <i>arithmetic</i> — remaining digits must fit remaining segments (1–3 digits each); check bounds before recursing and the tree is tiny.</li>
+        <li>Word Search's un-visit (<code>board[r][c] = tmp</code>) is unchoose applied to shared state — same third verb, mutable-grid edition.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/n-queens/" target="_blank" rel="noopener noreferrer">51 · N-Queens (hard)</a> · <a href="https://leetcode.com/problems/permutations-ii/" target="_blank" rel="noopener noreferrer">47 · Permutations II</a> · <a href="https://leetcode.com/problems/restore-ip-addresses/" target="_blank" rel="noopener noreferrer">93 · Restore IP Addresses</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · DP -->
+<section class="lesson" id="dp">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
     <div>
       <h3>Dynamic programming — stop re-answering the same question</h3>
       <p class="lvl">the feared one, taught in the order that works</p>
@@ -1016,10 +1123,10 @@ console.log('4×5 grid paths:', uniquePaths(4, 5));</code></pre>
   </div>
 </section>
 
-<!-- 5 · GREEDY -->
+<!-- 6 · GREEDY -->
 <section class="lesson" id="greedy">
   <div class="lesson-head">
-    <span class="lesson-num">05</span>
+    <span class="lesson-num">06</span>
     <div>
       <h3>Greedy — the best local move, when it's provably enough</h3>
       <p class="lvl">advanced → the burden of proof is the whole topic</p>
@@ -1087,10 +1194,484 @@ console.log('ababcbaca|defegde|hijhklij →', partition('ababcbacadefegdehijhkli
   </div>
 </section>
 
-<!-- 6 · CHOOSING -->
+<!-- 7 · EXCHANGE -->
+<section class="lesson" id="exchange">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>The exchange argument — proving greedy right (or dead)</h3>
+      <p class="lvl">intermediate → the sixty-second attack, formalized</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 06 said "greedy needs a proof"; here's the proof shape that covers nearly all of them. The <b>exchange argument</b>: take any optimal solution that <i>disagrees</i> with greedy's choice, and show you can <b>swap</b> greedy's choice in without making it worse. If every disagreement can be exchanged away, greedy's answer is as good as any optimum — done. For activity selection: any optimal schedule not using the earliest-ending meeting can swap its first meeting for the earliest-ender (it frees up <i>at least</i> as much room). The swap never hurts → greedy by earliest end is optimal.</p>
+    <p>The same tool in reverse is the <b>counterexample hunt</b>: when the swap CAN hurt, that hurt is your counterexample. Coins <code>[1, 3, 4]</code>, target 6: greedy grabs 4 (the "best" coin), forcing 4+1+1; the optimum 3+3 uses no 4 at all — the exchange fails because taking 4 <i>changes what the rest can be</i>. That interdependence is the tell: <b>when a choice reshapes the remaining problem's structure, greedy dies and DP takes over.</b></p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">swap-test.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Activity selection: earliest-END wins; earliest-START loses. Watch both.
+const meetings = [[1, 9], [2, 3], [3, 5], [4, 6], [5, 7], [8, 10]];
+
+function schedule(list, key) {
+  const sorted = [...list].sort((a, b) =&gt; key(a) - key(b));
+  const taken = [];
+  let freeAt = -Infinity;
+  for (const m of sorted)
+    if (m[0] &gt;= freeAt) { taken.push(m); freeAt = m[1]; }
+  return taken;
+}
+const byEnd = schedule(meetings, (m) =&gt; m[1]);
+const byStart = schedule(meetings, (m) =&gt; m[0]);
+console.log('greedy by END:  ', JSON.stringify(byEnd), '→', byEnd.length, 'meetings');
+console.log('greedy by START:', JSON.stringify(byStart), '→', byStart.length, 'meetings');
+console.log('by-start grabbed [1,9] — one long meeting ate the day. Exchange it');
+console.log('for the earliest-ender [2,3] and MORE fits: that swap IS the proof.\n');
+
+// coin greedy vs DP — the counterexample, computed
+function greedyCoins(coins, target) {
+  const sorted = [...coins].sort((a, b) =&gt; b - a);
+  const used = [];
+  for (const c of sorted)
+    while (target &gt;= c) { target -= c; used.push(c); }
+  return target === 0 ? used : null;
+}
+function dpCoins(coins, target) {
+  const best = new Array(target + 1).fill(Infinity);
+  const pick = new Array(target + 1).fill(-1);
+  best[0] = 0;
+  for (let t = 1; t &lt;= target; t++)
+    for (const c of coins)
+      if (c &lt;= t &amp;&amp; best[t - c] + 1 &lt; best[t]) { best[t] = best[t - c] + 1; pick[t] = c; }
+  const used = [];
+  for (let t = target; t &gt; 0; t -= pick[t]) used.push(pick[t]);
+  return used;
+}
+console.log('coins [1,3,4], target 6:');
+console.log('  greedy:', greedyCoins([1, 3, 4], 6).join('+'), ' (3 coins — wrong)');
+console.log('  DP:    ', dpCoins([1, 3, 4], 6).join('+'), '   (2 coins — right)');
+console.log('  taking the 4 reshaped what remained — the exchange broke, greedy died');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">same code shape, one sort key apart — and the proof lives in the swap</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-exch-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does greedy-by-largest work for US coins [1, 5, 10, 25] but fail for [1, 3, 4]?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">US coins are sorted and [1,3,4] isn't</button>
+        <button class="mcq-opt" type="button" data-ok>In the US system every coin divides cleanly into the larger ones' structure — any solution using small coins can always be exchanged up; 3+3=6 has no such exchange through 4</button>
+        <button class="mcq-opt" type="button">Greedy needs at least five denominations</button>
+        <button class="mcq-opt" type="button">It's coincidence — greedy is never provably right on coins</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> canonical coin systems have the exchange property baked in: five 1s exchange for a 5, two 5s for a 10 — local swaps always reach the greedy answer without loss. [1,3,4] breaks it: two 3s make 6, but no sequence of "swap up to a 4" preserves the count. Same algorithm, different <i>input structure</i> — which is why "is greedy correct?" is a question about the problem, not the code. That reframe is the whole section.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The proof ritual, out loud: "Assume an optimal solution differs from greedy's first choice. Exchange in greedy's choice. Show no loss. Induct on the rest." Four sentences; interviewers rarely want more.</li>
+        <li>Partition Labels (763): greedy by "last occurrence extends the window" — prove it by noting any split earlier would cut a letter's span. Cuts-can't-cross is the exchange in disguise.</li>
+        <li>Two sort keys, two worlds: merge intervals sorts by START (dsa-structures §05); scheduling sorts by END (here). Knowing WHY each key fits its question beats memorizing which.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/non-overlapping-intervals/" target="_blank" rel="noopener noreferrer">435 · Non-overlapping Intervals</a> · <a href="https://leetcode.com/problems/partition-labels/" target="_blank" rel="noopener noreferrer">763 · Partition Labels</a> · <a href="https://leetcode.com/problems/jump-game/" target="_blank" rel="noopener noreferrer">55 · Jump Game</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · BS ANSWER -->
+<section class="lesson" id="bsanswer">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Binary search on the answer — the general machine</h3>
+      <p class="lvl">intermediate → feasible(x) monotone → search x, not the array</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 02 planted the seed with Koko; here's the full machine. The recipe: (1) reframe "minimize X" as a <b>yes/no question</b> — "could we succeed with X = mid?"; (2) confirm the question is <b>monotone</b> — if X works, every larger X works (more capacity can't hurt); (3) binary search the <i>answer space</i>, keeping a feasibility checker that's usually a simple greedy pass. The array was never what you were searching.</p>
+    <p>Trigger phrases: <b>"minimize the maximum"</b>, <b>"maximize the minimum"</b>, "smallest capacity/speed/days such that…". They all confess the same shape: a monotone frontier between failure and success, and binary search walks straight to it.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">minimize-the-maximum.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Ship packages within D days (LC 1011): minimize ship capacity
+const weights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const days = 5;
+
+// the feasibility checker — a greedy simulation, O(n)
+function canShip(capacity) {
+  let need = 1, load = 0;
+  for (const w of weights) {
+    if (w &gt; capacity) return false;         // one package alone won't fit
+    if (load + w &gt; capacity) { need++; load = 0; }
+    load += w;
+  }
+  return need &lt;= days;
+}
+
+// search the ANSWER SPACE: [max single weight … total weight]
+let lo = Math.max(...weights);
+let hi = weights.reduce((a, b) =&gt; a + b, 0);
+console.log(`answer space: [${lo} … ${hi}]`);
+while (lo &lt; hi) {
+  const mid = (lo + hi) &gt;&gt; 1;
+  const ok = canShip(mid);
+  console.log(`  capacity ${mid}? ${ok ? 'works — try smaller' : 'fails — go bigger'}`);
+  ok ? hi = mid : lo = mid + 1;
+}
+console.log('minimum capacity:', lo);
+
+// the frontier this searched: F F F ... F T T T ... T
+const row = [];
+for (let c = 10; c &lt;= 20; c++) row.push(canShip(c) ? 'T' : 'F');
+console.log('feasible(10..20):', row.join(' '), '← one clean boundary, hence searchable');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the F…FT…T row is the monotonicity check — always print it in your head</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-bsa-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Split Array Largest Sum (LC 410, hard): split an array into k parts minimizing the largest part-sum. Why is this the same machine as shipping?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Both involve arrays of positive numbers</button>
+        <button class="mcq-opt" type="button" data-ok>"Can we split with no part exceeding S?" is monotone in S, and a greedy pass answers it — so binary search S between max(arr) and sum(arr)</button>
+        <button class="mcq-opt" type="button">Both are solved by sorting first</button>
+        <button class="mcq-opt" type="button">It isn't — 410 requires interval DP</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "days" became "parts" and "capacity" became "cap S" — the code is line-for-line the shipping solution. The famous-hard status evaporates once you see the frontier. (Interval DP also solves it — in O(k·n²) versus this O(n log sum); mentioning both and picking the cheaper one is a flex worth doing.) The lesson: hards are often a known machine plus one reframing step.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Bounds discipline: lo = the largest single element (can't split below it), hi = the total (one group). Wrong bounds are the #1 bug — derive them, don't guess.</li>
+        <li>The <code>lo &lt; hi; ok ? hi = mid : lo = mid + 1</code> template finds the <i>leftmost true</i> — one template, memorized cold, reused everywhere (it's section 02's boundary search on an invisible array).</li>
+        <li>Feasibility checkers are almost always greedy simulations — this section and the last one are teammates, not neighbors.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/" target="_blank" rel="noopener noreferrer">1011 · Ship Within D Days</a> · <a href="https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/" target="_blank" rel="noopener noreferrer">1482 · M Bouquets</a> · <a href="https://leetcode.com/problems/split-array-largest-sum/" target="_blank" rel="noopener noreferrer">410 · Split Array (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the families that win hards</span></div>
+
+<!-- 9 · DP GRID -->
+<section class="lesson" id="dpgrid">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>DP in two dimensions — grids, edit distance &amp; knapsacks</h3>
+      <p class="lvl">advanced → the three 2D families, one table-reading skill</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 05's DP was one-dimensional — the state was "position". The classic mediums add a second axis, and three families cover them. <b>Grid paths</b>: state = cell, answer flows from top/left neighbors (Min Path Sum). <b>Two sequences</b>: state = (prefix of A, prefix of B) — Edit Distance and LCS ask "how do these prefixes relate?", and the table's diagonal carries the match/mismatch decision. <b>Knapsack</b>: state = (items considered, budget) — 0/1 knapsack (each item once: iterate budget <i>downward</i>) vs unbounded (reuse allowed: iterate <i>upward</i>) — the loop direction IS the take-once rule, the subtlest famous detail in DP.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">two-axes.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// FAMILY 2 · Edit distance, table printed — read the machine's mind
+function editDistance(a, b) {
+  const T = Array.from({ length: a.length + 1 },
+    (_, i) =&gt; Array.from({ length: b.length + 1 }, (_, j) =&gt; i === 0 ? j : j === 0 ? i : 0));
+  for (let i = 1; i &lt;= a.length; i++)
+    for (let j = 1; j &lt;= b.length; j++)
+      T[i][j] = a[i-1] === b[j-1]
+        ? T[i-1][j-1]                                  // match — free diagonal
+        : 1 + Math.min(T[i-1][j-1], T[i-1][j], T[i][j-1]);  // sub / delete / insert
+  console.log('    ε ' + b.split('').join(' '));
+  T.forEach((row, i) =&gt; console.log((i ? a[i-1] : 'ε') + '  ' + row.join(' ')));
+  return T[a.length][b.length];
+}
+console.log('edit("cat" → "cart"):', editDistance('cat', 'cart'), 'operation\n');
+
+// FAMILY 3 · knapsack: loop DIRECTION is the take-once rule
+const coins = [1, 3, 4];
+function ways(target, unbounded) {
+  const dp = new Array(target + 1).fill(0);
+  dp[0] = 1;
+  if (unbounded) {
+    for (const c of coins)
+      for (let t = c; t &lt;= target; t++) dp[t] += dp[t - c];   // upward: reuse OK
+  } else {
+    for (const c of coins)
+      for (let t = target; t &gt;= c; t--) dp[t] += dp[t - c];   // downward: once each
+  }
+  return dp[target];
+}
+console.log('ways to make 7, coins reusable (coin-change-ii):', ways(7, true));
+console.log('ways to make 7, each coin once (subset-style):  ', ways(7, false));
+console.log('same code, reversed inner loop — downward means "this coin not reused,');
+console.log('because dp[t-c] still describes a world where c was never taken"');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">read the printed table corner to corner — every cell is a sentence</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-dpg-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In 0/1 knapsack with a 1D array, why must the budget loop run DOWNWARD?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Downward loops are faster in JS engines</button>
+        <button class="mcq-opt" type="button" data-ok>Upward, dp[t−c] would already include the current item — you'd count taking it twice; downward reads only last-round values, where the item doesn't exist yet</button>
+        <button class="mcq-opt" type="button">To avoid negative array indexes</button>
+        <button class="mcq-opt" type="button">Direction doesn't matter if dp[0] = 1</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the 1D array is two table rows squashed together — "previous item-row" and "current". Downward iteration reads cells not yet overwritten this round (the previous row = item unavailable); upward reads freshly-written ones (item already usable = unbounded). One loop arrow encodes the entire 0/1-vs-unbounded distinction — and Partition Equal Subset Sum (416) is exactly this with dp as booleans. Explaining the squashed-rows picture is the answer that gets remembered.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>State your state: "T[i][j] = min ops turning the first i of A into the first j of B" — the sentence <i>before</i> the code is what's graded.</li>
+        <li>LCS vs edit distance: same table, different recurrence — and "diff tools are LCS" connects it to every git diff you've read.</li>
+        <li>Space rule: needing only the previous row → keep two rows (or one, looped right). Say it as an available upgrade; implement only if asked.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/minimum-path-sum/" target="_blank" rel="noopener noreferrer">64 · Min Path Sum</a> · <a href="https://leetcode.com/problems/edit-distance/" target="_blank" rel="noopener noreferrer">72 · Edit Distance</a> · <a href="https://leetcode.com/problems/longest-common-subsequence/" target="_blank" rel="noopener noreferrer">1143 · LCS</a> · <a href="https://leetcode.com/problems/partition-equal-subset-sum/" target="_blank" rel="noopener noreferrer">416 · Partition Equal Subset</a> · <a href="https://leetcode.com/problems/coin-change-ii/" target="_blank" rel="noopener noreferrer">518 · Coin Change II</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · DP ADVANCED -->
+<section class="lesson" id="dpadvanced">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>DP, advanced — patience piles, bitmasks &amp; trees</h3>
+      <p class="lvl">advanced → three exotic states, each in its plainest form</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Three DP variants that headline hards, each tamed by naming its state. <b>LIS in O(n log n)</b>: play patience — place each number on the leftmost pile whose top is ≥ it, new pile if none; pile count = LIS length. The array of pile-tops is sorted, so "leftmost pile" is binary search — section 02 inside section 10. <b>Bitmask DP</b>: when the state is "which of ≤20 items are used", encode the subset as an integer's bits — <code>dp[mask]</code> — and the bits toolkit from dsa-foundations becomes state management. <b>Tree DP</b>: each node returns a small tuple — House Robber III returns <code>[bestIfRobbed, bestIfSkipped]</code> — and the parent combines children's tuples. Post-order traversal IS the DP order (answers flow up).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">exotic-states.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · LIS via patience piles (LC 300 in n log n)
+function lis(nums) {
+  const tops = [];                                 // sorted pile tops
+  for (const x of nums) {
+    let lo = 0, hi = tops.length;
+    while (lo &lt; hi) {                              // leftmost pile with top ≥ x
+      const mid = (lo + hi) &gt;&gt; 1;
+      tops[mid] &gt;= x ? hi = mid : lo = mid + 1;
+    }
+    tops[lo] = x;
+    console.log(`  place ${x} → piles: [${tops.join(' ')}]`);
+  }
+  return tops.length;
+}
+console.log('LIS length:', lis([10, 9, 2, 5, 3, 7, 101, 18]), '\n');
+
+// 2 · tree DP — House Robber III (LC 337): rob or skip, per subtree
+const N = (v, l = null, r = null) =&gt; ({ v, l, r });
+const houses = N(3, N(2, null, N(3)), N(3, null, N(1)));
+function rob(node) {
+  if (!node) return [0, 0];                        // [ifRobbed, ifSkipped]
+  const L = rob(node.l), R = rob(node.r);
+  return [
+    node.v + L[1] + R[1],                          // rob me → children must skip
+    Math.max(...L) + Math.max(...R),               // skip me → children choose
+  ];
+}
+console.log('best haul:', Math.max(...rob(houses)), '(rob the 3+3+1 layer, skip the middle)\n');
+
+// 3 · bitmask state — count ways to pair 3 cats with 3 baskets (perfect matchings)
+const likes = [[1, 1, 0], [0, 1, 1], [1, 0, 1]];   // cat i tolerates basket j
+const FULL = (1 &lt;&lt; 3) - 1;
+const memo = new Map();
+function assign(cat, usedMask) {
+  if (cat === 3) return 1;
+  const key = cat * 8 + usedMask;
+  if (memo.has(key)) return memo.get(key);
+  let ways = 0;
+  for (let b = 0; b &lt; 3; b++)
+    if (likes[cat][b] &amp;&amp; !(usedMask &amp; (1 &lt;&lt; b)))
+      ways += assign(cat + 1, usedMask | (1 &lt;&lt; b));
+  memo.set(key, ways);
+  return ways;
+}
+console.log('valid cat→basket assignments:', assign(0, 0), '— state was just an integer');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch the piles stay sorted — that's why binary search is legal</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-dpa-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In patience piles, replacing a pile's top with a smaller number doesn't change the pile count. What is the tops array actually tracking?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The actual longest increasing subsequence, in order</button>
+        <button class="mcq-opt" type="button" data-ok>For each length L, the SMALLEST possible tail of an increasing subsequence of length L — smaller tails keep more future options open</button>
+        <button class="mcq-opt" type="button">A sorted copy of the input so far</button>
+        <button class="mcq-opt" type="button">The positions where the LIS elements occur</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>tops[L−1]</code> = "cheapest ending for a length-L run so far". Lowering a tail never shortens anything — it just makes extending easier later (reversibility instinct, quantified). The classic gotcha: the array is NOT the LIS itself (its contents can be an impossible sequence); only its <i>length</i> is the answer. Recovering the actual subsequence needs parent pointers — say so before the interviewer asks.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Bitmask viability math, out loud: 2²⁰ masks ≈ 1M × 20 transitions ≈ 20M ops — fine; n = 25 is 700M — not. The n ≤ 20 smell-test is the whole skill.</li>
+        <li>Tree DP's contract: "each child answers a fixed small question; the parent combines" — diameter, longest path, camera placement, all the same shape as rob/skip.</li>
+        <li>Patience piles power "Russian Doll Envelopes": sort by width, LIS on heights (desc-tie trick) — 2D reduced to 1D by sorting one axis away.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/longest-increasing-subsequence/" target="_blank" rel="noopener noreferrer">300 · LIS (do the n log n)</a> · <a href="https://leetcode.com/problems/house-robber-iii/" target="_blank" rel="noopener noreferrer">337 · House Robber III</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · QUICKSELECT -->
+<section class="lesson" id="quickselect">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Quickselect — the k-th element without the full sort</h3>
+      <p class="lvl">advanced → partition once, recurse into ONE side</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>"Find the k-th largest" tempts a full sort (O(n log n)) or a heap (O(n log k), dsa-structures' answer). <b>Quickselect</b> beats both on average: run quicksort's <b>partition</b> — pick a pivot, wall smaller-left / bigger-right, pivot lands in its final position — then recurse <b>only into the side containing k</b>. Half the work discards per round: n + n/2 + n/4 + … = <b>O(n) average</b>. The honesty clause: adversarial pivots degrade it to O(n²); random pivots make that vanishingly unlikely (and "median-of-medians guarantees O(n), nobody codes it live" is the complete answer).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">one-side-only.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// deterministic "random" pivot (no Math.random — reproducible output)
+let seed = 7;
+const nextSeed = (n) =&gt; (seed = (seed * 1103515245 + 12345) % 2147483648) % n;
+
+function quickselect(a, k) {                 // k-th SMALLEST, 0-indexed
+  let lo = 0, hi = a.length - 1, touched = 0;
+  while (true) {
+    const p = lo + nextSeed(hi - lo + 1);
+    [a[p], a[hi]] = [a[hi], a[p]];           // pivot to the end
+    let wall = lo;
+    for (let i = lo; i &lt; hi; i++) {
+      touched++;
+      if (a[i] &lt; a[hi]) { [a[i], a[wall]] = [a[wall], a[i]]; wall++; }
+    }
+    [a[wall], a[hi]] = [a[hi], a[wall]];     // pivot to its FINAL position
+    console.log(`  partition [${lo}..${hi}] → pivot ${a[wall]} settles at ${wall}`);
+    if (wall === k) {
+      console.log(`  touched ${touched} elements (n=${a.length}, full sort ≈ ${Math.round(a.length * Math.log2(a.length))})`);
+      return a[wall];
+    }
+    wall &lt; k ? lo = wall + 1 : hi = wall - 1;   // ONE side only
+  }
+}
+const weights = [64, 25, 12, 22, 11, 90, 42, 31, 77, 53, 18, 8];
+const k = 5;
+console.log(`${k}-th smallest of [${weights.join(',')}]:`);
+console.log('answer:', quickselect([...weights], k));
+console.log('check: ', [...weights].sort((a, b) =&gt; a - b)[k], '(via full sort)');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">each partition line covers a SHRINKING range — that's the n + n/2 + … sum</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-qs-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Top-k from 10 million items: quickselect (O(n) avg) or a size-k min-heap (O(n log k))? A senior's tiebreakers?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Quickselect always — better asymptotics end the discussion</button>
+        <button class="mcq-opt" type="button" data-ok>Heap if the data is STREAMING or doesn't fit memory (one pass, k memory); quickselect if it's in-memory and mutable (it reorders in place); sort if k ≈ n or you need order anyway</button>
+        <button class="mcq-opt" type="button">Heap always — quickselect's worst case disqualifies it</button>
+        <button class="mcq-opt" type="button">Sort always — simplicity wins at any scale</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the constraints outrank the asymptotics: quickselect needs random access to the whole array (dead on streams) and mutates it (rude to shared data); the heap sips k memory over one pass but pays log k per item. This three-way calibration — heap / quickselect / sort by data shape — is dsa-structures' heap section and this one shaking hands, and it's precisely what "senior" sounds like.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Partition is Sort Colors (75) — the Dutch-flag two-wall variant handles duplicate-heavy data and is the same 10 lines interviewers ask separately.</li>
+        <li>K Closest Points (973): quickselect on squared distance — no sqrt needed, comparisons preserve order. Small flexes add up.</li>
+        <li>"k-th largest" = index n−k when 0-indexed ascending — off-by-ones kill more attempts here than the algorithm does; write the conversion first.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/kth-largest-element-in-an-array/" target="_blank" rel="noopener noreferrer">215 · Kth Largest</a> · <a href="https://leetcode.com/problems/k-closest-points-to-origin/" target="_blank" rel="noopener noreferrer">973 · K Closest Points</a> · <a href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank" rel="noopener noreferrer">347 · Top K Frequent</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · STRINGS -->
+<section class="lesson" id="strings">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>String algorithms — palindromes &amp; the failure function</h3>
+      <p class="lvl">advanced → expand-around-center, and what KMP actually precomputes</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Two machines close out the module. <b>Expand-around-center</b>: every palindrome has a center — a character (odd length) or a gap (even) — so try all 2n−1 centers and expand while the ends match. O(n²) worst case but simple, correct, and the expected answer for Longest Palindromic Substring (nobody wants Manacher's live — know its name, skip its code).</p>
+    <p><b>KMP's failure function</b> is the one that separates readers from understanders. For each prefix of the pattern, precompute: <b>the length of the longest proper prefix that is also a suffix</b>. Why that, of all things? Because on a mismatch, it answers "how much of what I just matched is <i>still usable</i>?" — slide the pattern so its prefix overlaps the suffix you've already confirmed, and <b>never re-read a text character</b>. O(n + m) guaranteed — the worst-case-proof cousin of dsa-structures' rolling hash.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">centers-and-failures.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// 1 · expand around every center — count ALL palindromic substrings (LC 647)
+function countPalindromes(s) {
+  let count = 0;
+  const expand = (l, r) =&gt; {
+    while (l &gt;= 0 &amp;&amp; r &lt; s.length &amp;&amp; s[l] === s[r]) { count++; l--; r++; }
+  };
+  for (let i = 0; i &lt; s.length; i++) {
+    expand(i, i);         // odd centers  (a char)
+    expand(i, i + 1);     // even centers (a gap)
+  }
+  return count;
+}
+console.log('palindromic substrings of "meowoem":', countPalindromes('meowoem'));
+
+// 2 · the failure function, printed and read aloud
+function failureTable(p) {
+  const f = new Array(p.length).fill(0);
+  let k = 0;
+  for (let i = 1; i &lt; p.length; i++) {
+    while (k &gt; 0 &amp;&amp; p[i] !== p[k]) k = f[k - 1];   // fall back through borders
+    if (p[i] === p[k]) k++;
+    f[i] = k;
+  }
+  return f;
+}
+const pat = 'abcabcab';
+const f = failureTable(pat);
+console.log('\npattern:', pat.split('').join('  '));
+console.log('failure:', f.join('  '));
+console.log('reading f[7]=5: "abcabcab" ends with "abcab" — which is also its start.');
+console.log('on a mismatch after position 7, slide to keep those 5, re-check nothing.\n');
+
+// 3 · the failure table party trick (LC 459): repeated substring pattern
+function isRepeated(s) {
+  const last = failureTable(s).at(-1);
+  return last &gt; 0 &amp;&amp; s.length % (s.length - last) === 0;
+}
+for (const s of ['meowmeowmeow', 'meowmeom'])
+  console.log(`"${s}" is a repeated block?`, isRepeated(s));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">read the failure row aloud once — the table stops being magic</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dal-str-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does KMP never need to move backward in the TEXT, even after a mismatch deep into the pattern?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It keeps a copy of the text in a buffer</button>
+        <button class="mcq-opt" type="button" data-ok>The matched characters are known — the failure table tells the pattern how far to slide so its own prefix aligns with the already-confirmed suffix, reusing that knowledge instead of re-reading</button>
+        <button class="mcq-opt" type="button">It hashes the text first like Rabin-Karp</button>
+        <button class="mcq-opt" type="button">It does move backward, at most once per mismatch</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> after matching "abcab" and failing, you don't know the next text char — but you know the last five, because you just matched them. The question "what's the longest pattern-prefix hiding inside that suffix?" was precomputed. The pattern repositions; the text pointer only advances. That's the whole theorem, and phrasing it as "reuse what the mismatch already proved" beats reciting the pseudocode.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Calibration table, one breath: one search in one text → KMP-or-hash both fine; many patterns → tries (dsa-trees-graphs); substring equality queries → rolling hash; palindromes → centers. Choosing is the skill.</li>
+        <li>Longest Palindromic Substring returns the <i>string</i>: track (start, maxLen) inside expand — returning the count is the classic misread of the question.</li>
+        <li>The 459 trick's arithmetic: if the border has length b, the block size is n−b; repetition ⟺ n divisible by block size. Two lines that look like sorcery — cite the reasoning, not just the code.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/longest-palindromic-substring/" target="_blank" rel="noopener noreferrer">5 · Longest Palindromic Substring</a> · <a href="https://leetcode.com/problems/palindromic-substrings/" target="_blank" rel="noopener noreferrer">647 · Palindromic Substrings</a> · <a href="https://leetcode.com/problems/repeated-substring-pattern/" target="_blank" rel="noopener noreferrer">459 · Repeated Substring Pattern</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · CHOOSING -->
 <section class="lesson" id="choosing">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">13</span>
     <div>
       <h3>Choosing the weapon — the decision tree</h3>
       <p class="lvl">the meta-skill: hear the problem, name the strategy</p>
@@ -1135,9 +1716,16 @@ console.log('ababcbaca|defegde|hijhklij →', partition('ababcbacadefegdehijhkli
       <tr><td class="mono">01</td><td>sorting</td><td>Levels × per-level work: halve log n times, merge n per level; counting sort dodges comparisons entirely.</td></tr>
       <tr><td class="mono">02</td><td>binary search</td><td>Any "no no no YES yes yes" boundary is searchable — including answer spaces, not just arrays.</td></tr>
       <tr><td class="mono">03</td><td>backtracking</td><td>Choose, explore, UNCHOOSE — Mochi exits the box completely; prune hopeless branches early.</td></tr>
-      <tr><td class="mono">04</td><td>DP</td><td>Same sub-questions repeating? Notepad. Recursion → memo → table, and say the recurrence in English.</td></tr>
-      <tr><td class="mono">05</td><td>greedy</td><td>Local-best is only right with a proof (exchange / invariant); the counterexample that kills it designs your DP.</td></tr>
-      <tr><td class="mono">06</td><td>choosing</td><td>Map the wording to the weapon out loud — the first 90 seconds are the interview.</td></tr>
+      <tr><td class="mono">04</td><td>pruning</td><td>Constraint sets veto in O(1); sort+break kills siblings; dedupe equal values at the same level.</td></tr>
+      <tr><td class="mono">05</td><td>DP</td><td>Same sub-questions repeating? Notepad. Recursion → memo → table, and say the recurrence in English.</td></tr>
+      <tr><td class="mono">06</td><td>greedy</td><td>Local-best is only right with a proof (exchange / invariant); the counterexample that kills it designs your DP.</td></tr>
+      <tr><td class="mono">07</td><td>exchange</td><td>Swap greedy's choice into any optimum — no loss means proven; a loss means your DP counterexample.</td></tr>
+      <tr><td class="mono">08</td><td>bs on answer</td><td>"Minimize the max" → feasible(x) monotone → binary search x with a greedy checker.</td></tr>
+      <tr><td class="mono">09</td><td>DP in 2D</td><td>Grids flow from neighbors; sequences meet on the diagonal; knapsack's loop direction IS the take-once rule.</td></tr>
+      <tr><td class="mono">10</td><td>DP, advanced</td><td>Patience piles keep the cheapest tails; masks make subsets integers; trees return tuples upward.</td></tr>
+      <tr><td class="mono">11</td><td>quickselect</td><td>Partition, then recurse into ONE side — n + n/2 + … = O(n) average; heap for streams.</td></tr>
+      <tr><td class="mono">12</td><td>strings</td><td>2n−1 palindrome centers; the failure table = "how much of what I matched is still usable".</td></tr>
+      <tr><td class="mono">13</td><td>choosing</td><td>Map the wording to the weapon out loud — the first 90 seconds are the interview.</td></tr>
     </tbody>
   </table></div>
   <div class="idea" style="margin-top:24px">
@@ -1160,6 +1748,7 @@ console.log('ababcbaca|defegde|hijhklij →', partition('ababcbacadefegdehijhkli
       <li><b>Open every problem with the decision tree, audibly.</b> "All possible → backtracking; let me define choose/explore/unchoose" is already passing.</li>
       <li><b>For DP:</b> recurrence in English → memoized recursion (it's easier to get right live) → mention the table/space upgrade if time allows. Nobody fails for stopping at memoization.</li>
       <li><b>For greedy:</b> the sixty-second attack ritual, always. A found counterexample is a WIN — narrate the pivot to DP.</li>
+      <li><b>Hards decompose into these sections:</b> minimize-the-max → 08; two-sequence tables → 09; n ≤ 20 → bitmask (10); k-th anything → 11 vs a heap; substring guarantees → 12. Naming the family in the first minute is most of the grade.</li>
       <li>Timed drills: <a href="../dsa.html#binsearch">DSA in 48 · binary search</a>, <a href="../dsa.html#backtracking">· backtracking</a>, <a href="../dsa.html#dp">· DP</a>. With this module done, the whole DSA learn arc is complete — the course's day-2 drills should now feel like review.</li>
     </ul>
   </div>

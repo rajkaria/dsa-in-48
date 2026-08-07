@@ -14,12 +14,18 @@ under interview pressure."
 | Behavioral in 48 | [`behavioral.html`](./behavioral.html) | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 | Full-Stack in 48 | [`fullstack.html`](./fullstack.html) | [/fullstack](https://dsa-in-48.vercel.app/fullstack) · [Pages](https://rajkaria.github.io/dsa-in-48/fullstack.html) |
 | Frontend System Design in 48 | [`frontend-system-design.html`](./frontend-system-design.html) | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
-| The Learn track (hub + 13 modules) | [`learn/`](./learn/) | [/learn](https://dsa-in-48.vercel.app/learn) · [Pages](https://rajkaria.github.io/dsa-in-48/learn/) |
+| The Learn track (hub + 16 modules) | [`learn/`](./learn/) | [/learn](https://dsa-in-48.vercel.app/learn) · [Pages](https://rajkaria.github.io/dsa-in-48/learn/) |
 
-**The Learn track** (`learn/index.html` + 13 modules, added Aug 2026) is the self-paced
+**The Learn track** (`learn/index.html` + 16 modules, added Aug 2026) is the self-paced
 deep-dive companion to the courses: beginner→advanced tutorials with inline-JS interactive
 widgets (MCQ quizzes with first-attempt scoring, sandboxed "run it" panels, hand-rolled
-visualizers, persisted worksheets). Module scaffolding lives in `.ocean/templates/`
+visualizers, persisted worksheets). Every module is now 13–15 sections deep, split by
+`// beginner` / `// intermediate` / `// advanced` band dividers. Shelves: *Learn JavaScript*
+(js-fundamentals, js-async, typescript — purple `#C084FC`), *Learn DSA* (foundations,
+structures, trees-graphs, algorithms), *Build the stack* (react-deep-dive, node-backend,
+postgres-databases, aws-cloud, testing — red `#F87171`), *Think in systems*
+(system-design-backend, frontend-system-design, web-platform — slate `#94A3B8`), *Ace the
+interview* (interview-kit). Module scaffolding lives in `.ocean/templates/`
 (`learn-head-base.html` + `make_head.py` + `learn-tail.html`) — new modules are built by
 instantiating the head (accent/meta/fav placeholders), writing the body, and appending the
 tail with the `__SLUG__` swap. localStorage: `learn:<slug>:done` (array of section ids),

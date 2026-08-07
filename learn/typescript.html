@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript, from Zero — Learn track · in 48</title>
+<meta name="description" content="TypeScript for working JS engineers — structural typing, narrowing, generics, utility types, and the strict config, from first principles. Quiz-checked, cat-themed, honest about what the compiler can and cannot save you from.">
+<meta name="author" content="DSA in 48">
+<meta name="theme-color" content="#F6F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1216" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TypeScript, from Zero — Learn track · in 48">
+<meta property="og:description" content="TypeScript for working JS engineers — structural typing, narrowing, generics, utility types, and the strict config, from first principles. Quiz-checked, cat-themed, honest about what the compiler can and cannot save you from.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TypeScript, from Zero — Learn track · in 48">
+<meta name="twitter:description" content="TypeScript for working JS engineers — structural typing, narrowing, generics, utility types, and the strict config, from first principles. Quiz-checked, cat-themed, honest about what the compiler can and cannot save you from.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23141B22'/%3E%3Ctext x='50' y='68' font-size='52' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23C084FC'%3ETS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#F6F6F1;
+  --card:#FFFFFF;
+  --ink:#141B22;
+  --ink-2:#3E4A56;
+  --ink-3:#79848F;
+  /* every translucent overlay is mixed from --tint, so one flip re-themes them all */
+  --tint:20,27,34;
+  --line:rgba(var(--tint),.14);
+  --line-soft:rgba(var(--tint),.045);
+  --mark:#C084FC;
+  --mark-deep:#9333EA;
+  --mark-soft:rgba(192,132,252,.16);
+  --on-mark:#141B22;
+  --on-ink:#C084FC;
+  --code-bg:#12161D;
+  --code-head:#181E27;
+  --code-line:rgba(255,255,255,.07);
+  --code-border:rgba(20,27,34,.55);
+  --easy-bg:#DDF0E3; --easy-tx:#166B3D;
+  --med-bg:#FBEED3; --med-tx:#8F6400;
+  --hard-bg:#F9DEDC; --hard-tx:#AE332C;
+  --r-card:14px;
+  --r-code:12px;
+  --w-content:860px;
+  --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#A855F7;
+  --mark-soft:rgba(192,132,252,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+  --paper:#0E1216;
+  --card:#161B22;
+  --ink:#E9EEF3;
+  --ink-2:#A7B3BF;
+  --ink-3:#73808D;
+  --tint:233,238,243;
+  --line:rgba(var(--tint),.13);
+  --line-soft:rgba(var(--tint),.05);
+  --mark-deep:#A855F7;
+  --mark-soft:rgba(192,132,252,.13);
+  --on-ink:#0E1216;
+  --code-bg:#080B0F;
+  --code-head:#10151C;
+  --code-border:rgba(var(--tint),.14);
+  --easy-bg:rgba(48,190,120,.15); --easy-tx:#57D19A;
+  --med-bg:rgba(240,190,60,.15); --med-tx:#EDC463;
+  --hard-bg:rgba(240,100,90,.15); --hard-tx:#F0928A;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html:focus-within{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:28px 28px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--mark);color:var(--on-mark)}
+a{color:inherit}
+button{font:inherit;cursor:pointer;background:none;border:none;color:inherit}
+:focus-visible{outline:3px solid var(--mark-deep);outline-offset:2px;border-radius:4px}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:264px minmax(0,1fr);
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky;top:0;align-self:start;
+  height:100vh;overflow-y:auto;
+  padding:34px 26px 40px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:26px;
+  scrollbar-width:thin;
+}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.icon-btn{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);display:grid;place-items:center;
+  color:var(--ink-2);transition:background .15s ease,color .15s ease;
+}
+.icon-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.icon-btn .moon{display:none}
+:root[data-theme="dark"] .icon-btn .sun{display:none}
+:root[data-theme="dark"] .icon-btn .moon{display:block}
+.reset-btn{
+  font-family:var(--font-mono);font-size:.64rem;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;align-self:flex-start;
+  transition:background .15s ease,color .15s ease;
+}
+.reset-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.brand-mark{
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;
+}
+.brand-mark em{
+  font-style:normal;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(192,132,252,0) 0%, rgba(192,132,252,.95) 6%, rgba(192,132,252,.8) 94%, rgba(192,132,252,0) 100%);
+  padding:0 .12em;
+}
+.brand-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3)}
+.side-group{display:flex;flex-direction:column;gap:2px}
+.side-group h4{
+  font-family:var(--font-mono);font-weight:400;font-size:.7rem;color:var(--ink-3);
+  margin-bottom:8px;letter-spacing:.02em;
+}
+.side-link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-family:var(--font-mono);font-size:.78rem;text-decoration:none;color:var(--ink-2);
+  padding:5px 8px;margin-left:-8px;border-radius:6px;
+  transition:background .15s ease,color .15s ease;
+}
+.side-link .t{color:var(--ink-3);font-size:.66rem}
+.side-link:hover{background:rgba(var(--tint),.05);color:var(--ink)}
+.side-link.active{background:var(--mark-soft);color:var(--ink);font-weight:700}
+.side-link.active .t{color:var(--mark-deep)}
+.progress-wrap{margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.pbar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--ink-2);margin-bottom:5px}
+.pbar{height:6px;border-radius:99px;background:rgba(var(--tint),.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:0%;background:var(--mark);border-radius:99px;transition:width .35s ease}
+.progress-note{font-family:var(--font-mono);font-size:.62rem;color:var(--ink-3);line-height:1.5}
+
+/* ---------- main ---------- */
+.main{min-width:0}
+.inner{max-width:var(--w-content);margin:0 auto;padding:56px 44px 140px}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-3);
+  margin-bottom:18px;
+}
+.eyebrow b{font-weight:400;color:var(--mark-deep)}
+
+/* marker highlight */
+.hl{
+  color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(192,132,252,0) 0%, rgba(192,132,252,.95) 5%, rgba(192,132,252,.78) 95%, rgba(192,132,252,0) 100%);
+  background-repeat:no-repeat;background-size:100% 100%;
+  padding:0 .1em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.hl-anim{background-size:0% 100%;background-position:left center;transition:background-size .7s cubic-bezier(.22,1,.36,1)}
+.hl-anim.on{background-size:100% 100%}
+
+/* ---------- hero ---------- */
+.hero{padding-top:16px}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(2.7rem,6vw,4.4rem);
+  line-height:1.04;letter-spacing:-.025em;
+  margin-bottom:26px;max-width:15ch;
+}
+.hero .lede{font-size:1.13rem;color:var(--ink-2);max-width:56ch;margin-bottom:14px}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);
+  margin:26px 0 44px;
+}
+.hero-meta span b{color:var(--ink);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:.85rem;font-weight:700;
+  background:var(--ink);color:var(--paper);
+  padding:13px 22px;border-radius:10px;text-decoration:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:4px 4px 0 rgba(var(--tint),.12);
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 rgba(192,132,252,.9)}
+.btn .arrow{transition:transform .15s ease}
+.btn:hover .arrow{transform:translateY(2px)}
+
+/* translation strip — signature */
+.xlate-wrap{margin-top:64px}
+.xlate-head{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-2);margin-bottom:16px;
+}
+.xlate{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.x-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 16px;
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.x-item:hover{background:var(--mark-soft);border-color:rgba(var(--tint),.3);transform:translateY(-1px)}
+.x-from{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2);flex:1;line-height:1.45}
+.x-arrow{font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+.x-to{
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;
+  border-bottom:3px solid var(--mark);white-space:nowrap;
+}
+.reveal{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- generic sections ---------- */
+.section{margin-top:96px}
+.section-eyebrow{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-bottom:12px}
+.section h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.1;margin-bottom:14px;
+}
+.section .sub{color:var(--ink-2);max-width:60ch}
+
+/* how-to rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.rule{
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.rule h5{font-family:var(--font-mono);font-size:.74rem;font-weight:700;color:var(--mark-deep);margin-bottom:6px}
+.rule p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.rule p b{color:var(--ink)}
+
+/* ---------- day headers ---------- */
+.day-head{margin-top:110px;padding-top:26px;border-top:2px solid var(--ink)}
+.day-head .eyebrow{margin-bottom:10px}
+.day-head h2{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.025em;
+  font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin-bottom:12px;
+}
+.day-head .day-sub{color:var(--ink-2);max-width:58ch;margin-bottom:24px}
+.sched{
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);
+  padding:8px 0;
+}
+.sched-row{
+  display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:baseline;
+  padding:8px 18px;font-size:.9rem;
+}
+.sched-row + .sched-row{border-top:1px dashed var(--line)}
+.sched-row .st{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3)}
+.sched-row .sn{font-weight:600}
+.sched-row .sn a{text-decoration:none;border-bottom:2px solid var(--mark)}
+.sched-row .sn a:hover{background:var(--mark-soft)}
+.sched-row .sd{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.sched-row.break .sn{color:var(--ink-3);font-weight:400;font-style:italic}
+
+/* ---------- topic cards ---------- */
+.topic{
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--r-card);
+  margin-top:40px;
+  scroll-margin-top:24px;
+  overflow:hidden;
+}
+.topic-head{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 26px 0;
+}
+.topic-head-main{flex:1;min-width:0}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{
+  font-family:var(--font-mono);font-size:.68rem;
+  border:1px solid var(--line);border-radius:99px;
+  padding:3px 10px;color:var(--ink-2);background:var(--paper);
+  white-space:nowrap;
+}
+.chip.time{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.big-o{color:var(--mark-deep);border-color:rgba(192,132,252,.55);font-weight:700}
+.topic h3{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.015em;
+  font-size:clamp(1.35rem,2.6vw,1.7rem);line-height:1.15;
+}
+.topic .tagline{color:var(--ink-2);font-size:.95rem;margin-top:6px;max-width:60ch}
+.toggle{
+  flex:none;width:34px;height:34px;border-radius:9px;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;color:var(--ink-2);
+  transition:background .15s ease,transform .25s ease;
+}
+.toggle:hover{background:var(--mark-soft)}
+.toggle svg{transition:transform .25s ease}
+.topic.collapsed .toggle svg{transform:rotate(-90deg)}
+.topic-body{padding:20px 26px 28px;display:flex;flex-direction:column;gap:22px}
+.topic.collapsed .topic-body{display:none}
+.topic.collapsed .topic-head{padding-bottom:22px}
+
+/* analogy callout */
+.analogy{
+  background:var(--mark-soft);
+  border-left:3px solid var(--ink);
+  border-radius:0 10px 10px 0;
+  padding:14px 18px;
+}
+.analogy h6{font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.03em}
+.analogy p{font-size:.93rem;color:var(--ink-2);line-height:1.6}
+.analogy p code, .idea li code, .sub code, .tagline code, .rule p code, .pt-when code{
+  font-family:var(--font-mono);font-size:.83em;background:rgba(var(--tint),.07);
+  padding:.1em .35em;border-radius:5px;color:var(--ink);
+}
+.analogy p b{color:var(--ink)}
+
+/* idea bullets */
+.mini-label{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--ink-3);
+  margin-bottom:9px;
+}
+.mini-label b{color:var(--mark-deep);font-weight:700}
+.idea ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.idea li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-2);line-height:1.6}
+.idea li::before{content:"▪";position:absolute;left:2px;color:var(--mark-deep)}
+.idea li b{color:var(--ink);font-weight:600}
+
+/* code panel */
+.code{border-radius:var(--r-code);overflow:hidden;border:1.5px solid var(--code-border)}
+.code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--code-head);padding:9px 14px;
+  border-bottom:1px solid var(--code-line);
+}
+.code-head .fname{font-family:var(--font-mono);font-size:.72rem;color:#8B96A5}
+.copy{
+  font-family:var(--font-mono);font-size:.68rem;color:#AAB4C2;
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:3px 10px;
+  transition:all .15s ease;
+}
+.copy:hover{background:var(--mark);color:var(--on-mark);border-color:var(--mark)}
+.code pre{background:var(--code-bg);overflow-x:auto;padding:16px 18px}
+.code code{
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;
+  color:#C9D4E0;background:transparent;
+}
+/* custom hljs theme */
+.hljs{background:transparent;color:#C9D4E0}
+.hljs-keyword,.hljs-meta{color:var(--mark)}
+.hljs-string{color:#8FE388}
+.hljs-number,.hljs-literal{color:#82AAFF}
+.hljs-comment{color:#5E6B7A;font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-title.class_{color:#F0F4F8;font-weight:700}
+.hljs-built_in{color:#7BD4E8}
+.hljs-params{color:#C9D4E0}
+.hljs-attr,.hljs-property{color:#C9D4E0}
+.hljs-operator,.hljs-punctuation{color:#8B96A5}
+
+/* spot-it list */
+.spot ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.spot li{
+  display:flex;align-items:baseline;gap:12px;
+  font-size:.88rem;
+}
+.spot .cue{font-style:italic;color:var(--ink-2);flex:1}
+.spot .then{
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;white-space:nowrap;color:var(--on-mark);
+  background-image:linear-gradient(120deg, rgba(192,132,252,0) 0%, rgba(192,132,252,.9) 6%, rgba(192,132,252,.7) 94%, rgba(192,132,252,0) 100%);
+  padding:1px 6px;
+}
+.spot li::before{content:"→";font-family:var(--font-mono);color:var(--mark-deep);font-weight:700}
+/* this course's "reach for" labels run longer than the other pages' — let them wrap */
+.spot li{flex-wrap:wrap}
+.spot .then{white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+/* problems */
+.probs{display:flex;flex-direction:column}
+.prob{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 2px;
+  border-top:1px dashed var(--line);
+}
+.prob-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.prob:first-of-type{border-top:none}
+.prob input{position:absolute;opacity:0;width:1px;height:1px}
+.prob .box{
+  flex:none;width:19px;height:19px;border-radius:6px;
+  border:1.5px solid rgba(var(--tint),.4);
+  display:grid;place-items:center;
+  transition:all .15s ease;background:var(--card);
+}
+.prob .box svg{opacity:0;transform:scale(.5);transition:all .15s ease}
+.prob input:checked ~ .box{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.prob input:checked ~ .box svg{opacity:1;transform:scale(1)}
+.prob input:focus-visible ~ .box{outline:3px solid var(--mark-deep);outline-offset:2px}
+.prob .pn{flex:1;font-size:.92rem;font-weight:500;transition:color .15s ease}
+.prob input:checked ~ .pn{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--mark-deep);text-decoration-thickness:2px}
+.diff{font-family:var(--font-mono);font-size:.64rem;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.diff.e{background:var(--easy-bg);color:var(--easy-tx)}
+.diff.m{background:var(--med-bg);color:var(--med-tx)}
+.diff.h{background:var(--hard-bg);color:var(--hard-tx)}
+.lc{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-3);white-space:nowrap}
+a.lc{text-decoration:none;border-bottom:1px solid transparent;transition:color .15s ease,border-color .15s ease}
+a.lc::after{content:" \2197";opacity:.6}
+a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
+
+/* quiz details */
+.quiz{border:1px dashed var(--line);border-radius:10px;overflow:hidden}
+.quiz + .quiz{margin-top:8px}
+.quiz summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--font-mono);font-size:.78rem;
+  color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;
+}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary::before{content:"?";flex:none;width:20px;height:20px;border-radius:6px;background:var(--mark);color:var(--on-mark);font-weight:700;display:grid;place-items:center;font-size:.7rem}
+.quiz[open] summary::before{content:"!"}
+.quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
+.quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
+.tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
+.tbl-wrap .tbl{border:none}
+.tbl th{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:700;color:var(--ink-2);
+  text-align:left;padding:11px 14px;background:rgba(var(--tint),.04);
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:10px 14px;border-bottom:1px dashed var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.mono, .tbl td code{font-family:var(--font-mono);font-size:.76rem}
+.tbl td code{background:rgba(var(--tint),.06);padding:.12em .4em;border-radius:5px}
+.tbl td.good{color:var(--easy-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.bad{color:var(--hard-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+.tbl td.mid{color:var(--med-tx);font-weight:700;font-family:var(--font-mono);font-size:.76rem}
+
+/* playbook steps */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.step{
+  display:flex;gap:16px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;
+}
+.step::before{
+  counter-increment:step;content:counter(step);
+  flex:none;width:30px;height:30px;border-radius:9px;
+  background:var(--ink);color:var(--on-ink);
+  font-family:var(--font-mono);font-weight:700;font-size:.85rem;
+  display:grid;place-items:center;
+}
+.step h5{font-family:var(--font-display);font-size:1.02rem;font-weight:700;margin-bottom:3px}
+.step p{font-size:.9rem;color:var(--ink-2);line-height:1.55}
+.step p code{font-family:var(--font-mono);font-size:.8em;background:rgba(var(--tint),.07);padding:.1em .35em;border-radius:5px}
+
+/* footer */
+.footer{
+  margin-top:120px;border-top:2px solid var(--ink);padding-top:28px;
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.footer p{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);max-width:46ch;line-height:1.7}
+.footer p b{color:var(--ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .shell{display:block}
+  .sidebar{
+    position:sticky;top:0;z-index:60;height:auto;
+    flex-direction:row;align-items:center;gap:18px;
+    padding:12px 18px;overflow-x:auto;overflow-y:hidden;
+    background:var(--paper);border-right:none;border-bottom:1.5px solid var(--line);
+    scrollbar-width:none;
+  }
+  .sidebar::-webkit-scrollbar{display:none}
+  .brand{flex:none;gap:10px}
+  .brand-sub{display:none}
+  .side-group{flex:none;flex-direction:row;align-items:center;gap:2px}
+  .side-group h4{margin:0 6px 0 0;white-space:nowrap}
+  .side-link{white-space:nowrap;margin-left:0}
+  .side-link .t{display:none}
+  .progress-wrap{display:none}
+  .inner{padding:44px 22px 110px}
+  .xlate{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr}
+  .sched-row{grid-template-columns:52px 1fr auto;padding:8px 14px}
+  .topic-head{padding:18px 18px 0}
+  .topic-body{padding:16px 18px 22px}
+}
+@media print{
+  .sidebar,.toggle,.copy,.icon-btn,.reset-btn,.btn{display:none !important}
+  body{background:#fff;background-image:none;color:#000;font-size:10.5pt}
+  .shell{display:block}
+  .inner{max-width:none;padding:0}
+  .topic.collapsed .topic-body{display:flex !important}
+  .topic,.step,.rule,.tbl-wrap,.analogy,.code{break-inside:avoid;page-break-inside:avoid}
+  .day-head{break-before:page;page-break-before:always}
+  .section,.topic{margin-top:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .reveal,.hl-anim{opacity:1;transform:none;background-size:100% 100%}
+}
+
+/* ---------- learn-module components ---------- */
+.side-link .dot{
+  flex:none;width:8px;height:8px;border-radius:99px;margin-right:2px;
+  border:1.5px solid var(--line);display:inline-block;
+}
+.side-link .dot.on{background:var(--easy-tx);border-color:var(--easy-tx)}
+
+.crumb{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-3);margin-bottom:14px}
+.crumb a{text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--mark-deep)}
+.level-chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.level-chip{font-family:var(--font-mono);font-size:.7rem;padding:5px 10px;border-radius:99px;border:1.5px solid var(--line);color:var(--ink-2)}
+.level-chip.b{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.level-chip.i{background:var(--med-bg);color:var(--med-tx);border-color:transparent}
+.level-chip.a{background:var(--hard-bg);color:var(--hard-tx);border-color:transparent}
+
+.lesson{margin-top:54px;border:1.5px solid var(--line);border-radius:var(--r-card);background:var(--card);overflow:hidden}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 4px}
+.lesson-num{
+  flex:none;font-family:var(--font-mono);font-weight:700;font-size:.8rem;
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:var(--mark);color:var(--on-mark);margin-top:2px;
+}
+.lesson.done .lesson-num{background:var(--easy-bg);color:var(--easy-tx)}
+.lesson-head h3{font-family:var(--font-display);font-size:1.3rem;letter-spacing:-.015em;line-height:1.25}
+.lesson-head .lvl{font-family:var(--font-mono);font-size:.68rem;color:var(--ink-3);margin-top:3px}
+.lesson-body{padding:10px 26px 26px}
+.lesson-body > p{margin-top:14px;color:var(--ink-2);max-width:70ch}
+.lesson-body > p b{color:var(--ink)}
+.lesson-body h4{font-family:var(--font-display);font-size:1.02rem;margin-top:26px}
+
+.whiskers{
+  display:flex;gap:14px;align-items:flex-start;
+  margin-top:20px;padding:16px 18px;border-radius:12px;
+  background:var(--mark-soft);border:1.5px dashed rgba(var(--tint),.2);
+}
+.whiskers .cat{flex:none;width:34px;height:34px;color:var(--mark-deep)}
+.whiskers p{font-size:.95rem;color:var(--ink-2)}
+.whiskers p b{color:var(--ink)}
+.whiskers .who{display:block;font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:4px;letter-spacing:.04em}
+
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+
+.runner{margin-top:20px}
+.runner .code{margin-top:0}
+.run-bar{display:flex;gap:10px;align-items:center;margin-top:10px}
+.run-btn{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:700;
+  background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:9px;
+  transition:transform .12s ease;
+}
+.run-btn:hover{transform:translateY(-1px)}
+.run-hint{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+.run-out{
+  display:none;margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:var(--code-bg);border:1.5px solid var(--code-border);
+  font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#E9EEF3;
+  white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;
+}
+.run-out.on{display:block}
+.run-out .err{color:#F0928A}
+.run-out .note{color:#8FA0B0;font-style:italic}
+
+.levelup{margin-top:20px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper)}
+.levelup h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--hard-tx);margin-bottom:8px}
+.levelup p, .levelup li{font-size:.93rem;color:var(--ink-2)}
+.levelup ul{padding-left:18px;margin-top:6px}
+.levelup b{color:var(--ink)}
+
+.done-row{display:flex;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+.done-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+  border:1.5px solid var(--line);padding:9px 16px;border-radius:9px;color:var(--ink-2);
+  transition:background .12s ease,color .12s ease;
+}
+.done-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.lesson.done .done-btn{background:var(--easy-bg);color:var(--easy-tx);border-color:transparent}
+.done-note{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-3)}
+
+.viz{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.viz h6{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.05em;color:var(--mark-deep);margin-bottom:10px}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.viz-btn{
+  font-family:var(--font-mono);font-size:.74rem;font-weight:700;
+  border:1.5px solid var(--line);padding:7px 13px;border-radius:8px;color:var(--ink-2);
+}
+.viz-btn:hover{background:var(--mark-soft);color:var(--ink)}
+.viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
+
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.recap{margin-top:26px}
+</style>
+<script>
+/* set the theme before first paint so there is no flash */
+(function () {
+  try {
+    var t = localStorage.getItem('learn:theme');
+    if (t !== 'light' && t !== 'dark') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+
+<body>
+<div class="shell">
+
+<!-- ======================= SIDEBAR ======================= -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-txt">
+      <div class="brand-mark">learn <em>· typescript</em></div>
+      <div class="brand-sub">module 14 · beginner → advanced</div>
+    </div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+
+  <nav class="side-group" aria-label="Sections">
+    <h4>// sections</h4>
+    <a class="side-link" href="#mental"><span><i class="dot" data-for="mental"></i> The Mental Model</span></a>
+    <a class="side-link" href="#basics"><span><i class="dot" data-for="basics"></i> Annotations &amp; Inference</span></a>
+    <a class="side-link" href="#narrowing"><span><i class="dot" data-for="narrowing"></i> Unions &amp; Narrowing</span></a>
+    <a class="side-link" href="#functions"><span><i class="dot" data-for="functions"></i> Typing Functions</span></a>
+    <a class="side-link" href="#generics"><span><i class="dot" data-for="generics"></i> Generics</span></a>
+    <a class="side-link" href="#utility"><span><i class="dot" data-for="utility"></i> Utility &amp; Mapped Types</span></a>
+    <a class="side-link" href="#classes"><span><i class="dot" data-for="classes"></i> Interfaces &amp; Classes</span></a>
+    <a class="side-link" href="#declarations"><span><i class="dot" data-for="declarations"></i> Declarations &amp; @types</span></a>
+    <a class="side-link" href="#tsconfig"><span><i class="dot" data-for="tsconfig"></i> tsconfig, Strictly</span></a>
+    <a class="side-link" href="#react"><span><i class="dot" data-for="react"></i> TS + React</span></a>
+    <a class="side-link" href="#node"><span><i class="dot" data-for="node"></i> TS + Node</span></a>
+    <a class="side-link" href="#migration"><span><i class="dot" data-for="migration"></i> Migration &amp; Escape Hatches</span></a>
+    <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Error Gauntlet</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Reference">
+    <h4>// wrap up</h4>
+    <a class="side-link" href="#recap"><span>Recap Table</span></a>
+    <a class="side-link" href="#interview"><span>In the Interview</span></a>
+  </nav>
+
+  <nav class="side-group" aria-label="Track">
+    <h4>// the learn track</h4>
+    <a class="side-link" href="./index.html"><span>All modules</span><span class="t">↑</span></a>
+    <a class="side-link" href="./js-fundamentals.html"><span>JS Fundamentals</span><span class="t">←</span></a>
+    <a class="side-link" href="../fullstack.html"><span>Full-Stack in 48</span><span class="t">→</span></a>
+  </nav>
+
+  <div class="progress-wrap">
+    <div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar"><i id="sec-bar"></i></div>
+    </div>
+    <div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+    </div>
+    <p class="progress-note">progress + theme save in this browser.</p>
+  </div>
+</aside>
+
+<!-- ======================= MAIN ======================= -->
+<main class="main">
+<div class="inner">
+
+<!-- HERO -->
+<header class="hero">
+  <p class="crumb"><a href="./index.html">← the learn track</a></p>
+  <p class="eyebrow">// module 14 <b>the type system your JS was missing</b></p>
+  <h1>TypeScript, actually <span class="hl hl-anim" data-d="0">reasoned</span> <span class="hl hl-anim" data-d="1">through</span>.</h1>
+  <p class="lede">You've read TypeScript for years — squiggles, generics, config folklore. This module rebuilds it from one idea: <b>types describe the shapes values already have</b>, and the compiler is a very fast, very pedantic reviewer who never gets tired. Learn what it checks, what it erases, and how to make it work <i>for</i> you instead of around you.</p>
+  <p class="lede">Prerequisite: <a href="./js-fundamentals.html">JS Fundamentals</a> — TypeScript is JavaScript with a proof layer; the runtime never changes. The compiler can't run on this page, so this module trades runners for <b>predict-the-error quizzes</b> — read sharply. The cats have opinions about type safety. 🐈</p>
+  <div class="level-chips">
+    <span class="level-chip b">starts at: "why types at all?"</span>
+    <span class="level-chip i">middle: generics that stop hurting</span>
+    <span class="level-chip a">ends at: strict-mode fluency</span>
+  </div>
+  <div class="hero-meta">
+    <span><b>13</b> sections</span>
+    <span><b>15</b> quiz questions</span>
+    <span><b>1</b> runnable panel</span>
+    <span><b>~8.5h</b> self-paced</span>
+  </div>
+  <a class="btn" href="#mental">Start with the model <span class="arrow">↓</span></a>
+</header>
+
+<div class="band" id="band-beginner"><span>// beginner — shapes, not ceremonies</span></div>
+
+<!-- 1 · MENTAL -->
+<section class="lesson" id="mental">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <div>
+      <h3>The mental model — structural typing &amp; the eraser</h3>
+      <p class="lvl">beginner → duck typing with a proof, gone by runtime</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Two ideas explain 90% of TypeScript's behavior. <b>One: typing is structural.</b> A type is a <i>shape description</i> — any value with the right shape fits, no declarations of allegiance needed. If a function wants <code>{ name: string }</code>, every object with a string <code>name</code> qualifies, whatever it was called or however it was made. (Java/C# are the opposite — <i>nominal</i>: you must declare <code>implements</code>.) <b>Two: types are erased.</b> Compilation strips every annotation; the JavaScript that runs contains no trace of them. Types can't affect runtime behavior — no type-based branching, no runtime validation for free — which is precisely why the boundary sections (§11) exist.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>The shelter's "is it a cat?" test doesn't check papers — it checks the <b>shape</b>: four legs, whiskers, disdain. Anything matching the shape passes, pedigree or alley. That's structural typing. And the test happens <b>at the door, before the party</b> — during the party (runtime) there are no inspectors anywhere in the building. If a raccoon got past the door wearing whiskers (a lying <code>as</code>, a wild API response), the party has a raccoon in it. The door is the compiler; the party is production.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">erasure.js — run it (the OUTPUT of tsc — note what's missing)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// this WAS TypeScript:  function weigh(cat: { name: string; kg: number }): string
+// after tsc, what runs is just:
+function weigh(cat) {
+  return `${cat.name}: ${cat.kg}kg`;
+}
+console.log(weigh({ name: 'Mochi', kg: 4.2 }));
+
+// erasure means NO runtime trace:
+console.log('any type info on the function?',
+  Object.keys(weigh).length === 0 ? 'none — annotations are gone' : '??');
+
+// …so nothing stops a lying value AT RUNTIME:
+const fromAPI = JSON.parse('{"name":"Raccoon","kg":"HEAVY"}');   // kg is a string!
+console.log(weigh(fromAPI), ' ← ran fine, wrong silently');
+console.log('typeof fromAPI.kg:', typeof fromAPI.kg);
+console.log('\nthe compiler checks the door. JSON.parse climbs in a window.');
+console.log('that gap is what §11 (validate at boundaries) exists to close.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the only runner in this module — proving the types are truly gone</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="ts-mental-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>interface Cat { name: string }</code> · <code>const dog = { name: 'Rex', barks: true }</code> · <code>const c: Cat = dog</code> — compile?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Error — dog was never declared to implement Cat</button>
+        <button class="mcq-opt" type="button" data-ok>Compiles — dog's shape includes everything Cat requires; extra properties are fine on assignment from a variable (structural typing)</button>
+        <button class="mcq-opt" type="button">Error — dog has an extra property Cat doesn't list</button>
+        <button class="mcq-opt" type="button">Compiles, but barks is deleted from the object</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Cat asks "do you have a string name?" — dog does; done. No nominal ceremony (A is the Java instinct), no property deletion (types never touch values — erasure). The wrinkle worth knowing: assigning a fresh <i>object literal</i> directly (<code>const c: Cat = { name: 'Rex', barks: true }</code>) DOES error — "excess property checking" flags probable typos on literals only. Variable: fine; literal: checked. That asymmetry is a famous interview probe.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The one-liner: <b>"TypeScript checks shapes at compile time and vanishes at runtime — it's a linter with a PhD, not a guard dog."</b></li>
+        <li>Because types erase, <code>instanceof MyInterface</code> is impossible — runtime checks need real values (discriminants §03, classes §07, or validators §11).</li>
+        <li>Structural typing is why two identically-shaped types are interchangeable — and why branding (a phantom property) exists when you need <code>UserId</code> ≠ <code>OrderId</code> despite both being strings.</li>
+        <li>Enums and namespaces are the two exceptions that DO emit runtime code — one sentence of trivia that signals real mileage (and why <code>as const</code> unions are the modern preference).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 2 · BASICS -->
+<section class="lesson" id="basics">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <div>
+      <h3>Annotations &amp; inference — write less, know more</h3>
+      <p class="lvl">beginner → where annotations belong, and where they're noise</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The compiler <b>infers</b> most types: <code>let kg = 4.2</code> is a <code>number</code> — annotating it is noise. The discipline: <b>annotate boundaries</b> (function parameters and public return types — the contracts), <b>infer internals</b> (locals, obvious expressions). Two inference behaviors worth knowing cold: <code>let</code> widens (<code>let s = 'tuna'</code> is <code>string</code> — it could be reassigned) while <code>const</code> narrows to the <b>literal</b> (<code>const s = 'tuna'</code> is type <code>'tuna'</code>); and <code>as const</code> freezes a whole structure into readonly literals — the idiomatic way to make a plain object behave like an enum.</p>
+    <p>The shapes toolbox: object types (<code>{ name: string; kg?: number }</code> — <code>?</code> means may be absent), arrays (<code>string[]</code>), <b>tuples</b> (<code>[number, number]</code> — fixed length, per-position types; what <code>useState</code> returns), and <code>readonly</code> for immutability <i>at the type level</i> (a compile-door promise — erased like everything else, as js-fundamentals' <code>Object.freeze</code> discussion foreshadowed: freeze is runtime, readonly is compile-time; different layers, both useful).</p>
+    <div class="mcq" data-qid="ts-basics-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>const MOODS = ['grumpy', 'aloof', 'feral'] as const;</code> — what is <code>MOODS[0]</code>'s type, and why does anyone do this?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>string</code> — arrays always hold their element type</button>
+        <button class="mcq-opt" type="button" data-ok><code>'grumpy'</code> — as const makes a readonly tuple of literal types; <code>typeof MOODS[number]</code> then derives the union 'grumpy' | 'aloof' | 'feral' — an enum with zero runtime cost</button>
+        <button class="mcq-opt" type="button">A compile error — const assertions only work on primitives</button>
+        <button class="mcq-opt" type="button"><code>'grumpy'</code> at compile time, <code>string</code> at runtime</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> without <code>as const</code>, TS widens to <code>string[]</code> (you might push to it). With it: <code>readonly ['grumpy', 'aloof', 'feral']</code> — and the <code>typeof MOODS[number]</code> trick turns the VALUES into a TYPE, so the list exists exactly once (single source of truth: add 'zoomies' to the array, the union updates itself). Option D is a category error worth noticing: there are no types at runtime at all (§01) — the question doesn't parse.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>?</code> (absent) vs <code>| undefined</code> (present-but-undefined) differ under <code>exactOptionalPropertyTypes</code> — deep-cut flag knowledge, deploy sparingly.</li>
+        <li>Annotate return types on exported/public functions even when inferable — they pin the contract so a refactor's type-drift errors at the source, not at fifty call sites.</li>
+        <li><code>string[]</code> vs <code>[string]</code> confusion is the classic screen-share tell — array vs one-element tuple; say it before they ask.</li>
+        <li>Inference quality is WHY strict mode matters: without <code>noImplicitAny</code>, un-inferable things silently become <code>any</code> and the checking quietly stops (§09's story).</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 3 · NARROWING -->
+<section class="lesson" id="narrowing">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <div>
+      <h3>Unions &amp; narrowing — the control-flow type system</h3>
+      <p class="lvl">beginner → the compiler reads your ifs; discriminated unions &amp; never</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>union</b> (<code>string | number</code>, <code>Cat | null</code>) says "one of these" — and until you know which, you may only do what's legal for <i>all</i> of them. <b>Narrowing</b> is how you find out: the compiler <i>reads your control flow</i> — <code>typeof x === 'string'</code>, <code>x !== null</code>, <code>'meow' in x</code>, <code>x instanceof Cat</code> — and inside each branch, the type shrinks accordingly. This is the machinery that makes <code>strictNullChecks</code> livable: <code>Cat | null</code> forces the null-check the bug report would have demanded anyway, and after the check, it's just <code>Cat</code>.</p>
+    <p>The crown jewel is the <b>discriminated union</b>: variants sharing a literal tag field — <code>{ status: 'loading' } | { status: 'ready'; data: Cat[] } | { status: 'error'; error: string }</code>. Switch on the tag and each case knows its exact shape (<code>data</code> only exists under 'ready' — <i>impossible states unrepresentable</i>, the pattern React state sections preach). The <b><code>never</code></b> finisher: a <code>default</code> case assigning to <code>never</code> makes the compiler <b>error when a future variant is added but unhandled</b> — exhaustiveness as a compile-time tripwire.</p>
+    <div class="mcq" data-qid="ts-narrow-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does the fetch-state discriminated union beat <code>{ loading: boolean; data?: Cat[]; error?: string }</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It's shorter to write</button>
+        <button class="mcq-opt" type="button" data-ok>The flags version permits nonsense states (loading:true + error set + data present simultaneously) that every consumer must defensively consider; the union makes those states unrepresentable, and narrowing hands each branch exactly its fields</button>
+        <button class="mcq-opt" type="button">Optional properties are slower at runtime</button>
+        <button class="mcq-opt" type="button">It enables instanceof checks on the states</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> with flags, "can data and error both be set?" is answered by convention and prayer; with the union, by the type system: no. Every <code>if (state.status === 'ready')</code> is also documentation. (C is the §01 category error again — types cost nothing at runtime; D misses that erased types can't instanceof — the <i>tag value</i> is the runtime check.) "Make impossible states unrepresentable" is the sentence to carry into every interview.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Custom type guards — <code>function isCat(x: unknown): x is Cat</code> — extend narrowing to your own predicates; the <code>x is</code> return type is the magic (and a lying guard is a lying <code>as</code>: the compiler trusts you).</li>
+        <li>Narrowing doesn't survive callbacks or awaits on mutable bindings — "possibly null" after an <code>if</code> usually means the check and use are in different closures; capture to a const first.</li>
+        <li><code>satisfies</code> (TS 4.9+) — validate against a type WITHOUT widening to it: config objects keep their literal keys AND get checked. Modern flex, one sentence.</li>
+        <li>Exhaustiveness via never is how unions scale in teams: adding a variant lights up every switch that needs updating — the compiler as a refactoring TODO list.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — abstraction without tears</span></div>
+
+<!-- 4 · FUNCTIONS -->
+<section class="lesson" id="functions">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <div>
+      <h3>Typing functions — parameters, returns &amp; the void quirk</h3>
+      <p class="lvl">intermediate → contracts for the unit of work</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Function types read as arrows: <code>(cat: string, kg?: number) =&gt; string</code>. The pieces that trip people: <b>optional parameters</b> (<code>?</code>) must trail required ones; <b>rest parameters</b> type as arrays (<code>...names: string[]</code>); <b>callback parameters</b> are where annotation pays most — <code>onAdopt: (cat: Cat) =&gt; void</code> gives the caller's arrow function full inference (you write <code>c =&gt; …</code>, c is Cat, free). The famous <b>void quirk</b>: a callback typed to return <code>void</code> <i>accepts</i> functions returning anything ("I promise to ignore your return value") — which is why <code>arr.forEach(x =&gt; map.set(k, x))</code> compiles though <code>set</code> returns the Map. <code>void</code> means "not used", not "must be undefined".</p>
+    <p><b>Overloads</b> declare multiple call shapes above one implementation — <code>function find(id: number): Cat; function find(name: string): Cat[]</code> — the implementation signature is invisible to callers and must handle every overload. Modern honesty: unions + conditional returns often replace overloads; reach for overloads when the <i>return type depends on the argument type</i> and a union return would force every caller to narrow.</p>
+    <div class="mcq" data-qid="ts-fn-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Two function types: <code>f: () =&gt; void</code> and <code>g: () =&gt; undefined</code>. You pass <code>() =&gt; 42</code> to each. Verdicts?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Both error — 42 is neither void nor undefined</button>
+        <button class="mcq-opt" type="button" data-ok>f accepts it (void-returning contexts ignore return values — the forEach/set idiom depends on this); g rejects it (undefined is a real type that 42 isn't)</button>
+        <button class="mcq-opt" type="button">Both compile — return types are never checked on callbacks</button>
+        <button class="mcq-opt" type="button">f rejects, g accepts — void is stricter than undefined</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>void</code> in a callback position is a promise from the CALLER ("I won't look at what you return"), so any return value is safe to allow — banning them would break every terse arrow that happens to return something. <code>undefined</code> is an actual value type with actual checking. This asymmetry is deliberate design, not sloppiness — explaining the WHY (who consumes the value?) is what separates the answer from trivia.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Parameter counts are structurally forgiving too: <code>(x) =&gt; …</code> satisfies <code>(x, i, arr) =&gt; …</code> — callbacks may ignore trailing args (why <code>map(x =&gt; x*2)</code> works). Fewer is fine; more is not.</li>
+        <li>Type <code>this</code> for old-style APIs (<code>function(this: Cat)</code>) — rare, but naming it shows you've met legacy code.</li>
+        <li>Function type vs call signature vs constructor signature (<code>new () =&gt; Cat</code>) — one breath each; interfaces can hold all three.</li>
+        <li>Async functions: return <code>Promise&lt;T&gt;</code>, always — <code>async (): Promise&lt;void&gt;</code> for fire-and-forget handlers keeps the floating-promise lint (js-async §05) coherent.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · GENERICS -->
+<section class="lesson" id="generics">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <div>
+      <h3>Generics — type variables, not type magic</h3>
+      <p class="lvl">intermediate → the compiler solves for T; you just relate the parts</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A generic is a <b>type variable</b>: <code>function first&lt;T&gt;(arr: T[]): T</code> says "whatever element type comes in, that's what comes out" — the <i>relationship</i> between input and output is the entire point. Without it: <code>first(cats)</code> returns <code>any</code> (checking off) or <code>unknown</code> (caller must cast). With it, <b>the compiler infers T at each call site</b> — you almost never write <code>first&lt;Cat&gt;(cats)</code>; T is solved from the argument. When you catch yourself writing a generic the output doesn't use (<code>function log&lt;T&gt;(x: T): void</code>), delete it — <code>unknown</code> does that job; generics earn their keep only by <i>connecting</i> types.</p>
+    <p><b>Constraints</b> bound the variable: <code>&lt;T extends { id: string }&gt;</code> means "any shape with an id" — inside, <code>x.id</code> is legal; outside, callers keep their full type (that's the win over just taking <code>{ id: string }</code>: the return can be T, not the stripped-down shape). The keyof duet — <code>&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K]</code> — types <code>pluck(cat, 'kg')</code> as <code>number</code> and rejects <code>'wings'</code> at compile time: the whole "typed ORM/config accessor" genre in one signature.</p>
+    <div class="mcq" data-qid="ts-gen-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">API helper: <code>async function get(url: string): Promise&lt;any&gt;</code> vs <code>async function get&lt;T&gt;(url: string): Promise&lt;T&gt;</code> — the honest difference?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The generic validates the response matches T at runtime</button>
+        <button class="mcq-opt" type="button" data-ok>Neither checks anything at runtime (erasure!) — but any silently poisons every downstream expression, while &lt;T&gt; at least propagates the CLAIMED shape so consumers type-check against it; the real fix adds a §11 validator at the boundary</button>
+        <button class="mcq-opt" type="button">They're identical since T is unconstrained</button>
+        <button class="mcq-opt" type="button">The generic version is slower — type checks per call</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>get&lt;Cat[]&gt;('/cats')</code> is still a promise about the network the compiler can't verify — but it's a <i>propagated, checkable</i> promise: every use of the result is typed, and one validator at the fetch site makes it true. <code>any</code> is a contagion: everything it touches becomes unchecked without a squiggle anywhere. Options A and D are the erasure misunderstanding in two costumes — generics are compile-time only, always.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Read error messages inside-out: "T is not assignable to…" errors usually mean the RELATIONSHIP is wrong, not the annotation — re-derive what T should solve to.</li>
+        <li>Default type params (<code>&lt;T = unknown&gt;</code>) make generic containers ergonomic; constraints + defaults together cover the API-wrapper pattern.</li>
+        <li>Variance intuition without the jargon: producers of T are covariant (Cat[] fits Animal[] reads), consumers are contravariant (a handler of Animal accepts more than a handler of Cat) — <code>strictFunctionTypes</code> enforces the latter.</li>
+        <li>The "when would you NOT use a generic" question has a real answer: single fixed type (just name it), or T appearing once (unknown). Generics model relationships — no relationship, no generic.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · UTILITY -->
+<section class="lesson" id="utility">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>Utility &amp; mapped types — types computed from types</h3>
+      <p class="lvl">intermediate → Partial to infer, and the loop that builds them all</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The built-ins you'll use weekly, each one sentence: <code>Partial&lt;T&gt;</code> (all optional — update payloads), <code>Required</code>, <code>Readonly</code>, <code>Pick&lt;T, 'a' | 'b'&gt;</code> / <code>Omit&lt;T, 'password'&gt;</code> (API responses derived from DB rows — <i>derive, don't duplicate</i> is the whole philosophy), <code>Record&lt;K, V&gt;</code> (typed dictionaries), <code>ReturnType&lt;typeof fn&gt;</code> / <code>Parameters</code> (extract from existing functions — typing what you don't own). They're not magic: each is a <b>mapped type</b>, a for-loop over keys: <code>Partial</code> is literally <code>{ [K in keyof T]?: T[K] }</code>. Read that once slowly — "for each key K in T, same value type, add ?" — and the standard library stops being incantations.</p>
+    <p><b>Conditional types</b> add the if-statement: <code>T extends U ? X : Y</code>, with <code>infer</code> as the pattern-matcher — <code>type Unwrap&lt;T&gt; = T extends Promise&lt;infer U&gt; ? U : T</code> pulls the resolved type out of a promise. You'll <i>read</i> these in library types daily and <i>write</i> them rarely; the honest skill split is "fluent reader, occasional author" — say exactly that when asked how deep your type-level TypeScript goes.</p>
+    <div class="mcq" data-qid="ts-util-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">DB row: <code>type CatRow = { id: string; name: string; passwordHash: string; vetNotes: string }</code>. The API returns everything except the sensitive fields. The maintainable type?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Write <code>type PublicCat = { id: string; name: string }</code> — explicit beats clever</button>
+        <button class="mcq-opt" type="button" data-ok><code>type PublicCat = Omit&lt;CatRow, 'passwordHash' | 'vetNotes'&gt;</code> — derived, so new columns flow through automatically and the omit-list documents exactly what's withheld</button>
+        <button class="mcq-opt" type="button"><code>Partial&lt;CatRow&gt;</code> — optional covers absent</button>
+        <button class="mcq-opt" type="button"><code>any</code>, with the filtering done at runtime</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the hand-copy (A) silently drifts — add <code>adoptedAt</code> to the row and the API type forgets it exists; six months later the types lie. Omit inverts the maintenance: additions propagate, and the exclusion list is the security review. Partial (C) says "every field maybe" — a different, wrong claim. The meta-lesson interviewers fish for: <b>types have DRY too</b> — one source of truth, everything else derived. (And the runtime filtering still has to exist — types don't strip fields; §01 forever.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Template literal types (<code>`cat:${string}`</code>) type string patterns — event names, route params; one example earns the point.</li>
+        <li><code>keyof</code> + mapped + <code>as</code> remapping renames keys in flight (<code>getName</code> from <code>name</code>) — recognize it in library code, don't author it under pressure.</li>
+        <li>Deep utility types (DeepPartial) are recursive conditionals with edge cases — "I'd take type-fest's, not write mine" is the senior answer.</li>
+        <li>When a type-level puzzle exceeds ~3 layers, the design is usually wrong one level up — simplify the VALUE model; the type model follows. Saying this aloud is rare and lands.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · CLASSES -->
+<section class="lesson" id="classes">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Interfaces, types &amp; classes — which keyword when</h3>
+      <p class="lvl">intermediate → the eternal interface-vs-type question, settled</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The question every TS interview asks: <b><code>interface</code> vs <code>type</code></b>. The real differences are two: interfaces can be <b>reopened</b> (declaration merging — the mechanism that lets you augment a library's types, §08), and interfaces only describe object/function shapes while <code>type</code> aliases anything (unions, tuples, primitives, mapped/conditional constructions). Everything else is style. The defensible convention: <b>interface for public object contracts</b> (extendable, better error messages), <b>type for unions and computed types</b> (interfaces can't union at all) — then stop arguing about it, which is itself the senior answer.</p>
+    <p>Classes get a type-system twist: a class declaration creates <b>both</b> a value (the constructor) and a type (the instance shape) — <code>Cat</code> works after <code>new</code> and after <code>:</code>. <code>implements Iface</code> checks the shape but changes nothing structurally (any matching class passes anyway — §01); TS's <code>private</code> is compile-only politeness (erased!), while <code>#private</code> (js-fundamentals §07) is runtime-real — the interview one-liner: "<code>private</code> is a comment the compiler reads; <code>#</code> is a wall the runtime builds." <code>abstract</code> classes are interfaces that may also ship implementation — use when sharing code, not just shape.</p>
+    <div class="mcq" data-qid="ts-class-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Which of these NEEDS <code>type</code> rather than <code>interface</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A props object for a React component</button>
+        <button class="mcq-opt" type="button" data-ok><code>type Result = { ok: true; data: Cat } | { ok: false; error: string }</code> — a union; interfaces describe single object shapes and cannot express "or"</button>
+        <button class="mcq-opt" type="button">A shape extending another shape</button>
+        <button class="mcq-opt" type="button">A function signature</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> A, C and D all work as either (extends/intersections, call signatures — both keywords handle them). Unions are the hard boundary: "this OR that" has no interface syntax. Since discriminated unions (§03) are the workhorse pattern, <code>type</code> earns its place no matter how interface-flavored your codebase style is. Knowing the ONE real constraint beats reciting style-guide folklore.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Parameter properties (<code>constructor(private readonly db: Db)</code>) declare-and-assign in one stroke — the DI idiom every Nest/service codebase runs on.</li>
+        <li>"Should this be a class or a plain object + functions?" — same answer as js-fundamentals §07 (stateful identity vs data+transforms), now with "interfaces type both" appended.</li>
+        <li>Declaration merging on interfaces is why <code>interface Window { myGlobal: string }</code> works — the feature is the door §08 walks through.</li>
+        <li><code>satisfies</code> vs <code>implements</code> vs <code>:</code> — three ways to check a value against a contract; satisfies keeps inference, the others widen. Modern, precise, two sentences.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · DECLARATIONS -->
+<section class="lesson" id="declarations">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Declarations &amp; @types — typing the code you didn't write</h3>
+      <p class="lvl">intermediate → .d.ts files, DefinitelyTyped &amp; augmentation</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b><code>.d.ts</code> file</b> is types with no implementation — the shape of code that exists elsewhere. Three sources, in the order you'll meet them: <b>bundled</b> (modern packages ship their own — the <code>types</code> field in package.json), <b>DefinitelyTyped</b> (<code>npm i -D @types/express</code> — community-written declarations for packages that don't ship them; version-matched to the runtime package, and occasionally wrong: they're documentation someone wrote, not compiler-verified truth), and <b>yours</b> — <code>declare module 'legacy-thing'</code> to paper over the untyped, or <code>declare global</code> for window extensions.</p>
+    <p><b>Module augmentation</b> is the pro move: reopening a library's interfaces to add your fields — the canonical example is Express: <code>declare global { namespace Express { interface Request { user?: SessionUser } } }</code> so <code>req.user</code> type-checks after your auth middleware (the node module's pattern, typed). It rides on interface merging (§07), and its power is also its warning: augmentations are global claims — one lying augmentation poisons the whole project's checking, quietly.</p>
+    <div class="mcq" data-qid="ts-decl-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>npm i cool-lib</code> → "Could not find a declaration file for module 'cool-lib'". Rank the responses.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">// @ts-ignore the import and move on</button>
+        <button class="mcq-opt" type="button" data-ok>Try <code>@types/cool-lib</code> first; if none exists, write a minimal local .d.ts typing just the surface you use ("declare module with the two functions I call") — full fidelity is the library's job, honest coverage of YOUR usage is yours</button>
+        <button class="mcq-opt" type="button">Fork the library and add full types upstream before using it</button>
+        <button class="mcq-opt" type="button">declare module 'cool-lib' with everything as any, permanently</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the escalation ladder is check-the-registry → type-what-you-touch → (if generous) contribute upstream. ts-ignore (A) suppresses this <i>and future</i> errors on that line; blanket-any (D) is the same surrender with extra steps — acceptable as a day-one wedge only if §12's ratchet retires it. The minimal-surface .d.ts is the underrated middle: eight lines that make YOUR call sites checked, which is all the checking you were owed.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>skipLibCheck: true</code> (default in modern configs) means dependency .d.ts conflicts don't block your build — know that it's ON and what it silences.</li>
+        <li>Publishing a library? <code>declaration: true</code> emits your .d.ts from source — hand-maintained declaration files for your own code is a smell.</li>
+        <li>Augmentation files must be modules (an import/export) or they become scripts with different scoping — the "my augmentation isn't applying" bug, one sentence.</li>
+        <li>The trust model in one line: "@types is crowdsourced documentation the compiler enforces — usually right, verifiably wrong sometimes, and my validators (§11) don't care either way."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — strictness, frameworks &amp; the real world</span></div>
+
+<!-- 9 · TSCONFIG -->
+<section class="lesson" id="tsconfig">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>tsconfig, strictly — the flags that are the product</h3>
+      <p class="lvl">advanced → strict mode is the type system; the rest is plumbing</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b><code>"strict": true</code> is not a preference; it's whether TypeScript works.</b> The umbrella's heavy hitters: <code>noImplicitAny</code> (un-inferable types error instead of silently unchecking — without it, checking has invisible holes), <code>strictNullChecks</code> (<b>the</b> flag: null/undefined leave every type unless declared — the billion-dollar mistake, opted out of; off, every <code>cat.name</code> is a potential TypeError the compiler blessed), <code>strictFunctionTypes</code> (callback variance, §05), <code>strictPropertyInitialization</code> (class fields provably assigned). Beyond the umbrella, the two worth adding: <code>noUncheckedIndexedAccess</code> (<code>arr[i]</code> is <code>T | undefined</code> — honest about bounds) and <code>exactOptionalPropertyTypes</code>.</p>
+    <p>The plumbing tier, one line each: <code>target</code> (what JS syntax comes out), <code>module</code>/<code>moduleResolution</code> (how imports resolve — <code>"bundler"</code> for app code in 2026), <code>esModuleInterop</code> (CJS/ESM peace treaty — the js-fundamentals modules story, config edition), <code>paths</code> (import aliases — must agree with your bundler's, a classic two-config drift bug), <code>incremental</code>/project references (build speed at monorepo scale). Apps extend shared presets (<code>@tsconfig/node20</code>-style); the flags you deliberately set are the ones worth talking about.</p>
+    <div class="mcq" data-qid="ts-config-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A team inherits a large codebase with <code>strict: false</code> and "we'll turn it on later". What's the honest cost of running non-strict meanwhile?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Slightly worse autocomplete, nothing structural</button>
+        <button class="mcq-opt" type="button" data-ok>Nulls flow untracked into every type and implicit anys punch silent holes — the annotations LOOK like guarantees but check only the happy shapes; every day non-strict adds code that will error when the flag flips, growing the migration. Enable per-flag/per-directory now and ratchet (§12)</button>
+        <button class="mcq-opt" type="button">None — strict only adds style lint rules</button>
+        <button class="mcq-opt" type="button">Builds are faster non-strict, a fair trade in CI</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> non-strict TS is a costume: <code>function greet(cat: Cat)</code> accepts null happily, and the reader believes a check that isn't happening — arguably worse than JS because it <i>looks</i> verified. "Later" compounds daily. The workable path is the ratchet: strict flags on new directories, <code>// TODO(strict)</code> debt burned down file-by-file — §12's migration machinery pointed inward. Naming the false-confidence problem (not just "strict is better") is the depth marker.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>tsc as CI's <code>--noEmit</code> checker while the bundler (esbuild/swc — which skip checking entirely!) does the building — the standard split; knowing WHO checks and who compiles is real-project literacy.</li>
+        <li><code>verbatimModuleSyntax</code> + <code>import type</code> keep type-only imports out of the runtime bundle — erasure hygiene meets tree-shaking.</li>
+        <li>Non-null assertion <code>!</code> and <code>as</code> are strictNullChecks' escape valves — each one is a place the config's promise is manually overridden; lint-count them (§12).</li>
+        <li>The one-sentence philosophy: "the compiler is free code review on every save — strict mode is just refusing to mute the reviewer."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · REACT -->
+<section class="lesson" id="react">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>TS + React — props, hooks &amp; events, idiomatically</h3>
+      <p class="lvl">advanced → the five patterns that type 95% of components</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The working set: <b>props are a type/interface</b>, with <code>children: React.ReactNode</code> (the everything-renderable type — not <code>JSX.Element</code>, which bans strings/arrays/null; the distinction is a favorite probe). <b>useState infers</b> from the initial value; annotate only the union cases — <code>useState&lt;Cat | null&gt;(null)</code> (infer from null alone and the state is forever null). <b>Events</b> come typed from the handler position — inline handlers get inference free; extracted handlers name their type (<code>React.ChangeEvent&lt;HTMLInputElement&gt;</code>). <b>useRef</b> has two personalities: <code>useRef&lt;HTMLInputElement&gt;(null)</code> for DOM (readonly current, null until mount) vs <code>useRef&lt;number&gt;(0)</code> for the instance-variable box (react module §09, now typed). <b>Generic components</b> — <code>function List&lt;T&gt;({ items, render }: Props&lt;T&gt;)</code> — give <code>render</code> a typed item per call site: the select/table/list genre, solved.</p>
+    <p>The payoff pattern to name: <b>discriminated union props</b> — <code>{ variant: 'link'; href: string } | { variant: 'button'; onClick: () =&gt; void }</code> makes "link without href" unrepresentable (§03 applied to component APIs — the fesd component-contract lesson, enforced by the compiler instead of the code review).</p>
+    <div class="mcq" data-qid="ts-react-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>const [cat, setCat] = useState(null)</code> then later <code>setCat(fetchedCat)</code> errors: "Cat is not assignable to null". The diagnosis?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">useState can't hold objects — use useReducer</button>
+        <button class="mcq-opt" type="button" data-ok>Inference had only null to look at, so the state type IS null forever; declare the union the state actually lives in: <code>useState&lt;Cat | null&gt;(null)</code></button>
+        <button class="mcq-opt" type="button">fetchedCat needs an <code>as null</code> assertion</button>
+        <button class="mcq-opt" type="button">A React 19 regression — pin @types/react</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> inference is only as good as the evidence at the declaration site (§02), and <code>null</code> is thin evidence. The generic parameter states the full lifecycle: "starts null, becomes Cat" — and every consumer now null-checks (strictNullChecks doing its §09 job). Option C — asserting the VALUE to satisfy a wrong type — is exactly backwards, and recognizing that reflex as backwards is the actual lesson.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>ComponentProps&lt;typeof Button&gt;</code> extracts another component's props — wrap/extend without importing its type, or spreading native button props (<code>ComponentProps&lt;'button'&gt;</code>) into yours.</li>
+        <li>Don't annotate <code>React.FC</code> — plain function + typed props is the modern idiom (FC's implicit children and awkward generics dated it); knowing WHY dates your knowledge correctly.</li>
+        <li>Custom hooks returning tuples need <code>as const</code> (or a tuple return type) — else <code>[value, setter]</code> widens to an array of unions; the five-second fix everyone learns the hard way.</li>
+        <li>Server/client boundary (react §14): props crossing it must be serializable — a type-level discipline no flag enforces; naming it connects the modules.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · NODE -->
+<section class="lesson" id="node">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>TS + Node — typing the boundaries that lie</h3>
+      <p class="lvl">advanced → parse, don't validate-by-vibes: env, requests &amp; DB rows</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Backend TypeScript is boundary management: everything entering the process — <b>env vars</b> (<code>process.env.X</code> is <code>string | undefined</code>, honestly), <b>request bodies</b> (<code>any</code>-shaped network input), <b>DB rows</b>, <b>queue messages</b>, third-party webhooks — arrives untyped, and §01 says annotations can't check it. The pattern that closes the gap: <b>parse at the boundary</b> — a schema validator (zod-style) that <i>checks at runtime AND derives the static type from the same schema</i>: <code>const Env = z.object({ DATABASE_URL: z.string().url() })</code>; <code>Env.parse(process.env)</code> crashes at boot with a named error (not at 3am with "undefined is not a function"), and <code>z.infer&lt;typeof Env&gt;</code> IS the type — one source of truth, both worlds (the node module's validation section, upgraded from discipline to machinery).</p>
+    <p>Inside the boundary, types flow: typed request handlers (augmented <code>req.user</code>, §08), typed query builders (Kysely/Prisma derive row types from the schema — the pg module's tables, mirrored in types), and the rule that keeps it honest: <b>validated once at the edge, trusted everywhere inside</b> — re-validating in every layer is noise; never validating is the raccoon at the party.</p>
+    <div class="mcq" data-qid="ts-node-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q"><code>const user = req.body as User</code> in a handler. What did <code>as</code> actually do, and what's the correct line?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Converted the body to a User, coercing field types</button>
+        <button class="mcq-opt" type="button" data-ok>Nothing at runtime — it silenced the compiler's doubt about a value the network controls; the correct line is <code>const user = UserSchema.parse(req.body)</code> — checked for real, typed by inference, and a 400 (not a deep crash) when clients lie</button>
+        <button class="mcq-opt" type="button">Validated the shape and threw on mismatch</button>
+        <button class="mcq-opt" type="button">Nothing wrong — as is how boundaries are typed</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>as</code> is a promise, and at a network boundary it's a promise about OTHER PEOPLE'S data — the one thing you can't promise. The erased assertion means the first wrong payload detonates wherever <code>user.email.toLowerCase()</code> happens to live, stack-traced far from the cause. Parse-at-the-edge relocates the failure to the boundary with a client-blameable error. "as means the compiler stops looking — use it where YOU know more, never where the network knows more" is the whole section in a sentence.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Boot-time env parsing turns config drift into deploy failures instead of runtime mysteries — the aws IaC "fail at plan, not at 3am" instinct, in-process.</li>
+        <li><code>unknown</code> is the boundary type: catch clauses (<code>catch (e: unknown)</code> — then narrow), JSON.parse wrappers, message handlers. any lets you proceed; unknown makes you check first.</li>
+        <li>Share types across the stack (a <code>shared/</code> package or tRPC-style inference) so the frontend's Cat and the backend's Cat can't drift — the monorepo argument in one line.</li>
+        <li>Schema-first vs type-first: zod derives types from schemas (one truth); writing types then schemas duplicates. Order matters; say which way yours flows.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · MIGRATION -->
+<section class="lesson" id="migration">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Migration &amp; escape hatches — any, unknown, as &amp; the ratchet</h3>
+      <p class="lvl">advanced → moving a living codebase without stopping the ship</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The escape hatches, ranked by danger: <b><code>unknown</code></b> (safe — "no idea, so you must narrow before using"), <b><code>as</code></b> (a scoped claim — legitimate when you truly know more than the compiler: after a filter, a DOM lookup you control; illegitimate at boundaries, §11), <b><code>!</code></b> (non-null assertion — a tiny <code>as</code>, same rules), <b><code>any</code></b> (checking OFF, contagiously — every expression it touches unchecks silently), and <b><code>@ts-ignore</code></b> (suppresses whatever the NEXT line's error is, including future different ones — prefer <code>@ts-expect-error</code>, which errors when the error disappears: self-cleaning). The honest hierarchy: reach for unknown first, as with a comment second, any never-without-a-TODO.</p>
+    <p>Migrating a JS codebase is a <b>ratchet, not a rewrite</b>: <code>allowJs</code> so both languages coexist → rename files leaf-first (utilities before entry points — fewer dependents, faster wins) → <code>strict</code> on for new code immediately (a lenient global config teaches the team non-strict habits — §09's false-confidence trap) → burn down the any-count with a lint budget that only shrinks (the "ratchet": CI fails if escapes increase). Six weeks of file-by-file beats a six-month branch nobody can merge — the pg zero-downtime migration philosophy (expand → migrate → contract), applied to a type system.</p>
+    <div class="mcq" data-qid="ts-mig-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Mid-migration, a util throws: <code>catch (e)</code> and you need <code>e.message</code>. Rank: <code>catch (e: any)</code> vs <code>catch (e: unknown)</code> + narrowing.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">any — errors are always Error objects anyway</button>
+        <button class="mcq-opt" type="button" data-ok>unknown + <code>e instanceof Error ? e.message : String(e)</code> — because JS can throw ANYTHING (strings, undefined, a cat), and the narrowing handles the day a library throws a non-Error; any just relocates that surprise to production</button>
+        <button class="mcq-opt" type="button">any with a try/catch around the .message access</button>
+        <button class="mcq-opt" type="button">Neither — rethrow immediately, never inspect errors</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> js-fundamentals §10 taught that throw accepts any value — the type system just made that fact unignorable. <code>unknown</code> is the honest type for "the language guarantees nothing here", and the two-line narrow is the entire cost. This tiny case IS the migration philosophy: unknown forces the check you needed anyway; any defers it to an incident. (And <code>useUnknownInCatchVariables</code> — in strict — makes unknown the default: the config agreeing with the answer.)</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Every <code>as</code> deserves the one-line why (<code># safe: filtered above</code>) — assertions with receipts age fine; bare ones rot into mysteries.</li>
+        <li>Codemods + ts-migrate for the bulk rename; humans for the boundaries — effort goes where §11 lives, not into annotating locals inference already handles.</li>
+        <li>Measure the migration: any-count, ts-expect-error count, % files strict — a burndown chart makes "later" (§09's lie) into a date.</li>
+        <li>The interview question behind all of this is really "can you improve a system while it runs?" — answer with the ratchet, whatever the technology.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · PRACTICE -->
+<section class="lesson" id="practice">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>The error gauntlet — predict the compiler, three for three</h3>
+      <p class="lvl">advanced → the module's ideas, disguised as squiggles</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Reading compiler errors <i>before the compiler produces them</i> is the fluency test — and the interview format ("what does TypeScript say about this?") is exactly these three. No hints beyond everything above.</p>
+    <div class="mcq" data-qid="ts-prac-1">
+      <p class="mcq-tag">// gauntlet 1 of 3</p>
+      <p class="mcq-q"><code>function pet(cat?: { name: string }) { console.log(cat.name) }</code> — strict mode says?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Compiles — optional parameters default to an empty object</button>
+        <button class="mcq-opt" type="button" data-ok>Error: 'cat' is possibly undefined — <code>?</code> means the union includes undefined, and §03's narrowing (or <code>cat?.name</code>) is the toll</button>
+        <button class="mcq-opt" type="button">Error: optional parameters can't be objects</button>
+        <button class="mcq-opt" type="button">Compiles with a warning only</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>cat?</code> is sugar for <code>cat: { name: string } | undefined</code> — and strictNullChecks (§09) refuses property access until the undefined arm is eliminated. The fix menu, each with different semantics: <code>cat?.name</code> (undefined flows on), <code>if (!cat) return</code> (early exit), a default parameter (changes the contract). Compilers don't warn (D) — TypeScript errors or it doesn't.</p>
+    </div>
+    <div class="mcq" data-qid="ts-prac-2">
+      <p class="mcq-tag">// gauntlet 2 of 3</p>
+      <p class="mcq-q"><code>const ids = cats.map(c =&gt; c.id).filter(id =&gt; id !== undefined)</code> where <code>id: string | undefined</code>. What's <code>ids</code>' type, disappointingly, and the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>string[]</code> — the filter obviously removed undefined</button>
+        <button class="mcq-opt" type="button" data-ok>Still <code>(string | undefined)[]</code> — a plain boolean callback doesn't narrow the ARRAY type; use a type-guard predicate (<code>id =&gt; id !== undefined</code> as <code>(id): id is string</code>) — or in TS 5.5+, inference finally handles exactly this case</button>
+        <button class="mcq-opt" type="button"><code>never[]</code> — contradictory filters produce never</button>
+        <button class="mcq-opt" type="button"><code>unknown[]</code> — filtering erases element types</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>filter</code>'s signature only knows the callback returns boolean — WHAT it tested is invisible unless the callback's type says <code>id is string</code> (§03's custom guards, in the one place everyone actually needs them). The 5.5 note is the current-knowledge flourish: inferred type predicates fixed the most-googled TS annoyance — knowing both the old pain and the new fix dates you as active.</p>
+    </div>
+    <div class="mcq" data-qid="ts-prac-3">
+      <p class="mcq-tag">// gauntlet 3 of 3</p>
+      <p class="mcq-q"><code>type Keys = keyof { name: string; kg: number }</code> and <code>const k: Keys = 'tail'</code> — verdict, and what IS Keys?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Compiles — keyof produces string</button>
+        <button class="mcq-opt" type="button" data-ok>Error — Keys is the literal union <code>'name' | 'kg'</code>, and 'tail' isn't in it; this precision is what makes §05's <code>K extends keyof T</code> reject bad property names at compile time</button>
+        <button class="mcq-opt" type="button">Error — keyof only works on interfaces, not literals</button>
+        <button class="mcq-opt" type="button">Compiles — string literals widen to string on assignment</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> keyof produces the union of the ACTUAL keys as literal types (§02's literals doing structural work) — not the vague <code>string</code>. That precision cascades: <code>pluck(cat, 'tail')</code> failing at compile time, typed routers, typed translations — half the "how does the library know?" magic is keyof + literals. Three for three means the model stuck: shapes, narrowed by evidence, erased at runtime, precise to the literal.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — where to go from here</h6>
+      <ul>
+        <li>Daily reps: turn strict flags on in one small real project and fix what surfaces — config archaeology teaches more than tutorials.</li>
+        <li>Read one well-typed library's types per week (zod, hono) — fluent reading (§06's goal) compounds fastest in the wild.</li>
+        <li>The rapid-fire pairs in <a href="../fullstack.html#esnext">Full-Stack in 48 · modern JS &amp; TS</a> are the night-before drill for screens.</li>
+        <li>And the meta-skill transfers: every "make illegal states unrepresentable" instinct here is a system-design instinct (§sd) wearing type syntax.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- RECAP -->
+<section class="section" id="recap">
+  <p class="section-eyebrow">// wrap up · the one-screen review</p>
+  <h2>Recap table</h2>
+  <p class="sub">Tomorrow, then before any TS-flavored screen. Fuzzy row → its section.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>§</th><th>the idea</th><th>the sentence to remember</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>the model</td><td>Shapes, not pedigrees; checked at the door, erased at the party.</td></tr>
+      <tr><td class="mono">02</td><td>inference</td><td>Annotate boundaries, infer internals; const narrows to literals, as const freezes them.</td></tr>
+      <tr><td class="mono">03</td><td>narrowing</td><td>The compiler reads your ifs; tag your unions; never makes forgetting a variant a compile error.</td></tr>
+      <tr><td class="mono">04</td><td>functions</td><td>Void means "not consulted", not "returns nothing" — callbacks may return anyway.</td></tr>
+      <tr><td class="mono">05</td><td>generics</td><td>Type variables model relationships; no relationship, no generic — unknown does the rest.</td></tr>
+      <tr><td class="mono">06</td><td>utility types</td><td>Mapped types are for-loops over keys; derive types from types — DRY has a type level.</td></tr>
+      <tr><td class="mono">07</td><td>interface vs type</td><td>Interfaces merge and extend; type does unions — the one hard boundary; the rest is style.</td></tr>
+      <tr><td class="mono">08</td><td>declarations</td><td>.d.ts is shape without substance; type what you use; augmentations are global claims.</td></tr>
+      <tr><td class="mono">09</td><td>tsconfig</td><td>Non-strict TS is a costume — strictNullChecks IS the product; ratchet toward it.</td></tr>
+      <tr><td class="mono">10</td><td>TS + React</td><td>children is ReactNode; annotate union state; discriminated props make bad JSX unwritable.</td></tr>
+      <tr><td class="mono">11</td><td>TS + Node</td><td>Parse at the boundary, trust inside — the schema is both the check and the type.</td></tr>
+      <tr><td class="mono">12</td><td>migration</td><td>unknown then as-with-receipts then never-bare-any; migrate as a ratchet, leaf-first.</td></tr>
+      <tr><td class="mono">13</td><td>the gauntlet</td><td>Predict the squiggle before the compiler draws it — that's the whole fluency.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- INTERVIEW -->
+<section class="section" id="interview">
+  <p class="section-eyebrow">// wrap up · where this gets asked</p>
+  <h2>In the interview</h2>
+  <p class="sub">TS questions calibrate seniority fast — the difference between "uses it" and "reasons in it" shows in one exchange.</p>
+  <div class="idea" style="margin-top:24px">
+    <ul>
+      <li><b>"Interface vs type?"</b> — §07's two real differences, then deliberately decline the style war. Thirty seconds, full marks.</li>
+      <li><b>"any vs unknown?"</b> — §12's ranked hatches; "unknown makes you check, any makes you hope" closes it.</li>
+      <li><b>"How do you type an API response?"</b> — the §11 boundary answer (parse, don't assert) is the one that levels you; <code>as User</code> is the one that levels you down.</li>
+      <li><b>Live-coding in TS:</b> let inference work — annotating every local reads as unfamiliarity; typing the function signature and trusting the flow reads as home.</li>
+      <li>Next: the react and node modules apply everything here in framework context, and <a href="../fullstack.html#esnext">Full-Stack in 48</a> has the rapid-fire drills.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><b>Predict every squiggle before checking. Read one library's types per week.</b> Type fluency is reading fluency — and it compounds faster than any other JS skill right now.</p>
+  <p>part of the <a href="./index.html">in-48 learn track</a> · pairs with <a href="../fullstack.html">Full-Stack in 48</a><br>
+  <a href="https://github.com/rajkaria/dsa-in-48" target="_blank" rel="noopener noreferrer">github.com/rajkaria/dsa-in-48</a> · MIT<br>
+  <b>shapes at the door, no inspectors at the party. 🐾</b></p>
+</footer>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /shell -->
+<script>
+(function () {
+  var $ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var SLUG = 'typescript';
+  var NS = 'learn:' + SLUG;
+  var K_DONE = NS + ':done';
+  var K_QUIZ = NS + ':quiz';
+  var K_THEME = 'learn:theme';
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  function init() {
+    if (window.hljs) { try { hljs.highlightAll(); } catch (e) {} }
+
+    /* ---------- theme (shared across the learn track) ---------- */
+    var themeBtn = document.getElementById('theme-toggle');
+    function paintTheme() {
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+    paintTheme();
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem(K_THEME, next); } catch (e) {}
+        paintTheme();
+      });
+    }
+
+    /* ---------- hero reveals ---------- */
+    $('.reveal').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 250 + d * 90);
+    });
+    $('.hl-anim').forEach(function (el) {
+      var d = parseInt(el.getAttribute('data-d') || '0', 10);
+      setTimeout(function () { el.classList.add('on'); }, 350 + d * 380);
+    });
+
+    /* ---------- copy buttons ---------- */
+    $('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.closest('.code').querySelector('code');
+        var text = code.innerText;
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied!' : 'select + copy';
+          setTimeout(function () { btn.textContent = 'copy'; }, 1500);
+        };
+        function fallback() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+        } else { fallback(); }
+      });
+    });
+
+    /* ---------- section done-toggles + progress ---------- */
+    var lessons = $('.lesson');
+    var doneIds = load(K_DONE, []);
+    if (!Array.isArray(doneIds)) doneIds = [];
+
+    function paintProgress() {
+      var total = lessons.length;
+      var count = lessons.filter(function (l) { return l.classList.contains('done'); }).length;
+      var countEl = document.getElementById('sec-count');
+      var barEl = document.getElementById('sec-bar');
+      if (countEl) countEl.textContent = count + '/' + total;
+      if (barEl) barEl.style.width = (total ? (count / total) * 100 : 0) + '%';
+      $('.side-link .dot').forEach(function (d) {
+        var id = d.getAttribute('data-for');
+        d.classList.toggle('on', doneIds.indexOf(id) !== -1);
+      });
+    }
+
+    lessons.forEach(function (lesson) {
+      if (doneIds.indexOf(lesson.id) !== -1) lesson.classList.add('done');
+      var btn = lesson.querySelector('.done-btn');
+      if (!btn) return;
+      var label = function () {
+        btn.innerHTML = lesson.classList.contains('done')
+          ? '&#10003; done — tap to undo'
+          : 'mark section done';
+      };
+      label();
+      btn.addEventListener('click', function () {
+        var isDone = lesson.classList.toggle('done');
+        var i = doneIds.indexOf(lesson.id);
+        if (isDone && i === -1) doneIds.push(lesson.id);
+        if (!isDone && i !== -1) doneIds.splice(i, 1);
+        save(K_DONE, doneIds);
+        label();
+        paintProgress();
+      });
+    });
+
+    /* ---------- MCQ quizzes (first attempt is the recorded one) ---------- */
+    var quizState = load(K_QUIZ, {});
+    if (!quizState || typeof quizState !== 'object') quizState = {};
+
+    function paintQuizScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = quizState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('quiz-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function reveal() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (quizState[qid] === 1 || quizState[qid] === 0) {
+        reveal();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          reveal();
+          if (quizState[qid] !== 1 && quizState[qid] !== 0) {
+            quizState[qid] = ok ? 1 : 0;
+            save(K_QUIZ, quizState);
+          }
+          paintQuizScore();
+        });
+      });
+    });
+
+    /* ---------- "run it" sandboxes ---------- */
+    $('.runner').forEach(function (r) {
+      var btn = r.querySelector('.run-btn');
+      var out = r.querySelector('.run-out');
+      var codeEl = r.querySelector('pre code');
+      if (!btn || !out || !codeEl) return;
+      btn.addEventListener('click', function () {
+        out.textContent = '';
+        out.classList.add('on');
+        var t0 = Date.now();
+        var line = function (text, cls) {
+          var span = document.createElement('span');
+          if (cls) span.className = cls;
+          span.textContent = text + '\n';
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        };
+        var fakeConsole = {
+          log: function () { line(Array.prototype.map.call(arguments, fmt).join(' ')); },
+          warn: function () { line('⚠ ' + Array.prototype.map.call(arguments, fmt).join(' ')); },
+          error: function () { line(Array.prototype.map.call(arguments, fmt).join(' '), 'err'); }
+        };
+        function fmt(v) {
+          if (typeof v === 'string') return v;
+          if (v === undefined) return 'undefined';
+          try { return JSON.stringify(v); } catch (e) { return String(v); }
+        }
+        try {
+          var src = codeEl.innerText;
+          var fn = new Function('console', '"use strict";\nreturn (async function () {\n' + src + '\n})();');
+          var p = fn(fakeConsole);
+          if (p && typeof p.then === 'function') {
+            p.then(function () {
+              if (Date.now() - t0 > 150) line('— async work finished —', 'note');
+            }, function (err) { line(String(err), 'err'); });
+          }
+        } catch (err) {
+          line(String(err), 'err');
+        }
+      });
+    });
+
+    paintProgress();
+    paintQuizScore();
+
+    /* ---------- scrollspy ---------- */
+    var links = $('.side-link');
+    var byId = {};
+    links.forEach(function (l) {
+      var href = l.getAttribute('href') || '';
+      if (href.charAt(0) === '#') byId[href.slice(1)] = l;
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && byId[en.target.id]) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            byId[en.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      $('[id]').forEach(function (el) { if (byId[el.id]) io.observe(el); });
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

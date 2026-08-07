@@ -1,60 +1,72 @@
-# REPORT — ocean-20260806-150637
+# Ocean run report — ocean-20260807-130307
 
-**Goal:** Ship Frontend System Design in 48 + the full cat-themed Learn track (13
-deep-dive modules) live on the site.
-**Status: COMPLETE.** All 9 sprints done, deployed to production.
+**Goal:** Expand all 13 Learn modules to 12–15 sections (beginner→advanced), add 3 new
+modules (typescript, testing, web-platform), rewire every count, verify, deploy.
+
+**Result: shipped.** The Learn track grew from 13 modules / ~80 sections / ~50h to
+**16 modules / 221 sections / ~145h**, every module a beginner→intermediate→advanced
+ladder with band dividers, every new section carrying a first-attempt-scored quiz.
+Existing section ids and quiz qids were never renamed — reader progress survives.
 
 ## What shipped (sprint → commit)
 
-| sprint | commit | delivered |
-|---|---|---|
-| plan | 2bcb4b8 | SPEC, 9-sprint plan, verify harness (`scripts/verify.sh`) |
-| 1 | 9eabab8 | **Frontend System Design in 48** (course 05): 12 topics, 141 Q&As, 36 drills, rose accent, full landing/nav/README wiring |
-| 2 | 5957d52 | **Learn hub** (13-card shelf, cross-page progress) + **js-fundamentals** (the template-bearer) + reusable module templates |
-| 3 | 16dde94 | **js-async** (event-loop stepper) + **react-deep-dive** (cascade sim, setState queue sim, hook slots) |
-| 4 | 0c82e7f | **dsa-foundations** (growth explorer) + **dsa-structures** (pointer-surgery stepper, MinHeap) — 32 LC links API-verified |
-| 5 | 2c0fd1e | **dsa-trees-graphs** (BFS grid flood, trie, Kahn's, union-find) + **dsa-algorithms** (sorting race, DP call-counter) — 30 more LC links verified |
-| 6 | 0e5cacd | **node-backend** (20-line Express, tamperable JWT) + **postgres-databases** (SQL/join engines, lost-update race, N+1 demo) |
-| 7 | c1f72eb | **aws-cloud** (staged architectures, IAM) + **system-design-backend** (envelope calculator, 5 worked designs) |
-| 8 | 889844c | **frontend-system-design deep dive** (RADIO pass, decision tree) + **interview-kit** (12 persisted worksheets, 4-week planner) |
-| 9 | cc52149 → merge 0c4f4a7 | Sweep: landing Learn section, cross-links on all 5 courses, README/CLAUDE.md/context doc, fresh-pane browser QA, **deploy** |
+| # | Sprint | Commit |
+|---|--------|--------|
+| 1 | js-fundamentals 7→15 + js-async 7→14 | `18329c9` |
+| 2 | dsa-foundations 7→14 + dsa-structures 6→13 | `3641378` |
+| 3 | dsa-trees-graphs 6→13 + dsa-algorithms 6→13 | `8eebf71` |
+| 4 | react-deep-dive 7→15 + node-backend 7→15 | `f38600e` |
+| 5 | postgres-databases 7→15 + aws-cloud 6→14 | `9368bfb` |
+| 6 | system-design-backend 7→14 + frontend-system-design 7→14 | `d0e972a` |
+| 7 | interview-kit 7→13 + NEW typescript (13) | `1ff647d` |
+| 8 | NEW testing (13) + NEW web-platform (13) | `c550ece` |
+| 9 | hub + landing + docs wiring, full recount | `0284c42` |
+| 10 | browser sweep, title fixes, report, merge + deploy | (this commit) |
 
-## Live URLs (verified 200 + content)
+## Decisions worth human review (full journal: `.ocean/DECISIONS.md`)
 
-- https://dsa-in-48.vercel.app/ — landing with course 05 card + Learn track section
-- https://dsa-in-48.vercel.app/frontend-system-design — course 05
-- https://dsa-in-48.vercel.app/learn — the hub; all 13 modules under /learn/<slug>
-- GitHub Pages: push landed (54914ca..0c4f4a7); Pages build was still propagating at
-  report time — auto-completes within minutes, no action needed.
-- Vercel deployment: dpl_EcXu1ky6Zo6TALRyqkxWpKVivVBf (READY, aliased).
+- **One-way door — expand in place, never rename ids/qids.** Chosen over rewrite or
+  companion pages to preserve `learn:<slug>:done` / `learn:<slug>:quiz` progress keys.
+- **Spec deviations, both logged:** js-async's planned `combinators` section already
+  existed as `parallel` (swapped in rejections/building/scheduling/iterasync/streams/
+  workers/patterns instead); system-design-backend's planned chat worked-design already
+  existed (swapped in a leaderboard design).
+- **New accents:** typescript `#C084FC`, testing `#F87171`, web-platform `#94A3B8` —
+  grep-verified distinct from all 13 existing accents.
+- **Durations:** sections × ~40 min, rounded to 0.5h — hub cards, module heroes, hub
+  hero (~145h), landing page, and README all recounted by hand and cross-checked.
+- **Harness upgrade (sp2):** `scripts/check_pages.py` now enforces `data-qid`
+  uniqueness after catching a real duplicate.
 
-## Decisions worth human review (full journal in DECISIONS.md)
+## Verification
 
-- **D1/D2 (one-way):** Learn track URLs (`/learn/<slug>`) and localStorage namespaces
-  (`learn:<slug>:*`, `fesd48:*`) are now published — renames would break bookmarks and
-  orphan progress.
-- **D7:** "built with love for Prachi" appears on the Learn hub hero (only there);
-  courses stay general. Trivial to remove if unwanted.
-- **D9:** deploy executed under Raj's explicit "make it live" instruction.
-- **Theme sharing:** the Learn track shares one `learn:theme` across its 14 pages
-  (deliberate deviation from the courses' per-page themes — one track, one feel).
+- `bash scripts/verify.sh` green — 23 pages clean (tag balance, unique keys/qids,
+  anchors, external-request allowlist, namespace hygiene).
+- Hub `data-total` per card cross-checked against each module's actual `done-btn`
+  count and its own `sec-count` label: 16/16 exact matches.
+- Browser sweep (local server, Chromium): all 23 pages load with **zero console
+  errors** and **zero horizontal overflow at 375px**. Hub verified visually in both
+  themes; js-fundamentals verified dark, typescript verified light.
+- Interactions verified live: runner panel executes, quiz stores first-attempt score
+  (`learn:<slug>:quiz`), mark-section-done persists across reload (`learn:<slug>:done`),
+  hub progress bars read those keys (3/15 → 20% bar), shared `learn:theme` persists.
+- Stale-count grep: zero "13 modules" / "~50h" references anywhere.
 
 ## Known limitations
 
-- No `.soon` placeholder cards remain on the hub — a future module needs a new card.
-- Hero-meta counts (quizzes/runners per module) are hand-maintained; `verify.sh`
-  doesn't check them.
-- The GitHub repo/Vercel project are still named `dsa-in-48` (pre-existing).
-- Browser-pane QA quirk (documented in docs/context/learn-track.md): hidden panes
-  throttle timers and report zero geometry — not a page bug.
+- Timer-based demos (event-loop stepper, scheduling demos) are throttled by the
+  browser in hidden/background tabs — cosmetic only, standard browser behavior.
+- typescript module has one runnable panel by design (no in-browser tsc); its depth
+  rides on predict-the-error MCQs.
+- Hub section totals remain hardcoded per card (house convention) — a future module
+  edit must update its card, `sec-count`, and duration label by hand; verify.sh does
+  not count sections.
 
-## How to verify
+## How to run / verify
 
 ```bash
-bash scripts/verify.sh          # 20 pages, static gate
-python3 -m http.server 8000     # then the CLAUDE.md browser checklist
+bash scripts/verify.sh          # static gate, must print "OK — 23 pages clean"
+python3 -m http.server 8000     # then open /learn/ — localStorage needs HTTP
 ```
 
-Totals: 20 self-contained pages (~1.5MB source), 141 course Q&As + 87 module quizzes,
-~60 runnable panels/simulations, 11 visualizers/widgets, 12 persisted worksheets,
-62 API-verified LeetCode links, 0 new external requests.
+Live: https://dsa-in-48.vercel.app/learn · https://rajkaria.github.io/dsa-in-48/learn/

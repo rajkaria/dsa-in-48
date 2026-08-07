@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -677,7 +681,14 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#caching"><span><i class="dot" data-for="caching"></i> Caching</span></a>
     <a class="side-link" href="#datascale"><span><i class="dot" data-for="datascale"></i> Scaling the Data</span></a>
     <a class="side-link" href="#queues"><span><i class="dot" data-for="queues"></i> Queues &amp; Async</span></a>
+    <a class="side-link" href="#consistency"><span><i class="dot" data-for="consistency"></i> Consistency Models</span></a>
+    <a class="side-link" href="#idempotency"><span><i class="dot" data-for="idempotency"></i> Idempotency</span></a>
+    <a class="side-link" href="#ratelimiter"><span><i class="dot" data-for="ratelimiter"></i> Design a Rate Limiter</span></a>
+    <a class="side-link" href="#consensus"><span><i class="dot" data-for="consensus"></i> Quorums &amp; Leaders</span></a>
+    <a class="side-link" href="#search"><span><i class="dot" data-for="search"></i> Search Systems</span></a>
+    <a class="side-link" href="#multiregion"><span><i class="dot" data-for="multiregion"></i> Multi-Region</span></a>
     <a class="side-link" href="#worked"><span><i class="dot" data-for="worked"></i> Worked Designs</span></a>
+    <a class="side-link" href="#workedplus"><span><i class="dot" data-for="workedplus"></i> Three More Designs</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -695,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -722,14 +733,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: five full designs</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>7</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>14</b> quiz questions</span>
     <span><b>1</b> estimation calculator</span>
-    <span><b>5</b> worked designs</span>
-    <span><b>~4.5h</b> self-paced</span>
+    <span><b>8</b> worked designs</span>
+    <span><b>~9.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#loop">Enter the loop <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the loop &amp; the envelope</span></div>
 
 <!-- 1 · LOOP -->
 <section class="lesson" id="loop">
@@ -810,6 +823,8 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+
+<div class="band" id="band-intermediate"><span>// intermediate — the load-bearing blocks</span></div>
 
 <!-- 3 · TRAFFIC -->
 <section class="lesson" id="traffic">
@@ -950,10 +965,228 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
-<!-- 7 · WORKED -->
-<section class="lesson" id="worked">
+<!-- 7 · CONSISTENCY -->
+<section class="lesson" id="consistency">
   <div class="lesson-head">
     <span class="lesson-num">07</span>
+    <div>
+      <h3>Consistency models — what "reading your own write" costs</h3>
+      <p class="lvl">intermediate → linearizable to eventual, and PACELC over CAP</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Once data lives in two places (replicas, caches, regions), "what does a read return?" needs a contract. The ladder, strongest first: <b>linearizable</b> — every read sees the latest committed write, as if one copy existed (pay in latency and availability); <b>read-your-writes</b> — <i>you</i> see your own updates, others may lag (the one users actually notice — post a comment, refresh, it's gone = this violated); <b>monotonic reads</b> — time never runs backwards for one client; <b>eventual</b> — replicas converge, eventually, promises nothing meanwhile. Most products need linearizability for a few things (payments, inventory decrement, usernames) and get away with eventual + read-your-writes everywhere else — <b>choosing per-operation, not per-system</b>, is the design skill.</p>
+    <p>CAP's honest successor is <b>PACELC</b>: under <b>P</b>artition, choose <b>A</b>vailability or <b>C</b>onsistency — <i>Else</i> (normal operation!) choose <b>L</b>atency or <b>C</b>onsistency. The "else" is the daily trade: a linearizable read crosses to the leader (slow, correct); a local replica read is fast and slightly stale. Partitions are rare; the latency choice is every request.</p>
+    <div class="mcq" data-qid="sd-cons-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A user updates their profile photo, and the app reads from replicas. Which is the cheapest fix for "my photo didn't change"?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Make all reads hit the primary — correctness first</button>
+        <button class="mcq-opt" type="button" data-ok>Read-your-writes tactically: route THIS user's reads to the primary briefly after their write (or serve the new value from cache/session) — everyone else can see the old photo for a few seconds harmlessly</button>
+        <button class="mcq-opt" type="button">Synchronous replication to every replica</button>
+        <button class="mcq-opt" type="button">Client-side polling until the replica catches up</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the violation only matters to the writer — nobody else knows the photo changed. Pinning the writer to the primary for ~replication-lag seconds (a cookie/timestamp trick), or echoing the write back from the client/cache, buys the experience without taxing every read (option A) or every write (option C). "Scope the consistency to who needs it" is the senior sentence — and it's the postgres module's read-replica caveat, promoted to a design principle.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Say "stale-read window ≈ replication lag" with a number (ms to seconds) — quantifying the staleness turns hand-waving into engineering.</li>
+        <li>The interview trap: "we need strong consistency" — reply "for which operations?" Inventory decrements yes; product-page view counts no. Per-operation budgets impress.</li>
+        <li>Causal consistency is the honorable middle: "replies never appear before their parent comment" — name it for social/threaded features.</li>
+        <li>Tie-in: caching (§04) is deliberately-stale replication — TTL is your consistency contract written in seconds.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · IDEMPOTENCY -->
+<section class="lesson" id="idempotency">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Idempotency, end to end — the retry-safe request path</h3>
+      <p class="lvl">intermediate → from double-click to double-charge, closed at every layer</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Queues (§06) needed idempotent consumers; this section closes the whole path, because <b>retries happen at every layer</b> — double-clicks, timeout-and-retry HTTP clients (did the first request land? unknowable!), queue redeliveries, replayed webhooks. The standard machinery: the client generates an <b>idempotency key</b> (UUID per <i>logical</i> operation, not per attempt); the server, in one atomic step, records the key and does the work; a repeat key returns the <b>stored original response</b> — not an error, the same 200, so retrying clients can't tell (and don't need to). The atomic step matters: check-then-do without atomicity is the §pg lost-update race — implement as a unique-constraint insert on the key, the DB as referee again.</p>
+    <p>The complementary discipline is knowing what's <b>naturally idempotent</b>: setting absolute state (<code>status = 'shipped'</code>, <code>seats = 4</code>) retries harmlessly; relative mutations (<code>seats = seats − 1</code>, "append line") do not — so prefer absolute writes where the domain allows, and guard the truly relative ones with keys. HTTP's contract encodes this: PUT/DELETE are idempotent by spec, POST is not — which is why "retry-able POST" is precisely what idempotency keys exist to build.</p>
+    <div class="mcq" data-qid="sd-idem-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A payment request times out client-side. The client retries with the SAME idempotency key and gets a 200 with a charge id. What actually happened at the server, in both possible worlds?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The charge ran twice but was refunded automatically</button>
+        <button class="mcq-opt" type="button" data-ok>Either the first attempt never landed (retry did the charge, once), or it landed and the retry hit the key record and replayed the stored response — the client cannot tell, and that indistinguishability IS the feature</button>
+        <button class="mcq-opt" type="button">The retry was rejected with 409 and the client recovered</button>
+        <button class="mcq-opt" type="button">The timeout guaranteed the first attempt was rolled back</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a timeout means "outcome unknown" — the request may have died en route OR completed with the response lost. Idempotency keys make both worlds converge on one charge and one canonical response, which is why Stripe et al. mandate them. Option D is the dangerous myth: timeouts abort the <i>wait</i>, never the work. Saying "timeouts create ambiguity; keys collapse it" is the whole interview answer in eight words.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Key scope: one key per <i>user intent</i> ("this checkout"), minted client-side, stored with TTL (24h covers retry storms without unbounded growth).</li>
+        <li>Concurrent duplicates: the second request arriving mid-flight blocks on (or is rejected by) the key row — the unique constraint serializes them; mention the "in-progress" state.</li>
+        <li>Webhooks are inbound retries: process-exactly-once = dedupe on the event id — same machinery, direction reversed.</li>
+        <li>Cross-service sagas: each step idempotent + compensations for rollback — one sentence of it signals you know where this scales to.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 9 · RATE LIMITER -->
+<section class="lesson" id="ratelimiter">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Design a rate limiter — the classic, assembled</h3>
+      <p class="lvl">intermediate → algorithm, storage, distribution &amp; the 429 contract</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>"Design a rate limiter" is beloved because it's every trade-off in one small box. <b>Algorithm</b>: token bucket (bursts up to N, refill R/sec — the node-backend implementation) vs sliding-window counter (smooth, Redis-friendly: weight two adjacent window counts) — fixed windows lose to the boundary-burst (2× limit straddling the reset). <b>Storage</b>: in-process is a lie behind a load balancer (each replica its own count — the nb clustering lesson); centralize in Redis — <code>INCR</code> + <code>EXPIRE</code>, atomic via Lua/pipelines, ~sub-ms. <b>Placement</b>: at the gateway (protects everything behind it) with per-route budgets; auth'd requests key by user/API-key, anonymous by IP (both, for login — the credential-stuffing lesson). <b>The contract</b>: 429 + <code>Retry-After</code> + rate-limit headers — a limiter without honest headers turns polite clients into accidental attackers.</p>
+    <p>The distributed wrinkle worth volunteering: Redis round-trips per request add latency and a SPOF — production gateways use <b>local buckets synced asynchronously</b> (slightly loose global limit, zero hot-path dependency) or Redis cell-style sharding by key. "Exactly enforced, globally, cheaply — pick two" is the honest framing.</p>
+    <div class="mcq" data-qid="sd-rl-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your limiter allows 100 req/min with fixed 1-minute windows. An attacker sends 100 requests at 11:59:58 and 100 more at 12:00:01. Result, and the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Blocked — 200 requests exceeds the limit</button>
+        <button class="mcq-opt" type="button" data-ok>All 200 land within ~3 seconds — each burst sat in its own window; sliding windows (or token buckets) price requests against the trailing 60s instead of a calendar boundary</button>
+        <button class="mcq-opt" type="button">The second burst is delayed until 12:01</button>
+        <button class="mcq-opt" type="button">Only a problem if the attacker changes IPs</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the fixed window resets at 12:00:00 sharp — both bursts are "legal", delivering 2× the intended rate exactly when someone tries. The sliding-window counter approximates the trailing window from two adjacent counts (weighted by overlap) — one extra Redis field, boundary closed. This precise failure narrative is what separates "I'd use Redis" from "I've thought about limiters".</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>State the tiers unprompted: per-user, per-IP, per-route, global (load-shedding) — different budgets, different keys, one mechanism.</li>
+        <li>Degradation policy: if Redis is down, fail OPEN with local fallback limits (availability) or fail CLOSED (protection) — say which and why for THIS product; the choice is the answer.</li>
+        <li>Cost of a limiter miss ≠ uniform: login and password-reset get tight budgets; GET /catalog gets loose ones — budgets follow abuse value.</li>
+        <li>The aws messaging tie-in: queues are rate limiting for <i>writes you can defer</i> — throttle what must be sync, buffer what needn't be.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — consensus, search &amp; the planet</span></div>
+
+<!-- 10 · CONSENSUS -->
+<section class="lesson" id="consensus">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Quorums &amp; leader election — agreement without a boss (briefly, with one)</h3>
+      <p class="lvl">advanced → why odd numbers, what Raft settles, and split-brain</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Replicated systems keep needing one fact agreed on — who's the leader, what's the next log entry — while nodes crash and networks tear. The workhorse idea is the <b>quorum</b>: any decision needs a <b>majority</b> (⌈(n+1)/2⌉ of n). Why majorities: <b>any two majorities overlap</b> — so two conflicting decisions can't both pass, even during a partition; the minority side simply <i>can't decide</i>. That's also why clusters are odd-sized: 4 nodes tolerate one failure (majority 3), same as 3 nodes — the fourth buys nothing but cost; and why a 6/6 split network halts both halves (no majority anywhere) — a <b>halt being the correct behavior</b>, because the alternative is <b>split-brain</b>: two leaders both accepting writes, divergence you get to reconcile by hand at 3am.</p>
+    <p><b>Raft</b> (the consensus algorithm you name) packages this: nodes elect a leader by majority vote (with terms — epoch numbers — so a stale leader returning from a partition discovers it's been deposed), the leader sequences all writes, and a write is committed once a majority acknowledges. You will likely never implement it; you <i>operate</i> it constantly — etcd, the control planes of Kafka/Kubernetes, Postgres HA tooling. The interview asks for the shape: majorities overlap, terms fence the stale, minorities halt.</p>
+    <div class="mcq" data-qid="sd-quorum-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A 5-node cluster partitions 3/2. The old leader is in the 2-side. What happens, and why is it correct?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Both sides elect leaders — availability is preserved</button>
+        <button class="mcq-opt" type="button" data-ok>The 3-side elects a new leader (it has a majority) and serves writes; the old leader's 2-side cannot commit anything (no quorum) — and when healed, its higher-term peers depose it. One leader ever active; no divergence to merge</button>
+        <button class="mcq-opt" type="button">The cluster halts entirely until the partition heals</button>
+        <button class="mcq-opt" type="button">The 2-side keeps serving because it holds the leader</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the old leader can still <i>accept</i> requests but can never <i>commit</i> them (needs 3 acks, has 2 nodes) — its writes are stuck proposals, not divergent truth. The overlap argument does the work: any majority (3) intersects any other, so a second concurrent leader is arithmetically impossible. Options A and D are split-brain descriptions; option C over-halts (the majority side is fine). Walking this scenario cleanly is the entire consensus interview.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Fencing tokens: the deposed leader's in-flight side effects (a write to storage!) are blocked by attaching the term/token to every operation — storage rejects stale terms. Name it for the "zombie leader" follow-up.</li>
+        <li>Leases = leadership with an expiry heartbeat — cheaper than full consensus for locks; clock-skew is their known sin.</li>
+        <li>Dynamo-style quorums (R + W &gt; N) are <i>replication</i> quorums — tunable consistency per read/write, related math, different machinery than leader consensus; keeping them distinct is a depth marker.</li>
+        <li>The calibration sentence: "I don't build consensus; I rent it (etcd/managed) and design so few things need it — most data tolerates §07's weaker contracts."</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · SEARCH -->
+<section class="lesson" id="search">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Search systems — the inverted index &amp; the sync problem</h3>
+      <p class="lvl">advanced → why LIKE dies, how relevance ranks, keeping two truths aligned</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><code>WHERE title LIKE '%wireless%'</code> scans every row and can't rank — search needs the <b>inverted index</b>: tokenize documents (lowercase, strip stems — "charging" → "charg"), then map <b>term → posting list of document ids</b>. A query intersects posting lists (dsa's hash-set intersection at planetary scale) and <b>ranks</b> the survivors: TF-IDF/BM25 — a document scores higher when the term is frequent <i>in it</i> but rare <i>overall</i> ("wireless" beats "the"). That's Elasticsearch/OpenSearch's core; Postgres's built-in full-text (tsvector + GIN — the pg module's index!) is the right first stop for modest scale, and saying so before reaching for a search cluster is judgment interviewers reward.</p>
+    <p>The system-design half is <b>two sources of truth</b>: the DB owns the data, the index owns the searchable copy, and they <i>will</i> drift. Sync options, in ascending robustness: dual-write from the app (races and partial failures — the known-bad), async via the outbox/CDC (change-data-capture tailing the DB log — the standard), and periodic full reindex as the self-healing backstop. Search being <b>eventually consistent with the DB</b> is accepted and stated: a new listing appearing in search seconds later is fine; say the window.</p>
+    <div class="mcq" data-qid="sd-search-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Products are updated in Postgres and dual-written to Elasticsearch in the same request handler. What failure will support eventually report, and the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Search gets slower over time — indexes fragment</button>
+        <button class="mcq-opt" type="button" data-ok>"Item shows old price in search" — the ES write failed after the DB commit (or raced a concurrent update); replace dual-writes with CDC/outbox ordering from the DB's own log, plus periodic reconciliation</button>
+        <button class="mcq-opt" type="button">Postgres deadlocks under the double write</button>
+        <button class="mcq-opt" type="button">Duplicate documents accumulate in the index</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two independent writes = the partial-failure zoo (DB yes + ES no; or interleaved updates applying in different orders to each store). The DB's WAL already serializes the truth — CDC replays <i>that</i>, giving ordering and at-least-once retries for free; the reindex backstop bounds any residual drift. "Never dual-write two sources of truth; derive one from the other's log" generalizes to caches, analytics, and every read-model — it's a whole architecture lesson wearing a search costume.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Autocomplete ≠ search: prefix queries want edge-ngrams or a trie-shaped index (dsa's tries, deployed) with tiny latency budgets — name it as its own system.</li>
+        <li>Faceted search (counts per brand/size) is aggregations over the same inverted index — one sentence connects the UI feature to the structure.</li>
+        <li>Relevance is a product decision: boosting (title &gt; description), recency decay, personalization — "BM25 is the floor, the ranking function is the product".</li>
+        <li>Semantic/vector search is the modern sibling (embeddings + ANN index) — one honest sentence: "different index, same sync problem".</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · MULTI-REGION -->
+<section class="lesson" id="multiregion">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Multi-region — failover, active-active &amp; the write problem</h3>
+      <p class="lvl">advanced → RTO/RPO, and why "just run it in two regions" is a data question</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Two reasons to leave one region: <b>latency</b> (Sydney users, Virginia servers, 200ms floor — physics) and <b>survival</b> (regions do fail). The vocabulary that structures every answer: <b>RTO</b> (how long until service returns) and <b>RPO</b> (how much data you may lose), because they price the strategies. <b>Backup-restore</b>: hours RTO, backup-age RPO, nearly free. <b>Active-passive</b> (warm standby + replication): minutes RTO, seconds RPO, double-ish infra. <b>Active-active</b>: zero-ish RTO... and now <b>writes conflict</b> — two regions accepting updates to the same row is the §10 split-brain, invited on purpose.</p>
+    <p>Resolving active-active writes is a menu of costs: <b>home-region routing</b> (each user's writes go to their region — co-location again; cross-region only for the rare shared object), <b>CRDTs/last-write-wins</b> for data that merges (counters, presence — and LWW silently drops updates: say so), or <b>global consensus databases</b> (Spanner-class: correct, expensive, latency-taxed). Reads are the easy 90%: serve locally everywhere (CDN + replicas), and most "multi-region" asks dissolve into "global reads, home-region writes, regional failover" — the calibrated shape to draw.</p>
+    <div class="mcq" data-qid="sd-mr-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Leadership wants "zero downtime even if a region dies" for a payments system. The RPO conversation to have first?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">None needed — active-active gives zero RTO and zero RPO</button>
+        <button class="mcq-opt" type="button" data-ok>Async cross-region replication means seconds of committed-but-unreplicated payments vanish in a failover (RPO &gt; 0); making RPO ≈ 0 requires sync cross-region commits — a permanent ~50-100ms tax on EVERY payment. Pick which cost the business prefers, explicitly</button>
+        <button class="mcq-opt" type="button">RPO only matters for backup-restore strategies</button>
+        <button class="mcq-opt" type="button">Payments should simply pause during regional failures</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> replication lag IS the RPO under async — failover loses the in-flight tail, and for payments "we lost 4 seconds of charges" is a reconciliation project. Sync replication buys RPO≈0 by putting a cross-region round-trip inside every commit — the PACELC latency choice (§07) at its starkest. There's no trick answer; the skill is surfacing the trade <i>before</i> the outage: latency every day, or data-loss risk on the bad day. Executives can choose; engineers must ask.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Failover is a <i>practiced procedure</i>, not a config: DNS/anycast shift, replica promotion, and the drill cadence — "we game-day it quarterly" is worth more than any diagram.</li>
+        <li>Data residency (EU data stays in EU) is multi-region for <i>legal</i> reasons — partitioning by law, not latency; one sentence shows awareness.</li>
+        <li>The failback trap: after the region returns, who reconciles writes the standby took? Rejoining is harder than leaving — mention it and watch the interviewer nod.</li>
+        <li>Cost honesty: active-active ≈ 2× infra + engineering forever; "most businesses buy active-passive and spend the difference on preventing incidents" is a defensible close.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · WORKED -->
+<section class="lesson" id="worked">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
     <div>
       <h3>Five worked designs — the blocks, recombined</h3>
       <p class="lvl">the payoff: watch the same six blocks solve everything</p>
@@ -988,6 +1221,43 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
+<!-- 14 · WORKED PLUS -->
+<section class="lesson" id="workedplus">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Three more worked designs — geo, contention &amp; rankings</h3>
+      <p class="lvl">advanced → the blocks again, plus this module's new machinery</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>6 · Proximity — "find cat cafés near me" (the geo question).</b> Envelope: read-heavy, location updates modest, staleness tolerable (a café doesn't move). The core problem: SQL can't index "within 2km" with a B-tree — lat/lon are two dimensions. The answer is <b>geo-bucketing</b>: geohash/S2 cells turn coordinates into <i>string prefixes</i> where nearby places share prefixes — suddenly it's a prefix query (the trie idea, on the planet). Design: places in Postgres (+ PostGIS or a geohash column), hot cells cached, query = "my cell + 8 neighbors" (edge cases at cell boundaries — the detail that shows you've thought), rank by distance + rating. Moving objects (drivers, not cafés) flip the envelope: write-heavy location pings → in-memory grid sharded by cell, TTL'd — nobody needs last hour's position.</p>
+    <p><b>7 · Ticketmaster — selling exactly N seats (the contention question).</b> Envelope: reads dwarf writes until on-sale moment, then 100k people want seat 14B <i>simultaneously</i> — the lost-update race as a business model. The layers: a <b>virtual waiting room</b> (queue admission tokens — §06 absorbing the spike before it touches inventory), <b>seat holds with TTL</b> (SELECT … FOR UPDATE or Redis SETNX + expiry: hold, pay within 8 minutes, release on timeout — §08's idempotency keys on the payment), and the final decrement <b>atomic in Postgres</b> (the single-row referee; sharding by event id keeps each on-sale's contention on one shard — co-location). The honest sentence: "the database is the bottleneck <i>on purpose</i> — correctness for seats beats throughput, and the waiting room makes the queue explicit instead of a thundering herd."</p>
+    <p><b>8 · Leaderboard — live game rankings (the sorted-data question).</b> Envelope: heavy score writes, heavy rank reads ("my rank among 10M"). Naive SQL (<code>ORDER BY score</code> + COUNT for rank) recomputes the world per query. The purpose-built structure: <b>Redis sorted sets</b> — O(log n) score updates, O(log n) rank lookups, top-100 pages for free (a skip list underneath — the dss balance section's cousin, in production). Design: ZADD on game events (via a queue — spikes again), ZREVRANK for "my rank", periodic snapshot to Postgres for durability (Redis is the fast copy, not the truth — §11's derive-don't-dual-write). Windowed boards (daily/weekly) = one sorted set per window with TTLs; "rank among friends" = intersect with the friend set, small n, compute live.</p>
+    <div class="mcq" data-qid="sd-wp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">At on-sale, 100k concurrent buyers hit "reserve seat". Why does the design put a waiting room + holds IN FRONT of an atomic decrement, instead of just trusting the atomic decrement?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Atomic decrements can't be trusted under load</button>
+        <button class="mcq-opt" type="button" data-ok>Correctness survives either way — but 100k transactions colliding on the same rows means 99.9k slow failures hammering the DB; admission control turns the stampede into an orderly stream and holds make "almost bought" a real, expiring state</button>
+        <button class="mcq-opt" type="button">Waiting rooms exist purely for fairness optics</button>
+        <button class="mcq-opt" type="button">Redis holds replace the need for DB atomicity</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the atomic decrement keeps you <i>correct</i>; it does nothing for the experience of 100k people retrying against locked rows (connection-pool exhaustion → the whole site down — the nb migration lesson's cascade). Layering is the answer: shed load early (waiting room), convert contention into held state with expiry (holds), and let only serialized, admitted traffic reach the referee. "Correctness at the core, flow control at the edges" is the pattern this whole design exists to teach.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Geo edge case to volunteer: a search point near a cell border misses neighbors in adjacent cells — always query the 3×3 block; the follow-up ("what about the poles/meridian?") is why libraries, not hand-rolled geohashing.</li>
+        <li>Ticketing's idempotency: the payment retry with the same key (§08) is what makes "I clicked pay twice during the timeout" harmless — connect the sections aloud.</li>
+        <li>Leaderboard ties: "top-K" is the dss heap question; "rank among 10M" is why sorted sets (skip lists) beat heaps here — heaps answer top, not arbitrary rank. Choosing between your OWN tools is the final exam.</li>
+        <li>All three designs end the same way: name the block (bucketing / admission control / purpose-built structure), the consistency contract, and the failure story. The ritual from §13 applies verbatim.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1002,7 +1272,14 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <tr><td class="mono">04</td><td>caching</td><td>Cache-aside + TTL backstop + write-path invalidation; jitter and per-key locks stop stampedes.</td></tr>
       <tr><td class="mono">05</td><td>data scale</td><td>Replicas → partitions → shards; shard key = co-locate what you query together; consistent hashing moves 1/n.</td></tr>
       <tr><td class="mono">06</td><td>queues</td><td>Decouple slow from now; at-least-once + idempotent consumers = effectively once; DLQ the poison; age over length.</td></tr>
-      <tr><td class="mono">07</td><td>designs</td><td>Shortener, limiter, hybrid feed (write-amplification!), chat, docs — six blocks, recombined forever.</td></tr>
+      <tr><td class="mono">07</td><td>consistency</td><td>Choose per-operation: linearizable for money, read-your-writes for me, eventual for everyone else.</td></tr>
+      <tr><td class="mono">08</td><td>idempotency</td><td>Timeouts create ambiguity; keys collapse it — record key + do work atomically, replay the stored response.</td></tr>
+      <tr><td class="mono">09</td><td>rate limiter</td><td>Token bucket in Redis, keyed per user AND IP, honest 429s — and fixed windows leak 2x at the boundary.</td></tr>
+      <tr><td class="mono">10</td><td>consensus</td><td>Majorities overlap, so two leaders can't both win; minorities halt — that's correct; terms depose zombies.</td></tr>
+      <tr><td class="mono">11</td><td>search</td><td>Inverted index + BM25; never dual-write two truths — derive the index from the DB's log (CDC).</td></tr>
+      <tr><td class="mono">12</td><td>multi-region</td><td>RPO/RTO price the strategies; global reads are easy, conflicting writes are the real question.</td></tr>
+      <tr><td class="mono">13</td><td>designs</td><td>Shortener, limiter, hybrid feed (write-amplification!), chat, docs — six blocks, recombined forever.</td></tr>
+      <tr><td class="mono">14</td><td>more designs</td><td>Geo-buckets for near-me, admission control for on-sale stampedes, sorted sets for live rank.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1017,6 +1294,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <li><b>Open with the loop, audibly:</b> "requirements and numbers first, then a skeleton, then let's go deep where it's interesting." The interviewer relaxes; you've taken the wheel.</li>
       <li><b>Do the envelope even if unasked</b> — it's the five minutes that makes everything after defensible, and skipping it is the #1 failure mode.</li>
       <li><b>Volunteer a failure story per component:</b> "if Redis dies, we degrade to DB reads with a latency hit; if the queue backs up, the age alarm fires and workers scale." That closing ritual is worth a level.</li>
+      <li><b>The advanced band is the L5/L6 gate:</b> per-operation consistency budgets (07), the timeout-ambiguity story (08), a rate limiter you can whiteboard from memory (09), the majority-overlap argument (10), derive-don't-dual-write (11), and the RPO conversation (12). Each is three rehearsed minutes.</li>
       <li>Timed drills: <a href="../system-design.html">System Design in 48</a> (the whole course is this module at sprint pace). The <b>interview-kit</b> module (next!) adds the mock-loop run sheets to practice it under a clock.</li>
     </ul>
   </div>

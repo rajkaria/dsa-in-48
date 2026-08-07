@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -674,9 +678,17 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#model"><span><i class="dot" data-for="model"></i> The Mental Model</span></a>
     <a class="side-link" href="#rendering"><span><i class="dot" data-for="rendering"></i> Renders &amp; Reconciliation</span></a>
     <a class="side-link" href="#state"><span><i class="dot" data-for="state"></i> useState, Precisely</span></a>
+    <a class="side-link" href="#keys"><span><i class="dot" data-for="keys"></i> Keys &amp; Reconciliation</span></a>
     <a class="side-link" href="#effects"><span><i class="dot" data-for="effects"></i> Effects Done Right</span></a>
     <a class="side-link" href="#hooks"><span><i class="dot" data-for="hooks"></i> The Other Hooks</span></a>
+    <a class="side-link" href="#forms"><span><i class="dot" data-for="forms"></i> Forms &amp; Actions</span></a>
+    <a class="side-link" href="#context"><span><i class="dot" data-for="context"></i> Context, Honestly</span></a>
+    <a class="side-link" href="#refs"><span><i class="dot" data-for="refs"></i> Refs — the Box</span></a>
     <a class="side-link" href="#performance"><span><i class="dot" data-for="performance"></i> Performance Discipline</span></a>
+    <a class="side-link" href="#boundaries"><span><i class="dot" data-for="boundaries"></i> Boundaries &amp; Suspense</span></a>
+    <a class="side-link" href="#concurrent"><span><i class="dot" data-for="concurrent"></i> Concurrent React</span></a>
+    <a class="side-link" href="#statemgmt"><span><i class="dot" data-for="statemgmt"></i> State Architecture</span></a>
+    <a class="side-link" href="#rsc"><span><i class="dot" data-for="rsc"></i> Server Components</span></a>
     <a class="side-link" href="#modern"><span><i class="dot" data-for="modern"></i> Suspense &amp; RSC</span></a>
   </nav>
 
@@ -696,11 +708,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/9</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/18</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -723,13 +735,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: architecture &amp; the RSC era</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>9</b> quiz questions</span>
+    <span><b>15</b> sections</span>
+    <span><b>18</b> quiz questions</span>
     <span><b>1</b> re-render simulator</span>
-    <span><b>~4.5h</b> self-paced</span>
+    <span><b>10</b> runnable panels</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#model">Start with the model <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the mental model</span></div>
 
 <!-- 1 · MODEL -->
 <section class="lesson" id="model">
@@ -915,10 +930,94 @@ console.log('mixed →', simulateEventHandler((count, set) =&gt; {
   </div>
 </section>
 
-<!-- 4 · EFFECTS -->
-<section class="lesson" id="effects">
+<div class="band" id="band-intermediate"><span>// intermediate — identity, effects &amp; the escape hatches</span></div>
+
+<!-- 4 · KEYS -->
+<section class="lesson" id="keys">
   <div class="lesson-head">
     <span class="lesson-num">04</span>
+    <div>
+      <h3>Reconciliation &amp; keys — how React matches old to new</h3>
+      <p class="lvl">intermediate → why index keys steal state, demonstrated</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 02 said React diffs trees; here's the part that bites: when diffing a <b>list</b>, React must decide which old item corresponds to which new item — because state, DOM focus, and animations belong to the <i>match</i>, not the position. The <b>key</b> is that identity claim. <code>key={item.id}</code> says "same id = same component, move it, keep its state." <code>key={index}</code> says "position 0 is always the same component" — so when you <b>prepend or delete</b>, every item after the change point inherits <i>someone else's state</i>.</p>
+    <p>The failure is invisible until a list item holds state: a checkbox, an input draft, an expanded row. Delete row one with index keys and row two's draft appears under row one's name. No error, no warning beyond the linter — just quietly wrong data.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">identity-theft.js — run it (a 20-line reconciler)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a mini reconciler: old "component instances" hold STATE (a draft note)
+function reconcile(oldInst, newItems, keyOf) {
+  const byKey = new Map(oldInst.map(inst =&gt; [inst.key, inst]));
+  return newItems.map((item, i) =&gt; {
+    const key = keyOf(item, i);
+    const reused = byKey.get(key);
+    return reused
+      ? { ...reused, item }                        // matched → KEEPS its state
+      : { key, item, draft: '' };                  // no match → fresh state
+  });
+}
+
+// three cats, each with an unsaved draft note in its row
+let instances = [
+  { key: 0, item: 'Mochi',   draft: 'likes tuna'   },
+  { key: 1, item: 'Biscuit', draft: 'scared of vacuum' },
+  { key: 2, item: 'Beans',   draft: 'bites (affectionately)' },
+];
+
+// the user deletes Mochi. New data:
+const afterDelete = ['Biscuit', 'Beans'];
+
+// INDEX keys: position pretends to be identity
+const byIndex = reconcile(instances, afterDelete, (_, i) =&gt; i);
+console.log('index keys after deleting Mochi:');
+byIndex.forEach(r =&gt; console.log(`  ${r.item}: draft = "${r.draft}"`));
+console.log('  ↑ Biscuit stole Mochi\'s note; Beans stole Biscuit\'s. Nobody crashed.\n');
+
+// STABLE keys: identity survives the shift
+instances = [
+  { key: 'mochi', item: 'Mochi', draft: 'likes tuna' },
+  { key: 'biscuit', item: 'Biscuit', draft: 'scared of vacuum' },
+  { key: 'beans', item: 'Beans', draft: 'bites (affectionately)' },
+];
+const byId = reconcile(instances,
+  [{ id: 'biscuit', name: 'Biscuit' }, { id: 'beans', name: 'Beans' }],
+  (item) =&gt; item.id);
+console.log('stable keys after deleting Mochi:');
+byId.forEach(r =&gt; console.log(`  ${r.item.name ?? r.item}: draft = "${r.draft}"`));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the exact algorithm React runs, small enough to read — watch the theft</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-keys-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">When ARE index keys acceptable?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Never — the linter forbids them for a reason</button>
+        <button class="mcq-opt" type="button" data-ok>When the list never reorders, never inserts/removes except at the end, and items hold no state — position genuinely IS identity then</button>
+        <button class="mcq-opt" type="button">Whenever items lack a natural id</button>
+        <button class="mcq-opt" type="button">Only in development builds</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the key contract is "stable identity across renders". A static, append-only, stateless list satisfies it with indexes — that's why the rule is a warning, not an error. The trap answer is C: no natural id means <i>generate</i> one at data-creation time (<code>crypto.randomUUID()</code> when the row is made — never during render, which mints a new identity every pass and resets everything).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Key on <code>Math.random()</code> or a render-time UUID = every render unmounts and remounts every row — the "my list flickers and drops focus" bug in one sentence.</li>
+        <li>Keys are also a <i>tool</i>: changing a key on purpose (<code>key={userId}</code> on a profile form) is the idiomatic "reset all state below when the user changes" — destruction as a feature.</li>
+        <li>Reconciliation's other rule: a different element <i>type</i> (div → span, ComponentA → ComponentB) tears down the whole subtree — type first, then key, then props.</li>
+        <li>Keys only need uniqueness <b>among siblings</b>, not globally — a detail that separates readers of the docs from repeaters of the lint rule.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 5 · EFFECTS -->
+<section class="lesson" id="effects">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
     <div>
       <h3>Effects done right — synchronization, not lifecycle</h3>
       <p class="lvl">the most misused hook, rehabilitated</p>
@@ -996,10 +1095,10 @@ mountCounterComponent();</code></pre>
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
-<!-- 5 · HOOKS -->
+<!-- 6 · HOOKS -->
 <section class="lesson" id="hooks">
   <div class="lesson-head">
-    <span class="lesson-num">05</span>
+    <span class="lesson-num">06</span>
     <div>
       <h3>The other hooks — one job each</h3>
       <p class="lvl">intermediate → ref vs memo vs callback vs reducer vs context</p>
@@ -1072,10 +1171,222 @@ console.log('render #2 (no bio): ', render(false));   // age reads slot 1…
   </div>
 </section>
 
-<!-- 6 · PERFORMANCE -->
+<!-- 7 · FORMS -->
+<section class="lesson" id="forms">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Forms — controlled, uncontrolled &amp; the new actions</h3>
+      <p class="lvl">intermediate → who owns the input's value, and why it matters</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Every form question reduces to one ownership decision: <b>who holds the value — React state or the DOM?</b> A <b>controlled</b> input (<code>value={text} onChange={...}</code>) makes React the single source of truth: every keystroke re-renders, which sounds heavy but buys you live validation, instant formatting, disabling submit on invalid — logic that reacts <i>as the user types</i>. An <b>uncontrolled</b> input leaves the value in the DOM and reads it at submit time (<code>ref</code> or <code>FormData</code>) — zero re-renders, perfect for simple forms where only the final value matters.</p>
+    <p>React 19's <b>form actions</b> shifted the default for the submit path: <code>&lt;form action={submitFn}&gt;</code> hands you <code>FormData</code> directly, <code>useFormStatus</code> exposes pending state, and <code>useActionState</code> holds the result/error — the boilerplate trio (preventDefault, loading flag, error state) absorbed into the framework.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">who-owns-the-value.js — run it (a controlled input, simulated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// the controlled-input loop, framework-free: state → render → event → state
+let state = { name: '' };
+let renders = 0;
+function render() {
+  renders++;
+  const valid = state.name.trim().length &gt;= 2;
+  return `[input value="${state.name}"] [submit ${valid ? 'ENABLED' : 'disabled'}]`;
+}
+function type(char) {                       // what onChange does
+  state = { ...state, name: state.name + char };   // new state (immutable — §01!)
+  console.log(`typed "${char}" → ${render()}`);
+}
+console.log('initial:', render());
+for (const ch of 'Mochi') type(ch);
+console.log(`\n${renders} renders for 5 keystrokes — the controlled trade.`);
+console.log('validation reacted mid-typing: submit enabled after "Mo".\n');
+
+// the uncontrolled read: DOM keeps the value, you ask ONCE
+const fakeDOM = { nameField: 'Biscuit' };   // the browser held this the whole time
+console.log('uncontrolled submit reads:', fakeDOM.nameField, '— zero re-renders until now');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">5 keystrokes, 6 renders — that cost buys the live "ENABLED" flip</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-forms-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">An input warns: "A component is changing a controlled input to be uncontrolled." The usual cause?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Using both value and defaultValue at once</button>
+        <button class="mcq-opt" type="button" data-ok>The value became <code>undefined</code> on some render (e.g. <code>value={user.name}</code> before data loads) — React reads undefined as "you stopped controlling this"</button>
+        <button class="mcq-opt" type="button">Forgetting preventDefault on submit</button>
+        <button class="mcq-opt" type="button">Mixing refs with onChange handlers</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> control is declared per-render by passing a defined <code>value</code>. Async data flows undefined → "Mochi", flipping uncontrolled → controlled mid-life, and React (rightly) complains that ownership changed hands. The fix is one idiom: <code>value={user.name ?? ''}</code> — controlled from birth, empty until real. Knowing the warning's mechanism (not just the fix) is what's being tested.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Default to uncontrolled + <code>FormData</code> for submit-only forms; go controlled per-field only when something must react mid-typing. "Controlled everything" is a habit, not a requirement.</li>
+        <li>Validation layering: HTML attributes (<code>required</code>, <code>pattern</code>) → controlled logic → server revalidation. The server one is non-negotiable; the fullstack course's security topic explains who's lying to whom.</li>
+        <li>Debouncing a controlled input doesn't debounce the <i>renders</i> — it debounces the expensive downstream effect (the search request). Where the debounce sits is the js-async tie-in interviewers probe.</li>
+        <li>File inputs are always uncontrolled (you can't set a file's value from JS — a security boundary) — a nice "knows the platform" aside.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · CONTEXT -->
+<section class="lesson" id="context">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Context — propagation, and the re-render tax nobody mentions</h3>
+      <p class="lvl">intermediate → when context shines, and when it thrashes</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Context solves <b>prop drilling</b>: a Provider up top, <code>useContext</code> anywhere below, no courier components in between. The mechanics that matter: when a Provider's <code>value</code> changes (by <code>Object.is</code>), <b>every consumer re-renders — regardless of memo, regardless of whether it uses the changed part.</b> Context has no selectors; subscription is all-or-nothing per context object.</p>
+    <p>Two consequences run most real codebases. One: <b>split contexts by change-rate</b> — theme (changes never) and live cursor position (changes constantly) must not share a Provider. Two: the classic footgun — <code>&lt;Ctx.Provider value={{ user, setUser }}&gt;</code> builds a <i>fresh object every render</i>, so every consumer re-renders whenever the Provider's parent does, data unchanged. Memoize the value or split it.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">broadcast-tax.js — run it (context as a subscription list)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// context, mechanically: a value + subscribers who ALL hear every change
+function createCtx(name) {
+  const subs = new Set();
+  let value;
+  return {
+    name,
+    provide(v) {
+      const changed = !Object.is(value, v);
+      value = v;
+      if (changed) subs.forEach(fn =&gt; fn(v));   // no selectors — everyone
+    },
+    consume(who) { subs.add((v) =&gt; console.log(`  ${who} re-rendered (${name} → ${JSON.stringify(v)})`)); },
+  };
+}
+
+// ONE context carrying everything — the thrash
+const app = createCtx('AppCtx');
+['Header', 'Sidebar', 'ThemeButton', 'CursorTrail'].forEach(c =&gt; app.consume(c));
+console.log('cursor moves once:');
+app.provide({ theme: 'dark', cursor: [10, 20] });
+console.log('cursor moves again — theme untouched, but:');
+app.provide({ theme: 'dark', cursor: [11, 21] });
+
+// SPLIT contexts — each consumer hears only its own channel
+console.log('\nsplit by change-rate:');
+const theme = createCtx('ThemeCtx');
+const cursor = createCtx('CursorCtx');
+theme.consume('ThemeButton');
+cursor.consume('CursorTrail');
+theme.provide('dark');
+cursor.provide([10, 20]);
+cursor.provide([11, 21]);
+console.log('  (ThemeButton stayed quiet through both cursor moves)');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">four re-renders per cursor move vs one — the split is the whole fix</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-ctx-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Wrapping a context consumer in <code>React.memo</code> — does it stop context-driven re-renders?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — memo blocks all re-renders with unchanged props</button>
+        <button class="mcq-opt" type="button" data-ok>No — memo guards the PROPS door; context is a separate subscription that bypasses it entirely</button>
+        <button class="mcq-opt" type="button">Only if the context value is primitive</button>
+        <button class="mcq-opt" type="button">Yes, but only with a custom comparison function</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a component re-renders for three reasons — parent rendered (memo can veto), own state changed, or a subscribed context changed. The last two are the component's <i>own</i> business; no wrapper vetoes them. The escape hatches: split the context, memoize the provider's value, or move the consuming leaf lower. Knowing memo's exact jurisdiction is the point of the question.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Context is a <b>dependency-injection channel, not a state manager</b> — it transports; something else (useState, a reducer, a store) owns. Saying that sentence reframes half the "context vs Redux" debate.</li>
+        <li>The provider-value memo idiom: <code>const value = useMemo(() =&gt; ({ user, setUser }), [user])</code> — setState functions are stable, so the dep array is just the data.</li>
+        <li>"use context for: theme, auth identity, locale, a form's plumbing. Use a store for: fast-changing shared data." — the calibration answer, one breath.</li>
+        <li>use(Context) in React 19 can be called conditionally — a small modern flex; the subscription semantics are unchanged.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 9 · REFS -->
+<section class="lesson" id="refs">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Refs — the box React promises not to look inside</h3>
+      <p class="lvl">intermediate → instance variables, DOM handles &amp; when not to</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A ref is a <b>mutable box that survives renders and triggers none</b> — <code>useRef(init)</code> returns the <i>same</i> <code>{ current }</code> object every render. That makes it two tools in one. As an <b>instance variable</b>: interval ids, "did this already run", latest-value mirrors for stale-closure escapes — anything you need to <i>remember</i> without <i>displaying</i>. As a <b>DOM handle</b>: <code>ref={el}</code> gives you the real element for the operations React deliberately doesn't model — focus, scroll position, text selection, measuring boxes, playing video.</p>
+    <p>The discipline: <b>if it's rendered, it's state; if it's remembered, it's a ref.</b> Putting rendered data in a ref means the screen silently stops updating (no render on mutation); putting an interval id in state means pointless re-renders. The two mistakes are mirror images.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">the-box.js — run it (ref vs state vs local, side by side)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// simulate three renders of the same component with each storage choice
+function makeComponent() {
+  const refBox = { current: 0 };            // ONE box, shared across renders
+  let renderCount = 0;
+  return function render() {
+    renderCount++;
+    let localVar = 0;                       // fresh every render — amnesia
+    refBox.current++;                       // persists, no re-render triggered
+    return `render #${renderCount}: localVar=${localVar} (reset!) refBox=${refBox.current} (remembers)`;
+  };
+}
+const render = makeComponent();
+console.log(render());
+console.log(render());
+console.log(render());
+console.log('localVar forgets; the ref remembers; neither CAUSED a render.\n');
+
+// the stale-closure escape — §05's bug, solved with a mirror ref
+function makeTicker() {
+  let state = 0;
+  const latest = { current: 0 };            // mirror of state
+  const tick = () =&gt; `interval sees: state-capture=${0} latestRef=${latest.current}`;
+  // simulate: state changes 3 times after the interval captured state=0
+  for (let i = 1; i &lt;= 3; i++) { state = i; latest.current = i; }
+  return tick();
+}
+console.log(makeTicker());
+console.log('the closure froze state at 0; the ref (same box, mutated) stayed live');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">one box mutated vs a value re-captured — the whole ref story</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-refs-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A "seconds elapsed" display stored in <code>useRef</code> and incremented every second doesn't update on screen. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The interval closure went stale</button>
+        <button class="mcq-opt" type="button" data-ok>Ref mutations don't schedule renders — the number is faithfully counting in the box while the UI shows the value from the last render. Rendered data belongs in state</button>
+        <button class="mcq-opt" type="button">useRef resets to initial on every render</button>
+        <button class="mcq-opt" type="button">Intervals can't access refs</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the exact inverse of the stale-closure bug — the data is fine, the <i>display</i> is stale, because nothing told React to redraw. The decision rule resolves it instantly: elapsed seconds are rendered → state. The interval <i>id</i> is remembered → ref. One timer feature, both tools, each in its lane — which is why interviewers love this tiny scenario.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Don't read/write <code>ref.current</code> during render (it breaks with concurrent re-renders) — touch it in effects and handlers. The lint rule exists; knowing <i>why</i> (renders may be discarded, §12) is the depth.</li>
+        <li>React 19: <code>ref</code> is now a normal prop — <code>forwardRef</code> is legacy wrapping you'll still recognize in every codebase.</li>
+        <li>Callback refs (<code>ref={(el) =&gt; ...}</code>) run at attach/detach — the right tool for "measure when it mounts" without an effect-plus-ref dance.</li>
+        <li><code>useImperativeHandle</code> exposes a curated API (<code>{ focus, reset }</code>) instead of the raw node — design-by-contract for the rare parent-drives-child case; reaching for it often is a smell worth saying aloud.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — performance, concurrency &amp; the server</span></div>
+
+<!-- 10 · PERFORMANCE -->
 <section class="lesson" id="performance">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">10</span>
     <div>
       <h3>Performance discipline — measure, colocate, then memoize</h3>
       <p class="lvl">advanced → the order of operations that actually works</p>
@@ -1141,10 +1452,309 @@ const results = useMemo(() =&gt; bigFilter(deferredQ), [deferredQ]);</code></pre
   </div>
 </section>
 
-<!-- 7 · MODERN -->
+<!-- 11 · BOUNDARIES -->
+<section class="lesson" id="boundaries">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Error boundaries &amp; Suspense — the two fallback systems</h3>
+      <p class="lvl">advanced → what catches what, and the symmetry between them</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>React has two mechanisms that swap a subtree for a fallback, and they're mirror images. An <b>error boundary</b> catches <i>failures</i>: a render threw somewhere below → show the error UI instead of white-screening the app. <b>Suspense</b> catches <i>not-yet</i>: something below is still loading (a lazy chunk, a suspending data read) → show the placeholder. Both work by the same tree mechanic: the nearest boundary above the event handles it, so <b>placement is design</b> — a boundary around the whole app means any widget's crash kills everything; boundaries around each independent panel mean one broken widget shows one broken card.</p>
+    <p>The catch-list is exam material: error boundaries catch <b>render-phase throws</b> (render, lifecycles, constructors below them). They do NOT catch: <b>event handlers</b> (your click handler's throw is ordinary JS — try/catch it), <b>async code</b> (the render finished long before the promise rejected — js-async §05's territory), and <b>server-side/SSR errors</b>. Class components with <code>componentDidCatch</code> remain the only native way to write one; everyone uses <code>react-error-boundary</code>'s wrapper.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">nearest-net.js — run it (boundary mechanics in 25 lines)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a component tree where nodes may throw during "render";
+// boundaries catch anything below them — NEAREST one wins
+const tree = {
+  name: 'App', boundary: true, children: [
+    { name: 'Header', children: [] },
+    { name: 'CatGrid', boundary: true, children: [
+      { name: 'CatCard(Mochi)', children: [] },
+      { name: 'CatCard(💥corrupt)', throws: true, children: [] },
+    ]},
+    { name: 'Footer', children: [] },
+  ],
+};
+
+function render(node, boundaryStack) {
+  const stack = node.boundary ? [...boundaryStack, node.name] : boundaryStack;
+  try {
+    if (node.throws) throw new Error(`${node.name} render failed`);
+    const kids = node.children.map(c =&gt; render(c, stack)).join(', ');
+    return kids ? `${node.name}[${kids}]` : node.name;
+  } catch (e) {
+    const net = stack.at(-1);
+    console.log(`  💥 "${e.message}" → caught by nearest boundary: ${net}`);
+    return `${net === node.name ? node.name : ''}⟨fallback⟩`;
+  }
+}
+console.log('rendered:', render(tree, []));
+console.log('CatGrid ate the crash — Header and Footer never noticed.\n');
+
+// remove the inner boundary and the SAME crash takes out everything:
+tree.children[1].boundary = false;
+console.log('without the inner boundary:');
+console.log('rendered:', render(tree, []));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">same crash, two blast radii — placement is the entire design decision</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-bound-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A fetch inside a click handler rejects and the error boundary shows nothing. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The boundary needs a key to reset first</button>
+        <button class="mcq-opt" type="button" data-ok>Boundaries only catch render-phase throws — a handler's async rejection happens outside any render; catch it yourself and setState an error the UI renders</button>
+        <button class="mcq-opt" type="button">Fetch errors are swallowed by the browser</button>
+        <button class="mcq-opt" type="button">Error boundaries don't work in production builds</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the boundary is a try/catch <i>around rendering</i> — by the time the promise rejects, that call stack is history (the js-async lesson about errors traveling through time, resurfacing here). The idiomatic bridge: catch in the handler, <code>setError(e)</code>, and either render the error state directly or <code>throw error</code> during render to hand it to the boundary deliberately. Knowing the bridge exists is the senior half of the answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The symmetry sentence: "Suspense catches promises, boundaries catch errors — both walk up to the nearest net." One mechanism, two payloads.</li>
+        <li>Reset strategy: give the boundary a <code>key</code> (or resetKeys) tied to the route/user — navigation replaces the crashed subtree with a fresh mount instead of a dead fallback.</li>
+        <li>Suspense placement mirrors boundary placement: one spinner around the page = everything pops in together; nested Suspense = streaming reveal. The frontend-system-design module prices these choices.</li>
+        <li>Report from <code>componentDidCatch</code>/onError to your error tracker — a boundary that swallows silently is the "catch and continue" sin from js-fundamentals §10, in a React costume.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · CONCURRENT -->
+<section class="lesson" id="concurrent">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Concurrent React — transitions, and renders that lose</h3>
+      <p class="lvl">advanced → urgent vs deferrable, and why renders must be pure</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Concurrent rendering's one idea: <b>not all updates deserve equal urgency.</b> A keystroke must paint <i>now</i>; the 5,000-row filter results it triggers can lag a beat. <code>startTransition</code> (and <code>useTransition</code>'s pending flag) marks an update <b>deferrable</b>: React renders it in the background, <b>can pause or abandon that render</b> when an urgent update (the next keystroke) arrives, and only commits when it finishes cleanly. <code>useDeferredValue</code> is the same idea aimed at a value: the deferred copy lags behind while urgent work stays crisp.</p>
+    <p>This is <i>why the rules exist</i>: renders can now run twice, be thrown away, or interleave — so <b>render must be pure</b> (no mutations, no side effects mid-render), which is also why you don't touch <code>ref.current</code> during render (§09) and why StrictMode double-invokes on purpose: it's rehearsing abandonment to catch impure renders in dev.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">urgent-vs-deferrable.js — run it (the scheduler's decision, simulated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// simulate: each keystroke = urgent update + a SLOW filter render (deferrable)
+// strategy A — everything urgent: the filter blocks the next keystroke
+// strategy B — filter marked as a transition: abandoned when out-typed
+const keystrokes = ['m', 'mo', 'moc', 'mochi'];
+const FILTER_COST = 80;                       // ms of blocking render work
+
+let clock = 0, painted = [];
+console.log('A · everything urgent:');
+for (const q of keystrokes) {
+  clock += 2;                                 // keystroke handled
+  clock += FILTER_COST;                       // filter render BLOCKS
+  painted.push(`"${q}"+results@${clock}ms`);
+}
+console.log('  input painted at:', painted.join('  '));
+console.log(`  worst gap between keystrokes: ~${FILTER_COST + 2}ms — typing feels mushy\n`);
+
+clock = 0;
+console.log('B · filter in a transition (abandonable):');
+const log = [];
+for (let i = 0; i &lt; keystrokes.length; i++) {
+  clock += 2;
+  log.push(`"${keystrokes[i]}" painted@${clock}ms`);
+  const hasNext = i &lt; keystrokes.length - 1;
+  if (hasNext) {
+    clock += 10;                              // background render starts…
+    log.push(`  (filter for "${keystrokes[i]}" ABANDONED — new keystroke)`);
+  } else {
+    clock += FILTER_COST;                     // last one runs to completion
+    log.push(`  results for "${keystrokes[i]}" committed@${clock}ms`);
+  }
+}
+log.forEach(l =&gt; console.log(' ', l));
+console.log('  input stayed instant; only the FINAL filter ever committed');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">three abandoned renders is the feature — wasted work bought responsiveness</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-conc-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why must render functions be pure for concurrent features to be safe?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Purity makes renders faster to execute</button>
+        <button class="mcq-opt" type="button" data-ok>Concurrent renders can run twice, pause, or be abandoned before committing — a side effect inside one would fire for a render the user never sees, with no way to undo it</button>
+        <button class="mcq-opt" type="button">Impure renders can't be minified</button>
+        <button class="mcq-opt" type="button">It's convention only — impure renders work identically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> commit is the transaction point — effects, DOM, and mutations belong there precisely because commits are never abandoned. Render is now speculative computation. This one sentence explains three "weird React rules" at once: StrictMode's double-render (a purity fuzzer), no-ref-writes-in-render, and effects-not-in-render. Connecting the rules to the scheduler is the depth marker.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Calibration: transitions fix <b>render-bound</b> jank (big lists, heavy trees). Network waits want Suspense; single expensive components want memo first. Naming which tool for which jank is the answer's spine.</li>
+        <li><code>useDeferredValue</code> + memoized list = the search-results idiom: the input rides urgent lanes, the list lags a render behind, nobody blocks.</li>
+        <li>"Tearing" is the word to drop: interleaved renders reading an external store mid-change see inconsistent snapshots — the exact problem <code>useSyncExternalStore</code> (§13) exists to solve.</li>
+        <li>Transitions don't make work <i>faster</i> — they make it <i>losable</i>. If the filter itself is O(n²), fix the filter; the scheduler only hides latency between keystrokes.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · STATE MGMT -->
+<section class="lesson" id="statemgmt">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>State architecture — colocation, reducers &amp; external stores</h3>
+      <p class="lvl">advanced → where state lives, and what Redux/Zustand actually are</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The architecture question isn't "which library" — it's <b>"who needs this state, and how far apart do they live?"</b> The ladder: <b>colocate</b> (state in the component that uses it — most state belongs here); <b>lift</b> to the nearest common parent when siblings share; <b>reducer</b> when updates are multi-step transitions of one cohesive object (a form wizard, a game — <code>dispatch({type})</code> centralizes the legal moves); <b>context</b> to transport stable, slow-changing values (§08); and an <b>external store</b> when fast-changing state is read from many distant places.</p>
+    <p>Every external store — Redux, Zustand, Jotai under the hood — is the same 15-line machine: <b>state outside React + subscribe + snapshot</b>, bridged in through <code>useSyncExternalStore</code>, which guarantees consistent reads under concurrent rendering (§12's tearing, solved). Server data is its own category: caches with staleness and refetching (React Query's job) — putting API responses in Redux by hand is the 2018 habit interviews still probe.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">store-in-15-lines.js — run it (what Zustand is)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// the entire external-store contract: getSnapshot + subscribe + update
+function createStore(initial) {
+  let state = initial;
+  const listeners = new Set();
+  return {
+    getSnapshot: () =&gt; state,
+    subscribe: (fn) =&gt; { listeners.add(fn); return () =&gt; listeners.delete(fn); },
+    setState: (patch) =&gt; {
+      state = { ...state, ...patch };            // immutable — reference equality works
+      listeners.forEach(fn =&gt; fn());
+    },
+  };
+}
+
+const store = createStore({ cats: 3, theme: 'dark' });
+
+// two "components" subscribe with SELECTORS — only re-render if their slice changed
+function connect(name, selector) {
+  let last = selector(store.getSnapshot());
+  store.subscribe(() =&gt; {
+    const next = selector(store.getSnapshot());
+    if (!Object.is(last, next)) {                // the selector check context lacks!
+      last = next;
+      console.log(`  ${name} re-rendered → ${JSON.stringify(next)}`);
+    }
+  });
+}
+connect('CatCounter', s =&gt; s.cats);
+connect('ThemeButton', s =&gt; s.theme);
+
+console.log('cats 3 → 4:');
+store.setState({ cats: 4 });
+console.log('cats 4 → 5 (theme untouched):');
+store.setState({ cats: 5 });
+console.log('theme flips:');
+store.setState({ theme: 'light' });
+console.log('\nselectors gave per-slice subscriptions — the exact thing §08 said context can\'t do');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">this is Zustand minus the ergonomics — and why stores beat context for fast state</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-sm-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A form wizard has 6 fields, per-step validation, and back/next that must restore prior answers. Best state shape?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Six useStates plus a step useState</button>
+        <button class="mcq-opt" type="button" data-ok>One useReducer — the state is one cohesive object with legal transitions (NEXT, BACK, ANSWER), and the reducer is a pure, testable transition table</button>
+        <button class="mcq-opt" type="button">Redux — multi-step means global</button>
+        <button class="mcq-opt" type="button">A ref holding the answers, state for the step</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the tells for a reducer are all present — multiple fields changing <i>together</i>, updates with rules ("can't NEXT while invalid"), transition-shaped logic. Seven scattered useStates can't express "these change as one move"; Redux is scope overkill (nothing outside the wizard reads it); a ref hides rendered data (§09's sin). Bonus: a reducer is a plain function — unit-test the whole wizard without rendering anything.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The opening move in any "how would you manage state" question: <b>classify it</b> — UI state / shared app state / server cache / URL state. Different owners; the URL one (filters, tabs, pagination) is the most-forgotten.</li>
+        <li>Custom hooks are the packaging layer: <code>useCart()</code> hides whether it's context, store, or reducer inside — consumers can't tell, and you can migrate the internals without touching them. Design-by-interface, from js-fundamentals' modules section.</li>
+        <li>"Why not context for everything?" now has a two-part answer you can prove: no selectors (§08's runner) + tearing under concurrency (§12) — <code>useSyncExternalStore</code> is the store's unfair advantage.</li>
+        <li>Redux Toolkit's actual remaining value: devtools time-travel, middleware discipline, and org-scale conventions — say that instead of "Redux is dead", which reads as fashion, not judgment.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · RSC -->
+<section class="lesson" id="rsc">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Server components &amp; hydration — where components run</h3>
+      <p class="lvl">advanced → the client boundary, and what "use client" really marks</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The mental model that makes RSC click: components now have a <b>location</b>. A <b>server component</b> runs only on the server — it can read the database directly, its dependencies never ship to the browser, and its output is a serialized UI description (not HTML — a tree the client React merges). A <b>client component</b> (marked <code>'use client'</code>) ships as JS and runs in the browser — it's every component you wrote before 2023: state, effects, handlers, browser APIs.</p>
+    <p>Two rules carry all the interviews. One: <b><code>'use client'</code> marks a boundary, not a file preference</b> — everything a client component <i>imports</i> becomes client code too; the directive poisons downward. (A server component can still appear <i>inside</i> a client one — passed as <code>children</code>, composed rather than imported.) Two: <b>hydration is attach, not re-draw</b> — the server's HTML (via SSR) paints first; then the client bundle loads and React walks the existing DOM attaching handlers and state. The gap between paint and hydration is why a button can be visible-but-dead for a moment, and why server/client markup must match (the hydration-mismatch error is React refusing to guess which is right).</p>
+    <div class="code">
+      <div class="code-head"><span class="fname">the-boundary.jsx — read it (locations annotated)</span><button class="copy" type="button">copy</button></div>
+      <pre><code class="language-javascript">// SERVER component (default): db access, zero JS shipped
+async function CatShelfPage() {
+  const cats = await db.cats.findMany();          // no API route needed — this IS the server
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;The shelf&lt;/h1&gt;
+      {cats.map(cat =&gt; (
+        &lt;CatCard key={cat.id} cat={cat}&gt;          {/* client island below */}
+          &lt;VetNotes notes={cat.notes} /&gt;          {/* SERVER comp passed as children! */}
+        &lt;/CatCard&gt;
+      ))}
+    &lt;/main&gt;
+  );
+}
+
+// CatCard.jsx — the boundary line
+'use client';                                     // ← everything imported here ships
+import { useState } from 'react';
+function CatCard({ cat, children }) {
+  const [open, setOpen] = useState(false);        // interactivity → must be client
+  return (
+    &lt;article onClick={() =&gt; setOpen(!open)}&gt;
+      {cat.name} {open &amp;&amp; children}               {/* renders the server-made part */}
+    &lt;/article&gt;
+  );
+}
+
+// the payload math: markdown-renderer for VetNotes stays on the server —
+// 200KB of dependency the browser never downloads. That's the entire pitch.</code></pre>
+    </div>
+    <div class="mcq" data-qid="rdd-rsc-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"Hydration failed: text content does not match" — the classic cause?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The client bundle loaded before the HTML finished</button>
+        <button class="mcq-opt" type="button" data-ok>The component rendered differently on server vs client — e.g. <code>new Date().toLocaleTimeString()</code> or anything random/locale/window-dependent in render</button>
+        <button class="mcq-opt" type="button">A missing key prop in a server component list</button>
+        <button class="mcq-opt" type="button">CSS-in-JS loaded asynchronously</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> hydration <i>trusts</i> the server HTML and attaches to it — if the client's first render disagrees (time, randomness, <code>window.innerWidth</code>, user locale), React can't know which tree is true. Fixes, in order of honesty: move the varying bit into an effect (render a stable placeholder first), use <code>suppressHydrationWarning</code> for genuinely-varying text like timestamps, or compute it on one side only. Render purity (§12) strikes again — impurity is what desyncs the two runs.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The composition trick — server components as <code>children</code> of client components — is THE question that separates "read a tweet about RSC" from "gets the model". Import direction decides location; nesting doesn't.</li>
+        <li>SSR and RSC are different axes: SSR = render-to-HTML for first paint (existed for years); RSC = components whose code never ships. Next.js App Router does both at once, which is why people conflate them — untangling them out loud is the flex.</li>
+        <li>Server actions (<code>'use server'</code>) close the loop: forms (§07) posting straight to server functions, no API-route boilerplate — mention progressive enhancement (works before hydration) for the bonus point.</li>
+        <li>Honest cost accounting: RSC buys smaller bundles and direct data access; it costs infrastructure (a server, always) and a harder mental model. "Static site? RSC buys nothing" is a good closing sentence.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 15 · MODERN -->
 <section class="lesson" id="modern">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">15</span>
     <div>
       <h3>Suspense &amp; Server Components — the current era, minus the fog</h3>
       <p class="lvl">advanced → what actually changed, in five honest paragraphs</p>
@@ -1200,10 +1810,18 @@ const results = useMemo(() =&gt; bigFilter(deferredQ), [deferredQ]);</code></pre
       <tr><td class="mono">01</td><td>the model</td><td>UI = f(state); re-render = your function re-runs; diff protects the DOM.</td></tr>
       <tr><td class="mono">02</td><td>reconciliation</td><td>Same type updates, different type remounts, lists match by key — ids, not indexes.</td></tr>
       <tr><td class="mono">03</td><td>useState</td><td>State is a snapshot; sets batch per event; updater form reads fresh; new reference or no render.</td></tr>
-      <tr><td class="mono">04</td><td>effects</td><td>Effects synchronize external systems; cleanup runs before re-run; deps are the truth, not paperwork.</td></tr>
-      <tr><td class="mono">05</td><td>hooks</td><td>Ref survives silently, memo caches identity, reducer centralizes transitions, context injects — and slots explain the Rules.</td></tr>
-      <tr><td class="mono">06</td><td>performance</td><td>Measure → move state down / children up → memoize completely → schedule with transitions.</td></tr>
-      <tr><td class="mono">07</td><td>modern</td><td>Suspense = declarative loading regions that stream; RSC = components whose JS never ships.</td></tr>
+      <tr><td class="mono">04</td><td>keys</td><td>Keys are identity claims; index keys hand your state to the neighbor when the list shifts.</td></tr>
+      <tr><td class="mono">05</td><td>effects</td><td>Effects synchronize external systems; cleanup runs before re-run; deps are the truth, not paperwork.</td></tr>
+      <tr><td class="mono">06</td><td>hooks</td><td>Ref survives silently, memo caches identity, reducer centralizes transitions, context injects — and slots explain the Rules.</td></tr>
+      <tr><td class="mono">07</td><td>forms</td><td>Controlled when something reacts mid-typing; uncontrolled + FormData when only submit matters.</td></tr>
+      <tr><td class="mono">08</td><td>context</td><td>A transport, not a store: no selectors, all consumers pay — split by change-rate, memo the value.</td></tr>
+      <tr><td class="mono">09</td><td>refs</td><td>Rendered → state; remembered → ref. Mutating the box never redraws the screen.</td></tr>
+      <tr><td class="mono">10</td><td>performance</td><td>Measure → move state down / children up → memoize completely → schedule with transitions.</td></tr>
+      <tr><td class="mono">11</td><td>boundaries</td><td>Suspense catches promises, boundaries catch render throws — nearest net wins; handlers catch their own.</td></tr>
+      <tr><td class="mono">12</td><td>concurrent</td><td>Urgent paints now; transitions are abandonable — which is exactly why render must be pure.</td></tr>
+      <tr><td class="mono">13</td><td>state arch.</td><td>Colocate → lift → reducer → context → store; a store is subscribe + snapshot + selectors.</td></tr>
+      <tr><td class="mono">14</td><td>RSC</td><td>'use client' is a boundary that poisons downward; hydration attaches, it doesn't redraw.</td></tr>
+      <tr><td class="mono">15</td><td>modern</td><td>Suspense = declarative loading regions that stream; RSC = components whose JS never ships.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1216,9 +1834,10 @@ const results = useMemo(() =&gt; bigFilter(deferredQ), [deferredQ]);</code></pre
   <div class="idea" style="margin-top:24px">
     <ul>
       <li><b>"Explain rendering / why does this re-render?"</b> = sections 01–02. Drill the rapid-fire pairs in <a href="../fullstack.html#react">Full-Stack in 48 · React rendering</a>.</li>
-      <li><b>"Fix this buggy hook"</b> = sections 03–04: stale closure, missing cleanup, mutated state, derived-state-in-effect. The four bugs cover ~90% of live-debugging exercises.</li>
-      <li><b>"How would you make this app fast?"</b> = section 06's ladder, told in that order — measurement before memo is itself the answer. Cross-train with <a href="../frontend-system-design.html#perf">Frontend SD · performance</a>.</li>
-      <li><b>"Thoughts on Server Components?"</b> = section 07's honest paragraphs: what changed, what it costs, when you'd adopt. Calibration beats cheerleading.</li>
+      <li><b>"Fix this buggy hook"</b> = sections 03–05: stale closure, stolen keys, missing cleanup, mutated state, derived-state-in-effect. The four bugs cover ~90% of live-debugging exercises.</li>
+      <li><b>"How would you make this app fast?"</b> = section 10's ladder, told in that order — measurement before memo is itself the answer. Cross-train with <a href="../frontend-system-design.html#perf">Frontend SD · performance</a>.</li>
+      <li><b>"Thoughts on Server Components?"</b> = sections 14–15's honest paragraphs: what changed, what it costs, when you'd adopt. Calibration beats cheerleading.</li>
+      <li><b>Senior loops</b> live in the advanced band: boundary placement as design (11), why purity enables concurrency (12), classify-the-state (13), and the children-composition RSC trick (14) — each is a five-minute whiteboard answer now.</li>
       <li>Next modules: <b>node-backend</b> (the other side of your fetch calls) and <b>frontend-system-design</b> (this module's ideas at architecture scale).</li>
     </ul>
   </div>

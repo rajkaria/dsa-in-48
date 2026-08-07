@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -676,7 +680,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#joins"><span><i class="dot" data-for="joins"></i> Joins, Finally Clear</span></a>
     <a class="side-link" href="#indexes"><span><i class="dot" data-for="indexes"></i> Indexes &amp; EXPLAIN</span></a>
     <a class="side-link" href="#transactions"><span><i class="dot" data-for="transactions"></i> Transactions</span></a>
+    <a class="side-link" href="#isolation"><span><i class="dot" data-for="isolation"></i> Isolation Levels</span></a>
+    <a class="side-link" href="#mvcc"><span><i class="dot" data-for="mvcc"></i> MVCC &amp; VACUUM</span></a>
     <a class="side-link" href="#nplus1"><span><i class="dot" data-for="nplus1"></i> The N+1 Story</span></a>
+    <a class="side-link" href="#windows"><span><i class="dot" data-for="windows"></i> Window Functions</span></a>
+    <a class="side-link" href="#ctes"><span><i class="dot" data-for="ctes"></i> CTEs &amp; Recursion</span></a>
+    <a class="side-link" href="#jsonb"><span><i class="dot" data-for="jsonb"></i> JSONB</span></a>
+    <a class="side-link" href="#explain"><span><i class="dot" data-for="explain"></i> Reading EXPLAIN</span></a>
+    <a class="side-link" href="#indexplus"><span><i class="dot" data-for="indexplus"></i> The Exotic Indexes</span></a>
+    <a class="side-link" href="#migrations"><span><i class="dot" data-for="migrations"></i> Zero-Downtime Migrations</span></a>
     <a class="side-link" href="#scale"><span><i class="dot" data-for="scale"></i> Scaling Postgres</span></a>
   </nav>
 
@@ -695,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/7</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -722,13 +734,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: isolation levels &amp; scaling</span>
   </div>
   <div class="hero-meta">
-    <span><b>7</b> sections</span>
-    <span><b>7</b> quiz questions</span>
-    <span><b>5</b> runnable panels</span>
-    <span><b>~4h</b> self-paced</span>
+    <span><b>15</b> sections</span>
+    <span><b>15</b> quiz questions</span>
+    <span><b>13</b> runnable panels</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#sql">Start at SELECT <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — the language &amp; the shapes</span></div>
 
 <!-- 1 · SQL -->
 <section class="lesson" id="sql">
@@ -954,6 +968,8 @@ console.log('anti-join — never adopted:',
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+<div class="band" id="band-intermediate"><span>// intermediate — speed, safety &amp; concurrency</span></div>
+
 <!-- 4 · INDEXES -->
 <section class="lesson" id="indexes">
   <div class="lesson-head">
@@ -1097,10 +1113,149 @@ console.log('atomic update:   ', await raceWith('atomic'),
   </div>
 </section>
 
-<!-- 6 · N+1 -->
-<section class="lesson" id="nplus1">
+<!-- 6 · ISOLATION -->
+<section class="lesson" id="isolation">
   <div class="lesson-head">
     <span class="lesson-num">06</span>
+    <div>
+      <h3>Isolation levels — the four anomalies, staged on purpose</h3>
+      <p class="lvl">intermediate → what READ COMMITTED actually promises (and doesn't)</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 05 raced two writers; isolation levels govern what concurrent transactions <b>see</b>. The anomalies, mildest first: <b>dirty read</b> (seeing uncommitted data — Postgres never allows this, even at its floor), <b>non-repeatable read</b> (re-read a row mid-transaction, it changed), <b>phantom read</b> (re-run a query, new rows appeared), <b>serialization anomaly</b> (each transaction consistent alone, nonsense together — two vets each checking "is another vet on duty?" then both leaving). The levels are just which anomalies you accept: <b>READ COMMITTED</b> (Postgres default — each <i>statement</i> sees a fresh snapshot), <b>REPEATABLE READ</b> (whole <i>transaction</i> shares one snapshot), <b>SERIALIZABLE</b> (as if run one at a time — at the price of retry-able serialization failures).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">anomaly-theatre.js — run it (two transactions, interleaved)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// a tiny versioned table + snapshot machinery (MVCC preview!)
+let committed = { mochiWeight: 4.2 };            // the committed truth
+const snapshotOf = () =&gt; ({ ...committed });
+
+// NON-REPEATABLE READ at READ COMMITTED — each statement re-snapshots
+console.log('— READ COMMITTED —');
+let stmtSnap = snapshotOf();
+console.log('T1 reads weight:', stmtSnap.mochiWeight);
+committed = { mochiWeight: 5.0 };                // T2 commits an update between reads
+stmtSnap = snapshotOf();                          // T1's NEXT statement: fresh snapshot
+console.log('T1 re-reads:    ', stmtSnap.mochiWeight, ' ← changed mid-transaction (allowed here)');
+
+// REPEATABLE READ — one snapshot for the whole transaction
+console.log('\n— REPEATABLE READ —');
+committed = { mochiWeight: 4.2 };
+const txSnap = snapshotOf();                      // taken ONCE at first read
+console.log('T1 reads weight:', txSnap.mochiWeight);
+committed = { mochiWeight: 5.0 };                 // T2 commits again
+console.log('T1 re-reads:    ', txSnap.mochiWeight, ' ← stable — same snapshot');
+
+// SERIALIZATION ANOMALY — consistent alone, nonsense together
+console.log('\n— the on-duty vets (needs SERIALIZABLE to prevent) —');
+const duty = { vetA: true, vetB: true };
+const aSees = { ...duty }, bSees = { ...duty };   // both read the same start state
+if (aSees.vetB) duty.vetA = false;                // A: "B is here, I can leave"
+if (bSees.vetA) duty.vetB = false;                // B: "A is here, I can leave"
+console.log('vets on duty after both "safe" departures:', duty,
+  '← both gone. SERIALIZABLE would abort one with a retry error.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">three isolation behaviors from one snapshot mechanic — MVCC is next</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-iso-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A monthly report transaction reads the orders table many times over 3 minutes and the numbers must be mutually consistent. Minimum isolation level?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">READ COMMITTED — it's the default for a reason</button>
+        <button class="mcq-opt" type="button" data-ok>REPEATABLE READ — the whole report reads one frozen snapshot, so every number describes the same instant; writers aren't blocked meanwhile</button>
+        <button class="mcq-opt" type="button">SERIALIZABLE — reports need the maximum</button>
+        <button class="mcq-opt" type="button">None — wrap it in one big SELECT instead</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> at READ COMMITTED, page 1's totals and page 9's details can describe different moments (orders committed in between) — the report disagrees with itself. REPEATABLE READ freezes the world without locking it (MVCC magic, next section). SERIALIZABLE adds write-conflict machinery a read-only report doesn't need — though a read-only transaction at RR is so cheap the "over-provision" is forgivable; saying that nuance wins the point.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Postgres's READ COMMITTED already prevents dirty reads — its four levels are really three behaviors; "the floor is higher than the SQL standard's" is a nice precision flex.</li>
+        <li>SERIALIZABLE means <b>your code must retry</b> — error 40001 is a feature; a retry loop with backoff is part of adopting it, not an afterthought.</li>
+        <li>The §05 lost-update race is <i>not</i> fixed by RR alone — a concurrent write to the same row at RR throws a serialization failure instead of losing the update. Different failure, still needs handling. Connecting the two sections is the depth.</li>
+        <li>"Which level do you actually run?" — READ COMMITTED + explicit locking/atomic updates where it matters is the industry default answer; name it as a choice, not an accident.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · MVCC -->
+<section class="lesson" id="mvcc">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>MVCC &amp; VACUUM — why readers never block writers</h3>
+      <p class="lvl">intermediate → row versions, dead tuples &amp; the bloat story</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The trick behind those snapshots: Postgres <b>never updates a row in place</b>. An UPDATE writes a <b>new row version</b> and marks the old one as expired (each version carries <code>xmin</code>/<code>xmax</code> — the transaction ids that created and expired it). A snapshot is just a rule for <i>which versions are visible to me</i>. That's <b>MVCC</b> — multi-version concurrency control — and it's why readers never block writers: your report reads yesterday's versions while updates happily write new ones alongside.</p>
+    <p>The bill: expired versions (<b>dead tuples</b>) pile up. <b>VACUUM</b> reclaims them — and <b>autovacuum</b> must keep pace, because bloated tables mean slower scans and, in the worst neglect, transaction-id wraparound (the outage that gets blog posts written). This is also why <b>long-running transactions hurt</b>: VACUUM can't reclaim any version some old snapshot might still need — one forgotten idle-in-transaction connection holds back cleanup for the whole database.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">row-versions.js — run it (a table with xmin/xmax, visible)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// every UPDATE = new version; nothing is overwritten
+let xid = 100;
+const versions = [];
+const insert = (data) =&gt; versions.push({ ...data, xmin: ++xid, xmax: null });
+const update = (name, patch) =&gt; {
+  const live = versions.find(v =&gt; v.name === name &amp;&amp; v.xmax === null);
+  live.xmax = ++xid;                                   // expire the old version
+  versions.push({ ...live, ...patch, xmin: xid, xmax: null });
+};
+const visibleAt = (snapshotXid) =&gt;
+  versions.filter(v =&gt; v.xmin &lt;= snapshotXid &amp;&amp; (v.xmax === null || v.xmax &gt; snapshotXid));
+
+insert({ name: 'Mochi', weight: 4.2 });
+const reportSnapshot = xid;                            // report starts HERE
+update('Mochi', { weight: 4.5 });
+update('Mochi', { weight: 5.0 });
+
+console.log('all stored versions:');
+versions.forEach(v =&gt; console.log(`  xmin ${v.xmin} xmax ${v.xmax ?? '—'}  ${v.name} ${v.weight}kg`));
+console.log('\nreport (old snapshot) sees:', JSON.stringify(visibleAt(reportSnapshot).map(v =&gt; v.weight)));
+console.log('new transaction sees:      ', JSON.stringify(visibleAt(xid).map(v =&gt; v.weight)));
+
+const dead = versions.filter(v =&gt; v.xmax !== null &amp;&amp; v.xmax &lt;= reportSnapshot).length;
+const reclaimable = versions.filter(v =&gt; v.xmax !== null).length;
+console.log(`\ndead tuples: ${reclaimable} — but VACUUM can only reclaim ${dead} while the report snapshot lives`);
+console.log('close the report transaction and all', reclaimable, 'become reclaimable. Idle-in-transaction = bloat.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">two readers, two answers, zero locks — and the vacuum debt on display</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-mvcc-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A table gets 100% of its rows UPDATEd hourly. Disk usage triples in a week and scans slow down. The mechanism?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Postgres compresses old data too slowly</button>
+        <button class="mcq-opt" type="button" data-ok>Every UPDATE writes a whole new row version — dead versions accumulate faster than autovacuum reclaims them; tune autovacuum for this table, check for snapshot-holding long transactions, consider fillfactor/HOT updates</button>
+        <button class="mcq-opt" type="button">The WAL is being stored inside the table</button>
+        <button class="mcq-opt" type="button">Indexes duplicate the row data on update</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> update-heavy tables are MVCC's stress case — each pass rewrites every row, and the old copies wait for VACUUM. The named remedies are real levers: per-table autovacuum settings (more aggressive thresholds), hunting <code>idle in transaction</code> sessions (the silent bloat cause), and HOT updates (same-page rewrites that skip index churn, helped by fillfactor headroom). Listing levers beats naming the disease.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The one-liner: <b>"UPDATE is INSERT + expire; SELECT is a visibility filter; VACUUM is the garbage collector"</b> — MVCC in twelve words, and the GC framing links it to js-fundamentals' memory section.</li>
+        <li>DELETE doesn't shrink files (dead tuples again); plain VACUUM returns space to the <i>table</i>, VACUUM FULL to the <i>OS</i> (with an exclusive lock — say the caveat).</li>
+        <li>Monitoring names: <code>pg_stat_user_tables.n_dead_tup</code>, and the wraparound metric everyone quotes post-incident: <code>age(datfrozenxid)</code>.</li>
+        <li>This is why Postgres replicas can serve long analytical reads (MVCC snapshots) while the primary writes — the scale section's replica story, mechanically explained.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · N+1 -->
+<section class="lesson" id="nplus1">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
     <div>
       <h3>The N+1 story — death by a thousand tiny queries</h3>
       <p class="lvl">intermediate → the bug every ORM manufactures by default</p>
@@ -1168,10 +1323,442 @@ console.log(`batched:    ${queryCount} queries, ${(performance.now() - t0).toFix
   </div>
 </section>
 
-<!-- 7 · SCALE -->
+<!-- 9 · WINDOWS -->
+<section class="lesson" id="windows">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>Window functions — aggregates that keep the rows</h3>
+      <p class="lvl">intermediate → rank, running totals &amp; top-N-per-group</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>GROUP BY collapses rows into summaries; a <b>window function</b> computes the summary <i>while keeping every row</i> — each row gains a column calculated over its "window" of peers. The grammar: <code>fn() OVER (PARTITION BY … ORDER BY … )</code> — partition = which rows are peers, order = how the frame walks. The greatest hits: <code>ROW_NUMBER / RANK / DENSE_RANK</code> (positions — differing only in tie-handling), <code>SUM(...) OVER (ORDER BY d)</code> (running totals), <code>LAG / LEAD</code> (the previous/next row's value — month-over-month deltas without self-joins).</p>
+    <p>And the interview classic they unlock: <b>top-N-per-group</b> ("each cat's 2 biggest meals") — rank within partitions in a subquery, filter <code>rn &lt;= 2</code> outside. The pre-window alternative was a correlated-subquery monstrosity; this is the modern answer, expected on sight.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">window-engine.js — run it (OVER, implemented)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const meals = [
+  { cat: 'Mochi',   day: 1, grams: 40 }, { cat: 'Mochi',   day: 2, grams: 60 },
+  { cat: 'Mochi',   day: 3, grams: 50 }, { cat: 'Biscuit', day: 1, grams: 80 },
+  { cat: 'Biscuit', day: 2, grams: 30 }, { cat: 'Biscuit', day: 3, grams: 80 },
+];
+
+// OVER (PARTITION BY cat ORDER BY grams DESC): rank within each cat
+function withWindow(rows, partitionBy, orderBy, fns) {
+  const parts = new Map();
+  rows.forEach(r =&gt; (parts.get(r[partitionBy]) ?? parts.set(r[partitionBy], []).get(r[partitionBy])).push(r));
+  const out = [];
+  for (const peers of parts.values()) {
+    const sorted = [...peers].sort(orderBy);
+    let running = 0;
+    sorted.forEach((r, i) =&gt; {
+      running += r.grams;
+      out.push({ ...r, ...fns({ row: r, i, sorted, running }) });
+    });
+  }
+  return out;
+}
+
+const ranked = withWindow(meals, 'cat', (a, b) =&gt; b.grams - a.grams, ({ i, sorted, row }) =&gt; ({
+  row_number: i + 1,
+  rank: 1 + sorted.findIndex(s =&gt; s.grams === row.grams),          // ties share rank
+}));
+console.log('ranked within each cat (by grams desc):');
+ranked.forEach(r =&gt; console.log(`  ${r.cat.padEnd(8)} day${r.day} ${r.grams}g  row_number ${r.row_number}  rank ${r.rank}`));
+
+console.log('\ntop-2 meals per cat (WHERE row_number <= 2):');
+ranked.filter(r =&gt; r.row_number &lt;= 2).forEach(r =&gt;
+  console.log(`  ${r.cat} day${r.day} ${r.grams}g`));
+
+const runningTotals = withWindow(meals, 'cat', (a, b) =&gt; a.day - b.day, ({ running }) =&gt; ({ running }));
+console.log('\nrunning grams by day (SUM OVER ORDER BY day):');
+runningTotals.forEach(r =&gt; console.log(`  ${r.cat.padEnd(8)} day${r.day}: ${r.running}g so far`));
+console.log('\nnote Biscuit\'s day-1 and day-3 both rank 1 — RANK ties; ROW_NUMBER breaks them arbitrarily.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">partition → order → compute per row: the OVER clause as 20 lines of JS</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-win-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"Each customer's most recent order" — why does <code>GROUP BY customer_id</code> alone fail?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">GROUP BY can't sort within groups</button>
+        <button class="mcq-opt" type="button" data-ok>GROUP BY collapses to one row per group but only aggregate values survive — you can get MAX(created_at), but not the rest of THAT order's columns; window rank keeps whole rows, then filter rn=1</button>
+        <button class="mcq-opt" type="button">It works fine — add ORDER BY created_at DESC LIMIT 1</button>
+        <button class="mcq-opt" type="button">customer_id isn't unique enough to group on</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the trap is "columns must be grouped or aggregated" — selecting <code>order_id</code> alongside <code>MAX(created_at)</code> is invalid (which row's id?). <code>ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY created_at DESC)</code> then <code>WHERE rn = 1</code> keeps the full row. Postgres bonus answer: <code>DISTINCT ON (customer_id) … ORDER BY customer_id, created_at DESC</code> — naming both marks real Postgres mileage.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Windows run <i>after</i> WHERE/GROUP/HAVING — you can't filter on a window column in the same query level; the subquery/CTE wrapper isn't style, it's the execution order from §01.</li>
+        <li>Frames go deeper: <code>ROWS BETWEEN 6 PRECEDING AND CURRENT ROW</code> = 7-day moving average — one clause, no self-join.</li>
+        <li>ROW_NUMBER vs RANK vs DENSE_RANK in one breath: "break ties, share-and-skip, share-and-don't-skip."</li>
+        <li>LAG for "compare to previous period" kills the self-join answer — interviewers upgrade their estimate of you the moment LAG appears unprompted.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · CTES -->
+<section class="lesson" id="ctes">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>CTEs &amp; recursion — named steps, and walking trees in SQL</h3>
+      <p class="lvl">intermediate → WITH as pipeline, WITH RECURSIVE as iteration</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>CTE</b> (<code>WITH name AS (…)</code>) names a query step so the next step can read it — turning nested-subquery pyramids into a readable top-to-bottom pipeline. Since Postgres 12 they're inlined by the planner (the old "optimization fence" folklore is stale — <code>MATERIALIZED</code> is now an explicit choice when you <i>want</i> the fence).</p>
+    <p><b>WITH RECURSIVE</b> is the headline: SQL that iterates. Shape: a <b>base case</b> UNION ALL a <b>step that reads the CTE itself</b>, repeating until the step returns no rows — dsa's BFS, wearing SQL. It's THE answer for hierarchies in relational tables: org charts, category trees, "all prerequisites of this course", "everyone Mochi has ever influenced".</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">recursive-cte.js — run it (the fixpoint loop, visible)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// cats and their mentors (an adjacency table — parent_id style)
+const mentors = [                       // [student, mentor]
+  ['Biscuit', 'Mochi'], ['Beans', 'Mochi'],
+  ['Clawdia', 'Biscuit'], ['Tuna', 'Biscuit'], ['Salem', 'Clawdia'],
+];
+
+// WITH RECURSIVE lineage AS (
+//   SELECT 'Mochi' AS cat, 0 AS depth              -- base case
+//   UNION ALL
+//   SELECT m.student, l.depth + 1                  -- the step: reads lineage
+//   FROM mentors m JOIN lineage l ON m.mentor = l.cat
+// ) SELECT * FROM lineage;
+function recursiveCTE(root) {
+  let result = [{ cat: root, depth: 0 }];           // base case
+  let frontier = result;
+  let round = 1;
+  while (frontier.length) {                          // until the step adds nothing
+    const next = [];
+    for (const { cat, depth } of frontier)
+      for (const [student, mentor] of mentors)
+        if (mentor === cat) next.push({ cat: student, depth: depth + 1 });
+    if (next.length)
+      console.log(`round ${round++}: +${next.map(n =&gt; n.cat).join(', ')}`);
+    result = result.concat(next);
+    frontier = next;                                 // next round reads THIS round
+  }
+  return result;
+}
+const lineage = recursiveCTE('Mochi');
+console.log('\nfull lineage of Mochi:');
+lineage.forEach(l =&gt; console.log(`  ${'  '.repeat(l.depth)}${l.cat} (depth ${l.depth})`));
+console.log('\n— this is BFS: each UNION ALL round is one ring of the flood.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">round by round until empty — the dsa BFS flood, running inside "SQL"</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-cte-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A recursive CTE over a mentors table runs forever in one environment. The likely data problem, and the SQL guard?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Too many rows — recursion has a 1000-row limit</button>
+        <button class="mcq-opt" type="button" data-ok>A cycle in the data (A mentors B mentors A) — each round keeps finding "new" rows; guard with a depth cap, or track visited path (an array column) and stop on revisit</button>
+        <button class="mcq-opt" type="button">UNION ALL should be plain UNION for speed</button>
+        <button class="mcq-opt" type="button">Recursive CTEs require an index on the join key</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the loop only terminates when a round adds nothing — cycles feed it forever. The guards mirror graph-walking guards from dsa: a visited set (SQL: accumulate a path array, filter <code>NOT cat = ANY(path)</code>) or a depth limit. Fun fact worth saying: plain UNION (dedupe) also breaks the cycle — the "for speed" framing is wrong but the mechanism is real; explaining that distinction precisely is a strong moment.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Adjacency list (parent_id) + recursive CTE is the default tree model; name ltree/materialized-path as the read-optimized alternative when depth queries dominate.</li>
+        <li>Every recursive CTE is BFS/DFS in disguise — pattern-match it to the dsa module and the SQL writes itself (base = source, step = expand frontier).</li>
+        <li>CTE pipelines are also the reviewable-SQL answer: name each stage (<code>eligible</code>, <code>ranked</code>, <code>final</code>) — code review for queries.</li>
+        <li>The Postgres-12 inlining change is a great "is your knowledge current?" tell — pre-12 advice ("CTEs are slow!") still circulates; date it.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · JSONB -->
+<section class="lesson" id="jsonb">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>JSONB — documents inside the relational world</h3>
+      <p class="lvl">intermediate → operators, GIN, and when to normalize instead</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p><b>JSONB</b> stores parsed, binary JSON in a column — real document storage with real indexing, which is why "Postgres or MongoDB?" is mostly settled by "Postgres has both shapes". The operator set: <code>-&gt;</code> (get as json) vs <code>-&gt;&gt;</code> (get as text — the one you compare on), <code>@&gt;</code> (containment: does this document include this shape?), <code>?</code> (key exists), and jsonpath for the ambitious. The power move is a <b>GIN index</b> on the column: containment queries over millions of documents stop being sequential scans — an inverted index (the search-engine structure) over every key and value.</p>
+    <p>The judgment half: JSONB is for <b>genuinely variable shapes</b> — per-integration payloads, user-defined attributes, event envelopes. It is NOT a way to skip schema design: fields you filter on daily, join on, or enforce constraints over belong in <b>columns</b> (constraints, statistics, foreign keys — everything §02 taught — don't reach inside a blob).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">containment.js — run it (@&gt; and the inverted index, simulated)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const cats = [
+  { id: 1, doc: { name: 'Mochi', traits: { vocal: true, lap: true }, tags: ['tabby'] } },
+  { id: 2, doc: { name: 'Biscuit', traits: { vocal: false, lap: true }, tags: ['orange','chonk'] } },
+  { id: 3, doc: { name: 'Beans', traits: { vocal: true, lap: false }, tags: ['void'] } },
+];
+
+// @&gt; containment: does doc include this sub-shape?
+function contains(doc, shape) {
+  if (Array.isArray(shape)) return shape.every(s =&gt; (doc ?? []).some(d =&gt; contains(d, s)));
+  if (typeof shape === 'object' &amp;&amp; shape !== null)
+    return typeof doc === 'object' &amp;&amp; doc !== null &amp;&amp;
+      Object.entries(shape).every(([k, v]) =&gt; contains(doc[k], v));
+  return doc === shape;
+}
+const q = { traits: { vocal: true, lap: true } };
+console.log(`WHERE doc @&gt; '${JSON.stringify(q)}':`);
+cats.filter(c =&gt; contains(c.doc, q)).forEach(c =&gt; console.log('  hit:', c.doc.name));
+
+// why GIN: invert the documents → (path,value) → row ids
+const gin = new Map();
+cats.forEach(({ id, doc }) =&gt; {
+  (function walk(v, path) {
+    if (typeof v === 'object' &amp;&amp; v !== null &amp;&amp; !Array.isArray(v))
+      return Object.entries(v).forEach(([k, x]) =&gt; walk(x, path + '.' + k));
+    const vals = Array.isArray(v) ? v : [v];
+    vals.forEach(x =&gt; {
+      const key = `${path}=${x}`;
+      (gin.get(key) ?? gin.set(key, []).get(key)).push(id);
+    });
+  })(doc, '$');
+});
+console.log('\nthe GIN index (inverted: value → rows):');
+[...gin].slice(0, 6).forEach(([k, ids]) =&gt; console.log(`  ${k} → rows [${ids}]`));
+console.log('  …');
+console.log('\nquery via index: $.traits.vocal=true ∩ $.traits.lap=true =',
+  gin.get('$.traits.vocal=true').filter(id =&gt; gin.get('$.traits.lap=true').includes(id)),
+  '— set intersection, zero documents opened');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">containment as recursion, GIN as inversion — the same idea search engines run on</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-jsonb-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">A team stores orders entirely as JSONB: <code>{customer_id, status, total, line_items}</code>. Queries filter on status daily; finance sums totals; support joins to customers. Verdict?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Fine — GIN indexes make all of it fast</button>
+        <button class="mcq-opt" type="button" data-ok>customer_id, status, total are COLUMNS (joined, filtered, aggregated, constrainable); line_items — the genuinely nested, variable part — can stay JSONB. Hybrid is the design, not a compromise</button>
+        <button class="mcq-opt" type="button">Wrong database — this workload wants MongoDB</button>
+        <button class="mcq-opt" type="button">Fine if every query uses jsonpath</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the daily-filtered fields lose typed constraints (nothing stops <code>"total": "banana"</code>), planner statistics, and clean FKs inside a blob — the exact machinery §02 and §04 bought. The variable part earns JSONB honestly. The hybrid-shape answer — extract what the relational engine is <i>for</i>, document what actually varies — is the mark of someone who's paid the migration cost of getting it wrong.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li><code>-&gt;&gt;</code> returns text — <code>(doc-&gt;&gt;'total')::numeric</code> for math; forgetting the cast is the classic first jsonb bug.</li>
+        <li>Generated columns bridge the shapes: <code>total numeric GENERATED ALWAYS AS ((doc-&gt;&gt;'total')::numeric) STORED</code> — index and constrain a blob field without moving it.</li>
+        <li>GIN indexes are big and slow-ish to write — the reads-pay-writes trade from §04, amplified; jsonb_path_ops halves the size when you only need <code>@&gt;</code>.</li>
+        <li>JSONB updates rewrite the whole value (MVCC §07!) — high-churn counters inside a big document are the anti-pattern; that field wants a column.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the planner, the exotic indexes &amp; zero-downtime</span></div>
+
+<!-- 12 · EXPLAIN -->
+<section class="lesson" id="explain">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Reading EXPLAIN fluently — scans, joins &amp; lying estimates</h3>
+      <p class="lvl">advanced → the plan is a tree; read it bottom-up, argue with its rows=</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 04 ran EXPLAIN; this section makes you fluent. A plan is a <b>tree read bottom-up</b>: leaves fetch (Seq Scan, Index Scan, <b>Index Only Scan</b> — never touches the table, <b>Bitmap Scan</b> — collect matching pages first, then read them in order), inner nodes combine — <b>Nested Loop</b> (for each outer row, probe inner: wants an index, wins for few rows), <b>Hash Join</b> (build a hash of one side: wins for big unsorted sets — dsa's hash maps at work), <b>Merge Join</b> (both sides sorted). The planner picks by <b>cost model</b>: essentially "how many pages will I touch", steered by table statistics.</p>
+    <p>The debugging skill is comparing <b>estimated vs actual</b>: <code>rows=3</code> estimated, <code>rows=30000</code> actual means the <i>statistics</i> are stale or the predicate defeats them — and every join above that node inherited a catastrophically wrong strategy (a nested loop probing 30k times). <code>ANALYZE</code> the table, rewrite the un-estimatable predicate, or raise the stats target. Plans aren't read for style points; they're read to find the one node where reality diverged.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">cost-crossover.js — run it (why the planner switches scans)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// the planner's core arithmetic: pages touched per strategy
+const table = { rows: 1_000_000, rowsPerPage: 100 };   // 10,000 pages on disk
+const pages = table.rows / table.rowsPerPage;
+
+function seqScanCost() { return pages; }                // read everything, in order
+function indexScanCost(selectivity) {
+  const matches = table.rows * selectivity;
+  const indexPages = Math.ceil(Math.log2(table.rows));  // walk the B-tree
+  // each match may live on a DIFFERENT page → random I/O, costed ~4x sequential
+  return indexPages + matches * 4;
+}
+
+console.log('1M rows, 10k pages — cost in page-reads by % of rows matched:');
+console.log('  match%      index-scan      seq-scan     planner picks');
+for (const sel of [0.0001, 0.001, 0.01, 0.05, 0.2, 0.5]) {
+  const idx = Math.round(indexScanCost(sel));
+  const seq = seqScanCost();
+  console.log(`  ${(sel * 100).toFixed(2).padStart(6)}%   ${String(idx).padStart(9)}   ${String(seq).padStart(9)}     ${idx &lt; seq ? 'Index Scan' : 'Seq Scan  ← yes, on purpose'}`);
+}
+console.log('\nthe crossover is why "it ignored my index!" is usually the planner being right:');
+console.log('past a few % selectivity, hopping randomly via the index costs MORE than reading it all.');
+console.log('(Bitmap scans blur the middle: gather page ids from the index, then read sequentially.)');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the crossover table explains 80% of "why is Postgres ignoring my index"</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-exp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">EXPLAIN ANALYZE shows a Nested Loop where the inner Index Scan executed 48,000 times (loops=48000), estimate said rows=12. First move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Add an index to the outer table</button>
+        <button class="mcq-opt" type="button" data-ok>Fix the estimate — ANALYZE the outer table (or investigate why the predicate fools statistics); with honest row counts the planner would have chosen a hash join by itself</button>
+        <button class="mcq-opt" type="button">Force a hash join with enable_nestloop = off in production</button>
+        <button class="mcq-opt" type="button">Increase work_mem until the nested loop fits in RAM</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the plan was rational <i>for the estimate</i> — 12 probes is a great nested loop; 48,000 is not, and the 4000× estimate miss is the actual bug. Fix inputs, not conclusions: refresh stats, check for correlated predicates (extended statistics exist for that), THEN consider structural changes. Forcing planner flags in production (option C) is the move that pages you at 3am next quarter — saying why is worth as much as the right answer.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Read order: find the deepest node where <b>actual ≫ estimated</b> — everything above it is collateral damage. That sentence IS plan-debugging methodology.</li>
+        <li>Index Only Scan needs the visibility map (VACUUM again — §07's loop closes): "heap fetches: 30000" means your covering index is covering nothing until vacuum catches up.</li>
+        <li><code>BUFFERS</code> is the honest flag: shared hit vs read separates "slow query" from "cold cache".</li>
+        <li>Name the three joins with their data-shapes — few-rows→nested loop, big-unsorted→hash, both-sorted→merge — and you've answered most "how would the DB do this" follow-ups.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · INDEX PLUS -->
+<section class="lesson" id="indexplus">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>The exotic indexes — partial, covering, expression, GIN &amp; BRIN</h3>
+      <p class="lvl">advanced → five specialists beyond the default B-tree</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 04's B-tree answers equality and ranges; the specialists each shrink a specific cost. <b>Partial</b>: index only the rows a predicate keeps (<code>WHERE status = 'pending'</code>) — if queries always filter the same slice, why index the 99% you never search? Tiny index, hot cache. <b>Covering</b> (<code>INCLUDE</code>): pack the queried columns into the index so the plan becomes an Index Only Scan — the table itself never opens. <b>Expression</b>: index <code>lower(email)</code> — because §04 taught that functions blind an index; this one is <i>born</i> matching the function. <b>GIN</b>: inverted, for "contains" questions (jsonb §11, arrays, full-text). <b>BRIN</b>: block-range summaries — for huge append-only tables where physical order tracks the column (timestamps), a min/max per block-range is thousands of times smaller than a B-tree and nearly as good.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">specialists.js — run it (size &amp; touch math per index type)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const rows = 10_000_000;
+const pending = rows * 0.002;                      // 0.2% ever 'pending'
+const entrySize = 40;                              // bytes per B-tree entry (approx)
+const mb = (n) =&gt; (n / 1e6).toFixed(1) + ' MB';
+
+console.log('10M orders, queries: WHERE status=pending ORDER BY created_at\n');
+console.log('full B-tree on (status, created_at):   ', mb(rows * entrySize));
+console.log('partial  … WHERE status = pending:     ', mb(pending * entrySize),
+  ` — ${Math.round(rows / pending)}x smaller, always hot`);
+
+// covering: the query SELECTs id, total — include them, skip the heap
+console.log('\nSELECT id, total … — plain index: index hop + HEAP hop per row');
+console.log('covering (INCLUDE id, total): index only —', pending, 'heap fetches → 0');
+
+// BRIN on an append-only events table (timestamp correlates with position)
+const blocks = rows / 100 / 128;                   // pages / 128-page ranges
+console.log('\nevents table, WHERE ts &gt;= yesterday:');
+console.log('  B-tree on ts:', mb(rows * entrySize), ' · BRIN on ts:', mb(blocks * 24),
+  ' — same query, if physical order tracks ts');
+console.log('\neach specialist deletes one cost: dead weight (partial), heap hops (covering),');
+console.log('function-blindness (expression), containment scans (GIN), sheer size (BRIN).');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">500x smaller partial, zero heap fetches, kilobyte BRIN — pick by cost deleted</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-idxp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Login is case-insensitive, but <code>WHERE lower(email) = lower($1)</code> seq-scans despite an index on email. The precise fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Rebuild the email index with REINDEX</button>
+        <button class="mcq-opt" type="button" data-ok>An expression index ON (lower(email)) — the index must store what the query compares; alternatively the citext type makes the column itself case-insensitive</button>
+        <button class="mcq-opt" type="button">Uppercase all emails with a trigger</button>
+        <button class="mcq-opt" type="button">Add ILIKE — it's index-aware, unlike lower()</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the index stores <code>email</code> values; the query searches <code>lower(email)</code> values — different sort space, no lookup possible. The expression index stores the transformed value (and the planner even keeps statistics on it). Both fixes shown mark fluency; the trap answer D has it backwards (leading-wildcard ILIKE is the classic index-defeater — that one wants trigram GIN, a lovely follow-up to volunteer).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Multicolumn order matters: (a, b) serves a and a+b, not b alone — "leftmost prefix", same B-tree logic as §04.</li>
+        <li>Partial indexes also enforce conditional uniqueness: <code>UNIQUE … WHERE deleted_at IS NULL</code> — "one live row per email, soft-deletes free" is a real design trick worth its sentence.</li>
+        <li>Every index taxes every write and VACUUM (§07). <code>pg_stat_user_indexes.idx_scan = 0</code> is the drop list — indexes are cattle, audited quarterly.</li>
+        <li>BRIN's fine print: it works because of physical correlation — an UPDATE-heavy table shuffles that away; append-only or clustered data is its habitat.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 14 · MIGRATIONS -->
+<section class="lesson" id="migrations">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>Zero-downtime migrations — expand, migrate, contract</h3>
+      <p class="lvl">advanced → schema changes while the app keeps serving</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Two facts make naive migrations outages. One: during a deploy, <b>old and new code run simultaneously</b> — so every schema version must serve <i>both</i>. Two: some DDL takes locks that queue behind (and ahead of) all traffic — an <code>ALTER TABLE</code> waiting on a long transaction blocks every subsequent query on that table: a ten-second lock queue IS an outage. The discipline is <b>expand → migrate → contract</b>: add the new thing (nullable column, new table) while old code ignores it; backfill <b>in batches</b> (one giant UPDATE = lock pressure + MVCC bloat from §07); switch code to write-both-then-read-new; only when nothing reads the old shape, drop it — in a later release.</p>
+    <p>Postgres-specific traps worth naming: adding a column <b>with a volatile default</b> used to rewrite the table (constant defaults are metadata-only since v11); <code>NOT NULL</code> on a big table validates with a full scan (add as <code>CHECK … NOT VALID</code>, then <code>VALIDATE</code> separately — brief lock, long scan without one); and <b><code>CREATE INDEX CONCURRENTLY</code></b> — slower, can't run in a transaction, but doesn't block writes: the only acceptable way to index a hot table.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">expand-contract.js — run it (the deploy matrix, checked)</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// renaming users.name → full_name, the zero-downtime way.
+// at every step, BOTH code versions must work against the CURRENT schema.
+const steps = [
+  { schema: 'name',                 codeOld: 'r/w name',        codeNew: 'r/w name' },
+  { schema: 'name + full_name',     codeOld: 'r/w name',        codeNew: 'w both, read full_name ?? name' },
+  { schema: 'name + full_name (backfilled in batches)', codeOld: 'r/w name', codeNew: 'w both, read full_name' },
+  { schema: 'name + full_name',     codeOld: '(retired)',       codeNew: 'r/w full_name only' },
+  { schema: 'full_name',            codeOld: '—',               codeNew: 'r/w full_name' },
+];
+steps.forEach((s, i) =&gt; {
+  console.log(`step ${i}: schema [${s.schema}]`);
+  console.log(`   old code: ${s.codeOld}   |   new code: ${s.codeNew}   ✓ both served`);
+});
+
+console.log('\nnow the naive version: RENAME COLUMN in one deploy —');
+console.log('  during rollout: old code writes "name" → 500s. new code reads "full_name"');
+console.log('  on the old schema replica of a moment ago → 500s. Rollback? old code +');
+console.log('  new schema → STILL 500s. One-step renames burn the rollback bridge too.');
+
+// batch-backfill sizing: why 1000-row chunks
+const total = 20_000_000, chunk = 1000;
+console.log(`\nbackfill ${total.toLocaleString()} rows: ${(total/chunk).toLocaleString()} chunks of ${chunk}`);
+console.log('each chunk: short transaction, brief locks, vacuumable dead tuples (§07),');
+console.log('and a sleep between chunks keeps replication lag flat. Boring on purpose.');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">five boring steps vs one brave rename — and why rollback dies with the rename</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="pg-mig-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does <code>CREATE INDEX</code> (without CONCURRENTLY) on a busy table cause an incident even though reads "aren't blocked"?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It isn't an incident — plain CREATE INDEX is safe everywhere</button>
+        <button class="mcq-opt" type="button" data-ok>It blocks WRITES for the whole build (minutes on a big table) — every INSERT/UPDATE queues; connection pools fill with waiting writers, and then even reads can't get connections</button>
+        <button class="mcq-opt" type="button">It corrupts concurrent transactions' snapshots</button>
+        <button class="mcq-opt" type="button">It forces a full VACUUM first</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the failure cascades: writes queue on the lock → pool exhausts → the app's every request waits for a connection → total outage from a "read-safe" operation. CONCURRENTLY trades build time and a caveat (failed builds leave an INVALID index to drop) for no write lock. The cascade story — lock → pool → everything — is what "senior" sounds like in a migration question, and it's the same resource-exhaustion shape as §11's rate-limiter reasoning.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Always set <code>lock_timeout</code> (~2s) in migrations — better to fail and retry at 3am than to queue the world behind a lock you can't get.</li>
+        <li>Migrations are code: reviewed, versioned, ordered, with a tested <i>down</i> path — and irreversible ones (dropping data) split from reversible ones.</li>
+        <li>The deploy-matrix test generalizes: "old code × new schema, new code × old schema — both must pass" is the one-line spec for any zero-downtime change (APIs included).</li>
+        <li>Big-table column drops are also two-phase: stop reading it, THEN drop later — the column that's "unused since March" is the safe kind of boring.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 15 · SCALE -->
 <section class="lesson" id="scale">
   <div class="lesson-head">
-    <span class="lesson-num">07</span>
+    <span class="lesson-num">15</span>
     <div>
       <h3>Scaling Postgres — the ladder before the exotic</h3>
       <p class="lvl">advanced → pooling, replicas, partitions, and honest limits</p>
@@ -1216,8 +1803,16 @@ console.log(`batched:    ${queryCount} queries, ${(performance.now() - t0).toFix
       <tr><td class="mono">03</td><td>joins</td><td>INNER keeps matches, LEFT keeps everyone (NULLs for loners); COUNT the right side's column after a LEFT join.</td></tr>
       <tr><td class="mono">04</td><td>indexes</td><td>A B-tree per query pattern: reads fly, writes pay; functions on the column blind the index; EXPLAIN ends the guessing.</td></tr>
       <tr><td class="mono">05</td><td>transactions</td><td>All or nothing; read-think-write is the race — atomic updates, FOR UPDATE, or version checks. The DB is the only referee.</td></tr>
-      <tr><td class="mono">06</td><td>N+1</td><td>1 + one-per-row queries; JOIN or batch + Map-stitch; watch the query count, not the query speed.</td></tr>
-      <tr><td class="mono">07</td><td>scale</td><td>Pool → tune → cache → replicas (mind read-your-writes) → partition → shard last, if ever.</td></tr>
+      <tr><td class="mono">06</td><td>isolation</td><td>READ COMMITTED re-snapshots per statement; REPEATABLE READ freezes the world; SERIALIZABLE makes you retry.</td></tr>
+      <tr><td class="mono">07</td><td>MVCC</td><td>UPDATE is INSERT + expire; VACUUM is the GC — and one idle transaction holds back the cleanup.</td></tr>
+      <tr><td class="mono">08</td><td>N+1</td><td>1 + one-per-row queries; JOIN or batch + Map-stitch; watch the query count, not the query speed.</td></tr>
+      <tr><td class="mono">09</td><td>windows</td><td>Aggregates that keep their rows; rank in a subquery, filter rn — top-N-per-group, solved.</td></tr>
+      <tr><td class="mono">10</td><td>CTEs</td><td>WITH names the steps; WITH RECURSIVE is BFS — base ∪ step until nothing new (guard the cycles).</td></tr>
+      <tr><td class="mono">11</td><td>JSONB</td><td>Columns for what you filter/join/constrain; JSONB for what genuinely varies; GIN for @&gt;.</td></tr>
+      <tr><td class="mono">12</td><td>EXPLAIN</td><td>Read bottom-up; find the node where actual ≫ estimated — everything above it is collateral.</td></tr>
+      <tr><td class="mono">13</td><td>indexes+</td><td>Partial, covering, expression, GIN, BRIN — each deletes one named cost; audit the unused.</td></tr>
+      <tr><td class="mono">14</td><td>migrations</td><td>Expand → backfill in batches → contract; both code versions serve every schema; CONCURRENTLY or outage.</td></tr>
+      <tr><td class="mono">15</td><td>scale</td><td>Pool → tune → cache → replicas (mind read-your-writes) → partition → shard last, if ever.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1232,6 +1827,7 @@ console.log(`batched:    ${queryCount} queries, ${(performance.now() - t0).toFix
       <li><b>"Why is this query slow?"</b> — the §04 ritual verbatim: reproduce, EXPLAIN ANALYZE, hunt Seq Scans and estimate gaps, index or rewrite, re-measure. Never guess first.</li>
       <li><b>"Two users click buy on the last item"</b> — §05's conditional UPDATE (atomic check-and-set) with the rowcount check; mention FOR UPDATE and optimistic versions as the alternatives. </li>
       <li><b>"Your page makes 51 queries"</b> — name N+1 before they do; batch + stitch; the DataLoader connection if GraphQL comes up.</li>
+      <li><b>Senior DB rounds live in the advanced band:</b> read the plan's estimate-vs-actual (12), pick the index specialist by which cost it deletes (13), and narrate an expand-contract rename (14) — each is a whiteboard story now, with §06–07 as the concurrency vocabulary underneath.</li>
       <li>Rapid-fire drills: <a href="../fullstack.html#sql">Full-Stack in 48 · PostgreSQL core</a> and <a href="../fullstack.html#dbperf">· indexes &amp; N+1</a>. The system-design module (next shelf) picks up caching and replicas at architecture scale.</li>
     </ul>
   </div>

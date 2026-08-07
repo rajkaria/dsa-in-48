@@ -6,6 +6,7 @@ No dependencies — stdlib only. Run via scripts/verify.sh from the repo root.
 Checks, per page:
   1. Tag balance (stack-based; void elements exempt).
   2. data-key uniqueness within the page; data-day present and 1/2 on drill inputs.
+  2b. data-qid (quiz) uniqueness within the page.
   3. Internal anchors (#x) resolve to an id in the same page.
   4. Relative links resolve to real files; cross-file anchors resolve to real ids.
   5. External requests limited to the allowlist (Google Fonts + highlight.js CDN).
@@ -35,6 +36,7 @@ class PageParser(HTMLParser):
         self.errors = []
         self.ids = set()
         self.data_keys = []
+        self.data_qids = []      # (value, line)
         self.hrefs = []          # (value, line)
         self.ext_urls = []       # (value, line)
         self.hljs_scripts = []   # (attrs_dict, line)
@@ -48,6 +50,8 @@ class PageParser(HTMLParser):
             self.ids.add(a["id"])
         if "data-key" in a:
             self.data_keys.append((a.get("data-key"), a.get("data-day"), line))
+        if "data-qid" in a:
+            self.data_qids.append((a.get("data-qid"), line))
         for attr in ("href", "src"):
             v = a.get(attr)
             if not v:
@@ -117,6 +121,16 @@ def check_file(path: Path, all_ids: dict, problems: list):
         seen[key] = line
         if day not in (None, "1", "2"):
             problems.append(f"{rel}: KEY data-day '{day}' not 1/2 at line {line}")
+
+    seen_q = {}
+    for qid, line in p.data_qids:
+        if not qid:
+            problems.append(f"{rel}: QID empty data-qid at line {line}")
+            continue
+        if qid in seen_q:
+            problems.append(f"{rel}: QID duplicate data-qid '{qid}' "
+                            f"(lines {seen_q[qid]} and {line})")
+        seen_q[qid] = line
 
     for url, line in p.ext_urls:
         host = re.sub(r"^(https?:)?//", "", url).split("/")[0]

@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -675,8 +679,15 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#bst"><span><i class="dot" data-for="bst"></i> Binary Search Trees</span></a>
     <a class="side-link" href="#tries"><span><i class="dot" data-for="tries"></i> Tries</span></a>
     <a class="side-link" href="#graphs"><span><i class="dot" data-for="graphs"></i> Graphs · BFS &amp; DFS</span></a>
+    <a class="side-link" href="#bfsplus"><span><i class="dot" data-for="bfsplus"></i> BFS, Upgraded</span></a>
+    <a class="side-link" href="#gridtricks"><span><i class="dot" data-for="gridtricks"></i> The Islands Family</span></a>
     <a class="side-link" href="#topo"><span><i class="dot" data-for="topo"></i> Topological Sort</span></a>
     <a class="side-link" href="#unionfind"><span><i class="dot" data-for="unionfind"></i> Union-Find</span></a>
+    <a class="side-link" href="#topodp"><span><i class="dot" data-for="topodp"></i> DP on DAGs</span></a>
+    <a class="side-link" href="#shortestpaths"><span><i class="dot" data-for="shortestpaths"></i> Dijkstra &amp; Friends</span></a>
+    <a class="side-link" href="#mst"><span><i class="dot" data-for="mst"></i> Spanning Trees</span></a>
+    <a class="side-link" href="#lca"><span><i class="dot" data-for="lca"></i> Lowest Common Ancestor</span></a>
+    <a class="side-link" href="#rangetrees"><span><i class="dot" data-for="rangetrees"></i> Fenwick &amp; Segment</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -694,11 +705,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/6</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -721,14 +732,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: topo sort &amp; union-find fluency</span>
   </div>
   <div class="hero-meta">
-    <span><b>6</b> sections</span>
-    <span><b>7</b> quiz questions</span>
+    <span><b>13</b> sections</span>
+    <span><b>13</b> quiz questions</span>
     <span><b>1</b> BFS flood animation</span>
-    <span><b>14</b> verified LeetCode problems</span>
-    <span><b>~4h</b> self-paced</span>
+    <span><b>29</b> verified LeetCode problems</span>
+    <span><b>~8.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#trees">Start climbing <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — hierarchies &amp; prefixes</span></div>
 
 <!-- 1 · TREES -->
 <section class="lesson" id="trees">
@@ -961,6 +974,8 @@ console.log('bis… →', registry.suggest('bis').join(', '));</code></pre>
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+<div class="band" id="band-intermediate"><span>// intermediate — graphs &amp; the grid</span></div>
+
 <!-- 4 · GRAPHS -->
 <section class="lesson" id="graphs">
   <div class="lesson-head">
@@ -1055,10 +1070,175 @@ console.log('friendship circles:', circles(), '(the loner counts as one)');</cod
   </div>
 </section>
 
-<!-- 5 · TOPO -->
-<section class="lesson" id="topo">
+<!-- 5 · BFS PLUS -->
+<section class="lesson" id="bfsplus">
   <div class="lesson-head">
     <span class="lesson-num">05</span>
+    <div>
+      <h3>BFS, upgraded — multi-source, 0-1 &amp; meeting in the middle</h3>
+      <p class="lvl">intermediate → three twists on the flood you already know</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 04's BFS flooded from one source. Twist one: <b>multi-source BFS</b> — seed the queue with <i>every</i> source before starting, and the flood spreads from all of them simultaneously. "Minutes until all oranges rot", "distance to the nearest 0 for every cell" — one pass, no per-source repetition. The mental flip: you're not searching <i>from</i> a point, you're computing <b>distance-to-the-nearest-anything</b> for the whole grid.</p>
+    <p>Twist two: <b>0-1 BFS</b> — when edges cost 0 or 1, a deque replaces the priority queue: free moves go to the <i>front</i> (same distance, explore now), cost-1 moves to the <i>back</i>. Dijkstra's result at BFS prices. Twist three: <b>bidirectional BFS</b> — flood from both ends, stop when the frontiers touch; two shallow floods beat one deep one (Word Ladder's transformation space is the classic).</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">all-at-once.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Rotting Oranges (LC 994): 2 = rotten, 1 = fresh, 0 = empty
+const grid = [
+  [2, 1, 1, 0],
+  [1, 1, 0, 0],
+  [0, 1, 1, 2],
+];
+const R = grid.length, C = grid[0].length;
+const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+
+let queue = [], fresh = 0;
+for (let r = 0; r &lt; R; r++)
+  for (let c = 0; c &lt; C; c++) {
+    if (grid[r][c] === 2) queue.push([r, c]);      // seed with ALL sources
+    if (grid[r][c] === 1) fresh++;
+  }
+
+let minutes = 0;
+console.log('minute 0 — rotten at:', queue.map(([r,c]) =&gt; `(${r},${c})`).join(' '));
+while (queue.length &amp;&amp; fresh &gt; 0) {
+  const next = [];
+  for (const [r, c] of queue)                       // one RING per minute
+    for (const [dr, dc] of DIRS) {
+      const nr = r + dr, nc = c + dc;
+      if (nr &gt;= 0 &amp;&amp; nr &lt; R &amp;&amp; nc &gt;= 0 &amp;&amp; nc &lt; C &amp;&amp; grid[nr][nc] === 1) {
+        grid[nr][nc] = 2; fresh--;
+        next.push([nr, nc]);
+      }
+    }
+  queue = next;
+  if (queue.length) console.log(`minute ${++minutes} — newly rotten:`,
+    queue.map(([r,c]) =&gt; `(${r},${c})`).join(' '));
+}
+console.log(fresh === 0 ? `all rotten in ${minutes} minutes` : `${fresh} fresh unreachable → -1`);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">two rot sources flood together — count the rings, that's the answer</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-bfsp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">"For every cell in a grid of 0s and 1s, find the distance to the nearest 0" (LC 542). The efficient framing?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">BFS from each 1 until it finds a 0 — O(cells) per 1</button>
+        <button class="mcq-opt" type="button" data-ok>One multi-source BFS seeded with ALL the 0s — each ring stamps the next distance, whole grid in O(cells)</button>
+        <button class="mcq-opt" type="button">Sort the cells by coordinates and sweep</button>
+        <button class="mcq-opt" type="button">DFS from each 0 with a global visited set</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> per-1 BFS re-floods overlapping regions — O(n²) on a grid of n cells. Flip the direction: start at every 0 simultaneously; the first ring stamps every distance-1 cell, the second every distance-2 cell — each cell dequeued once. "Search from the <i>targets</i>, not the queries" is the reusable move (it's also how 'nearest facility' features work on real maps).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The layer loop (drain the whole queue per minute) vs plain BFS with distance stamps — both correct; the layer loop is the one to write when the question says "how many <i>rounds</i>".</li>
+        <li>Word Ladder: the graph is implicit (words one letter apart) — generate neighbors on the fly; bidirectional halves the exponential frontier. Saying "meet in the middle" earns the point without full code.</li>
+        <li>0-1 BFS earns its keep on "minimum flips/breaks to cross" problems — free edge front, paid edge back, deque instead of heap.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/rotting-oranges/" target="_blank" rel="noopener noreferrer">994 · Rotting Oranges</a> · <a href="https://leetcode.com/problems/01-matrix/" target="_blank" rel="noopener noreferrer">542 · 01 Matrix</a> · <a href="https://leetcode.com/problems/word-ladder/" target="_blank" rel="noopener noreferrer">127 · Word Ladder (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 6 · GRID TRICKS -->
+<section class="lesson" id="gridtricks">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <div>
+      <h3>The islands family — flood accounting &amp; boundary thinking</h3>
+      <p class="lvl">intermediate → the three moves that solve every grid-region problem</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Number of Islands (section 04) spawned a whole family, and it's three moves deep. <b>Move 1 — flood accounting</b>: make the DFS <i>return</i> something (cell count, perimeter contribution) and the flood becomes a measuring tool: Max Area of Island is islands + a counter. <b>Move 2 — boundary-first inversion</b>: when the question protects things touching the edge (Surrounded Regions), don't hunt the captured ones — <b>flood from the border</b>, mark the safe, and everything unmarked is captured by elimination. <b>Move 3 — two floods intersect</b>: Pacific-Atlantic asks which cells reach <i>both</i> oceans — flood inward from each coastline (reverse the flow: water climbs), intersect the two reach-sets.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Which cats are trapped in the middle of the room? Don't interrogate every cat about her escape routes — <b>open the doors and see who leaves</b>. Whoever's still inside was trapped; you learned it without asking them anything. That's boundary-first inversion: when "touching the edge" means safe, <i>start</i> at the edge and let safety spread inward. Counting who escaped is flood accounting; two doors on opposite walls is Pacific-Atlantic.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">open-the-doors.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+
+// MOVE 1 · flood accounting — max island area
+const sea = [
+  [1,1,0,0,1],
+  [1,0,0,1,1],
+  [0,0,1,1,0],
+];
+function maxArea(g) {
+  const R = g.length, C = g[0].length;
+  const flood = (r, c) =&gt; {
+    if (r &lt; 0 || r &gt;= R || c &lt; 0 || c &gt;= C || g[r][c] !== 1) return 0;
+    g[r][c] = -1;                                  // sink it (visited)
+    return 1 + DIRS.reduce((s, [dr, dc]) =&gt; s + flood(r + dr, c + dc), 0);
+  };
+  let best = 0;
+  for (let r = 0; r &lt; R; r++)
+    for (let c = 0; c &lt; C; c++)
+      if (g[r][c] === 1) best = Math.max(best, flood(r, c));
+  return best;
+}
+console.log('max island area:', maxArea(sea.map(row =&gt; [...row])));
+
+// MOVE 2 · boundary-first — Surrounded Regions
+const board = [
+  ['X','X','X','X'],
+  ['X','O','O','X'],
+  ['X','X','O','X'],
+  ['X','O','X','X'],
+];
+const R = board.length, C = board[0].length;
+function safe(r, c) {                              // flood SAFETY from the border
+  if (r &lt; 0 || r &gt;= R || c &lt; 0 || c &gt;= C || board[r][c] !== 'O') return;
+  board[r][c] = 'S';
+  DIRS.forEach(([dr, dc]) =&gt; safe(r + dr, c + dc));
+}
+for (let r = 0; r &lt; R; r++) { safe(r, 0); safe(r, C - 1); }
+for (let c = 0; c &lt; C; c++) { safe(0, c); safe(R - 1, c); }
+for (const row of board)
+  for (let c = 0; c &lt; C; c++)
+    row[c] = row[c] === 'S' ? 'O' : row[c] === 'O' ? 'X' : row[c];  // unmarked O = captured
+console.log('after capture (edge-connected O survived):');
+board.forEach(row =&gt; console.log(' ', row.join(' ')));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the bottom-left O touches the edge and survives; the middle pocket flips</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-grid-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Pacific-Atlantic: find cells whose water can reach both oceans (edges), flowing downhill-or-equal. Why flood FROM the oceans instead of DFS-ing from every cell?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Flooding from cells gives wrong answers on plateaus</button>
+        <button class="mcq-opt" type="button" data-ok>Per-cell DFS repeats overlapping work — O(cells²); two inward floods (climbing uphill) cover the grid twice total, then intersect</button>
+        <button class="mcq-opt" type="button">Oceans are larger, so their floods terminate faster</button>
+        <button class="mcq-opt" type="button">You can't DFS from a cell toward two targets</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> same inversion as 01-Matrix in the last section — many queries, few targets → search from the targets. The twist worth saying: flooding from the ocean means moving <i>against</i> the flow, so the neighbor condition flips to "climb to equal-or-higher". Two O(cells) floods, one set intersection, done. Spotting the direction flip is the entire problem.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Sinking visited cells in-place (<code>g[r][c] = -1</code>) vs a visited set: in-place is O(1) space and fine <i>if mutation is allowed</i> — ask before you sink; restoring afterward is the polite encore.</li>
+        <li>Recursion depth on a 1000×1000 grid can stack-overflow — say "I'd switch this flood to an explicit stack/queue at scale" (the dsa-foundations recursion section's escape hatch, deployed).</li>
+        <li>Island <i>shapes</i> (LC 694-family): record the flood's move-sequence as a signature — canonical-form hashing from dsa-foundations, on a grid.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/max-area-of-island/" target="_blank" rel="noopener noreferrer">695 · Max Area of Island</a> · <a href="https://leetcode.com/problems/surrounded-regions/" target="_blank" rel="noopener noreferrer">130 · Surrounded Regions</a> · <a href="https://leetcode.com/problems/pacific-atlantic-water-flow/" target="_blank" rel="noopener noreferrer">417 · Pacific Atlantic</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · TOPO -->
+<section class="lesson" id="topo">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
     <div>
       <h3>Topological sort — dependency order, formalized</h3>
       <p class="lvl">advanced-sounding, genuinely easy → Kahn's algorithm</p>
@@ -1134,10 +1314,10 @@ console.log(schedule(courses, [
   </div>
 </section>
 
-<!-- 6 · UNION FIND -->
+<!-- 8 · UNION FIND -->
 <section class="lesson" id="unionfind">
   <div class="lesson-head">
-    <span class="lesson-num">06</span>
+    <span class="lesson-num">08</span>
     <div>
       <h3>Union-find — "same group?" at machine speed</h3>
       <p class="lvl">advanced → 15 lines that answer connectivity instantly</p>
@@ -1205,6 +1385,383 @@ console.log('add mochi–tuft edge:',
   </div>
 </section>
 
+<div class="band" id="band-advanced"><span>// advanced — weighted worlds &amp; range machines</span></div>
+
+<!-- 9 · TOPO DP -->
+<section class="lesson" id="topodp">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>DP on DAGs — when topo order meets memoization</h3>
+      <p class="lvl">advanced → longest paths, dependency values &amp; the matrix in disguise</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 07 sorted DAGs; here's why that's a superpower: <b>processing nodes in topological order means every dependency is answered before it's asked</b> — which is exactly what dynamic programming needs. Longest path in a DAG (impossible in general graphs — cycles make "longest" undefined) becomes one pass: process in topo order, each node's best = 1 + max over incoming answers.</p>
+    <p>The disguise to unmask: <b>Longest Increasing Path in a Matrix</b> is this exact problem — cells are nodes, "smaller → bigger neighbor" edges form a DAG (increase can't cycle!), and DFS-with-memo <i>is</i> topo-order processing without building the sort explicitly (the recursion bottoms out at peaks and answers flow back). Recipes-from-supplies is Kahn's algorithm where resolving a node unlocks recipes that needed it. When a dependency structure carries <i>values</i>, it's topo DP.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">answers-flow-downhill.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Longest Increasing Path (LC 329) — DFS + memo = implicit topo DP
+const m = [
+  [9, 9, 4],
+  [6, 6, 8],
+  [2, 1, 1],
+];
+const R = m.length, C = m[0].length;
+const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+const memo = Array.from({ length: R }, () =&gt; new Array(C).fill(0));
+let evaluations = 0;
+
+function longestFrom(r, c) {
+  if (memo[r][c]) return memo[r][c];              // dependency already answered
+  evaluations++;
+  let best = 1;
+  for (const [dr, dc] of DIRS) {
+    const nr = r + dr, nc = c + dc;
+    if (nr &gt;= 0 &amp;&amp; nr &lt; R &amp;&amp; nc &gt;= 0 &amp;&amp; nc &lt; C &amp;&amp; m[nr][nc] &gt; m[r][c])
+      best = Math.max(best, 1 + longestFrom(nr, nc));   // edge: small → big (a DAG!)
+  }
+  return memo[r][c] = best;
+}
+
+let answer = 0;
+for (let r = 0; r &lt; R; r++)
+  for (let c = 0; c &lt; C; c++)
+    answer = Math.max(answer, longestFrom(r, c));
+console.log('longest increasing path:', answer, '(1→2→6→9)');
+console.log(`cells: ${R * C}, evaluations: ${evaluations} — each cell computed ONCE`);
+console.log('memo table (longest path starting at each cell):');
+memo.forEach(row =&gt; console.log(' ', row.join(' ')));
+
+// why no visited-set is needed: you can never return to a smaller cell —
+// the increase condition IS the acyclicity proof. Say that sentence.</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">9 cells, 9 evaluations — the memo is doing the topo ordering silently</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-tdp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does Longest Increasing Path need no visited-set (unlike every other grid DFS in this module)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The memo table doubles as the visited set</button>
+        <button class="mcq-opt" type="button" data-ok>The strictly-increasing edge condition makes revisits impossible — a path can never cycle back to a smaller-or-equal cell, so the graph is a DAG by construction</button>
+        <button class="mcq-opt" type="button">It does need one — the code above has a latent bug</button>
+        <button class="mcq-opt" type="button">Grids under 10×10 can't form cycles</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a cycle would require increasing forever and returning to the start — impossible. That's the acyclicity argument, and it's the difference between this and normal grid DFS (where flat/equal moves CAN loop, hence visited sets). The memo isn't preventing infinite loops (option A's near-miss); it's preventing <i>re-computation</i>. Two different jobs; the interview probe is whether you know which is which.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The general recipe, one breath: "values on a dependency graph → topo order (explicit Kahn's or implicit DFS-memo), then each node combines its prerequisites' answers."</li>
+        <li>Course Schedule II is topo sort <i>returning</i> the order; recipes-from-supplies is Kahn's where completing a node unlocks new zero-indegree nodes mid-flight.</li>
+        <li>Longest path in a general graph is NP-hard — "…but on a DAG it's one topo pass" is a sentence that flexes both directions at once.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/longest-increasing-path-in-a-matrix/" target="_blank" rel="noopener noreferrer">329 · Longest Increasing Path (hard)</a> · <a href="https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/" target="_blank" rel="noopener noreferrer">2115 · Recipes from Supplies</a> · <a href="https://leetcode.com/problems/course-schedule/" target="_blank" rel="noopener noreferrer">207 · Course Schedule</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · SHORTEST PATHS -->
+<section class="lesson" id="shortestpaths">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Dijkstra &amp; friends — shortest paths when edges have prices</h3>
+      <p class="lvl">advanced → the settled frontier, and which algorithm for which graph</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>BFS finds shortest paths when every hop costs 1. Add <b>weights</b> and rings break — a cheap three-hop route can beat an expensive direct one. <b>Dijkstra's</b> fix: always expand the <b>cheapest unsettled node</b> (a min-heap of candidates), because with non-negative edges, nothing discovered later can undercut it — once settled, settled forever. It's BFS where the queue is a priority queue and "rings" become "cost contours".</p>
+    <p>The decision table interviewers actually test: <b>unit weights → BFS</b> (don't Dijkstra what BFS solves). <b>Non-negative weights → Dijkstra</b>, O((V+E) log V). <b>Negative edges → Bellman-Ford</b> (relax all edges V−1 times; also detects negative cycles). <b>Cheapest-with-at-most-K-stops → Bellman-Ford capped at K rounds</b> — the constraint IS the round count, which is why plain Dijkstra fails that one.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">cost-contours.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Network Delay (LC 743 shape): signal spreads from node A
+const graph = {                    // node → [[neighbor, cost], …]
+  A: [['B', 4], ['C', 1]],
+  B: [['E', 2]],
+  C: [['B', 1], ['D', 5]],
+  D: [['E', 1]],
+  E: [],
+};
+
+function dijkstra(start) {
+  const dist = { [start]: 0 };
+  const settled = new Set();
+  const pq = [[0, start]];                        // [cost, node] — array-as-heap
+  while (pq.length) {
+    pq.sort((a, b) =&gt; a[0] - b[0]);               // (real heap in production —
+    const [d, node] = pq.shift();                 //  this is the teaching version)
+    if (settled.has(node)) continue;              // stale entry — skip
+    settled.add(node);
+    console.log(`settle ${node} at cost ${d}   (frontier: ${pq.map(([c,n]) =&gt; n+':'+c).join(' ') || '—'})`);
+    for (const [next, w] of graph[node])
+      if (!settled.has(next) &amp;&amp; d + w &lt; (dist[next] ?? Infinity)) {
+        dist[next] = d + w;
+        pq.push([d + w, next]);
+      }
+  }
+  return dist;
+}
+const dist = dijkstra('A');
+console.log('final costs:', JSON.stringify(dist));
+console.log('note: B settles at 2 (via C), NOT 4 (direct) — rings would have lied');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch B get discovered at 4, then undercut to 2 before settling</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-sp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does Dijkstra break with negative edges — mechanically, not just "it's not allowed"?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Negative costs make the priority queue sort backwards</button>
+        <button class="mcq-opt" type="button" data-ok>Settling assumes no later route can be cheaper — a negative edge discovered later CAN undercut an already-settled node, and Dijkstra never reopens the settled</button>
+        <button class="mcq-opt" type="button">Distances overflow below zero</button>
+        <button class="mcq-opt" type="button">It doesn't — it's just slower</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the entire correctness proof is "cheapest unsettled can't be improved, because every alternative path costs ≥ its current frontier cost + something non-negative." One negative edge deletes the "non-negative" and the induction collapses. Bellman-Ford survives by never settling — everyone stays reopenable for V−1 rounds. Knowing the proof's load-bearing beam is what "understands Dijkstra" means.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Path with Minimum Effort (1631): Dijkstra where "cost" is the max edge on the path, not the sum — swap the relax formula (<code>max(d, w)</code> for <code>d + w</code>). Dijkstra is a template with a pluggable cost monoid.</li>
+        <li>The stale-entry skip (<code>if settled → continue</code>) replaces decrease-key, which JS heaps don't have — the "lazy deletion" trick from two-heaps, again.</li>
+        <li>A* is Dijkstra + an admissible guess toward the target — one sentence of it (and that games use it) is plenty.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/network-delay-time/" target="_blank" rel="noopener noreferrer">743 · Network Delay Time</a> · <a href="https://leetcode.com/problems/path-with-minimum-effort/" target="_blank" rel="noopener noreferrer">1631 · Path with Min Effort</a> · <a href="https://leetcode.com/problems/cheapest-flights-within-k-stops/" target="_blank" rel="noopener noreferrer">787 · Cheapest Flights, K Stops</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · MST -->
+<section class="lesson" id="mst">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Minimum spanning trees — connect everything, cheaply</h3>
+      <p class="lvl">advanced → Kruskal reuses union-find; Prim reuses the frontier</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Different question from shortest paths: not "cheapest route A→B" but <b>"cheapest set of edges connecting <i>everyone</i>"</b> — wiring offices, connecting points, clustering. The answer is a spanning tree (V−1 edges, no cycles), and two greedy algorithms build the minimum one. <b>Kruskal</b>: sort all edges cheapest-first, take each edge unless it forms a cycle — and "would this form a cycle?" is <i>exactly</i> union-find's one question (section 08 pays off). <b>Prim</b>: grow one blob from any start, always absorbing the cheapest edge leaving the blob — Dijkstra's frontier with "edge cost" instead of "path cost".</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">wire-the-offices.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Min Cost to Connect All Points (LC 1584) — Kruskal + union-find
+const points = [[0,0], [2,2], [3,10], [5,2], [7,0]];
+
+// union-find, compact (section 08's machine, reused verbatim)
+const boss = points.map((_, i) =&gt; i);
+const find = (x) =&gt; boss[x] === x ? x : (boss[x] = find(boss[x]));
+const union = (a, b) =&gt; {
+  const ra = find(a), rb = find(b);
+  if (ra === rb) return false;                    // same group → cycle
+  boss[ra] = rb;
+  return true;
+};
+
+// all candidate edges, manhattan distance
+const edges = [];
+for (let i = 0; i &lt; points.length; i++)
+  for (let j = i + 1; j &lt; points.length; j++)
+    edges.push([
+      Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1]),
+      i, j,
+    ]);
+edges.sort((a, b) =&gt; a[0] - b[0]);                // cheapest first
+
+let cost = 0, used = 0;
+for (const [w, i, j] of edges) {
+  if (union(i, j)) {                              // no cycle → take it
+    cost += w; used++;
+    console.log(`take ${JSON.stringify(points[i])}—${JSON.stringify(points[j])} cost ${w}`);
+    if (used === points.length - 1) break;        // V−1 edges → done
+  } else {
+    console.log(`skip edge cost ${w} — would close a loop`);
+  }
+}
+console.log('minimum wiring cost:', cost, `(${used} edges for ${points.length} points)`);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">every skip is union-find saying "cycle" — the two structures interlock</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-mst-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Dijkstra from node A and Prim from node A both grow a frontier greedily. What's the actual difference?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — an MST contains all shortest paths from A</button>
+        <button class="mcq-opt" type="button" data-ok>Dijkstra ranks candidates by TOTAL PATH cost from A; Prim by SINGLE EDGE cost into the blob — different objective, generally different trees</button>
+        <button class="mcq-opt" type="button">Prim only works on grids</button>
+        <button class="mcq-opt" type="button">Dijkstra is greedy, Prim is dynamic programming</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> one line of code differs — <code>d + w</code> vs <code>w</code> in the priority — and the meaning changes entirely: "cheap to reach from A" vs "cheap to attach to the group". A famous counterexample: two nodes joined directly by cost 10, or via a middle node with 6+6 — Dijkstra takes the 10 direct (path 10 &lt; 12), MST takes both 6s (tree cost 12 &lt; 16). Same skeleton, different question. Interviewers love asking exactly this.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Kruskal O(E log E) sort-dominated vs Prim O(E log V) heap-driven — dense graphs slightly favor Prim; sparse, either. One sentence, move on.</li>
+        <li>Cut property (why greedy is safe): the cheapest edge crossing any partition belongs to <i>some</i> MST — this is the exchange argument from dsa-algorithms wearing graph clothes.</li>
+        <li>Stop early at V−1 accepted edges; and if edges run out first, the graph was disconnected — say what your code does in that case.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/min-cost-to-connect-all-points/" target="_blank" rel="noopener noreferrer">1584 · Connect All Points</a> · <a href="https://leetcode.com/problems/redundant-connection/" target="_blank" rel="noopener noreferrer">684 · Redundant Connection</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · LCA -->
+<section class="lesson" id="lca">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Lowest common ancestor — where paths meet</h3>
+      <p class="lvl">advanced → the one-pass recursion, and the path-through-node family</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The <b>LCA</b> of two nodes is the deepest node with both in its subtree — where their root-paths diverge. In a <b>BST</b>, ordering gives it away: walk from the root; the first node between the two values (or equal to one) is the answer, O(height), no recursion needed. In a <b>plain binary tree</b>, the celebrated one-pass recursion: ask each subtree "did you find p or q?" — if both sides report a find, <i>you</i> are the LCA; if one side, pass its report up.</p>
+    <p>The reason LCA earns an advanced slot: it unlocks the <b>path-through-node family</b>. Distance between two nodes = depth(p) + depth(q) − 2·depth(LCA). Diameter, path sums, "time for information to travel between leaves" — all are "some path bends at some node" problems, and the LCA is the bend.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">where-paths-meet.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">//        A
+//      /   \
+//     B     C
+//    / \   / \
+//   D   E F   G
+//      / \
+//     H   I
+const N = (v, l = null, r = null) =&gt; ({ v, l, r });
+const tree = N('A',
+  N('B', N('D'), N('E', N('H'), N('I'))),
+  N('C', N('F'), N('G')));
+
+// the one-pass recursion (LC 236)
+function lca(node, p, q) {
+  if (!node || node.v === p || node.v === q) return node;
+  const left = lca(node.l, p, q);
+  const right = lca(node.r, p, q);
+  if (left &amp;&amp; right) return node;       // one on each side → the meeting point
+  return left ?? right;                  // pass the single find upward
+}
+for (const [p, q] of [['H','I'], ['D','I'], ['H','G'], ['B','E']])
+  console.log(`LCA(${p}, ${q}) = ${lca(tree, p, q).v}`);
+
+// distance via LCA: depth(p) + depth(q) − 2·depth(lca)
+function depthOf(node, v, d = 0) {
+  if (!node) return -1;
+  if (node.v === v) return d;
+  const l = depthOf(node.l, v, d + 1);
+  return l !== -1 ? l : depthOf(node.r, v, d + 1);
+}
+const dist = (p, q) =&gt;
+  depthOf(tree, p) + depthOf(tree, q) - 2 * depthOf(tree, lca(tree, p, q).v);
+console.log('distance(H, G) =', dist('H', 'G'), 'edges  (H→E→B→A→C→G)');
+console.log('distance(D, I) =', dist('D', 'I'), 'edges');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">LCA(B,E)=B — a node can be its own ancestor; the base case handles it free</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-lca-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In the one-pass recursion, a subtree returns non-null having found only p (q is elsewhere). What does that return value MEAN to the parent?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A bug — it should return null until both are found</button>
+        <button class="mcq-opt" type="button" data-ok>"Someone you're looking for is down here" — if the other side also reports a find, the parent crowns itself; otherwise the report keeps bubbling up</button>
+        <button class="mcq-opt" type="button">The LCA is always that returned node</button>
+        <button class="mcq-opt" type="button">The recursion restarts from that node</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the function's contract is subtle — it returns "the LCA if both are here, else whichever target is here, else null." The elegance (and the interview trap) is that one return value carries three meanings, disambiguated by the sibling's answer. Bonus depth: if p is an ancestor of q, p's subtree contains both, and the early base-case return crowns p without ever visiting q — correct by the same contract.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>BST version: no recursion needed — walk down until you're between the values. O(h), and saying "the ordering IS the ancestry information" links sections 02 and 12.</li>
+        <li>With parent pointers, LCA = intersection of two linked lists (walk up both paths) — a structures crossover interviewers enjoy.</li>
+        <li>Binary lifting (jump-pointer tables for O(log n) LCA on static trees) is a name-and-move-on: "precompute 2^k-th ancestors; interview trees don't need it."</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/" target="_blank" rel="noopener noreferrer">236 · LCA of Binary Tree</a> · <a href="https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" target="_blank" rel="noopener noreferrer">235 · LCA of BST</a> · <a href="https://leetcode.com/problems/diameter-of-binary-tree/" target="_blank" rel="noopener noreferrer">543 · Diameter</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · RANGE TREES -->
+<section class="lesson" id="rangetrees">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
+    <div>
+      <h3>Fenwick &amp; segment trees — prefix sums that can move</h3>
+      <p class="lvl">advanced → updates AND range queries, both in O(log n)</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>dsa-foundations left a cliffhanger: prefix sums answer ranges in O(1) but an <i>update</i> rewrites O(n) of the table; a plain array updates in O(1) but sums in O(n). When reads and writes <b>interleave</b>, you need the middle ground. A <b>Fenwick tree</b> (binary indexed tree) stores partial sums sized by each index's <b>lowest set bit</b> (the <code>n &amp; −n</code> trick from the bits section, load-bearing at last): both update and prefix-query hop through O(log n) cells. Twenty lines, and "sum of any range, data keeps changing" is solved.</p>
+    <p>The <b>segment tree</b> is the general machine: a binary tree of interval aggregates. More code, but the aggregate can be <i>anything associative</i> — min, max, gcd — where Fenwick's subtraction trick (<code>prefix(j) − prefix(i−1)</code>) only works for invertible operations like sum. Interview honesty: Fenwick when sums suffice, segment tree when they don't, and <i>name</i> lazy propagation for range-updates rather than coding it.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">moving-totals.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Fenwick tree (LC 307 shape) — 1-indexed, lowbit hops
+class Fenwick {
+  constructor(n) { this.t = new Array(n + 1).fill(0); }
+  update(i, delta) {                       // i is 1-based
+    for (; i &lt; this.t.length; i += i &amp; -i) this.t[i] += delta;
+  }
+  prefix(i) {                              // sum of [1..i]
+    let s = 0;
+    for (; i &gt; 0; i -= i &amp; -i) s += this.t[i];
+    return s;
+  }
+  range(i, j) { return this.prefix(j) - this.prefix(i - 1); }
+}
+
+// adoption counts per day, then live edits
+const days = [3, 1, 4, 1, 5, 9, 2, 6];
+const fw = new Fenwick(days.length);
+days.forEach((v, i) =&gt; fw.update(i + 1, v));
+
+console.log('sum days 3..6:', fw.range(3, 6), ' (4+1+5+9)');
+console.log('· day 4 gets 10 more adoptions');
+fw.update(4, +10);
+console.log('sum days 3..6 now:', fw.range(3, 6), ' — updated in O(log n)');
+console.log('sum all days:', fw.prefix(8));
+
+// watch the lowbit hops that make it log n:
+let trace = [];
+for (let i = 6; i &gt; 0; i -= i &amp; -i) trace.push(`t[${i}] (covers ${i &amp; -i})`);
+console.log('prefix(6) reads only:', trace.join(' + '));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">prefix(6) touches 2 cells, not 6 — the lowbit ladder at work</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dtg-rt-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Static array, one million range-sum queries, zero updates. Fenwick tree or plain prefix array?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Fenwick — it's the more advanced structure</button>
+        <button class="mcq-opt" type="button" data-ok>Plain prefix array — O(1) per query beats O(log n), and the extra machinery buys nothing without updates</button>
+        <button class="mcq-opt" type="button">Segment tree — a million queries needs lazy propagation</button>
+        <button class="mcq-opt" type="button">They're equivalent in every way</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the entire reason Fenwick exists is <i>interleaved updates</i>; remove them and it's strictly worse than the dsa-foundations prefix array. Reaching for the fancier structure unprompted is a real negative signal — the question tests whether you pick tools by requirement, not by impressiveness. "What's the update rate?" is the senior's first question, in interviews and in system design alike.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The trigger phrase: "range queries <b>and</b> point updates, interleaved" — the word <i>and</i> is the whole signal.</li>
+        <li>Counting inversions / "count smaller after self": Fenwick over <i>values</i> instead of positions — the reindexing trick that turns order statistics into prefix sums.</li>
+        <li>Segment tree over Fenwick when the aggregate isn't invertible (min/max/gcd) — subtraction has no "un-min".</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/range-sum-query-mutable/" target="_blank" rel="noopener noreferrer">307 · Range Sum Query, Mutable</a> · <a href="https://leetcode.com/problems/range-sum-query-immutable/" target="_blank" rel="noopener noreferrer">303 · (static baseline)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review + ladder</p>
@@ -1217,8 +1774,15 @@ console.log('add mochi–tuft edge:',
       <tr><td class="mono">02</td><td>BSTs</td><td>Left smaller, right bigger → O(height) search, sorted in-order walk; sorted inserts make sticks — hence balancing &amp; B-trees.</td></tr>
       <tr><td class="mono">03</td><td>tries</td><td>One letter per hop; cost = word length; everything below a prefix is a suggestion; the $ marker separates words from prefixes.</td></tr>
       <tr><td class="mono">04</td><td>graphs</td><td>BFS floods in rings → shortest unweighted paths; DFS dives → regions &amp; cycles; visited-on-enqueue, always.</td></tr>
-      <tr><td class="mono">05</td><td>topo sort</td><td>Kahn's: start everything with zero prerequisites, tick counters down; leftovers = the cycle, named.</td></tr>
-      <tr><td class="mono">06</td><td>union-find</td><td>Boss pointers + path compression: same-group in effectively O(1); union returning false = cycle found.</td></tr>
+      <tr><td class="mono">05</td><td>bfs, upgraded</td><td>Seed the queue with EVERY source; free edges front, paid edges back; two floods meet in the middle.</td></tr>
+      <tr><td class="mono">06</td><td>islands family</td><td>Make the flood return numbers; when edges mean safety, flood FROM the border and invert.</td></tr>
+      <tr><td class="mono">07</td><td>topo sort</td><td>Kahn's: start everything with zero prerequisites, tick counters down; leftovers = the cycle, named.</td></tr>
+      <tr><td class="mono">08</td><td>union-find</td><td>Boss pointers + path compression: same-group in effectively O(1); union returning false = cycle found.</td></tr>
+      <tr><td class="mono">09</td><td>DP on DAGs</td><td>Topo order answers dependencies before they're asked; increase-only edges can't cycle.</td></tr>
+      <tr><td class="mono">10</td><td>shortest paths</td><td>Settle the cheapest frontier node forever — safe only while every edge is non-negative.</td></tr>
+      <tr><td class="mono">11</td><td>MST</td><td>Cheapest edges first, union-find vetoes cycles; Prim ranks by edge, Dijkstra by path.</td></tr>
+      <tr><td class="mono">12</td><td>LCA</td><td>One recursion, three meanings — both sides report a find, and the parent crowns itself.</td></tr>
+      <tr><td class="mono">13</td><td>range trees</td><td>Interleaved updates + range reads → Fenwick lowbit hops; non-invertible aggregates → segment tree.</td></tr>
     </tbody>
   </table></div>
   <div class="idea" style="margin-top:24px">
@@ -1241,6 +1805,7 @@ console.log('add mochi–tuft edge:',
       <li><b>Hear "shortest / fewest / minimum steps"</b> in an unweighted world → BFS, say "rings" out loud. <b>"Count regions / can it reach / explore all"</b> → DFS flood. <b>"Prerequisites / build order / deadlock"</b> → topo sort. <b>"Same group, merging over time"</b> → union-find.</li>
       <li><b>Announce your representation first:</b> "I'll build an adjacency list, then BFS" — interviewers relax the moment the plan precedes the code.</li>
       <li><b>Trees:</b> pick the traversal by where answers flow — down (pre), sorted (in), up (post) — and always mention stack space.</li>
+      <li><b>The advanced band in one map:</b> weights → Dijkstra (10), connect-everything → MST (11), dependencies-with-values → topo DP (09), paths-that-bend → LCA (12), moving range sums → Fenwick (13). Recognizing WHICH machine is the interview.</li>
       <li>Timed drills: <a href="../dsa.html#trees">DSA in 48 · trees</a> and <a href="../dsa.html#graphs">· graphs</a>. Next module: <b>dsa-algorithms</b> — sorting, binary search, backtracking, and DP, where these walks become strategies.</li>
     </ul>
   </div>

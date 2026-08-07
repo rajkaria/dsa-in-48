@@ -16,8 +16,9 @@ routes you to whichever course you need (and to every future one).
 | **Frontend System Design in 48** | 12 topics for the senior frontend design round — RADIO walkthrough, rendering strategies, state & data architecture, CWV, resilience, a11y, security — 140+ Q&As with answers | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [GitHub Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
 
 **Not cramming?** The **[Learn track](https://dsa-in-48.vercel.app/learn)** is the other speed:
-thirteen self-paced, beginner-to-advanced modules (JS ×2, DSA ×4, React, Node, PostgreSQL,
-AWS, system design ×2, and an interview kit with persisted worksheets) — plain language,
+sixteen self-paced, beginner-to-advanced modules (JS ×2, TypeScript, DSA ×4, React, Node,
+PostgreSQL, AWS, testing, system design ×2, the web platform, and an interview kit with
+persisted worksheets) — plain language,
 code that runs on the page, quizzes, visualizers, and per-module progress. Each module is
 one self-contained HTML file under [`learn/`](./learn/), same rules as the courses.
 
@@ -62,7 +63,7 @@ open index.html
 
 `index.html` is the landing page; `dsa.html`, `system-design.html`, `behavioral.html`,
 `fullstack.html`, and `frontend-system-design.html` are the courses; `learn/` holds the
-Learn track (hub + 13 modules). Serve over HTTP (not `file://`) for localStorage progress
+Learn track (hub + 16 modules). Serve over HTTP (not `file://`) for localStorage progress
 to behave, and run `bash scripts/verify.sh` for the static checks (tag balance, anchors,
 unique drill keys, external-request allowlist).
 
