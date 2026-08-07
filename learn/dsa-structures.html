@@ -638,6 +638,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .viz-btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .viz-stage{font-family:var(--font-mono);font-size:.8rem;line-height:1.8}
 
+.band{display:flex;align-items:center;gap:14px;margin:56px 0 -6px}
+.band span{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.band::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .recap{margin-top:26px}
 </style>
 <script>
@@ -676,6 +680,13 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#queues"><span><i class="dot" data-for="queues"></i> Queues &amp; Deques</span></a>
     <a class="side-link" href="#heaps"><span><i class="dot" data-for="heaps"></i> Heaps</span></a>
     <a class="side-link" href="#intervals"><span><i class="dot" data-for="intervals"></i> Intervals</span></a>
+    <a class="side-link" href="#monotonic"><span><i class="dot" data-for="monotonic"></i> Monotonic Stacks</span></a>
+    <a class="side-link" href="#deque"><span><i class="dot" data-for="deque"></i> Deques &amp; Window Max</span></a>
+    <a class="side-link" href="#listsplus"><span><i class="dot" data-for="listsplus"></i> Lists, Advanced</span></a>
+    <a class="side-link" href="#lrucache"><span><i class="dot" data-for="lrucache"></i> LRU Cache</span></a>
+    <a class="side-link" href="#twoheaps"><span><i class="dot" data-for="twoheaps"></i> Two Heaps</span></a>
+    <a class="side-link" href="#rollinghash"><span><i class="dot" data-for="rollinghash"></i> Rolling Hashes</span></a>
+    <a class="side-link" href="#balance"><span><i class="dot" data-for="balance"></i> Balanced Trees</span></a>
     <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Practice Ladder</span></a>
   </nav>
 
@@ -694,11 +705,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/6</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/7</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -721,14 +732,16 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: heap-vs-sort judgment calls</span>
   </div>
   <div class="hero-meta">
-    <span><b>6</b> sections</span>
-    <span><b>7</b> quiz questions</span>
+    <span><b>13</b> sections</span>
+    <span><b>13</b> quiz questions</span>
     <span><b>1</b> pointer-surgery stepper</span>
-    <span><b>14</b> verified LeetCode problems</span>
-    <span><b>~3.5h</b> self-paced</span>
+    <span><b>34</b> verified LeetCode problems</span>
+    <span><b>~8.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#lists">Start with lists <span class="arrow">↓</span></a>
 </header>
+
+<div class="band" id="band-beginner"><span>// beginner — lines, towers &amp; fair queues</span></div>
 
 <!-- 1 · LINKED LISTS -->
 <section class="lesson" id="lists">
@@ -962,6 +975,8 @@ console.log('maxes:', windowMax([1, 3, -1, -3, 5, 3, 6, 7], 3));</code></pre>
     <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
   </div>
 </section>
+<div class="band" id="band-intermediate"><span>// intermediate — priorities, sweeps &amp; the resolve-once trick</span></div>
+
 <!-- 4 · HEAPS -->
 <section class="lesson" id="heaps">
   <div class="lesson-head">
@@ -1126,10 +1141,571 @@ console.log('remove', minRemovals([[1,2],[2,3],[3,4],[1,3]]), 'booking(s)');
   </div>
 </section>
 
-<!-- 6 · PRACTICE -->
-<section class="lesson" id="practice">
+<!-- 6 · MONOTONIC -->
+<section class="lesson" id="monotonic">
   <div class="lesson-head">
     <span class="lesson-num">06</span>
+    <div>
+      <h3>Monotonic stacks — resolve each element exactly once</h3>
+      <p class="lvl">intermediate → "next greater / until warmer / visible from here"</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 02 name-dropped this; now build it. A <b>monotonic stack</b> keeps its contents sorted by construction: before pushing, <b>pop everything your new element beats</b>. The magic is what popping <i>means</i> — for each popped element, the newcomer is the answer to its question ("who's the next one bigger than me?"). Every element pushes once and pops at most once → O(n) for a problem that reads like O(n²).</p>
+    <p>The recipe has one decision: <b>which comparison pops.</b> Looking for the next <i>greater</i>? Pop while the newcomer is bigger (the stack stays decreasing). Next <i>smaller</i>? Pop while it's smaller. Say the invariant out loud before coding — "my stack holds the unresolved, in decreasing order" — and the code writes itself.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Cats queue at the window ledge, each waiting for a taller cat to see over. When a <b>tall cat arrives</b>, every shorter cat waiting in line goes "ah, found mine", gets its answer, and leaves — <i>all at once</i>. The line only ever holds cats still-waiting, tallest first. Nobody re-queues, nobody re-asks: one arrival can resolve five waiters, and that's why the whole day is O(n).</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">window-ledge.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Daily Temperatures (LC 739): days until a warmer day
+function daysUntilWarmer(temps) {
+  const answer = new Array(temps.length).fill(0);
+  const waiting = [];                       // indexes, temps decreasing
+  for (let i = 0; i &lt; temps.length; i++) {
+    while (waiting.length &amp;&amp; temps[i] &gt; temps[waiting.at(-1)]) {
+      const resolved = waiting.pop();       // today answers their question
+      answer[resolved] = i - resolved;
+      console.log(`  day ${resolved} (${temps[resolved]}°) resolved by day ${i} (${temps[i]}°)`);
+    }
+    waiting.push(i);
+  }
+  return answer;                            // still waiting → 0 (never warmer)
+}
+const temps = [73, 74, 75, 71, 69, 72, 76, 73];
+console.log('temps: ', temps.join(' '));
+console.log('answer:', daysUntilWarmer(temps).join(' '));
+
+// same machine, "previous smaller" flavor — one comparison flipped
+function prevSmaller(nums) {
+  const out = [], stack = [];               // values, increasing
+  for (const x of nums) {
+    while (stack.length &amp;&amp; stack.at(-1) &gt;= x) stack.pop();
+    out.push(stack.length ? stack.at(-1) : -1);
+    stack.push(x);
+  }
+  return out;
+}
+console.log('prev smaller of [4,7,2,9,3]:', prevSmaller([4,7,2,9,3]).join(' '));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch one warm day resolve three waiters at once — that's the O(n) proof</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-mono-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">The while-pop sits inside the for-loop. Why is the total still O(n)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The stack rarely has more than a few items in practice</button>
+        <button class="mcq-opt" type="button" data-ok>Each index is pushed once and popped at most once, ever — total stack operations ≤ 2n across the whole run</button>
+        <button class="mcq-opt" type="button">It's actually O(n log n) — the stack acts like a sorted tree</button>
+        <button class="mcq-opt" type="button">JS arrays make pop() free</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the same amortized budget argument as the sliding window and the set-walk: charge each pop to the element being popped, and no element can be popped twice. Loop nesting describes the <i>shape</i> of code, not its cost — the cost lives in how many total operations the input can fund. Three patterns, one argument: say it once per interview and mean it.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Largest Rectangle in Histogram (hard): for each bar, the monotonic stack finds <i>both</i> the previous-smaller and next-smaller — the bar's maximal width. Two sentences of setup turn a famous hard into "the same machine twice".</li>
+        <li>Store <b>indexes</b>, not values, whenever the answer involves distance or position — the temperatures runner is the template.</li>
+        <li>Stock Span (901) is next-greater running online — the stack survives <i>between</i> calls. Monotonic structures aren't batch-only.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/next-greater-element-i/" target="_blank" rel="noopener noreferrer">496 · Next Greater Element I</a> · <a href="https://leetcode.com/problems/daily-temperatures/" target="_blank" rel="noopener noreferrer">739 · Daily Temperatures</a> · <a href="https://leetcode.com/problems/online-stock-span/" target="_blank" rel="noopener noreferrer">901 · Online Stock Span</a> · <a href="https://leetcode.com/problems/largest-rectangle-in-histogram/" target="_blank" rel="noopener noreferrer">84 · Largest Rectangle (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 7 · DEQUE -->
+<section class="lesson" id="deque">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <div>
+      <h3>Deques &amp; the sliding-window maximum</h3>
+      <p class="lvl">intermediate → the champion's line, implemented for real</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A <b>deque</b> (double-ended queue) pushes and pops at <i>both</i> ends. Its one famous trick — teased in section 03 — is <b>Sliding Window Maximum</b>: the maximum of every k-wide window, in O(n) total. The deque holds <b>indexes of "still-relevant champions", front = current max, values decreasing</b>. Two maintenance moves per step: evict the front if it slid out of the window; pop the back while the newcomer beats it (a smaller element behind a bigger, younger one can never be a future max — it's dominated, gone forever).</p>
+    <p>It's the monotonic stack's cousin with an expiry date: monotonicity handles "beaten by a newcomer", the front-eviction handles "too old". Between them, every index enters once and leaves once.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">champions-line.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Sliding Window Maximum (LC 239) — the full machine
+function windowMax(nums, k) {
+  const out = [], dq = [];                  // dq: indexes, values decreasing
+  for (let i = 0; i &lt; nums.length; i++) {
+    if (dq[0] &lt;= i - k) dq.shift();         // front too old → expire
+    while (dq.length &amp;&amp; nums[dq.at(-1)] &lt; nums[i]) dq.pop();  // dominated → out
+    dq.push(i);
+    if (i &gt;= k - 1) out.push(nums[dq[0]]);  // front IS the window max
+  }
+  return out;
+}
+const nums = [1, 3, -1, -3, 5, 3, 6, 7];
+console.log('nums:      ', nums.join(' '));
+console.log('max per 3: ', windowMax(nums, 3).join(' '));
+
+// why "dominated → gone forever" is safe: trace one step
+// window [3, -1, -3], then 5 arrives:
+//   -3 &lt; 5 → popped. -1 &lt; 5 → popped. 3 &lt; 5 → popped. deque = [5]
+// none of the popped could EVER beat 5 while 5 remains in any window.
+
+// honesty about JS: Array.shift() is O(n). For interviews it's accepted;
+// the "real" deque uses a head index (or a ring buffer):
+function windowMaxIndexed(nums, k) {
+  const out = [], dq = []; let head = 0;    // dq[head..] is the live deque
+  for (let i = 0; i &lt; nums.length; i++) {
+    if (head &lt; dq.length &amp;&amp; dq[head] &lt;= i - k) head++;
+    while (dq.length &gt; head &amp;&amp; nums[dq.at(-1)] &lt; nums[i]) dq.pop();
+    dq.push(i);
+    if (i &gt;= k - 1) out.push(nums[dq[head]]);
+  }
+  return out;
+}
+console.log('same, O(1) front:', windowMaxIndexed(nums, 3).join(' '));</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the traced step is the whole proof — dominated means never-again</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-deque-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why does the deque pop <i>smaller</i> elements from the back when a bigger one arrives, instead of keeping everything in the window?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">To save memory — the deque would grow to size n</button>
+        <button class="mcq-opt" type="button" data-ok>A smaller element that's also OLDER than the newcomer can never be any future window's max — it exits every window before the newcomer does</button>
+        <button class="mcq-opt" type="button">Because deques must stay sorted to allow binary search</button>
+        <button class="mcq-opt" type="button">It's an optimization only needed for duplicate values</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the newcomer is bigger AND will outlive them (it entered later, so it expires later). Dominated on both axes → provably irrelevant → discard permanently. This "dominated candidates can be discarded" reasoning is the same logic behind monotonic stacks and half of greedy proofs — it's an argument template, not a deque fact.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Design Circular Deque (641) = ring buffer: fixed array + head/tail indexes wrapping with modulo — the structure JS's missing-deque forces you to fake.</li>
+        <li>Shortest Subarray with Sum ≥ K (hard, 862) is windowMax's evil twin: prefix sums + a monotonic deque, needed <i>because negatives break the plain window</i> — the exact boundary dsa-foundations §09 warned about.</li>
+        <li>Say the JS honesty line unprompted: "shift() is O(n); I'd use a head pointer in production" — it's a two-second flex that lands every time.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/sliding-window-maximum/" target="_blank" rel="noopener noreferrer">239 · Sliding Window Maximum (hard)</a> · <a href="https://leetcode.com/problems/design-circular-deque/" target="_blank" rel="noopener noreferrer">641 · Design Circular Deque</a> · <a href="https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/" target="_blank" rel="noopener noreferrer">862 · Shortest Subarray Sum ≥ K (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 8 · LISTS PLUS -->
+<section class="lesson" id="listsplus">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <div>
+      <h3>Linked lists, advanced — cycles, clones &amp; k-group surgery</h3>
+      <p class="lvl">intermediate → fast/slow pointers and the interleave trick</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Three upgrades to section 01's pointer grip. <b>Floyd's tortoise &amp; hare</b>: a slow pointer (1 step) and fast pointer (2 steps) — if there's a cycle they must meet inside it, in O(1) space. The encore that wins interviews: after meeting, reset one pointer to the head and walk both at speed 1 — <b>they meet exactly at the cycle's entrance</b> (the head-to-entrance distance provably equals meeting-point-to-entrance, going around).</p>
+    <p><b>Copy List with Random Pointer</b>: each node has a <code>random</code> pointing anywhere. The Map solution is easy (old→new, two passes). The O(1)-space showpiece is the <b>interleave trick</b>: weave each clone in right after its original (A→A'→B→B'…), so every clone's random is just <code>original.random.next</code> — then unzip. And <b>k-group reversal</b> is section 01's three-finger reversal applied per block with a dummy head stitching blocks together — pure composure testing.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">tortoise-and-hare.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">const node = (v) =&gt; ({ v, next: null, random: null });
+const chain = (...vs) =&gt; {
+  const nodes = vs.map(node);
+  nodes.forEach((n, i) =&gt; n.next = nodes[i + 1] ?? null);
+  return nodes;
+};
+
+// 1 · FLOYD — detect the cycle, then FIND ITS ENTRANCE in O(1) space
+const cats = chain('Mochi','Biscuit','Beans','Clawdia','Tuna','Salem');
+cats[5].next = cats[2];                     // Salem sneaks back to Beans → cycle!
+function cycleEntrance(head) {
+  let slow = head, fast = head;
+  while (fast?.next) {
+    slow = slow.next; fast = fast.next.next;
+    if (slow === fast) {                    // met inside the cycle
+      let probe = head;                     // the famous reset
+      while (probe !== slow) { probe = probe.next; slow = slow.next; }
+      return probe.v;
+    }
+  }
+  return null;
+}
+console.log('cycle starts at:', cycleEntrance(cats[0]));
+
+// 2 · CLONE with random pointers — the O(1)-space interleave
+const [a, b, c] = chain('A', 'B', 'C');
+a.random = c; b.random = a; c.random = b;
+function cloneList(head) {
+  for (let n = head; n; n = n.next.next)          // weave: A→A'→B→B'…
+    n.next = Object.assign(node(n.v + "'"), { next: n.next });
+  for (let n = head; n; n = n.next.next)          // clone randoms via the weave
+    if (n.random) n.next.random = n.random.next;
+  const clone = head.next;                         // unzip
+  for (let n = head; n; n = n.next) {
+    const twin = n.next;
+    n.next = twin.next;
+    twin.next = twin.next ? twin.next.next : null;
+  }
+  return clone;
+}
+const cloned = cloneList(a);
+console.log('clone:', cloned.v, cloned.next.v, cloned.next.next.v);
+console.log("clone randoms:", cloned.random.v, cloned.next.random.v, '— point at CLONES, not originals');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the entrance-finding reset is the part that gets the "oh nice" reaction</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-listp-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why must the fast and slow pointers meet if a cycle exists (rather than the fast one jumping over the slow forever)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Because linked lists can't have odd-length cycles</button>
+        <button class="mcq-opt" type="button" data-ok>Once both are inside the cycle, the gap between them shrinks by exactly 1 each step — it must hit 0 within one lap</button>
+        <button class="mcq-opt" type="button">The hare eventually runs out of stack space</button>
+        <button class="mcq-opt" type="button">They only meet if the cycle length is even</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> relative speed. Fast gains one position per step on slow; in a cycle of length L the gap is some g &lt; L, and g − 1 − 2 − 3… reaches 0 in at most L steps — no jumping over, because the gap changes by exactly one. Explaining Floyd with relative motion (not hand-waving "they'll meet eventually") is exactly the depth difference interviewers listen for.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Fast/slow does triple duty: cycle detection, <b>midpoint finding</b> (fast hits the end when slow's halfway — the first move of "sort a list" and "palindrome list"), and Happy Number from the math section.</li>
+        <li>Rotate List (61): close the list into a ring, walk to the new tail, cut once — turning the scary version into arithmetic.</li>
+        <li>Reverse in k-Group (hard): narrate the plan first — "count k ahead, reverse the block with the three-finger grip, stitch with a dummy head" — structure beats speed.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/linked-list-cycle/" target="_blank" rel="noopener noreferrer">141 · Linked List Cycle</a> · <a href="https://leetcode.com/problems/linked-list-cycle-ii/" target="_blank" rel="noopener noreferrer">142 · Cycle II (the entrance)</a> · <a href="https://leetcode.com/problems/copy-list-with-random-pointer/" target="_blank" rel="noopener noreferrer">138 · Copy w/ Random Pointer</a> · <a href="https://leetcode.com/problems/rotate-list/" target="_blank" rel="noopener noreferrer">61 · Rotate List</a> · <a href="https://leetcode.com/problems/reverse-nodes-in-k-group/" target="_blank" rel="noopener noreferrer">25 · Reverse in k-Group (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<div class="band" id="band-advanced"><span>// advanced — the design-round structures</span></div>
+
+<!-- 9 · LRU CACHE -->
+<section class="lesson" id="lrucache">
+  <div class="lesson-head">
+    <span class="lesson-num">09</span>
+    <div>
+      <h3>LRU cache — the structures capstone</h3>
+      <p class="lvl">advanced → two structures composed, O(1) everything</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The interview section promised this capstone; here it is. An <b>LRU (least-recently-used) cache</b> holds N items and evicts the one untouched longest. The requirement that makes it a composition problem: <code>get</code> AND <code>put</code> must both be <b>O(1)</b> — including the eviction <i>and</i> the "this item just became freshest" bump. A map alone can't order by recency; a list alone can't look up by key. The textbook answer: <b>hash map (key → list node) + doubly-linked list in recency order</b> — the map teleports you to the node, the DLL unlinks and re-heads it in O(1), evictions pop the tail.</p>
+    <p>JS has a shortcut worth knowing <i>and</i> worth being honest about: <code>Map</code> preserves insertion order, so <b>delete + re-set</b> moves a key to "most recent", and <code>map.keys().next().value</code> is the oldest. Ten lines, genuinely O(1) — but say "the Map is my ordered list; in a language without ordered maps I'd build map + DLL" so the interviewer hears the real structure, not a dodge.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">nap-spot-cache.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// LRU via JS Map's insertion order — every op O(1)
+class LRU {
+  constructor(cap) { this.cap = cap; this.m = new Map(); }
+  get(k) {
+    if (!this.m.has(k)) return -1;
+    const v = this.m.get(k);
+    this.m.delete(k); this.m.set(k, v);       // bump to freshest
+    return v;
+  }
+  put(k, v) {
+    if (this.m.has(k)) this.m.delete(k);       // re-insert = refresh position
+    else if (this.m.size === this.cap) {
+      const oldest = this.m.keys().next().value;
+      this.m.delete(oldest);
+      console.log(`  · evicted ${oldest} (least recently used)`);
+    }
+    this.m.set(k, v);
+  }
+  peek() { return [...this.m.keys()].join(' &lt; '); }   // oldest &lt; … &lt; freshest
+}
+
+const napSpots = new LRU(3);
+napSpots.put('windowsill', '☀️'); napSpots.put('laptop', '🔥'); napSpots.put('boxNo3', '📦');
+console.log('cache:', napSpots.peek());
+napSpots.get('windowsill');                  // Mochi revisits the sill
+console.log('after get(windowsill):', napSpots.peek());
+napSpots.put('radiator', '♨️');              // full → someone's spot is gone
+console.log('after put(radiator):', napSpots.peek());
+console.log('get(laptop):', napSpots.get('laptop'), ' ← evicted, correctly');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">the eviction picks the coldest nap spot — trace the order line by line</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-lru-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">In the classic map + doubly-linked-list LRU, why must the list be <i>doubly</i> linked?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Singly linked lists can't be traversed for eviction</button>
+        <button class="mcq-opt" type="button" data-ok>A get() must unlink a node from the MIDDLE in O(1) — which requires reaching its predecessor instantly, i.e. a prev pointer</button>
+        <button class="mcq-opt" type="button">Doubly linked lists use less memory per node</button>
+        <button class="mcq-opt" type="button">It's convention; singly linked works identically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the map hands you the node itself, but unlinking needs <code>node.prev.next = node.next</code> — without <code>prev</code> you'd walk from the head, O(n), and the whole contract collapses. This "which pointer does each operation need?" reasoning is the actual test; the LFU follow-up (460) stacks a frequency dimension on top — buckets of DLLs, still O(1), and fine to describe rather than code.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Bridge to systems, unprompted: "this is Redis's <code>allkeys-lru</code> eviction and the browser's bfcache instinct — cache invalidation by recency because recency predicts reuse."</li>
+        <li>The dummy <b>head and tail sentinels</b> in the DLL version delete all the edge cases (empty list, single node) — same dummy-head philosophy as section 01, promoted to a design tool.</li>
+        <li>TTL follow-up ("expire entries after 60s"): lazy expiry on access + periodic sweep — don't promise a timer per key.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/lru-cache/" target="_blank" rel="noopener noreferrer">146 · LRU Cache</a> · <a href="https://leetcode.com/problems/lfu-cache/" target="_blank" rel="noopener noreferrer">460 · LFU Cache (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 10 · TWO HEAPS -->
+<section class="lesson" id="twoheaps">
+  <div class="lesson-head">
+    <span class="lesson-num">10</span>
+    <div>
+      <h3>Two heaps — the streaming median &amp; friends</h3>
+      <p class="lvl">advanced → balance a max-heap and a min-heap at the split point</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Section 04 built one heap. The famous composition uses <b>two, facing each other</b>: a <b>max-heap holding the smaller half</b> of the numbers and a <b>min-heap holding the larger half</b>. The median lives at the boundary — the top of one heap (odd count) or the average of both tops (even). Each arrival: push into the correct half, then <b>rebalance</b> so sizes differ by at most one (move one top across). Every operation O(log n), median reads O(1) — on a stream where re-sorting would be O(n log n) per query.</p>
+    <p>The pattern generalizes: any time you need <b>live access to a boundary</b> between two dynamic groups — median, "k-th largest so far", scheduling against a budget — the answer is heaps facing each other across the cut.</p>
+    <div class="whiskers">
+      <svg class="cat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 L4 4 L8 7 L16 7 L20 4 L20 10 C20 15 17 18 12 18 C7 18 4 15 4 10 Z"/><circle cx="9" cy="11" r=".8" fill="currentColor"/><circle cx="15" cy="11" r=".8" fill="currentColor"/><path d="M12 13.5 L11 14.5 M12 13.5 L13 14.5 M12 18 L12 21 M8 20.5 Q12 23 16 20.5"/></svg>
+      <p><span class="who">PROFESSOR WHISKERS EXPLAINS</span>Weigh-in day. Cats split into two rooms: <b>lighter cats</b> in one, <b>heavier cats</b> in the other. Each room only needs to know its <b>cat nearest the doorway</b> (heaviest of the light room, lightest of the heavy room) — the median stands in the doorway between them. A new cat walks into whichever room fits, and if one room gets two cats fuller, the doorway cat switches rooms. Nobody ever lines up all the cats in order — just the doorway, maintained.</p>
+    </div>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">doorway-median.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// compact binary heap (comparator decides min vs max)
+class Heap {
+  constructor(cmp) { this.a = []; this.cmp = cmp; }
+  get size() { return this.a.length; }
+  peek() { return this.a[0]; }
+  push(x) {
+    this.a.push(x);
+    for (let i = this.a.length - 1; i &gt; 0;) {
+      const p = (i - 1) &gt;&gt; 1;
+      if (this.cmp(this.a[i], this.a[p]) &gt;= 0) break;
+      [this.a[i], this.a[p]] = [this.a[p], this.a[i]]; i = p;
+    }
+  }
+  pop() {
+    const top = this.a[0], last = this.a.pop();
+    if (this.size) {
+      this.a[0] = last;
+      for (let i = 0;;) {
+        let best = i;
+        for (const c of [2*i+1, 2*i+2])
+          if (c &lt; this.size &amp;&amp; this.cmp(this.a[c], this.a[best]) &lt; 0) best = c;
+        if (best === i) break;
+        [this.a[i], this.a[best]] = [this.a[best], this.a[i]]; i = best;
+      }
+    }
+    return top;
+  }
+}
+
+const light = new Heap((x, y) =&gt; y - x);   // max-heap: smaller half
+const heavy = new Heap((x, y) =&gt; x - y);   // min-heap: larger half
+function addWeight(kg) {
+  (light.size === 0 || kg &lt;= light.peek()) ? light.push(kg) : heavy.push(kg);
+  if (light.size &gt; heavy.size + 1) heavy.push(light.pop());   // rebalance
+  if (heavy.size &gt; light.size) light.push(heavy.pop());
+  const median = light.size === heavy.size
+    ? (light.peek() + heavy.peek()) / 2 : light.peek();
+  console.log(`+${kg}kg → median ${median}  (light:${light.size} heavy:${heavy.size})`);
+}
+[4.2, 6.1, 3.0, 5.5, 4.8, 7.2, 2.9].forEach(addWeight);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">watch the rooms stay within one cat of each other — that invariant IS the median</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-twoh-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why a MAX-heap for the smaller half and a MIN-heap for the larger half — not the other way around?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Convention — either orientation works</button>
+        <button class="mcq-opt" type="button" data-ok>The median is the LARGEST of the small half and the SMALLEST of the large half — each heap must expose its side's doorway element at the top</button>
+        <button class="mcq-opt" type="button">Max-heaps are faster for small numbers</button>
+        <button class="mcq-opt" type="button">It minimizes rebalancing frequency</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> heaps only give O(1) access to their <i>top</i> — so each half's top must be the element facing the boundary. Flip the orientations and the medians are buried at the bottoms, unreachable. "Point the heaps at the cut" is the design sentence; it also answers the follow-ups (k-th largest: one min-heap of size k, pointing its smallest — the threshold — at you).</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Sliding Window Median (hard) = two heaps + <b>lazy deletion</b> (tombstone a departed element, purge when it surfaces) — name the technique; implementing it live is rarely expected.</li>
+        <li>IPO (502): two heaps in <i>series</i> — a min-heap of projects by cost feeding a max-heap by profit as capital grows. Heaps as a pipeline, not a pair.</li>
+        <li>The rebalance invariant ("sizes differ ≤ 1, every light ≤ every heavy") is what you state FIRST in the interview — the code is just its enforcement.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/find-median-from-data-stream/" target="_blank" rel="noopener noreferrer">295 · Median from Data Stream (hard)</a> · <a href="https://leetcode.com/problems/sliding-window-median/" target="_blank" rel="noopener noreferrer">480 · Sliding Window Median (hard)</a> · <a href="https://leetcode.com/problems/ipo/" target="_blank" rel="noopener noreferrer">502 · IPO (hard)</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 11 · ROLLING HASH -->
+<section class="lesson" id="rollinghash">
+  <div class="lesson-head">
+    <span class="lesson-num">11</span>
+    <div>
+      <h3>Rolling hashes — string search without re-reading</h3>
+      <p class="lvl">advanced → Rabin-Karp, and hashing windows in O(1)</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Searching a length-m pattern in a length-n text naively compares up to m characters at each of n positions — O(n·m). <b>Rabin-Karp's</b> move: treat each m-wide window as a <b>number in base B</b> (each char a digit), and <i>roll</i> it — slide one position by subtracting the departing char's contribution, multiplying by B, adding the newcomer. One O(1) update per slide, like the sliding-window sum from dsa-foundations, but encoding <i>order</i>, not just contents.</p>
+    <p>Hashes collide, so a hash match is a <b>candidate, not a verdict</b> — verify with a real comparison. Expected cost stays O(n + m) because verifications are rare with a decent base and modulus; the honest sentence is "O(n+m) expected, O(n·m) adversarial worst case".</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">rolling-window.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// Rabin-Karp with comparison counting — vs naive
+const B = 31n, M = 1_000_000_007n;
+const code = (ch) =&gt; BigInt(ch.charCodeAt(0));
+
+function rabinKarp(text, pat) {
+  const n = text.length, m = pat.length;
+  let compares = 0, hits = [];
+  let hp = 0n, hw = 0n, pow = 1n;
+  for (let i = 0; i &lt; m; i++) {
+    hp = (hp * B + code(pat[i])) % M;
+    hw = (hw * B + code(text[i])) % M;
+    if (i &lt; m - 1) pow = (pow * B) % M;
+  }
+  for (let i = 0; ; i++) {
+    if (hp === hw) {                          // candidate — VERIFY
+      compares += m;
+      if (text.slice(i, i + m) === pat) hits.push(i);
+    }
+    if (i + m &gt;= n) break;
+    hw = ((hw - code(text[i]) * pow % M + M * B) % M * B + code(text[i + m])) % M;
+  }
+  return { hits, compares };
+}
+
+function naive(text, pat) {
+  let compares = 0, hits = [];
+  for (let i = 0; i + pat.length &lt;= text.length; i++) {
+    let j = 0;
+    while (j &lt; pat.length) { compares++; if (text[i + j] !== pat[j]) break; j++; }
+    if (j === pat.length) hits.push(i);
+  }
+  return { hits, compares };
+}
+
+const text = 'mochi naps, biscuit naps, everyone naps in the nap room'.repeat(4);
+const pat = 'naps';
+const rk = rabinKarp(text, pat), nv = naive(text, pat);
+console.log(`text length ${text.length}, pattern "${pat}"`);
+console.log('rabin-karp: found', rk.hits.length, 'matches —', rk.compares, 'char compares');
+console.log('naive:      found', nv.hits.length, 'matches —', nv.compares, 'char compares');
+console.log('same answers, fraction of the reads — the hash pre-screens candidates');</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">compare the compare-counts — hashing turns most positions into O(1) skips</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-roll-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Why must Rabin-Karp verify with a real character comparison when hashes match?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">BigInt arithmetic can round incorrectly</button>
+        <button class="mcq-opt" type="button" data-ok>Different strings can share a hash (pigeonhole: infinitely many strings, finitely many hash values) — a match proves "maybe", a mismatch proves "no"</button>
+        <button class="mcq-opt" type="button">The rolling update accumulates floating-point drift</button>
+        <button class="mcq-opt" type="button">It doesn't need to — the modulus makes collisions impossible</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the hash is a many-to-one compression — equality of hashes is necessary, never sufficient. The asymmetry is the useful part: unequal hashes REJECT with certainty, so the expensive verify runs only on the rare candidates. That "cheap filter + exact confirm" shape is everywhere in systems too (Bloom filters in front of databases) — connecting the two is a senior-sounding sentence you should absolutely say.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>Repeated DNA Sequences (187): all 10-char windows, hash each, report repeats — Rabin-Karp's sliding hash with a Set instead of a pattern.</li>
+        <li>Name KMP as the guaranteed-O(n+m) alternative (dsa-algorithms builds its intuition) — "Rabin-Karp when I want simple + multi-pattern, KMP when I need worst-case bounds".</li>
+        <li>The <code>+ M * B</code> in the roll keeps the modular subtraction non-negative — the off-by-one-mod bug everyone writes once; mentioning it means you've actually implemented this.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/" target="_blank" rel="noopener noreferrer">28 · First Occurrence (strStr)</a> · <a href="https://leetcode.com/problems/repeated-dna-sequences/" target="_blank" rel="noopener noreferrer">187 · Repeated DNA Sequences</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 12 · BALANCE -->
+<section class="lesson" id="balance">
+  <div class="lesson-head">
+    <span class="lesson-num">12</span>
+    <div>
+      <h3>Balanced trees — why they exist, when to name them</h3>
+      <p class="lvl">advanced → the O(log n) promise, and the honest interview scope</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>A binary search tree promises O(log n) lookups — <i>if</i> it stays bushy. Feed one sorted input and it degenerates into a linked list: every "left or right?" answer is "right", depth n, promise void. <b>Self-balancing trees</b> (AVL, red-black) defend the promise with <b>rotations</b> — local pointer surgeries that lift a heavy subtree's middle node up one level, shortening the tall side without breaking the sort order. Each insert does O(1) rotations after the normal walk; depth stays O(log n) forever.</p>
+    <p>The honest interview scope, stated plainly: <b>nobody expects you to implement AVL or red-black live.</b> You're expected to (1) explain <i>why</i> balance matters (the degeneration story), (2) know a rotation preserves in-order order, and (3) name who uses what: red-black inside most standard-library ordered maps (C++ <code>std::map</code>, Java <code>TreeMap</code>), B-trees in databases (dsa-trees-graphs and postgres-databases both pick that up), and <b>skip lists</b> — the probabilistic cousin — inside Redis sorted sets.</p>
+    <div class="runner">
+      <div class="code">
+        <div class="code-head"><span class="fname">degeneration.js — run it</span><button class="copy" type="button">copy</button></div>
+        <pre><code class="language-javascript">// build a plain BST and MEASURE the depth under two insert orders
+const insert = (root, v) =&gt; {
+  if (!root) return { v, l: null, r: null };
+  v &lt; root.v ? root.l = insert(root.l, v) : root.r = insert(root.r, v);
+  return root;
+};
+const depth = (n) =&gt; n ? 1 + Math.max(depth(n.l), depth(n.r)) : 0;
+
+const N = 1023;                          // perfect tree would be depth 10
+const sorted = Array.from({ length: N }, (_, i) =&gt; i);
+
+// 1 · sorted input → the "tree" is a conga line
+let degenerate = null;
+for (const v of sorted) degenerate = insert(degenerate, v);
+console.log(`sorted inserts:   depth ${depth(degenerate)}  (n = ${N} — it's a list)`);
+
+// 2 · random-ish order → naturally bushy (what balancing guarantees ALWAYS)
+const shuffled = [...sorted];
+let seed = 42;                            // deterministic shuffle, no Math.random
+for (let i = shuffled.length - 1; i &gt; 0; i--) {
+  seed = (seed * 1103515245 + 12345) % 2147483648;
+  const j = seed % (i + 1);
+  [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+}
+let bushy = null;
+for (const v of shuffled) bushy = insert(bushy, v);
+console.log(`shuffled inserts: depth ${depth(bushy)}  (log2(${N}) ≈ 10 — close!)`);
+
+// 3 · median-first insertion = what "balanced" looks like structurally
+function balancedFrom(arr, lo = 0, hi = arr.length - 1) {
+  if (lo &gt; hi) return null;
+  const mid = (lo + hi) &gt;&gt; 1;
+  return { v: arr[mid], l: balancedFrom(arr, lo, mid - 1), r: balancedFrom(arr, mid + 1, hi) };
+}
+console.log(`median-first:     depth ${depth(balancedFrom(sorted))}  (the LC 108 trick)`);</code></pre>
+      </div>
+      <div class="run-bar"><button class="run-btn" type="button">▶ run it</button><span class="run-hint">1023 nodes: depth 1023 vs ~20 vs 10 — the whole argument in three numbers</span></div>
+      <pre class="run-out" aria-live="polite"></pre>
+    </div>
+    <div class="mcq" data-qid="dss-bal-1">
+      <p class="mcq-tag">// quiz — first pick is the one that counts</p>
+      <p class="mcq-q">Your service keeps a sorted structure with heavy concurrent reads and writes; a teammate proposes a plain BST fed by (mostly increasing) timestamp keys. The core objection?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">BSTs can't store duplicate keys</button>
+        <button class="mcq-opt" type="button" data-ok>Mostly-increasing keys are the degenerate case — the tree collapses toward a list and every operation trends to O(n); you need self-balancing (or a skip list / B-tree)</button>
+        <button class="mcq-opt" type="button">Timestamps are too large for tree nodes</button>
+        <button class="mcq-opt" type="button">Trees can't be made thread-safe</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> sequential keys are exactly the sorted-insert catastrophe from the runner — and timestamp keys are the most common real-world way to trip it. Production answers: a red-black/AVL map, a B-tree (what your database index already is — every Postgres index on <code>created_at</code> is this problem solved), or Redis's skip list. Recognizing <i>your data's insert order</i> as an adversary is the systems-flavored insight.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — what interviewers listen for</h6>
+      <ul>
+        <li>The rotation one-liner: "lift the middle of the heavy path; in-order order is preserved, height drops by one" — draw three nodes, rotate once, done.</li>
+        <li>AVL vs red-black in a sentence: AVL balances harder (faster reads, more rotation on write); red-black tolerates more slack (fewer fix-ups, the library default). Choosing = read/write ratio.</li>
+        <li>Balance a BST (1382): in-order walk to a sorted array, rebuild median-first — the runner's part 3, and the standard "fix a broken tree" answer.</li>
+        <li>practice (verified): <a href="https://leetcode.com/problems/balanced-binary-tree/" target="_blank" rel="noopener noreferrer">110 · Balanced Binary Tree</a> · <a href="https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/" target="_blank" rel="noopener noreferrer">108 · Sorted Array → BST</a> · <a href="https://leetcode.com/problems/balance-a-binary-search-tree/" target="_blank" rel="noopener noreferrer">1382 · Balance a BST</a></li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
+<!-- 13 · PRACTICE -->
+<section class="lesson" id="practice">
+  <div class="lesson-head">
+    <span class="lesson-num">13</span>
     <div>
       <h3>The practice ladder — structures edition</h3>
       <p class="lvl">method → build each one once, then drill its problems</p>
@@ -1175,7 +1751,14 @@ console.log('remove', minRemovals([[1,2],[2,3],[3,4],[1,3]]), 'booking(s)');
       <tr><td class="mono">03</td><td>queues</td><td>Fair lines power BFS; shift() is O(n) so use an index pointer; the deque keeps window champions.</td></tr>
       <tr><td class="mono">04</td><td>heaps</td><td>Weak promise ("parent beats children") in an array → O(1) peek, O(log n) fix-ups; top-k = min-heap of size k.</td></tr>
       <tr><td class="mono">05</td><td>intervals</td><td>Overlap iff neither starts after the other ends; sort by start to merge, by end to schedule greedily.</td></tr>
-      <tr><td class="mono">06</td><td>practice</td><td>Build each once from memory, drill its problems interleaved, keep the re-solve ritual.</td></tr>
+      <tr><td class="mono">06</td><td>monotonic</td><td>Pop everything the newcomer beats — each pop IS an answer; push once, pop once → O(n).</td></tr>
+      <tr><td class="mono">07</td><td>deques</td><td>Champions decreasing, front = max; dominated (smaller AND older) means gone forever.</td></tr>
+      <tr><td class="mono">08</td><td>lists, adv.</td><td>Fast/slow closes the gap by 1 per step; reset-to-head finds the entrance; weave clones between originals.</td></tr>
+      <tr><td class="mono">09</td><td>LRU</td><td>Map teleports to the node, DLL reorders in O(1) — prev pointers are why "doubly".</td></tr>
+      <tr><td class="mono">10</td><td>two heaps</td><td>Max-heap of the small half, min-heap of the large — the median stands in the doorway.</td></tr>
+      <tr><td class="mono">11</td><td>rolling hash</td><td>Windows as base-B numbers, slid in O(1); hash match = candidate, mismatch = certain no.</td></tr>
+      <tr><td class="mono">12</td><td>balance</td><td>Sorted input degenerates a BST to a list; rotations lift the middle; name AVL/RB/B-tree, don't implement.</td></tr>
+      <tr><td class="mono">13</td><td>practice</td><td>Build each once from memory, drill its problems interleaved, keep the re-solve ritual.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1191,6 +1774,7 @@ console.log('remove', minRemovals([[1,2],[2,3],[3,4],[1,3]]), 'booking(s)');
       <li><b>Hear "next greater / until warmer / visible from…"</b> → monotonic stack. <b>"Top k / k-th / merge k"</b> → heap, with the sort-vs-heap-vs-quickselect calibration. <b>"Meetings/bookings"</b> → sort-then-sweep, and know WHICH sort key.</li>
       <li><b>LRU Cache</b> is the structures capstone — map + doubly-linked list, and it doubles as a systems talking point (it IS Redis's eviction story).</li>
       <li>The timed drill versions of all of this: <a href="../dsa.html#stacks">DSA in 48 · stacks &amp; queues</a>, <a href="../dsa.html#lists">· linked lists</a>, <a href="../dsa.html#heaps">· heaps</a>.</li>
+      <li><b>The advanced band is the design-round bridge:</b> LRU (09) and streaming median (10) are coding questions that grade like systems questions — state the invariant first, then code its enforcement.</li>
       <li>Next module: <b>dsa-trees-graphs</b> — where the queue becomes BFS, the stack becomes DFS, and the conga line grows branches.</li>
     </ul>
   </div>

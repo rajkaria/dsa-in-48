@@ -6,3 +6,4 @@
 - 2026-08-07 (planning): Duration labels = sections × ~40min rounded to 0.5h; honesty rule per CLAUDE.md. Two-way door.
 - 2026-08-07 (planning): Prod deploy in sprint 10 is pre-authorized — Raj explicitly chose "Approve — run it" over "Approve, but deploy manually" in-session.
 - 2026-08-07 (sp1): js-async — spec's planned `combinators` section already exists as `parallel` (combinators+loop trap), and debounce/throttle live in `cancel`. Swapped new sections to: rejections, building (promisify/deferred/event-interop), scheduling, iterasync, streams, workers, patterns (pool/dedupe/polling implementations). Still +7 → 14 sections. Two-way door.
+- 2026-08-07 (sp2): added data-qid uniqueness to check_pages.py after catching a real duplicate (dsf-hash-1 reused by the new hashing section — renamed dsf-hashing-1). Harness now guards all remaining quiz-heavy sprints.
