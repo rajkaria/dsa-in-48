@@ -1,71 +1,77 @@
 {
-  "run_id": "ocean-20260806-150637",
-  "created_at": 1786008997,
+  "run_id": "ocean-20260807-130307",
+  "created_at": 1786087987,
   "spec_path": ".ocean/SPEC.md",
-  "goal": "Ship Frontend System Design in 48 + the full cat-themed Learn track (13 deep-dive modules) live on the site",
-  "status": "complete",
-  "current_sprint": 9,
+  "goal": "Expand all 13 Learn modules to 12-15 sections (beginner→advanced) + 3 new modules (typescript, testing, web-platform), rewire counts, verify, deploy",
+  "status": "running",
+  "current_sprint": 0,
   "sprints": [
     {
       "id": 1,
-      "title": "Verify harness + Frontend System Design in 48 + wiring",
-      "status": "done",
-      "commit": "9eabab8"
+      "title": "js-fundamentals + js-async expansions",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 2,
-      "title": "Learn hub + module template + js-fundamentals",
-      "status": "done",
-      "commit": "5957d52"
+      "title": "dsa-foundations + dsa-structures expansions",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 3,
-      "title": "js-async + react-deep-dive",
-      "status": "done",
-      "commit": "16dde94"
+      "title": "dsa-trees-graphs + dsa-algorithms expansions",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 4,
-      "title": "dsa-foundations + dsa-structures",
-      "status": "done",
-      "commit": "0c82e7f"
+      "title": "react-deep-dive + node-backend expansions",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 5,
-      "title": "dsa-trees-graphs + dsa-algorithms",
-      "status": "done",
-      "commit": "2c0fd1e"
+      "title": "postgres-databases + aws-cloud expansions",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 6,
-      "title": "node-backend + postgres-databases",
-      "status": "done",
-      "commit": "0e5cacd"
+      "title": "system-design-backend + frontend-system-design expansions",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 7,
-      "title": "aws-cloud + system-design-backend",
-      "status": "done",
-      "commit": "c1f72eb"
+      "title": "interview-kit expansion + new typescript module",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 8,
-      "title": "frontend-system-design deep dive + interview-kit",
-      "status": "done",
-      "commit": "889844c"
+      "title": "new testing + web-platform modules",
+      "status": "todo",
+      "commit": ""
     },
     {
       "id": 9,
-      "title": "Sweep + landing integration + deploy + REPORT",
-      "status": "done",
-      "commit": "189121f"
+      "title": "hub + landing + docs wiring, full recount",
+      "status": "todo",
+      "commit": ""
+    },
+    {
+      "id": 10,
+      "title": "full sweep, browser pass, REPORT, deploy",
+      "status": "todo",
+      "commit": ""
     }
   ],
   "verify_cmd": "bash scripts/verify.sh",
   "iteration": 0,
   "reopen_count": 0,
-  "last_checkpoint": 1786019992,
-  "heartbeat": 1786019992,
+  "last_checkpoint": 1786088026,
+  "heartbeat": 1786088026,
   "blockers": [],
-  "notes": "SP8 done — all 13 modules live. Next: sprint-start 9 (the sweep): (1) landing page index.html gets a Learn track section (teaser + link to learn/, mention in hero/footer); (2) course pages get 'go deeper' cross-links to matching learn modules (light touch: one line in footers or howto); (3) README + CLAUDE.md + docs/context updated (learn track table, conventions, verify script); (4) full fresh-pane browser pass: preview_stop + preview_start, both themes on hub+2 modules+landing, 375px, console; (5) re-read .ocean/SPEC.md checking every deliverable; (6) merge branch to main, push origin main (GitHub Pages), vercel deploy --prod, verify live URLs; (7) write .ocean/REPORT.md + set-status complete. Deploy pre-authorized by Raj (D9)."
+  "notes": ""
 }
