@@ -688,6 +688,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#mst"><span><i class="dot" data-for="mst"></i> Spanning Trees</span></a>
     <a class="side-link" href="#lca"><span><i class="dot" data-for="lca"></i> Lowest Common Ancestor</span></a>
     <a class="side-link" href="#rangetrees"><span><i class="dot" data-for="rangetrees"></i> Fenwick &amp; Segment</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -705,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/22</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -732,11 +733,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: topo sort &amp; union-find fluency</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
-    <span><b>13</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>22</b> quiz questions</span>
     <span><b>1</b> BFS flood animation</span>
     <span><b>29</b> verified LeetCode problems</span>
-    <span><b>~8.5h</b> self-paced</span>
+    <span><b>~9h</b> self-paced</span>
   </div>
   <a class="btn" href="#trees">Start climbing <span class="arrow">↓</span></a>
 </header>
@@ -1762,6 +1763,129 @@ console.log('prefix(6) reads only:', trace.join(' + '));</code></pre>
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Thirteen sections taught you the walks; the gym checks whether you can reason with them cold. Warm-ups isolate one idea against its favorite misconceptions, applies make you trace real state — a boss array, an in-degree counter, a traversal's output — and stretches chain two sections under constraints, which is exactly what interviews do. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right.</p>
+    <div class="mcq" data-qid="dtg-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — reading a traversal's timing</p>
+      <p class="mcq-q">A binary tree: root <code>5</code>, whose left child <code>3</code> has children <code>1</code> and <code>4</code>, and whose right child is <code>8</code> (a leaf). What does a post-order walk print?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">1 3 4 5 8</button>
+        <button class="mcq-opt" type="button">5 3 1 4 8</button>
+        <button class="mcq-opt" type="button" data-ok>1 4 3 8 5</button>
+        <button class="mcq-opt" type="button">4 1 8 3 5</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> post-order = children first, node last, applied recursively: the left subtree bottoms out (1 and 4 report before 3), then the right (8), then the root speaks last — 1 4 3 8 5. "1 3 4 5 8" is the <i>in-order</i> walk, and it tempts because it's sorted — this tree happens to be a BST, so §02's free superpower fires in your head at the wrong timing. "5 3 1 4 8" is pre-order (node acts first), and "4 1 8 3 5" is reverse level-order — "bottom-up by floors" is a queue idea, not a recursion order. §01's rule settles all of it: the three DFS orders differ only in WHEN the node acts.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — what DFS actually proves</p>
+      <p class="mcq-q">In an unweighted maze graph, your DFS reaches the target at depth 7 on its very first dive. What do you now know about the shortest path?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Only that it's ≤ 7 — DFS proves A path exists; the shortest could be shorter, and only BFS's ring order proves minimality</button>
+        <button class="mcq-opt" type="button">It's exactly 7 — the first path any search finds is the shortest</button>
+        <button class="mcq-opt" type="button">It's exactly 7, provided the DFS used a visited set</button>
+        <button class="mcq-opt" type="button">Nothing at all — DFS results carry no distance information</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> DFS commits to a direction and dives past whole rings, so its first find can be arbitrarily longer than optimal — "first found = shortest" is a <i>BFS</i> guarantee, earned by visiting everything at distance d before anything at d+1 (§04). The visited set changes what gets re-explored, never which path is found first, so it confers no optimality. And the overcorrection — "nothing at all" — throws away a real bound: a concrete 7-edge path always caps the minimum at 7.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — what in-order actually promises</p>
+      <p class="mcq-q">Your tree's in-order walk prints <code>1 2 3 4 5</code>. A colleague concludes it's a valid BST <i>and</i> that it must be balanced. What do you actually know?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Both — only a bushy tree can emit sorted output</button>
+        <button class="mcq-opt" type="button">It's a stick — sorted output means the values arrived in sorted order</button>
+        <button class="mcq-opt" type="button">Neither — an in-order walk can't validate the BST invariant</button>
+        <button class="mcq-opt" type="button" data-ok>Valid BST, shape unknown — a strictly increasing in-order walk IS the invariant, but every shape from bushy to stick prints the same sequence</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> strictly-increasing in-order is exactly equivalent to the BST invariant — it's the second fix in §02's validation question — so validity is settled. But the traversal reads the <i>ordering</i>, not the geometry: a height-3 bushy tree and a height-5 stick over the same five values print identical walks, so balance stays unknown. "Sorted output means sorted inserts" runs §02's betrayal backwards — sorted inserts do make sticks, but sticks aren't the only trees that print sorted; every valid BST does. Shape questions need a height check, not a traversal.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — tracing the boss array</p>
+      <p class="mcq-q">Using §08's <code>UnionFind</code> (path compression, no union-by-size) on six cats <code>0..5</code>: <code>uf.union(0,1); uf.union(2,3); uf.union(1,3);</code> — then you call <code>uf.find(3)</code>. What does it return, and what is <code>boss[3]</code> after the call?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Returns 2, and <code>boss[3]</code> stays 2 — the two cliques never merged from 3's point of view</button>
+        <button class="mcq-opt" type="button" data-ok>Returns 0, and the call itself rewrites <code>boss[3]</code> to 0 — path compression does its work during reads</button>
+        <button class="mcq-opt" type="button">Returns 0, but <code>boss[3]</code> stays 2 — compression only happens during union</button>
+        <button class="mcq-opt" type="button">Returns 1 — <code>union(1,3)</code> made 3 report to 1 directly</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> union merges ROOTS: <code>union(1,3)</code> computes <code>find(1) = 0</code> and <code>find(3) = 2</code>, then writes <code>boss[2] = 0</code> — index 3 is untouched, which is why "returns 1" tempts anyone expecting the <i>arguments</i> to be rewired, and "returns 2" tempts anyone who missed that 2's boss changed above 3's head. <code>find(3)</code> then walks 3 → 2 → 0 and path compression repoints <code>boss[3] = 0</code> on the way back — reads mutate this structure, which is the whole reason it gets faster the more you ask (§08). "Compression only during union" has it backwards: compression lives inside <code>find</code>, and union merely calls it.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — predicting Kahn's under a cycle</p>
+      <p class="mcq-q">Four jobs: <b>B needs A and D · C needs B · D needs C</b>. You run §07's Kahn's algorithm. What happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A B C D completes — once A finishes, B's other prerequisite resolves on its own</button>
+        <button class="mcq-opt" type="button">Nothing runs — a cycle anywhere poisons the whole graph</button>
+        <button class="mcq-opt" type="button">It loops forever, re-checking B's counter</button>
+        <button class="mcq-opt" type="button" data-ok>Only A completes; B, C, D are left with in-degree &gt; 0 — and those survivors are the cycle report: B→C→D→B</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace the counters: A starts at zero and runs, dropping B to one — not zero, because B also waits on D, which waits on C, which waits on B. The queue dries up with three counters still positive, and the survivors ARE the diagnosis (§07's CI-pipeline move, now on concrete data). "Nothing runs" overshoots — a cycle only starves its descendants, and A owed nobody anything. "Loops forever" is exactly backwards: terminating early WITH leftovers is how Kahn's detects the deadlock instead of hanging like the pipeline it debugs.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — picking the walk under constraints</p>
+      <p class="mcq-q">A robot vacuum must find the FEWEST moves to its dock in a 1000×1000 grid with walls. Your JS engine overflows around 10k stack frames. Which approach?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>BFS with an explicit queue — "fewest moves" demands ring order, and the queue sidesteps the stack limit for free</button>
+        <button class="mcq-opt" type="button">Recursive DFS — simplest code, and the grid is only two-dimensional</button>
+        <button class="mcq-opt" type="button">Iterative DFS with an explicit stack — fixes the overflow, so it's equivalent</button>
+        <button class="mcq-opt" type="button">Dijkstra with a min-heap — a grid this big needs the heavier tool</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two constraints, one answer each way: "fewest" forces BFS — only ring order proves minimality (§04), while any DFS, recursive or iterative, merely proves a path <i>exists</i> (see warm-up 2). And a million cells can reach paths ~10⁶ deep, blowing the stack — but BFS never recurses, so the queue satisfies both constraints at once. Iterative DFS is the seductive near-miss: it cures the crash and still returns a wrong-length path. Dijkstra (§10) is for priced edges; every move here costs 1, and reaching for it unprompted is §13's lesson again — tools by requirement, not impressiveness.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">Three of these claims are true. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">With all edge weights equal, Dijkstra's cost contours collapse into BFS rings — the priority queue degenerates into a plain queue</button>
+        <button class="mcq-opt" type="button">During Kruskal's, <code>union(a, b)</code> returning false is precisely the signal that edge a–b would close a cycle</button>
+        <button class="mcq-opt" type="button" data-ok>Adding +10 to every edge weight changes neither the MST nor any shortest path — relative costs are preserved</button>
+        <button class="mcq-opt" type="button">Longest Increasing Path needs no visited set because increase-only edges cannot form a cycle</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the shift keeps the edge ORDER identical, and Kruskal only ever compares edges — same sort, same vetoes, same MST (§11). But a shortest path pays the shift once per EDGE: a cheap three-hop route absorbs +30 while a pricey direct edge absorbs +10, so the winner can flip (§10) — this is also why you can't "fix" negative edges by adding a big constant. The half-true claim is the classic trap: "relative costs preserved" holds per-edge, not per-path. The other three are this module verbatim: BFS as degenerate Dijkstra (§04×§10), the union veto (§08×§11), and increase-only acyclicity (§09).</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — back-of-envelope route planning</p>
+      <p class="mcq-q">A delivery app: ~100k intersections, ~400k road segments with travel times, one A→B request at a time. Pick the tool and estimate the work per request.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">BFS: O(V+E) ≈ 500k ops — the cheapest correct option</button>
+        <button class="mcq-opt" type="button" data-ok>Dijkstra with a heap: (V+E) log V ≈ 500k × 17 ≈ 10M cheap ops — milliseconds, fine to run per request</button>
+        <button class="mcq-opt" type="button">Dijkstra is O(V²) = 10¹⁰ ops — you must precompute all pairs offline</button>
+        <button class="mcq-opt" type="button">Shortest path over 100k nodes is NP-hard — you can only approximate</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> roads have prices, so BFS's rings lie — fewest hops ≠ fewest minutes; that's the §04→§10 boundary, and option one fails it while being beautifully cheap. Heap Dijkstra is O((V+E) log V): log₂(100k) ≈ 17, so ~10M simple ops — comfortably milliseconds in JS, no precomputation needed. O(V²) describes the heap-less teaching version, not a law of nature. And NP-hard is <i>longest</i> path (§09's flex, run in reverse) — shortest is thoroughly polynomial. Estimate first: the arithmetic alone eliminates three options before any theory does.</p>
+    </div>
+    <div class="mcq" data-qid="dtg-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — ordering meets ancestry</p>
+      <p class="mcq-q">Insert <code>8, 3, 10, 1, 6, 14, 4, 7</code> into an empty BST, in that order. What is LCA(4, 7)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">8 — without parent pointers you need the one-pass recursion, and it returns the root</button>
+        <button class="mcq-opt" type="button">3 — both 4 and 7 entered the tree through 3's subtree, so their paths diverge there</button>
+        <button class="mcq-opt" type="button" data-ok>6 — rebuild from the insertion order, then walk from the root: at 8 both are smaller (left), at 3 both bigger (right), and 6 is the first node BETWEEN 4 and 7 — the split point is the LCA</button>
+        <button class="mcq-opt" type="button">Can't be answered — insertion order alone doesn't determine a BST's shape</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two chained steps. First, §02: insertion order fully determines an unbalanced BST's shape — that kills option four — giving 8 at the root, 3 holding 6, and 6 holding 4 and 7. Second, §12's BST shortcut: the ordering IS the ancestry information, so walk from the root and the first node between the targets is the LCA — no recursion needed, which is why "8" (running the general one-pass and misreading its return) overpays. "3" is the subtle one: its subtree does contain both, but so does 6's, deeper — stopping at the first shared container instead of the LOWEST one forgets the L in the job title.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread the timing rule in §01 (WHEN the node acts), what each walk proves in §04 (rings prove minimality; dives prove existence), and what the invariant does and doesn't promise in §02 — every wrong option up there is one of those misconceptions wearing a costume.</li>
+        <li>Apply misses → adopt the tracing ritual: pencil a state table and update it one operation per line — the boss array after each union, the in-degree map after each Kahn's step, the output list at each recursive return. The wrong prediction always lives in the line you skipped.</li>
+        <li>Stretch misses → name the pairs and reread BOTH halves: §04×§10 (when rings stop being enough), §08×§11 (union-find inside Kruskal), §02×§12 (ordering makes LCA a walk), §09×§10 (longest vs shortest). Combining sections is the skill being tested — it never lives in either section alone.</li>
+        <li>One transferable habit: argue against your first answer before committing — the distractors were built from first instincts, so if you can't say why the second-best option fails, you haven't finished reasoning. Professor Whiskers wiggles before every pounce; so should you.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review + ladder</p>
@@ -1783,6 +1907,7 @@ console.log('prefix(6) reads only:', trace.join(' + '));</code></pre>
       <tr><td class="mono">11</td><td>MST</td><td>Cheapest edges first, union-find vetoes cycles; Prim ranks by edge, Dijkstra by path.</td></tr>
       <tr><td class="mono">12</td><td>LCA</td><td>One recursion, three meanings — both sides report a find, and the parent crowns itself.</td></tr>
       <tr><td class="mono">13</td><td>range trees</td><td>Interleaved updates + range reads → Fenwick lowbit hops; non-invertible aggregates → segment tree.</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>Trace the state, argue against your first instinct, chain two sections — the distractors eat first instincts for breakfast.</td></tr>
     </tbody>
   </table></div>
   <div class="idea" style="margin-top:24px">

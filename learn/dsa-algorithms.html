@@ -688,6 +688,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#quickselect"><span><i class="dot" data-for="quickselect"></i> Quickselect</span></a>
     <a class="side-link" href="#strings"><span><i class="dot" data-for="strings"></i> String Algorithms</span></a>
     <a class="side-link" href="#choosing"><span><i class="dot" data-for="choosing"></i> Choosing the Weapon</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -705,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/22</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -732,11 +733,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: DP + greedy judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
-    <span><b>13</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>22</b> quiz questions</span>
     <span><b>1</b> sorting race</span>
     <span><b>37</b> verified LeetCode problems</span>
-    <span><b>~8.5h</b> self-paced</span>
+    <span><b>~9h</b> self-paced</span>
   </div>
   <a class="btn" href="#sorting">Start the race <span class="arrow">↓</span></a>
 </header>
@@ -1705,6 +1706,129 @@ for (const s of ['meowmeowmeow', 'meowmeom'])
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Thirteen sections of strategies; now the gym checks whether they transfer. <b>Warm-up</b> isolates one idea against its favorite misconceptions — every wrong option here is a belief someone actually holds. <b>Apply</b> hands you small snippets and makes you trace them to their (sometimes infinite) conclusion. <b>Stretch</b> chains two or more sections under real constraints, the way hards do. First pick is the recorded one — and the "why" under each answer is the actual lesson, so read it even when you're right. Attack your own first instinct before committing; that's what the distractors were built from. 🐾</p>
+    <div class="mcq" data-qid="dal-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — what stability actually buys you</p>
+      <p class="mcq-q">You sort the shelter's cats alphabetically by name, then run a STABLE sort by weight. Mochi and Biscuit weigh exactly the same. What order are they in now?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Whatever order the engine's internal partitioning happens to leave them in</button>
+        <button class="mcq-opt" type="button" data-ok>Biscuit before Mochi — a stable sort keeps equal-key items in their INCOMING order, so the earlier alphabetical pass survives as the tiebreaker</button>
+        <button class="mcq-opt" type="button">Their order in the original unsorted array, before any sorting happened</button>
+        <button class="mcq-opt" type="button">Undefined — stability only guarantees the sort terminates deterministically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> stability means equal keys preserve the order they <i>arrived in</i> — and they arrived alphabetized, so sort-by-secondary-then-stable-sort-by-primary builds multi-key sorting for free. Option 1 is the pre-ES2019 instinct (JS <code>.sort()</code> is spec-stable now — §01 said so); option 3 confuses "incoming order" with "original order" — the alphabetical pass already rewrote that; option 4 mistakes stability for determinism, a different property entirely. This chaining trick is why stability is a feature and not trivia.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — when the notepad does nothing</p>
+      <p class="mcq-q">You bolt a memo Map onto a recursive function and the call count doesn't drop at all. Which property was the recursion missing?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Overlapping subproblems — every call had DISTINCT arguments (like merge sort's disjoint halves), so the cache was written constantly and read never</button>
+        <button class="mcq-opt" type="button">A base case — without one, memoization can't terminate the recursion</button>
+        <button class="mcq-opt" type="button">Tail recursion — JS engines only optimize memoized calls in tail position</button>
+        <button class="mcq-opt" type="button">An array-based memo — Map lookups are too slow to register as a speedup</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §05's notepad only pays when the same sub-question gets asked twice — <code>ways(3)</code> a million times. Memoize merge sort's <code>(lo, hi)</code> ranges and every key is unique: all writes, zero hits. Option 2 confuses non-termination with slowness (a missing base case hangs either way); option 3 imports a real term into a place it doesn't apply — memoization and tail calls are unrelated; option 4 is a constant-factor story, and a cache that never hits is slow at ANY lookup speed. "Does the recursion revisit states?" is the first question to ask before reaching for DP.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — the asymmetry of proof</p>
+      <p class="mcq-q">Your greedy passes 10,000 random tests, then fails one tiny handcrafted case. Which claim is now actually settled?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The random tests were too few — a million passes would establish correctness</button>
+        <button class="mcq-opt" type="button">Nothing is settled — one failure against 10,000 passes is statistically an outlier</button>
+        <button class="mcq-opt" type="button" data-ok>The greedy is wrong for the general problem, permanently — one counterexample outweighs any number of passes, which is exactly why §06's sixty-second attack hunts for one</button>
+        <button class="mcq-opt" type="button">The handcrafted case must violate the problem's constraints, or greedy would handle it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> correctness is a universal claim ("for ALL inputs"), so a single valid counterexample kills it forever, while passing tests only ever fails to kill it — the asymmetry §06 and §07 are built on. Options 1 and 2 both treat correctness as statistical, the exact instinct that ships plausible-but-wrong greedies ([1,3,4]/6 hides from random tests easily); option 4 is motivated reasoning dressed as debugging. The productive next move: read what the counterexample REMEMBERS that greedy forgot — that's your DP state, free of charge.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — the loop that never lands</p>
+      <p class="mcq-q">Rightmost-match hunt: <code>while (lo &lt; hi) { const mid = (lo + hi) &gt;&gt; 1; if (arr[mid] &lt;= target) lo = mid; else hi = mid - 1; }</code> — trace it with <code>lo = 4, hi = 5</code> and <code>arr[4] &lt;= target</code>. What happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It exits with <code>lo = 5</code> — the next iteration's mid rounds up to 5</button>
+        <button class="mcq-opt" type="button">Stack overflow — each failed probe re-enters the search one level deeper</button>
+        <button class="mcq-opt" type="button">It exits correctly at <code>lo = 4</code> — <code>hi = mid - 1</code> eventually fires and closes the window</button>
+        <button class="mcq-opt" type="button" data-ok>Infinite loop: <code>mid = (4+5)&gt;&gt;1 = 4</code>, so <code>lo = mid</code> re-assigns <code>lo = 4</code> — the two-cell window never shrinks; keeping mid on the LOW side demands a ceiling mid, <code>(lo + hi + 1) &gt;&gt; 1</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the invariant every binary search must keep is "each iteration strictly shrinks the window" — floor-mid pairs safely with <code>hi = mid</code> / <code>lo = mid + 1</code> (§02's template), but <code>lo = mid</code> with floor-mid stalls on any two-cell window where the low probe succeeds. Option 1 assumes the rounding fixes itself (it never re-rounds — same lo, same hi, same mid); option 2 confuses a while-loop with recursion, there's no stack to overflow; option 3 is the hopeful trace that never checks the failing case. Loops-forever bugs in binary search are always this one bug wearing different clothes: a branch that fails to shrink.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — what the state must remember</p>
+      <p class="mcq-q">Climbing stairs, house rule: you may hop 1 or 2, but never two 2-hops in a row. A friend memoizes on <code>n</code> alone — <code>pad.set(n, answer)</code> — and gets wrong counts. Why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Memoization can't express constraints — rules like "no double 2s" force a bottom-up table</button>
+        <button class="mcq-opt" type="button" data-ok>Two different situations share the key <code>n</code>: "n left, last hop was a 2" allows fewer moves than "n left, last hop was a 1" — the cache returns one situation's answer for the other; the state must be <code>(n, lastWas2)</code></button>
+        <button class="mcq-opt" type="button">The recursion needs a third base case for <code>n = 2</code> before the memo behaves</button>
+        <button class="mcq-opt" type="button">The Map keys collide because numbers aren't hashable — stringify <code>n</code> first</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §05's rule was "cache the answer to a sub-QUESTION" — and the real sub-question here is two-dimensional: what's left AND what the constraint still remembers about the past. Cache on <code>n</code> alone and the first caller poisons the pad for every caller in the other situation. The design test, worth memorizing: <b>anything the future is allowed to depend on belongs in the state.</b> Option 1 surrenders (memo and table have identical power — same states, same recurrence); option 3 patches the wrong layer, base cases don't fix a key collision; option 4 invents a JS problem that doesn't exist. Wrong-counts-with-a-memo almost always means an under-specified state.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — pricing a pipeline</p>
+      <p class="mcq-q">Matchmaking night: <code>const sorted = [...cats].sort(byWeight)</code>, then for EACH of the n cats, one binary search over <code>sorted</code> to find its play-partner. Total complexity?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>O(n log n) — the sort costs n log n, the loop costs n × log n, and SEQUENTIAL steps add: n log n + n log n is still O(n log n)</button>
+        <button class="mcq-opt" type="button">O(n² log n) — the sort runs inside the context of the loop, so multiply</button>
+        <button class="mcq-opt" type="button">O(n + log n) — one sort pass plus one binary search</button>
+        <button class="mcq-opt" type="button">O(n²) — two n-sized phases interacting always squares</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two reasoning steps, both easy to fumble under pressure. First, price each phase: sort = n log n; loop = n iterations × log n each = n log n (the per-iteration cost multiplies by the trip count — that pair IS nested). Second, combine: the phases run one after another, so they ADD, and equal terms just keep the same O. Option 2 multiplies sequential phases — the classic composition error (§01's "pay n log n to unlock a pattern" only works because it adds); option 3 bills the binary search once instead of n times; option 4 pattern-matches "two big things → n²" without doing either step. Say the arithmetic out loud in interviews — the accounting is the answer.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — hunt the false claim</p>
+      <p class="mcq-q">Three of these claims are true. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Merge sort's O(n log n) is a worst-case guarantee; randomized quicksort's is only expected — an unlucky pivot run still degrades to O(n²)</button>
+        <button class="mcq-opt" type="button">Binary search on the answer performs O(log range) iterations even when each feasibility check costs O(n) — the check's price scales the total, not the iteration count</button>
+        <button class="mcq-opt" type="button" data-ok>A greedy rule that survives your sixty-second counterexample attack is thereby proven correct and safe to code</button>
+        <button class="mcq-opt" type="button">Memoization only produces a speedup when the recursion revisits identical sub-questions</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> surviving an attack is <i>evidence</i>, not proof — §14's own warm-up 3 showed passing tests can't settle a universal claim, and §07 is the section that exists precisely because greedy needs an exchange or invariant ARGUMENT, not just an un-found counterexample. The rule of §06 was attack, then <i>state why</i> it survives, then code. The three true claims are load-bearing elsewhere: option 1 is §01/§11's guarantee-vs-expected distinction, option 2 is why §08's machine costs O(n log range) total, option 4 is warm-up 2 of this gym. False-claim questions reward reading each option as a suspect — the tempting one always sounds like something you were almost taught.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — budget the ops before coding</p>
+      <p class="mcq-q">Split an array (n = 10⁵, element sum up to 10⁹) into k = 50 parts, minimizing the largest part-sum. Two known solvers: interval DP at O(k·n²), or §08's binary-search-the-answer at O(n log sum). Budget ≈ 10⁸ ops per second — which is actually runnable?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Both — log factors and small constants like 50 wash out at this scale</button>
+        <button class="mcq-opt" type="button">The DP — k = 50 is a small constant, and constants don't affect feasibility</button>
+        <button class="mcq-opt" type="button">Neither — 10⁵ elements demands a strictly O(n) algorithm</button>
+        <button class="mcq-opt" type="button" data-ok>Only the binary search: 10⁵ × log₂(10⁹) ≈ 10⁵ × 30 = 3×10⁶ ops (milliseconds), while the DP is 50 × (10⁵)² = 5×10¹¹ — thousands of seconds</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the whole exercise is refusing to reason by vibes and doing the two multiplications: n² = 10¹⁰ before k even shows up, versus n·log(sum) where log₂10⁹ is just ~30. Option 2's instinct ("50 is small") stares at the constant and misses that n² alone already blows the budget 100× — constants only matter AFTER the polynomial fits; option 1 hand-waves exactly the arithmetic the question exists to force; option 3 over-corrects — 3×10⁶ is comfortably inside 10⁸, no O(n) heroics needed. This is §08 (the machine) shaking hands with the n ≤ 20 smell-test energy of §10: complexity classes become go/no-go decisions the moment you plug the numbers in.</p>
+    </div>
+    <div class="mcq" data-qid="dal-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — when the payout breaks the proof</p>
+      <p class="mcq-q">§07 proved earliest-end greedy optimal for picking the most non-overlapping meetings. Now each meeting pays a fee and you maximize TOTAL payout. What's the honest assessment?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Earliest-end still works — the exchange argument transferred with the problem</button>
+        <button class="mcq-opt" type="button" data-ok>Greedy dies: three short $1 meetings beat one long $100 one under earliest-end. Sort by end and go take-or-skip DP — <code>best(i) = max(best(i−1), pay[i] + best(p(i)))</code>, with §02's binary search finding p(i), the last meeting ending before i starts</button>
+        <button class="mcq-opt" type="button">Switch the greedy: take meetings by highest payout first, skipping conflicts</button>
+        <button class="mcq-opt" type="button">Only backtracking over all subsets can handle interacting payouts — accept the O(2ⁿ)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the exchange proof leaned on "any meeting can be swapped for the earliest-ender at no loss" — attach fees and the swap can now cost $99, so the proof dies with the swap (option 1's mistake: proofs are welded to their problem, they don't ride along to variants). Option 3 fails its own sixty-second attack: one $5 meeting can block two $4s that together pay $8. The counterexample designs the fix, exactly as §06 promised: the state must remember "best payout using meetings 1…i", the recurrence is §05's take-or-skip, and p(i) is a §02 boundary search over end times — O(n log n) total, so option 4's exponential surrender leaves everything on the table. Three sections, one problem: that's what hards feel like from the inside.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses: 1 → reread §01's stability note (the misconception: stable = deterministic); 2 → §05's notepad (memoization ≠ magic — it needs revisited states); 3 → §06/§07 (tests are evidence, counterexamples are verdicts).</li>
+        <li>Apply misses → adopt the tracing ritual: write lo/hi/mid (or the memo key, or each phase's cost) as actual columns on paper and step until the state repeats or resolves — the gym-4 infinite loop is invisible in your head and obvious in three written rows.</li>
+        <li>Stretch misses → the skill IS the combining: gym-7 chains §01×§06×§08, gym-8 chains §08×§10's budget math, gym-9 chains §02×§05×§07. Reread the pairs, then ask of every hard: "which two sections is this?"</li>
+        <li>Transferable everywhere: argue AGAINST your first answer for ten seconds before locking it — every distractor above was built from somebody's confident first instinct, and Mochi never commits to a box she hasn't sniffed twice.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review + ladder</p>
@@ -1726,6 +1850,7 @@ for (const s of ['meowmeowmeow', 'meowmeom'])
       <tr><td class="mono">11</td><td>quickselect</td><td>Partition, then recurse into ONE side — n + n/2 + … = O(n) average; heap for streams.</td></tr>
       <tr><td class="mono">12</td><td>strings</td><td>2n−1 palindrome centers; the failure table = "how much of what I matched is still usable".</td></tr>
       <tr><td class="mono">13</td><td>choosing</td><td>Map the wording to the weapon out loud — the first 90 seconds are the interview.</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>Nine inferences, zero recall — trace it, attack it, chain two sections, and read the why even when you're right.</td></tr>
     </tbody>
   </table></div>
   <div class="idea" style="margin-top:24px">

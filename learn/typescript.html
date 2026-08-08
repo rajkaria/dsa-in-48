@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#node"><span><i class="dot" data-for="node"></i> TS + Node</span></a>
     <a class="side-link" href="#migration"><span><i class="dot" data-for="migration"></i> Migration &amp; Escape Hatches</span></a>
     <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Error Gauntlet</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/24</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,10 +734,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: strict-mode fluency</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
-    <span><b>15</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>24</b> quiz questions</span>
     <span><b>1</b> runnable panel</span>
-    <span><b>~8.5h</b> self-paced</span>
+    <span><b>~9h</b> self-paced</span>
   </div>
   <a class="btn" href="#mental">Start with the model <span class="arrow">↓</span></a>
 </header>
@@ -1263,6 +1264,129 @@ console.log('that gap is what §11 (validate at boundaries) exists to close.');<
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The gauntlet checked whether the model stuck; the gym checks whether it <i>runs</i>. Warm-up isolates one concept against its favorite misconceptions, apply makes you trace unions and solve for T like the compiler does, and stretch chains sections under constraints — none of the nine yields to remembering a phrase. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right; Professor Whiskers grades on reasoning shown, not answers guessed.</p>
+    <div class="mcq" data-qid="ts-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — which way values may flow</p>
+      <p class="mcq-q"><code>declare function feed(id: string | number): void</code> · <code>declare function shout(s: string): void</code> · <code>let x: string | number</code>. Which call errors — <code>feed('Mochi')</code>, <code>feed(x)</code>, or <code>shout(x)</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>feed('Mochi')</code> — a bare string doesn't exactly match the union type</button>
+        <button class="mcq-opt" type="button">None — string and string | number overlap, so values flow both ways</button>
+        <button class="mcq-opt" type="button" data-ok>Only <code>shout(x)</code> — x might be holding a number, so it can't enter a string-only parameter until narrowed; values flow narrow → wide, never wide → narrow</button>
+        <button class="mcq-opt" type="button">All three, until x is annotated at each call site</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> assignability asks one question: is EVERY possible value of the source legal for the target? 'Mochi' → union: yes. x → union: yes (both arms fit). x → string: no — the number arm has nowhere to go, so §03 narrowing (<code>typeof x === 'string'</code>) is the toll. Option A is the exact-match/nominal instinct — types are sets of values (§01), and a member fits its set's superset; B confuses overlap with containment — sharing SOME values isn't enough, all must fit; D forgets that inference and flow analysis (§02) make per-call annotations noise.</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — what const does and doesn't freeze</p>
+      <p class="mcq-q"><code>const cat = { mood: 'grumpy' };</code> — what type does the compiler give <code>cat.mood</code>, and does <code>cat.mood = 'zoomies'</code> compile?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>string</code>, and the assignment compiles — const freezes the BINDING, not the object; literal properties widen because mutation stays legal. <code>as const</code> is how you'd pin readonly <code>'grumpy'</code></button>
+        <button class="mcq-opt" type="button"><code>'grumpy'</code>, and the assignment errors — const narrows everything it touches to literals</button>
+        <button class="mcq-opt" type="button">The assignment errors — const objects are deeply immutable in TypeScript</button>
+        <button class="mcq-opt" type="button"><code>'grumpy' | 'zoomies'</code> — the compiler collects every value the property is ever assigned</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two separate dials. const controls rebinding of the NAME (a JS fact); widening (§02) controls the property's type — and object-literal properties widen to their base type precisely because <code>cat.mood = …</code> remains legal. Option B applies const's literal-narrowing (true for <code>const m = 'grumpy'</code> itself) one level too deep; C confuses const with <code>Object.freeze</code>/<code>readonly</code> — different layers, neither implied; D imagines the checker executing the program — types come from declarations and inference at the declaration site, never from a trace of assignments.</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — narrowing that checks, logic that doesn't</p>
+      <p class="mcq-q"><code>function label(count: number | undefined) { if (count) return count.toFixed(0); return 'none'; }</code> — the verdict?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Errors — <code>if (count)</code> can't narrow away undefined; only an explicit <code>!== undefined</code> check does</button>
+        <button class="mcq-opt" type="button">Compiles, and behaves correctly for every input</button>
+        <button class="mcq-opt" type="button">Errors — count is still possibly undefined inside the branch</button>
+        <button class="mcq-opt" type="button" data-ok>Compiles — truthiness narrows count to <code>number</code> in the branch — but <code>label(0)</code> answers 'none': the test filtered a legal value along with undefined. The type-accurate check is <code>count !== undefined</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> truthiness IS one of §03's narrowing forms — the compiler honors it, so A and C under-credit the checker. The trap is that it's a VALUE test wearing a type test's clothes: 0 (and '' and NaN) ride out with undefined. Option B is the dangerous confidence — the squiggle-free version of wrong: the compiler proves shape, never intent (§01's door metaphor — the bouncer checks whiskers, not motives). A bowl holding 0 kibble is still a bowl; Professor Whiskers would like it refilled, not declared nonexistent.</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — solve for T like the compiler</p>
+      <p class="mcq-q"><code>declare function first&lt;T&gt;(items: T[]): T;</code> then <code>const x = first([4, 'paws', 9]);</code> — what is x's type?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>number</code> — inference reads the first element, and 4 is a number</button>
+        <button class="mcq-opt" type="button" data-ok><code>string | number</code> — every element is an inference candidate, so T solves to the union of all of them; the <code>T[] → T</code> relationship then hands that union back out</button>
+        <button class="mcq-opt" type="button">A compile error — arrays can't mix element types without an annotation</button>
+        <button class="mcq-opt" type="button"><code>any</code> — conflicting evidence makes inference give up</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two steps: first the compiler solves for T from the argument — all three elements are candidates, unioned into <code>string | number</code> (§05: generics relate types; §03: a union means "one of these") — then the return type T carries the union to x, which must be narrowed before <code>.toFixed</code> or <code>.toUpperCase</code>. Option A imagines inference peeking at runtime order (or the function's name — it never reads either); C imports another language's rule — heterogeneous arrays are just union-element arrays here; D is pre-strict folklore: inference degrades to an honest union, not to any, and a genuine give-up would trip <code>noImplicitAny</code> (§09).</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — trace the union through the branches</p>
+      <p class="mcq-q"><code>function announce(v: string | number | null) { if (v === null) return 'quiet'; if (typeof v === 'number') return v.toFixed(1); return v.toUpperCase(); }</code> — verdict on the last return?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Error — narrowing only applies inside an if block, and the bare final return has no check attached</button>
+        <button class="mcq-opt" type="button">Error — v could still be null there: typeof checks never eliminate null</button>
+        <button class="mcq-opt" type="button" data-ok>Compiles — the first return subtracts <code>null</code>, the second subtracts <code>number</code>; reaching the last line proves v is exactly <code>string</code>. Control flow spends the union one arm at a time</button>
+        <button class="mcq-opt" type="button">Compiles, but v is <code>string | null</code> — <code>=== null</code> comparisons don't narrow; only typeof does</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> narrowing is flow analysis, not block decoration (§03: the compiler reads your ifs): "this code only runs if both earlier tests failed" is a fact the checker proves and uses, so each early return permanently buries an arm. Option A is the block-scope myth — a returning if narrows everything AFTER it; B forgets the first line already handled null (correct that <code>typeof null === 'object'</code> wouldn't have — the ORDER is doing real work); D under-credits equality narrowing, which sits alongside typeof, <code>in</code>, and instanceof in §03's toolkit. Proof it's a chain, not a set: swap the last two returns and <code>v.toUpperCase()</code> squiggles on <code>string | number</code>.</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — the callback that demands too much</p>
+      <p class="mcq-q"><code>type OnCat = (c: { name: string }) =&gt; void;</code> then <code>const greet: OnCat = (c: { name: string; kg: number }) =&gt; console.log(c.kg);</code> — strict-mode verdict?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Error — greet's parameter DEMANDS <code>kg</code>, but OnCat only promises to supply <code>name</code>; parameters are checked in the reverse direction (what callers offer must satisfy what the callback requires), so requiring more than the contract offers fails</button>
+        <button class="mcq-opt" type="button">Compiles — extra properties on a parameter are fine, just like any extra properties in a structural match</button>
+        <button class="mcq-opt" type="button">Compiles — a more specific handler is always usable where a general one is expected</button>
+        <button class="mcq-opt" type="button">Error — parameter names and counts must match the alias exactly</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> function parameters flip the direction of checking (§05's variance bullet: consumers are contravariant): anyone holding an OnCat may call it with a bare <code>{ name: 'Mochi' }</code>, at which point <code>c.kg</code> reads undefined — <code>strictFunctionTypes</code> (§09) exists to refuse exactly this. Option B misapplies §01's rule for VALUES to a REQUIREMENT — extra properties on what you have are fine; extra demands on what you're given are not. C runs variance backwards — "more specific" helps what a function returns and hurts what it accepts. D: names never matter, and FEWER parameters are fine (§04's forEach freedom) — it's the deeper requirement that breaks, not the arity.</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — find the lie about the runtime story</p>
+      <p class="mcq-q">One of these claims about TypeScript's runtime story is FALSE — which?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">An <code>as</code> assertion compiles to nothing, so a wrong one surfaces later as a crash far from the lie</button>
+        <button class="mcq-opt" type="button" data-ok>Unlike <code>type</code> aliases, <code>interface</code> declarations emit a small runtime object — which is why <code>instanceof</code> works with interfaces but not with aliases</button>
+        <button class="mcq-opt" type="button">With strictNullChecks off, a parameter typed <code>Cat</code> accepts null without complaint — the annotation reads like a guarantee it isn't making</button>
+        <button class="mcq-opt" type="button">A zod-style schema both checks the value at runtime and is the source its static type derives from — one truth serving two layers</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> B is false twice over: interfaces and type aliases BOTH erase completely — §01's only emit exceptions are enums and namespaces — and <code>instanceof</code> needs a constructor VALUE, which only a class provides (§07: a class declaration creates a value and a type; an interface creates a type alone). The other three are truths worth keeping: A is why §11 bans <code>as</code> at boundaries (the detonation is far from the cause), C is §09's costume problem, D is parse-at-the-boundary machinery. Technique for FALSE-hunts: argue each claim TRUE from the model and see which one refuses — recall alone will happily nod at B, because it sounds like something a language might do.</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — two constraints, three keywords</p>
+      <p class="mcq-q"><code>const themes = { dusk: '#1e293b', dawn: '#f8fafc' }</code> must satisfy two constraints: (1) a compile error if any value isn't a string, and (2) <code>keyof typeof themes</code> stays <code>'dusk' | 'dawn'</code> so a picker can be typed from it. Which declaration meets both?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>const themes: Record&lt;string, string&gt; = { … }</code> — the annotation checks the values, job done</button>
+        <button class="mcq-opt" type="button"><code>const themes = { … } as Record&lt;string, string&gt;</code> — assert the contract and keep the inferred literals too</button>
+        <button class="mcq-opt" type="button" data-ok><code>const themes = { … } satisfies Record&lt;string, string&gt;</code> — validates every value against the contract WITHOUT replacing the inferred type, so keyof still yields <code>'dusk' | 'dawn'</code></button>
+        <button class="mcq-opt" type="button">No keyword needed — inference alone already enforces the value shapes</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> weigh each option against BOTH constraints. The annotation (A) checks but REPLACES: themes becomes <code>Record&lt;string, string&gt;</code>, keyof collapses to <code>string</code>, the picker's precision dies — §02: an annotation overrides what inference knew. The assertion (B) fails the same way with less honesty: the expression's type becomes whatever <code>as</code> claims (§12: assertions end the conversation), so the literals are equally gone. D has the opposite hole: inference describes what you WROTE and enforces nothing you MEANT — <code>dusk: 42</code> would cheerfully infer number. <code>satisfies</code> (§03/§07's modern flex, now load-bearing) is the one built for exactly this split: check against the contract, keep the inference. Constraint-driven keyword choice is the senior version of "interface vs type".</p>
+    </div>
+    <div class="mcq" data-qid="ts-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — the compiler can't see runtime luck</p>
+      <p class="mcq-q"><code>declare function grab&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K];</code> · <code>const bowl = { tuna: 2, kibble: 7 };</code> · <code>const k: string = 'tuna';</code> — verdict on <code>grab(bowl, k)</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Compiles — k is 'tuna' at runtime, and 'tuna' is a real key of bowl</button>
+        <button class="mcq-opt" type="button">Compiles — <code>string</code> is wider than <code>'tuna' | 'kibble'</code>, and wider always fits</button>
+        <button class="mcq-opt" type="button">Error — generic functions need explicit type arguments before they can check anything</button>
+        <button class="mcq-opt" type="button" data-ok>Error — the compiler sees k's ANNOTATION, and <code>string</code> doesn't extend <code>keyof typeof bowl</code> (<code>'tuna' | 'kibble'</code>): a string could be 'wings'. Drop the annotation — <code>const k = 'tuna'</code> infers the literal — and it compiles</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> three sections stack. §02: the <code>: string</code> annotation threw away the literal type inference would have kept — the declaration starved the evidence. §05: K must solve to something inside <code>keyof T</code>, and <code>string</code> can't promise that. §01: the checker reasons about what a type ADMITS, never about what the variable happens to HOLD — so option A is running-the-program thinking, and B is warm-up 1's direction error resurfacing: wide-into-narrow is precisely the flow that fails. C misdiagnoses — inference solves T from <code>bowl</code> effortlessly; the evidence, not the machinery, is what's broken. The senior reflex when a generic rejects a value you KNOW is right: fix the declaration that widened it, never the call site with an <code>as</code>.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread §02 (widening: what const pins and what it doesn't) and §03 (narrowing forms, and the gap between a type test and a value test) — each distractor up there is a named misconception: exact-match typing, deep-const immutability, truthiness-as-type-check.</li>
+        <li>Apply misses → adopt the tracing ritual: cover the options, write the union down, then subtract one arm per check as you read top to bottom — the compiler is doing flow analysis, so practice BEING the flow analysis on every snippet you meet this week.</li>
+        <li>Stretch misses → re-walk the pairs: §01×§07 (what erases vs what emits a value), §02×§07 (annotation vs assertion vs satisfies), §02×§05 (widened declarations starve generic inference). Combining sections IS the skill — reread both, then re-derive the answer with the options hidden.</li>
+        <li>The transferable habit: argue against your first answer before committing — these distractors were built from first instincts, so a pick that survives its own cross-examination is the one worth recording.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1284,6 +1408,7 @@ console.log('that gap is what §11 (validate at boundaries) exists to close.');<
       <tr><td class="mono">11</td><td>TS + Node</td><td>Parse at the boundary, trust inside — the schema is both the check and the type.</td></tr>
       <tr><td class="mono">12</td><td>migration</td><td>unknown then as-with-receipts then never-bare-any; migrate as a ratchet, leaf-first.</td></tr>
       <tr><td class="mono">13</td><td>the gauntlet</td><td>Predict the squiggle before the compiler draws it — that's the whole fluency.</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>Nine inferences, zero recall — the distractor that tempted you names your misconception.</td></tr>
     </tbody>
   </table></div>
 </section>

@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#auth"><span><i class="dot" data-for="auth"></i> Web Auth Flows</span></a>
     <a class="side-link" href="#realtime"><span><i class="dot" data-for="realtime"></i> Polling · SSE · Sockets</span></a>
     <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Platform Gauntlet</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/24</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,10 +734,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: security &amp; auth fluency</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
-    <span><b>15</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>24</b> quiz questions</span>
     <span><b>5</b> runnable panels</span>
-    <span><b>~8.5h</b> self-paced</span>
+    <span><b>~9h</b> self-paced</span>
   </div>
   <a class="btn" href="#browser">Start at the pixels <span class="arrow">↓</span></a>
 </header>
@@ -1377,6 +1378,129 @@ console.log('\nthe senior answer names the escalation: poll → SSE when latency
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>The gauntlet (§13) composed layers; the gym trains the reasoning moves themselves. <b>Warm-up</b> pits one concept against its favorite misconceptions, <b>apply</b> makes you trace timelines and predict verdicts before the network tab does, <b>stretch</b> chains sections under constraints — the cats will be counting round trips. First pick is the recorded one, and the "why" under each answer is the actual lesson: read it even when you're right.</p>
+    <div class="mcq" data-qid="wp-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — cache freshness verdicts</p>
+      <p class="mcq-q">A cat-photo CDN serves <code>mochi.jpg</code> with <code>Cache-Control: public, max-age=600</code>. The user views the page, clicks away, and clicks back 300 seconds later. What does the browser do for <code>mochi.jpg</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Sends <code>If-None-Match</code> and reuses the image only after a 304 comes back</button>
+        <button class="mcq-opt" type="button">Re-downloads it — the HTTP cache only serves refreshes of the same page, not fresh navigations</button>
+        <button class="mcq-opt" type="button" data-ok>Nothing on the network at all — age 300s ≤ max-age 600s means the entry is FRESH, and freshness is permission to skip the request entirely, not just the download</button>
+        <button class="mcq-opt" type="button">Sends a HEAD request to compare <code>Last-Modified</code> dates before reusing it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §06's two savings, kept distinct: freshness answers "may I skip the network?", ETags answer "may I skip the download?" — and revalidation only starts once freshness runs out. Option A tempts because "check with the server first" feels safe, but that round trip is exactly what <code>max-age</code> exists to delete; D invents a HEAD-check dance the HTTP cache never performs; B underestimates the cache — it serves ordinary navigations all day. The honest footnote: a user-initiated <i>reload</i> revalidates even fresh entries, which is precisely the behavior <code>immutable</code> was invented to switch off.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — preflight or not</p>
+      <p class="mcq-q">Four cross-origin requests leave <code>https://app.shelter.example.com</code> for <code>https://api.example.net</code>. Which ONE triggers a preflight <code>OPTIONS</code> first?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>A plain GET carrying an <code>Authorization: Bearer …</code> header — the method is simple, but any non-safelisted header forces the ask-first</button>
+        <button class="mcq-opt" type="button">A POST of a <code>URLSearchParams</code> body (<code>application/x-www-form-urlencoded</code>) with no extra headers</button>
+        <button class="mcq-opt" type="button">An <code>&lt;img&gt;</code> tag pulling a photo from the other origin</button>
+        <button class="mcq-opt" type="button">A bare <code>fetch(url)</code> GET with no options at all</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the trigger test is "could a 1998 form or tag have sent this?" (§08, §09): simple methods + safelisted headers + form content types go straight out — that legacy carve-out is why CSRF exists (§10) — while anything beyond (custom headers like <code>Authorization</code>, JSON content-type, DELETE) needs consent first. B tempts because POST <i>feels</i> dangerous, but the urlencoded body is exactly the shape forms always sent; C confuses embedding (no CORS read involved) with reading; D confuses "cross-origin" with "non-simple" — cross-origin GETs fly without preflight and only the READ is gated. Method AND headers AND content-type decide — never the verb alone, never the origin alone.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — cookie flags vs attacks</p>
+      <p class="mcq-q">A session cookie ships as <code>session=…; Secure; SameSite=Strict</code> — but someone forgot <code>HttpOnly</code>. Which attack does this configuration still leave wide open?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">CSRF — cross-site form posts will still carry the cookie</button>
+        <button class="mcq-opt" type="button">Wi-Fi eavesdropping — the cookie still travels in plaintext on hostile networks</button>
+        <button class="mcq-opt" type="button">None that matters — two of three flags is defense-in-depth enough</button>
+        <button class="mcq-opt" type="button" data-ok>XSS exfiltration — any injected script can read <code>document.cookie</code> and ship the session elsewhere; the missing flag is the only one that closes that door</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §07's flags are not overlapping layers of the same strength — each closes exactly one door: Secure vs wiretaps, SameSite vs CSRF's cookie-riding (§10), HttpOnly vs script reads. A tempts because CSRF is the famous cookie attack — but <code>Strict</code> is the strongest anti-CSRF setting the platform has; B is Secure's whole job, already done; C is the deadly instinct that flags are fungible quantity rather than one-per-attack. Grade a cookie by which doors are still open, not by how many flags it wears.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — trace the cache timeline</p>
+      <p class="mcq-q"><code>/api/cats</code> responds with <code>Cache-Control: max-age=60, stale-while-revalidate=120</code> and <code>ETag: "v1"</code>, stored at t=0. The page re-requests it at t=90 and again at t=200. What happens at each?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">t=90 and t=200: both send a blocking conditional request — anything past max-age must revalidate before use</button>
+        <button class="mcq-opt" type="button" data-ok>t=90: serves the stale copy instantly and revalidates in the background (60 &lt; 90 ≤ 180); t=200: past the SWR window too, so a blocking <code>If-None-Match: "v1"</code> goes out, hoping for a 304</button>
+        <button class="mcq-opt" type="button">t=90: fresh from cache with zero network (90 is inside 60+120 of freshness); t=200: full re-download because the ETag has expired</button>
+        <button class="mcq-opt" type="button">Both: full re-downloads — stale-while-revalidate is a CDN directive that browsers ignore</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two windows, three behaviors — §06's decider, replayed by hand: age ≤ 60 is fresh (skip the network), 60 &lt; age ≤ 180 is stale-but-usable (skip the WAIT, not the request — the response is served now and the revalidation happens behind it), past 180 the latency-hider is gone and revalidation blocks. A collapses SWR into plain staleness, losing its entire point (instant response, paid for with a briefly stale one); C promotes SWR to freshness — but the background fetch at t=90 absolutely happens, that's the "revalidate" half — and ETags never expire, they get compared. D sells browsers short: they implement it, which is how the latency-hiding lands client-side at all.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — predict the CORS verdict</p>
+      <p class="mcq-q">From <code>https://app.shelter.example.com</code>: <code>fetch('https://api.example.net/cats/9', { method: 'DELETE', credentials: 'include' })</code>. The API answers the preflight with <code>Access-Control-Allow-Origin: *</code>, <code>Access-Control-Allow-Methods: DELETE</code>, <code>Access-Control-Allow-Credentials: true</code>. What actually happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>The preflight itself fails — a credentialed request needs the EXACT origin echoed back, and <code>*</code> never satisfies it — so the DELETE never leaves the browser; cat #9 survives</button>
+        <button class="mcq-opt" type="button">The DELETE executes on the server, but the browser hides the response from the page</button>
+        <button class="mcq-opt" type="button">It works — all three permissions the request needs are present in the answer</button>
+        <button class="mcq-opt" type="button">It fails only because <code>Access-Control-Allow-Headers</code> is missing from the preflight response</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two steps to the verdict: DELETE is non-simple, so <code>OPTIONS</code> goes first — and the answer contains the one forbidden combination, wildcard + credentials (§08's runner called it "the config that never works"), so the check dies at the preflight. B is the near-miss worth savoring: "the server executed it anyway" IS true for <i>simple</i> requests — there the browser blocks the read, not the send, which is the CSRF-shaped hole §10 lives in — but preflighted requests are stopped BEFORE sending; that asymmetry is the whole question. C reads headers as a checklist without knowing the wildcard rule; D invents a requirement — no custom headers were sent, so Allow-Headers has nothing to permit. The fix: echo the exact origin, keep <code>Allow-Credentials</code>, never <code>*</code>.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — order the cold load</p>
+      <p class="mcq-q">First-ever visit to <code>https://shelter.example.com</code> — nothing cached at any layer. Which timeline is the physically possible one?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">TLS handshake → DNS lookup → connect → request → parse — encryption gets negotiated before anything else touches the network</button>
+        <button class="mcq-opt" type="button">DNS → connect → request → TLS upgrades the connection once the server agrees → parse</button>
+        <button class="mcq-opt" type="button" data-ok>DNS → connection + TLS handshake (one combined step under QUIC, two under TCP) → request, with matching cookies attached → response streams → the parser starts building the DOM before the last byte arrives, discovering subresource fetches as it goes</button>
+        <button class="mcq-opt" type="button">DNS → connect → TLS → request → the browser waits for the complete HTML download, then parses, then fetches subresources in document order</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each wrong order is impossible for a nameable reason: you can't handshake a connection that doesn't exist to an address you haven't resolved (A); sending the request before TLS completes would put the path, headers and cookies on the wire in plaintext — HTTPS never does request-then-encrypt (B); and parsing is STREAMING (§01) — the parser, plus the preload scanner running ahead of it, starts on the first chunks, which is why early <code>&lt;link&gt;</code> and <code>&lt;script&gt;</code> tags begin fetching while the HTML is still downloading. D's wait-for-the-whole-file throws away the network's best overlap. This is §13's five-word spine with every arrow justified — the version that survives follow-up questions.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">Four claims from four corners of the module. Exactly one is FALSE — which?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A <code>304 Not Modified</code> carries no body — the browser keeps the stored bytes and just refreshes their freshness metadata (§06)</button>
+        <button class="mcq-opt" type="button" data-ok><code>HttpOnly</code> stops the browser attaching the cookie to cross-site requests, making it a CSRF defense (§07)</button>
+        <button class="mcq-opt" type="button"><code>curl</code> happily reads a response that a browser's CORS check would refuse to hand to a page (§08)</button>
+        <button class="mcq-opt" type="button"><code>Cache-Control: private</code> lets the user's own browser cache a response while keeping CDNs and other shared caches out (§06)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>HttpOnly</code> hides the cookie from <code>document.cookie</code> — a defense against XSS <i>theft</i> (§10) — but the browser still attaches it to every matching request, cross-site ones included; attachment behavior belongs to <code>SameSite</code>. The claim seduces because both flags live in the same <code>Set-Cookie</code> line and both "restrict the cookie" — but they restrict different verbs: HttpOnly restricts READING, SameSite restricts SENDING. The other three are true and worth owning: 304's empty body is the entire economy of revalidation, CORS being browser-enforced is why it protects users rather than servers (curl was §08's proof), and <code>private</code> is exactly the browser/CDN split.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — price the revalidation tax</p>
+      <p class="mcq-q">A page ships 40 hashed assets (<code>app.3f9c2.js</code>-style). Config A: assets get <code>max-age=31536000, immutable</code>, HTML gets <code>no-cache</code>. Config B: everything gets <code>no-cache</code>. A user returns tomorrow; nothing was deployed. Roughly what does each config cost on the network?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Identical — both serve everything from cache, since nothing changed</button>
+        <button class="mcq-opt" type="button">Config B re-downloads all 40 bodies — <code>no-cache</code> means nothing was stored</button>
+        <button class="mcq-opt" type="button">Config A: zero requests of any kind — <code>immutable</code> exempts even the HTML from checking</button>
+        <button class="mcq-opt" type="button" data-ok>A: one conditional request (the HTML) → 304, all 40 assets straight from disk. B: 41 conditional requests → 41 tiny 304s — bodies skipped, but every one still pays headers, server work and waiting on a round trip. ~1 vs ~41 requests for identical bytes</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>no-cache</code> stores just fine (§06's misnomer, claiming its victim in B) but revalidates per use — and a 304 saves the DOWNLOAD, never the ROUND TRIP, which is the distinction A's "cached = free" instinct misses. That gap is the entire reason content hashing exists: move each asset's version into its NAME so one always-checked pointer can vouch for 40 never-checked files — C then overshoots by exempting the pointer itself, leaving users stuck on old HTML until the cache evicts it. HTTP/2 multiplexing (§03) softens B — the 41 requests share one connection — but header bytes, server hits and revalidation latency remain, multiplied by every return visit. Count the round trips before trusting the vibe: that's the estimation habit.</p>
+    </div>
+    <div class="mcq" data-qid="wp-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — storage under constraints</p>
+      <p class="mcq-q">Offline drafts for the shelter's volunteer notes: ~20MB of structured drafts per device, reads and writes must never stutter typing, and none of it should ride to the server on every request. Pick the store.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">localStorage — simplest API, survives restarts, everyone knows it</button>
+        <button class="mcq-opt" type="button" data-ok>IndexedDB — async (off the typing path, so §01's main thread stays clean), quota comfortably beyond 20MB, structured values without stringify round-trips: the only option that passes all three constraints</button>
+        <button class="mcq-opt" type="button">Cookies with a long <code>Max-Age</code> — persistence across visits is what cookies are for</button>
+        <button class="mcq-opt" type="button">sessionStorage — same API as localStorage but scoped more safely, per tab</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> run the constraints as a checklist against §07's priced menu: localStorage fails twice — its ~5MB-class quota can't hold 20MB, and every access is synchronous on the main thread, so bulk reads land exactly in the keystroke path (§01's jank, fesd's INP budget); cookies fail harder — a few KB apiece AND attached to every matching request, the "server needs it on each request" tool abused as a database; sessionStorage shares localStorage's quota class and its per-tab lifetime deletes the drafts with the tab. A and D tempt via API familiarity, C via the word "persistent" — but storage choice is constraint elimination, not API preference, and only one candidate survives all three cuts.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread the section whose misconception caught you: §06 if you conflated freshness with revalidation (two different savings), §07 if the cookie flags blurred together (one flag, one attack), §08–§09 if "cross-origin" or "POST" felt like the preflight trigger (the carve-out is the trigger's negative).</li>
+        <li>Apply misses → adopt the tracing ritual: write the numbers down before predicting — age vs max-age vs the SWR window, preflight-triggered? then check for the one forbidden combo. Then open a real network tab and narrate three requests' cache verdicts and any <code>OPTIONS</code> you find — prediction, then confirmation.</li>
+        <li>Stretch misses → name the pairings you dropped: §06×§03 (revalidation priced in round trips), §07×§10 (HttpOnly restricts reading, SameSite restricts sending — different verbs), §07×§01 (storage choice meets the main thread). Combining sections IS the skill — the gauntlet (§13) already told you the interview asks this way.</li>
+        <li>One transferable habit: argue against your first answer before committing — every distractor here was built from a first instinct, and the ninety-second explanations this module trains are exactly the tool for talking yourself out of one.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1398,6 +1522,7 @@ console.log('\nthe senior answer names the escalation: poll → SSE when latency
       <tr><td class="mono">11</td><td>auth</td><td>Each artifact has one safe home; passkeys bind to the origin so there's no secret to phish.</td></tr>
       <tr><td class="mono">12</td><td>realtime</td><td>Pick by direction and frequency: poll → SSE → WS; AI streams are SSE for a reason.</td></tr>
       <tr><td class="mono">13</td><td>the gauntlet</td><td>Resolve → connect → request → respond → render — five words, sixteen rooms behind them.</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>Nine inferences, three tiers — every distractor is a misconception with a section that cures it.</td></tr>
     </tbody>
   </table></div>
 </section>

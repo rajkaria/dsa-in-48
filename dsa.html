@@ -446,6 +446,26 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
 .quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
 
+/* reasoning gym — scored MCQs (first attempt persisted) */
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+.gym-score-row{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-top:10px}
+.gym-score-row b{color:var(--ink)}
+
 /* tables */
 .tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
 .tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
@@ -579,6 +599,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#dp"><span>Dynamic Programming</span><span class="t">90m</span></a>
   </nav>
 
+  <nav class="side-group" aria-label="Practice">
+    <h4>// practice</h4>
+    <a class="side-link" href="#gym"><span>Reasoning Gym</span><span class="t">12q</span></a>
+  </nav>
+
   <nav class="side-group" aria-label="Reference">
     <h4>// reference</h4>
     <a class="side-link" href="#playbook"><span>Interview Playbook</span></a>
@@ -623,6 +648,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   <div class="hero-meta">
     <span><b>13</b> topics</span>
     <span><b>48</b> curated problems</span>
+    <span><b>12</b> gym questions</span>
     <span><b>~8.5h</b> per day</span>
     <span><b>100%</b> JavaScript</span>
   </div>
@@ -1540,6 +1566,170 @@ function climbStairs(n) {
 </section>
 
 <!-- PLAYBOOK -->
+<!-- REASONING GYM -->
+<section class="section" id="gym">
+  <p class="section-eyebrow">// practice · after day 2 — or any time you want a workout</p>
+  <h2>The reasoning gym</h2>
+  <p class="sub">Twelve scored questions in three tiers. These aren't recall checks — every one forces an inference: trace the state, spot the invariant, estimate the cost, catch the false claim. Your first pick is the one that's recorded, so argue with yourself before you tap. The "why" under each answer is where the reps actually happen — read it even when you're right.</p>
+  <p class="gym-score-row">first-attempt score: <b id="gym-score">0/12</b> · saves in this browser</p>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 1 — warm-up: one concept, loaded distractors</p>
+
+    <div class="mcq" data-qid="gym-w1">
+      <p class="mcq-tag">// warm-up 1 of 4 — complexity is about growth, not loop count</p>
+      <p class="mcq-q"><code>for (const word of words) for (const ch of 'abcdefghijklmnopqrstuvwxyz') check(word, ch)</code> — with n = <code>words.length</code>, what's the time complexity?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">O(n²) — two nested loops is always quadratic</button>
+        <button class="mcq-opt" type="button" data-ok>O(n) — the inner loop is 26 iterations no matter how big n gets, and constants drop</button>
+        <button class="mcq-opt" type="button">O(n log n) — the alphabet acts like a log factor</button>
+        <button class="mcq-opt" type="button">O(26ⁿ) — exponential in the alphabet</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Big O asks "what grows when the input grows?" The inner loop does 26 iterations whether n is ten or ten million — that's a constant, and O(26n) = O(n). "Nested loops = O(n²)" is the reflex being tested: it's only true when <i>both</i> loops scale with the input. The log-factor option tempts people who've memorized shapes ("nested-ish… log-ish?") instead of asking what actually grows.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w2">
+      <p class="mcq-tag">// warm-up 2 of 4 — hidden loops count too</p>
+      <p class="mcq-q"><code>for (const x of a) if (b.includes(x)) hits.push(x)</code> — both arrays have n items. What's the honest complexity, and the idiomatic fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">O(n) — there's only one <code>for</code> loop in the code</button>
+        <button class="mcq-opt" type="button">O(n log n) — <code>includes</code> binary-searches internally</button>
+        <button class="mcq-opt" type="button" data-ok>O(n²) — <code>includes</code> is a linear scan in disguise; build <code>new Set(b)</code> once and check <code>set.has(x)</code> for O(n) total</button>
+        <button class="mcq-opt" type="button">O(n²), and it's unavoidable — membership always costs a scan</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The loop you can't see still runs: <code>.includes</code> walks <code>b</code> front to back, so it's n scans of n items. It can't binary-search — it has no idea the array is sorted (and it usually isn't). The last option is the trap for people who spot the O(n²) but stop reasoning there: a Set's hash lookup makes membership O(1) average, which is the single most common optimization in interview problems — trading O(n) space for a factor-of-n speedup.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w3">
+      <p class="mcq-tag">// warm-up 3 of 4 — preconditions are load-bearing</p>
+      <p class="mcq-q">You run textbook binary search for <code>9</code> on the unsorted array <code>[5, 2, 9, 1]</code>. What actually happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It still finds 9 — just slower than on a sorted array</button>
+        <button class="mcq-opt" type="button">It throws, because binary search validates its input</button>
+        <button class="mcq-opt" type="button" data-ok>It may confidently report "not found" — each halving step assumes sortedness to discard half, so it can discard the half containing 9</button>
+        <button class="mcq-opt" type="button">It degrades to a linear scan and finds 9 in O(n)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Binary search's whole power is the invariant "if the target exists, it's inside [lo, hi]" — maintained by comparing against the midpoint <i>of a sorted range</i>. Unsorted input silently breaks the invariant: mid = 2, and since 9 = 9 you'd get lucky here, but search for 5 and the first comparison (5 &lt; 9) discards the left half — where 5 lives. No error, no fallback, just a wrong answer delivered with O(log n) confidence. Algorithms don't check their preconditions; you do.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w4">
+      <p class="mcq-tag">// warm-up 4 of 4 — trace it, don't trust it</p>
+      <p class="mcq-q">What does <code>[3, 25, 100].sort()</code> return?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>[3, 25, 100]</code> — it's already in ascending order</button>
+        <button class="mcq-opt" type="button" data-ok><code>[100, 25, 3]</code> — default sort compares strings: '100' &lt; '25' &lt; '3' character by character</button>
+        <button class="mcq-opt" type="button"><code>[100, 3, 25]</code> — sorted by number of digits</button>
+        <button class="mcq-opt" type="button">A TypeError — numbers need a comparator</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> With no comparator, <code>.sort()</code> stringifies and compares UTF-16 code units: '1' &lt; '2' &lt; '3' decides everything before a second character is ever read, so 100 sorts first. It doesn't throw (JS forgives), and it doesn't peek at digit counts. The reasoning habit: when a built-in's behavior decides your answer, mentally run three elements through it — this one line has sunk countless real interviews. The fix is always <code>.sort((a, b) =&gt; a - b)</code>.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 2 — apply: trace the state before you tap</p>
+
+    <div class="mcq" data-qid="gym-a1">
+      <p class="mcq-tag">// apply 1 of 4 — two pointers, move by move</p>
+      <p class="mcq-q">Two pointers on sorted <code>[2, 7, 11, 15]</code>, target sum 18, <code>l=0, r=3</code>. Which exact sequence of moves finds it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">2+15=17 &lt; 18 → r-- · 2+11=13 &lt; 18 → r-- · never found</button>
+        <button class="mcq-opt" type="button" data-ok>2+15=17 &lt; 18 → l++ · 7+15=22 &gt; 18 → r-- · 7+11=18 → found in three comparisons</button>
+        <button class="mcq-opt" type="button">2+15=17 &lt; 18 → l++ · 7+15=22 &gt; 18 → l++ · 11+15=26 → overshoots, not found</button>
+        <button class="mcq-opt" type="button">It must check all six pairs to be sure — pointer walks can skip valid pairs</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The rule is directional: sum too <i>small</i> → only a bigger left value can help, so <code>l++</code>; too <i>big</i> → <code>r--</code>. Option A moves the wrong pointer on a too-small sum (shrinking the sum further — the classic sign flip), and option C keeps advancing <code>l</code> when the sum is too big. The last option doubts the invariant: every discarded pair is <i>provably</i> not the answer (if 2+15 is too small, 2 plus anything left of 15 is smaller still) — that proof is why O(n) suffices over O(n²).</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a2">
+      <p class="mcq-tag">// apply 2 of 4 — find the infinite loop</p>
+      <p class="mcq-q"><code>while (lo &lt; hi) { const mid = Math.floor((lo + hi) / 2); if (ok(mid)) lo = mid; else hi = mid - 1; }</code> — this "search the last true" loop has a bug. When does it spin forever?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">When <code>ok</code> is false for every index — <code>hi</code> underflows past 0</button>
+        <button class="mcq-opt" type="button">Never — <code>lo &lt; hi</code> guarantees the range shrinks each pass</button>
+        <button class="mcq-opt" type="button" data-ok>When <code>hi === lo + 1</code> and <code>ok(lo)</code> is true — <code>mid</code> floors to <code>lo</code>, so <code>lo = mid</code> changes nothing, forever</button>
+        <button class="mcq-opt" type="button">When the array length is odd — the midpoint lands off-center</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Walk the two-element endgame: <code>lo=4, hi=5</code> → <code>mid = floor(4.5) = 4</code> → <code>ok(4)</code> true → <code>lo = 4</code>. Same state, same next iteration: a fixed point. The loop-shrinks intuition (option B) fails precisely because <code>lo = mid</code> is not <code>lo = mid + 1</code> — assignment isn't progress. The fix: bias the midpoint up, <code>Math.ceil((lo + hi) / 2)</code>, so <code>mid</code> can never equal <code>lo</code> when two candidates remain. Every binary-search variant is verified the same way: hand-run the two-element case.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a3">
+      <p class="mcq-tag">// apply 3 of 4 — the stack knows what counting can't</p>
+      <p class="mcq-q">Checking <code>"([)]"</code> for valid brackets with a stack: push opens, pop-and-match on close. Every bracket type appears a balanced number of times. What happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Valid — each type opens and closes exactly once, so counts balance</button>
+        <button class="mcq-opt" type="button" data-ok>Invalid — when <code>)</code> arrives the stack top is <code>[</code>, not <code>(</code>: nesting order is violated even though counts balance</button>
+        <button class="mcq-opt" type="button">Invalid — the stack overflows on the second open bracket</button>
+        <button class="mcq-opt" type="button">Valid — brackets of different types don't interact with each other</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Trace it: push <code>(</code>, push <code>[</code>, then <code>)</code> arrives and must match the <i>most recent unclosed</i> open — the stack top <code>[</code>. Mismatch, invalid, done. This is exactly why the problem needs a stack and not four counters: counters verify quantity, the stack verifies <i>order</i> (LIFO mirrors how nesting works). Options A and D are the same misconception at different depths — if counting sufficed, this would be a hash-map problem.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a4">
+      <p class="mcq-tag">// apply 4 of 4 — the key you didn't ask for</p>
+      <p class="mcq-q"><code>const m = {}; m[{id: 1}] = 'a'; m[{id: 2}] = 'b';</code> — what is <code>Object.keys(m).length</code>, and why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">2 — two distinct objects were used as keys</button>
+        <button class="mcq-opt" type="button">0 — objects are invalid keys, so both writes silently fail</button>
+        <button class="mcq-opt" type="button">A TypeError — object keys must be stringified explicitly</button>
+        <button class="mcq-opt" type="button" data-ok>1 — both keys coerce to the string <code>'[object Object]'</code>, so the second write overwrites the first</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Plain-object keys pass through <code>String()</code>, and every plain object stringifies to the same <code>'[object Object]'</code> — so the two writes hit one slot and <code>m</code> holds only <code>'b'</code>. No error, no warning; JS coerces and moves on, which is what makes this bug so quiet in caches and memo tables keyed by object. The reasoning step being drilled: before answering "how many keys," ask "what does each key <i>become</i>?" — and reach for <code>Map</code>, which compares keys by identity and never coerces.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 3 — stretch: two ideas at once, constraints attached</p>
+
+    <div class="mcq" data-qid="gym-s1">
+      <p class="mcq-tag">// stretch 1 of 4 — will it finish before the interviewer's patience?</p>
+      <p class="mcq-q">n = 10⁵ items, ~10⁸ simple operations/second, time budget ~2 seconds. Which reasoning chain is right?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>O(n²) ≈ 10¹⁰ ops ≈ 100 s — dead on arrival; O(n log n) ≈ 1.7×10⁶ ops — milliseconds. The constraint itself is telling you which family to aim for</button>
+        <button class="mcq-opt" type="button">O(n²) ≈ 10¹⁰ ops ≈ 100 s, but modern JIT compilers close a 100× gap, so quadratic is fine</button>
+        <button class="mcq-opt" type="button">O(n²) on 10⁵ items is 10⁷ operations — comfortably within budget</button>
+        <button class="mcq-opt" type="button">Big O can't be converted to seconds, so constraints say nothing about which complexity you need</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The chain: square 10⁵ correctly (10¹⁰ — option C fumbles this exact exponent step, the most common arithmetic slip), divide by throughput (10¹⁰ / 10⁸ = 100 s), compare to budget. JITs buy constant factors, not the two orders of magnitude option B needs. And option D is technically-true-practically-wrong: Big O plus a throughput <i>estimate</i> is exactly how competitive programmers reverse-engineer the intended complexity from n before writing a line. Reading constraints as a hint is a skill, not a trick.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s2">
+      <p class="mcq-tag">// stretch 2 of 4 — catch the false claim</p>
+      <p class="mcq-q">Three of these are true. Which claim is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">For small inputs, an O(n²) algorithm can outrun an O(n log n) one — constants and cache behavior dominate before growth does</button>
+        <button class="mcq-opt" type="button">Hash-map operations are O(1) on average but can degrade toward O(n) when many keys collide</button>
+        <button class="mcq-opt" type="button" data-ok>Sorting the input first always makes a problem slower overall, because you've spent O(n log n) before the real work starts</button>
+        <button class="mcq-opt" type="button">An algorithm that discards half its remaining input each step runs in O(log n) steps</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "Always" is doing the lying: spending O(n log n) to sort often <i>buys down</i> the main phase — pair-finding drops from O(n²) brute force to O(n) two pointers, duplicate detection to a neighbor scan, intervals become mergeable at all. Total O(n log n) beats O(n²) for any real n. The three true claims are worth keeping: constants matter at small n (why insertion sort handles tiny subarrays inside real sort implementations), hash degradation is real, and halving is the signature of logarithms. FALSE-hunting trains the muscle interviews test with "is that always true?"</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s3">
+      <p class="mcq-tag">// stretch 3 of 4 — top-k under a memory ceiling</p>
+      <p class="mcq-q">A stream of 10⁹ scores arrives one at a time; you need the top 100 and can't store the stream. Best approach?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Collect everything, sort descending, take 100 — O(n log n) is acceptable here</button>
+        <button class="mcq-opt" type="button">Quickselect for the 100th largest, then one partition pass — O(n) average beats any heap</button>
+        <button class="mcq-opt" type="button" data-ok>Keep a min-heap of size 100: each score compares against the heap's minimum, evicting it when beaten — O(n log k) time, O(k) memory</button>
+        <button class="mcq-opt" type="button">A running max variable, updated 100 times</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The constraint kills the classics first — sorting and quickselect both need the full array in memory, and the stream forbids exactly that (their complexity math is fine; their <i>memory</i> model is wrong, which is the layered trap). The size-k min-heap holds the best 100 so far, and its <i>minimum</i> — the weakest of the champions — is the only element a newcomer needs to beat. n log(100) with 100 slots of memory. A "min-heap for top-k" sounds backwards until you reason it through, which is precisely why interviewers love asking it.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s4">
+      <p class="mcq-tag">// stretch 4 of 4 — a found path is not a shortest path</p>
+      <p class="mcq-q">Shortest path between two cells in an unweighted grid maze. DFS finds <i>a</i> path — why is BFS the correct tool, not just the customary one?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">BFS is asymptotically faster than DFS on grids, so it finds the same path sooner</button>
+        <button class="mcq-opt" type="button" data-ok>BFS explores in expanding distance layers — every cell is first reached via a minimum-length route, so the first arrival at the target is provably shortest. DFS commits to one direction and its first path can be arbitrarily scenic</button>
+        <button class="mcq-opt" type="button">DFS can't handle grids with cycles; BFS can</button>
+        <button class="mcq-opt" type="button">DFS uses recursion, which overflows on large mazes — that's the only real difference</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Both are O(V+E) (option A is false — same asymptotics), and both handle cycles with a visited set (option C). The real difference is the <i>order invariant</i>: BFS's queue processes all cells at distance d before any at d+1, so reaching the target at layer d proves no d-1 route exists. DFS's stack dives deep — its first path can wander the whole maze before stumbling onto the exit. Option D names a true engineering concern but not the correctness argument. Equal edge weights are what let plain BFS replace Dijkstra; the layer proof is why.</p>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="playbook">
   <p class="section-eyebrow">// reference · run this script in every interview</p>
   <h2>The interview playbook</h2>
@@ -1655,6 +1845,7 @@ function climbStairs(n) {
   var K_PROGRESS = 'dsa48:progress';
   var K_COLLAPSED = 'dsa48:collapsed';
   var K_THEME = 'dsa48:theme';
+  var K_GYM = 'dsa48:gym';
 
   function load(key, fallback) {
     try {
@@ -1770,6 +1961,47 @@ function climbStairs(n) {
       });
     });
     updateProgress();
+
+    /* ---------- reasoning gym (first attempt is the recorded one) ---------- */
+    var gymState = load(K_GYM, {});
+    if (!gymState || typeof gymState !== 'object') gymState = {};
+
+    function paintGymScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = gymState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('gym-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function revealMcq() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (gymState[qid] === 1 || gymState[qid] === 0) {
+        revealMcq();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          revealMcq();
+          if (gymState[qid] !== 1 && gymState[qid] !== 0) {
+            gymState[qid] = ok ? 1 : 0;
+            save(K_GYM, gymState);
+          }
+          paintGymScore();
+        });
+      });
+    });
+    paintGymScore();
 
     var resetBtn = document.getElementById('reset-progress');
     if (resetBtn) {

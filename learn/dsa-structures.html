@@ -688,6 +688,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#rollinghash"><span><i class="dot" data-for="rollinghash"></i> Rolling Hashes</span></a>
     <a class="side-link" href="#balance"><span><i class="dot" data-for="balance"></i> Balanced Trees</span></a>
     <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Practice Ladder</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -705,11 +706,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/22</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -732,11 +733,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: heap-vs-sort judgment calls</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
-    <span><b>13</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>22</b> quiz questions</span>
     <span><b>1</b> pointer-surgery stepper</span>
     <span><b>34</b> verified LeetCode problems</span>
-    <span><b>~8.5h</b> self-paced</span>
+    <span><b>~9h</b> self-paced</span>
   </div>
   <a class="btn" href="#lists">Start with lists <span class="arrow">↓</span></a>
 </header>
@@ -1738,6 +1739,129 @@ console.log(`median-first:     depth ${depth(balancedFrom(sorted))}  (the LC 108
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Thirteen sections of machinery — now the machinery gets tested. <b>Warm-up</b> isolates one concept against its favorite misconceptions, <b>apply</b> hands you a few lines of pointer surgery or a concrete trace and asks what the world looks like afterwards, and <b>stretch</b> chains sections together under constraints, the way interviews actually do. First pick is the recorded one, and the "why" under each answer is the actual lesson — Professor Whiskers insists you read it even when you're right.</p>
+    <div class="mcq" data-qid="dss-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — references vs nodes</p>
+      <p class="mcq-q">The shelter list is <code>mochi → biscuit → clawdia</code> and <code>head</code> points at mochi. You run <code>head = head.next;</code> — one line, nothing else. What's true now?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Mochi's node is deleted from memory the moment <code>head</code> stops pointing at it</button>
+        <button class="mcq-opt" type="button">Nothing changes — <code>head</code> is just a variable, and reassigning a variable can't alter a data structure, so the list from <code>head</code> is still mochi-first</button>
+        <button class="mcq-opt" type="button" data-ok>Every node is untouched — mochi still points at biscuit — but <code>head</code> now enters at biscuit, and since nothing references mochi anymore, the GC is free to reclaim her</button>
+        <button class="mcq-opt" type="button">Biscuit and clawdia become unreachable — moving <code>head</code> forward severs the links behind it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a variable is a <i>grip</i> on a node, not the node itself — §01's whole reference model in one line. Reassigning <code>head</code> moves the grip one cat down; no <code>.next</code> changed, so nothing was "deleted" (option 1's reassignment-equals-deletion instinct) and the links behind are exactly as they were (option 4 has it backwards — it's <i>mochi</i> who's now unreachable, not the tail). Option 2 is half right — reassignment really doesn't alter nodes — but <code>head</code> is the list's only entrance, so moving it changes what "the list" even is. Losing this distinction is how people drop half a list mid-surgery.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — LIFO matching, traced</p>
+      <p class="mcq-q">Run §02's bracket checker on <code>&quot;([)]&quot;</code> in your head. Where exactly does it reject, and why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>At the <code>)</code>: the stack holds <code>(</code> then <code>[</code>, so the top is <code>[</code> — LIFO demands the most recent unclosed opener close first, and <code>[</code> is not the partner <code>)</code> needs</button>
+        <button class="mcq-opt" type="button">It doesn't reject — every bracket type opens once and closes once, so the string is balanced</button>
+        <button class="mcq-opt" type="button">At the <code>]</code>: a closing square bracket can never legally appear right after a <code>)</code></button>
+        <button class="mcq-opt" type="button">Only at the end, when the stack still holds an unmatched <code>(</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace it: push <code>(</code>, push <code>[</code>; then <code>)</code> arrives, pops the top — <code>[</code> — and that mismatch rejects on the spot, at character three. Option 2 is the counting misconception: matching is about <i>nesting order</i>, not totals, and replacing counting with context is exactly the stack's job. Option 3 checks neighbors instead of context — in <code>"([()])"</code> a <code>]</code> legally follows a <code>)</code>. Option 4 describes the other failure mode (leftover openers at the end), which this string never survives long enough to reach.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — verify the heap invariant</p>
+      <p class="mcq-q">Read the array <code>[2, 5, 3, 9, 6, 4]</code> the way §04 does — index i's children at 2i+1 and 2i+2. Is this a valid min-heap?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">No — 5 appears before 3, and a heap must be sorted ascending</button>
+        <button class="mcq-opt" type="button" data-ok>Yes — check each parent against its own children only: 2 ≤ {5, 3}, 5 ≤ {9, 6}, 3 ≤ 4. Nothing else is promised; siblings can sit in any order</button>
+        <button class="mcq-opt" type="button">No — the 9 at index 3 is larger than the 6 and 4 that come after it in the array</button>
+        <button class="mcq-opt" type="button">Can't tell from an array — a tree needs actual node objects with pointers</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the heap's promise is deliberately weak — parent beats children, full stop. Option 1's 5-vs-3 compares <i>siblings</i> and option 3's 9-vs-6 compares across branches; neither pair shares a parent-child edge, so the invariant says nothing about them. That weakness is the feature: a repair only touches one root-to-leaf path (O(log n)), which full sortedness could never allow. Option 4 forgets §04's elegant bit — a complete tree encodes its shape in index arithmetic, no pointers required.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — four-line pointer surgery</p>
+      <p class="mcq-q">The line is <code>mochi → biscuit → clawdia → tuna</code>, <code>head</code> at mochi. Run: <code>const p = head.next; head.next = p.next; p.next = head; head = p;</code> — what does the list look like from <code>head</code>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>mochi → clawdia → tuna</code> — biscuit is lost the moment <code>head.next</code> skips over her</button>
+        <button class="mcq-opt" type="button">A cycle — pointing <code>p.next</code> back at <code>head</code> necessarily creates a loop</button>
+        <button class="mcq-opt" type="button"><code>mochi → biscuit → clawdia → tuna</code>, unchanged — <code>p</code> is a local copy, so writing through it can't affect the real list</button>
+        <button class="mcq-opt" type="button" data-ok><code>biscuit → mochi → clawdia → tuna</code> — the first two cats swapped, the tail untouched</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace it like §01's stepper: <code>p</code> grips biscuit (so she is never lost — option 1 dies on line one), mochi's arrow jumps to clawdia, biscuit's arrow turns back to mochi, and <code>head</code> enters at biscuit — the first-pair swap that opens LC 24. Option 2's cycle is what you get if you <i>flip lines 2 and 3</i>: rewire biscuit first and <code>head.next = p.next</code> then reads the already-rewired pointer, leaving mochi pointing at herself — order of surgery is everything. Option 3 confuses copying a reference with copying a node: <code>p</code> holds the <i>same</i> biscuit, so <code>p.next =</code> mutates the real list.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — run the monotonic stack by hand</p>
+      <p class="mcq-q">In your head, run §06's <code>daysUntilWarmer([70, 71, 68, 72])</code>. What comes back?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>[1, 2, 1, 0]</code></button>
+        <button class="mcq-opt" type="button"><code>[1, 1, 1, 0]</code></button>
+        <button class="mcq-opt" type="button"><code>[3, 2, 1, 0]</code></button>
+        <button class="mcq-opt" type="button"><code>[1, 2, 1, 3]</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> day 0 (70°) is resolved immediately by day 1 (71°) — distance 1. Day 1 then waits <i>past the dip</i>: 68° pushes on top of it, and both are popped by day 3's 72° — distances 2 and 1. Day 3 never sees warmer, and unresolved means 0, not "days to the end" (option 4). Option 2 is the "the answer is always tomorrow" instinct — it forgets 71 sits unresolved while 68 stacks above it; option 3 makes everyone wait for the maximum, but each day's question is "next warmer than <i>me</i>", and 71 answers 70 perfectly well. Bonus check: the stack ends holding just index 3 — the still-unresolved.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — recency, not insertion order</p>
+      <p class="mcq-q">An LRU cache with capacity 2 (§09): <code>put(1); put(2); get(1); put(3);</code> — the cache is full when 3 arrives. Who gets evicted?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Key 1 — it was inserted first, and a full cache evicts in insertion order</button>
+        <button class="mcq-opt" type="button" data-ok>Key 2 — <code>get(1)</code> bumped key 1 to most-recently-<i>used</i>, which leaves key 2 as the coldest entry</button>
+        <button class="mcq-opt" type="button">Nobody — a full LRU rejects the new <code>put</code> instead of evicting</button>
+        <button class="mcq-opt" type="button">Key 1 — reads don't refresh recency; only writes count as "use"</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> LRU evicts the least recently <i>used</i>, and a read is a use — that's the entire point of the delete-and-re-set bump in §09's runner (and of move-to-front in the classic map + DLL version). Option 1 describes FIFO eviction, a different and worse-hit-rate policy: insertion order stops mattering the moment anything is re-touched. Option 4 is a real design fork in some cache variants, but the LRU contract (and LC 146's) counts gets. Option 3 inverts what a cache is for — eviction is the feature, not a failure.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false complexity claim</p>
+      <p class="mcq-q">Three of these claims survive scrutiny. Which one is <b>FALSE</b>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">§06's while-inside-for is O(n) total — each index is pushed once and popped at most once, so the input can only fund ~2n stack operations</button>
+        <button class="mcq-opt" type="button">A queue built from two stacks (§03) dequeues in amortized O(1) — each element makes the pour from in-stack to out-stack exactly once in its lifetime</button>
+        <button class="mcq-opt" type="button">A min-heap (§04) peeks its minimum in O(1) and pops it in O(log n)</button>
+        <button class="mcq-opt" type="button" data-ok>A min-heap can also report its <b>maximum</b> in O(log n): start at the root and keep stepping to the larger child until you reach a leaf</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "parent ≤ children" points every path <i>away</i> from the minimum but says nothing about which child leads toward the maximum — greedy larger-child descent walks right past it. Try it on the valid min-heap <code>[1, 2, 3, 10, 11, 4, 5]</code>: the walk goes 1 → 3 → 5 and reports 5, while the true max, 11, hides down the "smaller" side. The maximum lives somewhere among the ~n/2 leaves and finding it costs O(n) — the weak promise (§04) buys cheap repair precisely by promising nothing sideways. The two true amortized claims are one argument wearing two costumes: charge the work to the element, not to the loop shape.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — structure for the operation mix</p>
+      <p class="mcq-q">A leaderboard ingests millions of scores per day, every write must ack fast, and the <b>only</b> read query is "current top 100". Best fit for that operation mix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A sorted array with binary-search insertion — O(log n) finds the slot, and sorted order makes the top 100 instant</button>
+        <button class="mcq-opt" type="button">A hash map of score → player — O(1) writes are unbeatable, and reads are rare enough to scan</button>
+        <button class="mcq-opt" type="button" data-ok>§04's capped min-heap of size 100 — compare each score to the heap's minimum (the current 100th place): below it, discard in O(1); above it, swap in at O(log 100); memory stays O(100) no matter how big the stream gets</button>
+        <button class="mcq-opt" type="button">A balanced BST (§12) over all scores — every operation is O(log n), so it dominates the alternatives</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the stated mix IS the question — reads only ever touch the top 100, so everything below 100th place is dead weight you'd be paying to keep ordered. The BST (option 4) is the tempting "senior" answer because it does <i>everything</i> in O(log n)… including maintaining order among millions of scores nobody will ever read; the size-k heap keeps exactly the 100 that matter, with log₂ 100 ≈ 7 as its worst step. Option 1 hides an O(n) shift of millions of elements inside a "binary search" headline (the same trap as the next question), and option 2 makes writes cheap by setting every read on fire. Choosing by operation mix, not by general-purpose power, is the judgment this module keeps circling.</p>
+    </div>
+    <div class="mcq" data-qid="dss-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — estimate the hidden O(n)</p>
+      <p class="mcq-q">You enqueue 1,000,000 jobs, then drain them one by one with <code>Array.prototype.shift()</code>. Back-of-envelope: total element moves, versus §03's index-pointer queue?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Within ~2× of each other — <code>shift()</code> carries some overhead, but both drains are O(n) overall</button>
+        <button class="mcq-opt" type="button" data-ok>Roughly 5 × 10¹¹ element moves (≈ n²/2 — every shift slides everything that's left) versus about 10⁶ pointer bumps — five-plus orders of magnitude apart</button>
+        <button class="mcq-opt" type="button">Identical — modern engines implement <code>shift()</code> as an O(1) internal pointer bump, so the old warning no longer applies</button>
+        <button class="mcq-opt" type="button">The index-pointer queue loses — it never frees dequeued slots, and that memory pressure dominates the runtime</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the first shift moves 999,999 elements, the next 999,998, and the sum is ≈ n²/2 = 5 × 10¹¹ — a quadratic hiding inside a one-line method call, which is exactly why §03's queue "removes" by moving a head index instead. Option 3 holds a grain of truth (engines memmove efficiently and fast-path small arrays), but on a million-element array each shift still slides O(n) elements — a fast constant times 10¹¹ loses to 10⁶ every time. Option 4 names a real trade-off — the index queue does hold its array until drained — but that's memory, not time, and §07's ring buffer fixes it with two wrapping indexes. This order-of-magnitude arithmetic is how you catch accidental quadratics in code review before production catches them for you.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li><b>Warm-up misses</b> → reread the reference model in §01 (a variable is a grip on a node, not the node — "reassignment deletes things" was the trap), the LIFO trace in §02 (counting brackets isn't matching them), and §04's weak promise (a heap is not a sorted array — parent-child edges are the only promises made).</li>
+        <li><b>Apply misses</b> → adopt the tracing ritual: paper, boxes and arrows, and after <i>every</i> line write the complete state — <code>head</code>, each <code>.next</code>, the stack's contents — before reading the next line. The bug always lives between two lines, never inside one; §01's stepper is this ritual, animated.</li>
+        <li><b>Stretch misses</b> → name the combinations: §04×§06 (invariants are what fund complexity claims), §04×§12 (the operation mix picks the structure, not general-purpose power), §03×§07 (the hidden O(n) inside a one-liner). Combining sections is the skill — interviews never ask one section at a time.</li>
+        <li>Transferable habit: <b>argue against your first answer before committing.</b> Every distractor above was built from somebody's first instinct — if you can't articulate why the runner-up option is wrong, you pattern-matched instead of reasoned, and the follow-up question will find you out.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1759,6 +1883,7 @@ console.log(`median-first:     depth ${depth(balancedFrom(sorted))}  (the LC 108
       <tr><td class="mono">11</td><td>rolling hash</td><td>Windows as base-B numbers, slid in O(1); hash match = candidate, mismatch = certain no.</td></tr>
       <tr><td class="mono">12</td><td>balance</td><td>Sorted input degenerates a BST to a list; rotations lift the middle; name AVL/RB/B-tree, don't implement.</td></tr>
       <tr><td class="mono">13</td><td>practice</td><td>Build each once from memory, drill its problems interleaved, keep the re-solve ritual.</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>Nine inferences, zero recall — trace the pointers, check the invariant, charge the cost to the element, and read the "why" even when you're right.</td></tr>
     </tbody>
   </table></div>
 </section>

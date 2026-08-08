@@ -19,8 +19,12 @@ under interview pressure."
 **The Learn track** (`learn/index.html` + 16 modules, added Aug 2026) is the self-paced
 deep-dive companion to the courses: beginner→advanced tutorials with inline-JS interactive
 widgets (MCQ quizzes with first-attempt scoring, sandboxed "run it" panels, hand-rolled
-visualizers, persisted worksheets). Every module is now 13–15 sections deep, split by
-`// beginner` / `// intermediate` / `// advanced` band dividers. Shelves: *Learn JavaScript*
+visualizers, persisted worksheets). Every module is now 14–16 sections deep, split by
+`// beginner` / `// intermediate` / `// advanced` band dividers, and closes with a
+**reasoning gym** (`#gym`, added Aug 2026): nine scored MCQs in three tiers — warm-up /
+apply / stretch — designed to force inference (trace, predict, spot-the-FALSE-claim,
+estimate) rather than recall. Gym qids are `<prefix>-gym-1..9` and ride the module's
+existing `learn:<slug>:quiz` key. Shelves: *Learn JavaScript*
 (js-fundamentals, js-async, typescript — purple `#C084FC`), *Learn DSA* (foundations,
 structures, trees-graphs, algorithms), *Build the stack* (react-deep-dive, node-backend,
 postgres-databases, aws-cloud, testing — red `#F87171`), *Think in systems*
@@ -74,7 +78,8 @@ pages' footers and the README.
   `--mark`/`--mark-deep`/`--mark-soft`.
 - **localStorage is namespaced per course** (`dsa48:*`, `sd48:*`, `bh48:*`, `fs48:*`,
   `fesd48:*`, and `in48:theme` for the landing page) so progress and theme never collide. Keys: `<ns>:progress`,
-  `<ns>:collapsed`, `<ns>:theme`. An anti-FOUC bootstrap in `<head>` sets `data-theme`
+  `<ns>:collapsed`, `<ns>:theme`, `<ns>:gym` (reasoning-gym first-attempt map, qid→0/1).
+  An anti-FOUC bootstrap in `<head>` sets `data-theme`
   before first paint. Theme is deliberately *not* shared across pages.
 - **The landing page is accent-neutral.** It keeps yellow as the page `--mark` and gives
   each course card its own `--acc`/`--acc-deep`/`--acc-soft` trio (`.course.dsa`,
@@ -86,6 +91,12 @@ pages' footers and the README.
 - **Drill checkboxes:** the `<label class="prob-main">` wraps only the input + name; the
   external link sits *outside* it so clicking a link never toggles a box. Each input needs
   a unique `data-key` and a `data-day` of `1` or `2`.
+- **Reasoning gym (every course, Aug 2026):** a `#gym` section between the last topic and
+  the playbook — 12 scored MCQs in three tiers (warm-up / apply / stretch), first attempt
+  persisted to `<ns>:gym`, score painted into `#gym-score`. The `.mcq` CSS + engine are
+  ported from the Learn track's `learn-tail.html`; a "// practice" side-group links it.
+  Questions must force an inference (trace / locate-the-layer / FALSE-claim / estimation),
+  never recall, and every distractor encodes a named misconception explained in `.mcq-why`.
 - Every page ends with reference sections: interview playbook, a 10-second pattern/
   component index, cheat tables, and an honest "safe to skip" list. Both days tell the
   reader what to cut if they only have one day.

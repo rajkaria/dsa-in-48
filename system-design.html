@@ -446,6 +446,26 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .quiz .ans{padding:0 15px 12px 45px;font-size:.86rem;color:var(--ink-2)}
 .quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
 
+/* reasoning gym — scored MCQs (first attempt persisted) */
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+.gym-score-row{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-top:10px}
+.gym-score-row b{color:var(--ink)}
+
 /* tables */
 .tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
 .tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
@@ -578,6 +598,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#chat"><span>Classic: Chat</span><span class="t">90m</span></a>
   </nav>
 
+  <nav class="side-group" aria-label="Practice">
+    <h4>// practice</h4>
+    <a class="side-link" href="#gym"><span>Reasoning Gym</span><span class="t">12q</span></a>
+  </nav>
+
   <nav class="side-group" aria-label="Reference">
     <h4>// reference</h4>
     <a class="side-link" href="#playbook"><span>Interview Playbook</span></a>
@@ -622,6 +647,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   <div class="hero-meta">
     <span><b>12</b> topics</span>
     <span><b>32</b> design drills</span>
+    <span><b>12</b> gym questions</span>
     <span><b>~8.5h</b> per day</span>
     <span><b>0</b> math beyond powers of ten</span>
   </div>
@@ -1397,6 +1423,170 @@ B offline?  no socket registered → push notification (APNs/FCM)
 </section>
 
 <!-- PLAYBOOK -->
+<!-- REASONING GYM -->
+<section class="section" id="gym">
+  <p class="section-eyebrow">// practice · after day 2 — the whiteboard without the whiteboard</p>
+  <h2>The reasoning gym</h2>
+  <p class="sub">Twelve scored questions in three tiers. System design interviews grade the <i>chain of reasoning</i>, not the final boxes — so every question here makes you run one: convert the traffic, find the bottleneck, trace the failure, catch the claim that sounds right but isn't. First pick is the recorded one. The "why" under each answer is the actual lesson — read it even when you're right.</p>
+  <p class="gym-score-row">first-attempt score: <b id="gym-score">0/12</b> · saves in this browser</p>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 1 — warm-up: powers of ten, loaded distractors</p>
+
+    <div class="mcq" data-qid="gym-w1">
+      <p class="mcq-tag">// warm-up 1 of 4 — requests per day is a vanity number</p>
+      <p class="mcq-q">A service takes 8.6M requests/day. What should you actually design for?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~1,000 QPS average — 8.6M over a day is about a thousand a second</button>
+        <button class="mcq-opt" type="button" data-ok>~100 QPS average (a day is ~86,400 s ≈ 10⁵), but provision for peak — traffic clusters, so plan for 2–5× average, ~300–500 QPS</button>
+        <button class="mcq-opt" type="button">8.6M QPS — always design for the headline number to be safe</button>
+        <button class="mcq-opt" type="button">Average QPS is the design target; peaks are the auto-scaler's problem, not the estimate's</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Two moves, both graded: the division (8.6×10⁶ / 8.64×10⁴ ≈ 100 — option A slips an order of magnitude, the most common napkin error in the room) and the <i>peak correction</i> — nobody's traffic is flat, and lunchtime or a push notification is 2–5× the mean. Option D sounds operationally savvy but designs the wrong system: auto-scaling has spin-up lag and databases don't auto-scale writes; the estimate itself must carry the peak.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w2">
+      <p class="mcq-tag">// warm-up 2 of 4 — cache math is about the misses</p>
+      <p class="mcq-q">Your cache hit rate improves from 90% to 99%. What happens to the read load on the database behind it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Drops by 9% — the hit rate went up nine points</button>
+        <button class="mcq-opt" type="button">Roughly halves — 99 is about twice as good as 90 relative to 100</button>
+        <button class="mcq-opt" type="button" data-ok>Drops 10× — misses fall from 10% of traffic to 1%, and the database only ever sees the misses</button>
+        <button class="mcq-opt" type="button">Unchanged — the database still stores all the data either way</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The database doesn't experience your hit rate; it experiences your <i>miss</i> rate — 10% → 1% is a factor of ten. This inversion is why the last few points of hit rate are worth real engineering, and why the scary corollary holds: a cache node dying at 99% doesn't add 1% load to the DB, it adds 100× its previous traffic (a "thundering herd"). Options A and B do arithmetic on the wrong quantity — the number that matters is the one the downstream system actually receives.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w3">
+      <p class="mcq-tag">// warm-up 3 of 4 — "just add servers" has a precondition</p>
+      <p class="mcq-q">You put a load balancer in front of 4 app servers and users start getting randomly logged out. What's the reasoning behind the failure?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Sessions live in each server's memory — a user's next request lands on a server that's never met them. Horizontal scaling requires state to move out (Redis, JWT) or sticky routing as a stopgap</button>
+        <button class="mcq-opt" type="button">The load balancer strips cookies from requests as a security default</button>
+        <button class="mcq-opt" type="button">Four servers is too few — below five, load balancers can't keep routing consistent</button>
+        <button class="mcq-opt" type="button">HTTPS terminates at the balancer, and sessions can't survive re-encryption</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The chain: session in RAM → round-robin sends request #2 elsewhere → no session there → logged out. "Add servers" only multiplies capacity when servers are <i>interchangeable</i>, and in-memory state is exactly what makes them not. Externalize the state (Redis session store, or stateless JWTs) and any server can serve anyone. Sticky sessions "work" but pin users to failure domains and fight the balancer. The other options are tech-flavored noise — naming plausible-sounding mechanisms that don't exist is how wrong answers survive interviews, which is why this gym makes you pick mechanisms, not vibes.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w4">
+      <p class="mcq-tag">// warm-up 4 of 4 — SQL vs NoSQL without the tribalism</p>
+      <p class="mcq-q">Which statement about the SQL / NoSQL choice would actually survive follow-up questions?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">NoSQL is faster than SQL, so high-traffic systems should default to it</button>
+        <button class="mcq-opt" type="button">SQL databases can't scale beyond a single machine, which is why NoSQL exists</button>
+        <button class="mcq-opt" type="button" data-ok>The choice follows the access patterns: relational joins, transactions, and ad-hoc queries favor SQL; simple key-based access at huge write volume favors NoSQL — and Postgres with read replicas carries further than most people assume</button>
+        <button class="mcq-opt" type="button">NoSQL means no schema, which removes the main source of production bugs</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "Faster" (A) at what, exactly? — a Postgres primary-key lookup is as fast as any KV store; NoSQL wins specific shapes (massive write fan-in, flexible documents) by <i>giving up</i> joins and cross-row transactions. B is folklore: replicas, partitioning, and tools like Vitess/Citus scale SQL a very long way — Instagram ran on sharded Postgres at hundreds of millions of users. D inverts reality: the schema moves into your application code, unversioned. The senior answer names workload traits, not team allegiances.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 2 — apply: trace the failure before you tap</p>
+
+    <div class="mcq" data-qid="gym-a1">
+      <p class="mcq-tag">// apply 1 of 4 — the disappearing post</p>
+      <p class="mcq-q">Primary + read replicas, ~300ms replication lag. A user submits a post, the page reloads, and their post isn't there — then appears on the next refresh. What happened, and what's the targeted fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The browser cached the old page — add <code>Cache-Control: no-store</code> to the feed response</button>
+        <button class="mcq-opt" type="button" data-ok>The write hit the primary; the reload's read hit a replica that hadn't replayed it yet. Fix: read-your-own-writes — route that user's reads to the primary briefly (or until the replica catches up to their write's position)</button>
+        <button class="mcq-opt" type="button">The write was lost and retried in the background — add a client-side retry queue</button>
+        <button class="mcq-opt" type="button">The post insert and the feed query raced inside one transaction — wrap both in SERIALIZABLE</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The symptom's shape gives it away: <i>gone, then back on its own</i> — data that was never written (C) doesn't resurrect itself, and a browser cache (A) wouldn't self-heal in 300ms. The write is safe on the primary; the read raced the replication stream. The fix is surgical, not global: only the author, only briefly, needs primary reads — everyone else's feed can be 300ms stale forever without anyone noticing. Escalating to SERIALIZABLE (D) misdiagnoses a replication problem as an isolation problem and pays for it in throughput. Diagnosing from the symptom's shape is the skill.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a2">
+      <p class="mcq-tag">// apply 2 of 4 — the double charge</p>
+      <p class="mcq-q">Your checkout POSTs to a payment service. The request times out; the client retries; the customer is charged twice. Trace the flaw and the real fix.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Retrying was the bug — payment requests must never be retried, and the user should be shown an error instead</button>
+        <button class="mcq-opt" type="button">Wrap the charge in a database transaction so the second request rolls back</button>
+        <button class="mcq-opt" type="button" data-ok>A timeout means "no answer," not "no charge" — the first request may have succeeded after the client gave up. Fix: an idempotency key per checkout attempt; the server stores it with the result and replays the stored response on retry instead of re-charging</button>
+        <button class="mcq-opt" type="button">Switch the retry to PUT — HTTP defines PUT as idempotent, which makes the double charge impossible</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The load-bearing insight: from the client's side, a timeout is <i>ambiguity</i> — the work may have finished after you stopped listening. Never retrying (A) trades double-charges for abandoned carts and still doesn't resolve the ambiguity. A DB transaction (B) protects one request's atomicity; the second request is a fresh transaction that happily charges again. And PUT (D) is only idempotent because servers are supposed to <i>implement</i> it that way — the verb is documentation, not mechanism. The idempotency key makes retries safe by giving both requests the same identity. Stripe's API works exactly this way.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a3">
+      <p class="mcq-tag">// apply 3 of 4 — what the queue actually buys</p>
+      <p class="mcq-q">Video uploads take ~30s to transcode inline, and at 10 uploads/s your API workers are all busy transcoding while new requests time out. You add a queue + worker pool. What changes for the uploading user?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Transcoding gets faster — queues parallelize the work</button>
+        <button class="mcq-opt" type="button" data-ok>Their POST returns in milliseconds with a job id (202 Accepted); the video finishes transcoding ~30s later and they find out via polling, push, or webhook. The 30s didn't shrink — it moved off the request path</button>
+        <button class="mcq-opt" type="button">Nothing — queues are an internal optimization invisible to clients</button>
+        <button class="mcq-opt" type="button">Uploads become more reliable but slower, since the queue adds a hop</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> A queue doesn't make work faster (A) — the same 30s of CPU happens, just on a worker instead of an API thread. What it changes is <i>who waits</i>: the API answers instantly, workers chew through the backlog at their own pace, and load spikes become queue depth instead of cascading timeouts. That forces a visible contract change (B, not C): the client now needs a way to learn about completion — job status endpoint, WebSocket, webhook. If your design adds a queue but the API still "returns the result," you've drawn a box without changing the system. Queue depth also becomes your best autoscaling signal — scale workers on backlog, not CPU.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a4">
+      <p class="mcq-tag">// apply 4 of 4 — the celebrity problem</p>
+      <p class="mcq-q">Your feed uses fan-out-on-write: each new post is copied into every follower's feed list. It works beautifully until an account with 50M followers posts. Trace the damage and the standard fix.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">50M feed inserts from one tap — a write storm that lags every queue. Fix: cap follower counts at the product level</button>
+        <button class="mcq-opt" type="button" data-ok>50M inserts per celebrity post — write amplification that melts the feed store. Fix: go hybrid — fan-out-on-write for normal accounts, fan-out-on-read for high-follower accounts (their posts get merged into feeds at read time)</button>
+        <button class="mcq-opt" type="button">The problem is storage cost, not writes — fix by compressing the feed entries</button>
+        <button class="mcq-opt" type="button">Switch everyone to fan-out-on-read — computing feeds at read time is strictly more scalable</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> One tap → 50M writes is the amplification math; queues smooth it but the backlog delays <i>everyone's</i> feeds behind one celebrity selfie. The instinct to flip entirely to read-time (D) trades one extreme for the other: now every feed load pays a merge across hundreds of followed accounts — you've moved the explosion from the write path to the much hotter read path. The hybrid keys the strategy on account size: cheap pre-computed feeds for the 99.9%, read-time merge only for the handful of whales. Splitting a strategy by workload segment — not picking one globally — is a pattern worth stealing for cache policy, sharding, and rate limits alike.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 3 — stretch: two ideas at once, constraints attached</p>
+
+    <div class="mcq" data-qid="gym-s1">
+      <p class="mcq-tag">// stretch 1 of 4 — the bytes are not the bottleneck</p>
+      <p class="mcq-q">500M user profiles at ~2KB each. Do the storage math, then answer honestly: why does this system still end up on multiple database nodes?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">500M × 2KB = ~1PB — the data physically can't fit on one machine, so sharding is forced</button>
+        <button class="mcq-opt" type="button" data-ok>500M × 2KB = ~1TB — trivially fits one machine. You distribute anyway for read/write throughput, availability (one box = one failure from total outage), and operational headroom — the QPS and the blast radius are the constraints, not the bytes</button>
+        <button class="mcq-opt" type="button">~1TB, so one machine is the right answer — distributing it would be premature optimization</button>
+        <button class="mcq-opt" type="button">The math doesn't matter — user data must be sharded by regulation in most jurisdictions</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> First the arithmetic: 5×10⁸ × 2×10³ bytes = 10¹² = 1TB (option A's petabyte needs a ×1000 slip — always sanity-check by exponents: 8+3=11, ≈10¹²... run it twice). Then the harder step: having proven the data <i>fits</i>, you must justify distribution on other grounds — 500M users generate reads no single box serves at peak, and a lone primary is a single point of failure with a multi-hour restore. Option C does the math right and the systems thinking wrong; capacity is only one of three constraints, and it's the one that <i>wasn't</i> binding. Naming which constraint actually binds is the whole skill.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s2">
+      <p class="mcq-tag">// stretch 2 of 4 — catch the false claim</p>
+      <p class="mcq-q">Three of these consistency claims are true. Which is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A system that stays available through a network partition may serve stale reads during it</button>
+        <button class="mcq-opt" type="button" data-ok>A consistency-first (CP) system stays fully available during partitions — the consistency choice only affects how fresh reads are, never uptime</button>
+        <button class="mcq-opt" type="button">Strong consistency across regions costs write latency, because replicas coordinate before acknowledging</button>
+        <button class="mcq-opt" type="button">When no partition is happening, a well-built system can deliver both consistency and availability — CAP's trade-off binds only during partitions</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> B smuggles in a contradiction: a CP system preserves consistency during a partition precisely by <i>refusing</i> some requests — a minority-side node that can't reach quorum must error or block rather than risk serving stale data or accepting a conflicting write. Unavailability isn't a side effect of the choice; it IS the choice. A is the mirror-image (AP) trade stated correctly, C is physics (coordination = round trips), and D is the most-forgotten fine print in CAP — the trade-off is partition-time only, which is why "CA until partition, then pick" is the honest framing. If an answer makes a trade-off sound free, it's the false one.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s3">
+      <p class="mcq-tag">// stretch 3 of 4 — rate limiting, distributed edition</p>
+      <p class="mcq-q">You must enforce "100 requests/min per API key" across 8 load-balanced API nodes. Each node currently keeps its own in-memory counter. What's actually being enforced, and what's the standard fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">100/min as intended — the load balancer spreads each key's traffic evenly, so the per-node counters sum correctly</button>
+        <button class="mcq-opt" type="button">The limit is under-enforced only when nodes crash — otherwise local counters are exact</button>
+        <button class="mcq-opt" type="button" data-ok>Up to ~800/min — each node counts only what it sees, so 8 independent counters each allow 100. Fix: centralize the count in Redis with atomic increments (accepting a small added hop), or pre-divide the quota per node and accept coarser fairness</button>
+        <button class="mcq-opt" type="button">Rate limiting belongs in the database — reject the excess requests where the data lives</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The invariant is <i>global</i> ("per key"), the state is <i>local</i> — that mismatch is the whole bug, and it generalizes to dedup, quotas, and "exactly one welcome email." Option A's even-spread assumption fails under connection reuse and is still 8×100 even when true. The fix is a genuine trade: Redis gives correctness for a millisecond hop and a hot key to watch; divided quotas keep zero-latency but strand headroom on idle nodes. Naming both options <i>with their costs</i> is what the interviewer is listening for. Option D pushes the work to the most expensive, least elastic tier — the component you're protecting becomes the bouncer.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s4">
+      <p class="mcq-tag">// stretch 4 of 4 — what breaks first at 10×</p>
+      <p class="mcq-q">A product-catalog service (reads:writes ≈ 100:1) runs on stateless app servers + one Postgres. Traffic is going 10×. Which component saturates first, and what's the right <i>order</i> of fixes?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">App servers first — they take every request. Scale them out, then see what's next</button>
+        <button class="mcq-opt" type="button">Shard Postgres now — at 10× you'll need it eventually, and migrations only get harder</button>
+        <button class="mcq-opt" type="button" data-ok>The database's read path saturates first. Order the fixes by leverage-per-cost: cache the hot catalog reads (100:1 makes this devastatingly effective), then add read replicas for the misses — and shard only if the write path ever becomes the constraint</button>
+        <button class="mcq-opt" type="button">Network bandwidth first — 10× the traffic means 10× the bytes, and the pipes go before the software</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Locate the bottleneck by elimination: stateless app servers are the <i>easiest</i> tier to scale (that's what stateless buys — option A picks the component that was never in danger), and catalog payloads are nowhere near saturating modern NICs (D). The single Postgres eats 100 reads for every write, so its read path binds first — and the 100:1 ratio is the clue that caching is the high-leverage move: read-heavy + tolerant-of-slight-staleness is the perfect cache workload. Sharding (B) is the most expensive tool in the drawer — permanent operational complexity — reached for while two cheaper fixes were still on the table. Cheapest-adequate-fix-first is the ordering interviewers reward.</p>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="playbook">
   <p class="section-eyebrow">// reference · run this script in every interview</p>
   <h2>The interview playbook</h2>
@@ -1510,6 +1700,7 @@ B offline?  no socket registered → push notification (APNs/FCM)
   var K_PROGRESS = 'sd48:progress';
   var K_COLLAPSED = 'sd48:collapsed';
   var K_THEME = 'sd48:theme';
+  var K_GYM = 'sd48:gym';
 
   function load(key, fallback) {
     try {
@@ -1625,6 +1816,47 @@ B offline?  no socket registered → push notification (APNs/FCM)
       });
     });
     updateProgress();
+
+    /* ---------- reasoning gym (first attempt is the recorded one) ---------- */
+    var gymState = load(K_GYM, {});
+    if (!gymState || typeof gymState !== 'object') gymState = {};
+
+    function paintGymScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = gymState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('gym-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function revealMcq() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (gymState[qid] === 1 || gymState[qid] === 0) {
+        revealMcq();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          revealMcq();
+          if (gymState[qid] !== 1 && gymState[qid] !== 0) {
+            gymState[qid] = ok ? 1 : 0;
+            save(K_GYM, gymState);
+          }
+          paintGymScore();
+        });
+      });
+    });
+    paintGymScore();
 
     var resetBtn = document.getElementById('reset-progress');
     if (resetBtn) {

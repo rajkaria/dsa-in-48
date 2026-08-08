@@ -13,6 +13,11 @@ updated: 2026-08-06
 - **Shipped to prod 2026-08-06.** `fullstack.html` live at
   https://dsa-in-48.vercel.app/fullstack (Vercel deploy `48c9ec1`, aliased) and on
   GitHub Pages via the `main` push. Nothing known broken.
+- **2026-08-08 (branch, not yet deployed):** gained a `#gym` reasoning-gym section —
+  12 scored three-tier MCQs (event loop, 401/403, bcrypt, React snapshots, nginx 413,
+  Express 4 async traps, N+1 math, JWT forgery, localStorage-JWT FALSE-claim, S3-vs-bytea
+  estimation, coupon race, CORS) with first attempts persisted to `fs48:gym`; hero-meta
+  and the landing card now list "12 gym questions".
 - Scope: 12 topics (JS core, async, modern JS/TS, React rendering, hooks, React at
   scale · Node internals, Express/API, PostgreSQL core, indexes/N+1, AWS map, AWS ops),
   **153 reveal-answer Q&As** (97 in topics + 56 in the `#qbank` bank), 36 drills

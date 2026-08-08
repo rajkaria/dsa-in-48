@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#coverage"><span><i class="dot" data-for="coverage"></i> Coverage, Honestly</span></a>
     <a class="side-link" href="#tdd"><span><i class="dot" data-for="tdd"></i> TDD, Demystified</span></a>
     <a class="side-link" href="#ci"><span><i class="dot" data-for="ci"></i> Flakes &amp; CI</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/13</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/22</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,10 +734,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: coverage judgment &amp; CI</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
-    <span><b>13</b> quiz questions</span>
+    <span><b>14</b> sections</span>
+    <span><b>22</b> quiz questions</span>
     <span><b>5</b> runnable panels</span>
-    <span><b>~8.5h</b> self-paced</span>
+    <span><b>~9h</b> self-paced</span>
   </div>
   <a class="btn" href="#why">Start with why <span class="arrow">↓</span></a>
 </header>
@@ -1477,6 +1478,139 @@ console.log('\nthree behaviors, three tests, zero speculative code — that is t
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Thirteen sections of judgment, now under load. <b>Warm-up</b> isolates one concept against its favorite misconceptions; <b>apply</b> hands you a small test and makes you trace it to a verdict; <b>stretch</b> chains sections together under real constraints. Your first pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right. The cats are watching your first instincts, which is exactly what the distractors were built from.</p>
+
+    <div class="mcq" data-qid="tq-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — what a spy assertion actually proves</p>
+      <p class="mcq-q"><code>it('sends a welcome email', async () =&gt; { const send = vi.fn(); await signup('mochi@cats.dev', send); expect(send).toHaveBeenCalled(); })</code> — green. What is actually proven?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">That a welcome email reached the inbox — the test's name says exactly that</button>
+        <button class="mcq-opt" type="button">Nothing at all — send is a fake, so any assertion about it is meaningless</button>
+        <button class="mcq-opt" type="button" data-ok>Only that signup invoked its send collaborator at least once — not who it addressed, not what it said, not that anything was delivered; the name promises far more than the assertion checks</button>
+        <button class="mcq-opt" type="button">That send received 'mochi@cats.dev' — spies record their arguments automatically</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a spy <i>records</i>; only the assertion <i>claims</i> — and <code>toHaveBeenCalled()</code> is the weakest claim on the menu, so signup could email the wrong address with an empty body and stay green. Option A is the misconception that the test name is the test's claim (§02: names are promises the asserts must keep — <code>toHaveBeenCalledWith('mochi@cats.dev')</code> keeps this one). D tempts because the arguments ARE recorded — but unasserted recordings prove nothing. B overcorrects: faking the email boundary is exactly right (§04); the flaw here is assertion strength, not the double.</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — assertion strength vs the bug</p>
+      <p class="mcq-q">A refactor breaks kitten pricing: <code>adoptionFee</code> now returns 500 instead of 5000. The only test covering it: <code>expect(adoptionFee({ age: 0.5, bonded: false })).toBeGreaterThan(0)</code>. Does CI go red?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>No — 500 is greater than 0, so the weakest-possible matcher waves the bug through; a test catches only the bugs its assertion can distinguish, and this one can't tell a kitten from a clearance sale</button>
+        <button class="mcq-opt" type="button">Yes — the broken line executed during the test, and executing broken code fails a test</button>
+        <button class="mcq-opt" type="button">Yes — matchers compare against the values the arrange step implies, so the framework knows 5000 was intended</button>
+        <button class="mcq-opt" type="button">No — but rerunning with coverage enabled would flag it, since coverage spots wrong results</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a test only fails when an assertion throws — a wrong value the matcher can't distinguish from a right one is invisible. B is the coverage misconception (§11: execution ≠ verification — the line ran, ran wrong, and nothing checked); D repeats it with a tool attached: coverage flags code that never ran, never values that came out wrong. C is framework-magic thinking — no matcher knows your intent. The habit: assert the exact value you computed by hand (<code>toBe(5000)</code>); ranges are for genuinely range-shaped contracts, not for dodging arithmetic.</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — naming the tier by its boundaries</p>
+      <p class="mcq-q">A test builds the app with <code>makeApp({ db: realTestPostgres })</code>, sends <code>POST /adoptions</code> through supertest, asserts a 201 and a row in the database. No browser; the payment provider is faked. Which tier is this — and what decides?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">E2E — it touches real infrastructure, and a real database means end-to-end</button>
+        <button class="mcq-opt" type="button">Unit — no browser is involved, so it can't be anything heavier</button>
+        <button class="mcq-opt" type="button">An inconsistent hybrid worth refactoring — mixing a real DB with a faked provider is a smell</button>
+        <button class="mcq-opt" type="button" data-ok>Integration — the tier is named by WHICH boundaries are real: your routes, middleware and DB run for real, the boundary you don't own is controlled, and no browser drives a deployed stack</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> tiers describe boundaries, not virtue: unit = your logic alone, integration = your wiring real with foreign edges controlled (§08 + §09), e2e = a browser driving the whole assembled stack (§10). A tempts because "real infra" sounds end-to-end — but e2e's cost comes from the browser and the deployed environment, not from Postgres in Docker. C has it exactly backwards: real-DB-plus-faked-payment is §08's sweet spot, the deliberate design. B's browserless-means-unit heuristic would demote every API contract test in the module.</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — will this test catch the bug?</p>
+      <p class="mcq-q"><code>const db = { find: vi.fn().mockResolvedValue({ name: 'Mochi' }) }; const repo = cachedRepo(db); await repo.get('m1'); await repo.get('m1'); expect(db.find).toHaveBeenCalledTimes(1)</code> — green. A teammate then ships a cache bug: the cache key ignores the id, so EVERY cat comes back as whichever was cached first. Does this test catch it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — toHaveBeenCalledTimes(1) is precisely the assertion shape that detects caching bugs</button>
+        <button class="mcq-opt" type="button" data-ok>No — trace the broken version: get('m1') misses and caches globally, the second get('m1') hits, find is called once, green; one id can't distinguish "cached by id" from "cached for everyone" — the missing test uses TWO different ids and expects two find calls returning two different cats</button>
+        <button class="mcq-opt" type="button">Yes — the stub returns Mochi for every call, so the wrong name would surface in the result</button>
+        <button class="mcq-opt" type="button">No — vi.fn() resets its call count at each await boundary, so the count was never reliable</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the exercise is running the BROKEN implementation in your head against the existing test — both correct and broken code produce exactly one <code>find</code> call for this input set, so the suite is silent. A tempts because call-counting IS the right assertion shape for caches; the flaw is the inputs, not the matcher. C collapses once you notice the stub returns Mochi for every id anyway — and no name is asserted. D invents framework behavior. Test design is adversarial input-picking: choose cases where plausible-wrong implementations disagree with the right one — §12's "the next test must force the generalization", aimed at someone else's code.</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — trace the flake to its mechanism</p>
+      <p class="mcq-q">The factory stamps <code>createdAt: new Date()</code>. The test: <code>await insert(makeCat({ name: 'Ziggy' })); await insert(makeCat({ name: 'Mochi' })); const res = await request(app).get('/cats?sort=newest'); expect(res.body[0].name).toBe('Mochi')</code>. Always green locally; in CI it fails about one run in five and passes on rerun. The mechanism?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Under load, Postgres treats ORDER BY as advisory and may return rows in any order</button>
+        <button class="mcq-opt" type="button">The two inserts race each other — sequential awaits can still interleave their queries</button>
+        <button class="mcq-opt" type="button">Supertest buffers response bodies differently on CI's Linux runners</button>
+        <button class="mcq-opt" type="button" data-ok>new Date() has millisecond resolution, and on a fast CI box both awaited inserts can land in the SAME millisecond — "newest" between tied timestamps is decided by nothing you control; fix the test by injecting explicit distinct timestamps, and fix the query with a stable tiebreaker (created_at DESC, id DESC)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> chain it: intermittent + machine-speed-correlated → suspect a tie or race in the sort key (§13: the failure's correlation IS the stack trace); the clock is the shared input (§05: the clock is a boundary — inject it, here via the factory). A is the tempting SQL myth — ORDER BY is guaranteed, but says nothing about order WITHIN ties, and tied keys are exactly what equal millisecond stamps produce. B misreads await: the second insert starts only after the first resolves. The two-part fix mirrors the two real bugs — and yes, the flake found a production defect too (unstable ordering under tied timestamps), which is §13's "a race your test found first is a gift".</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — when the double lies in the other direction</p>
+      <p class="mcq-q"><code>register</code> relies on Postgres's unique index to reject duplicate emails (it catches the constraint error and rethrows 'duplicate email'). The test: <code>const db = { save: vi.fn().mockResolvedValue({ id: 1 }) }; await register('a@cats.dev', db); await expect(register('a@cats.dev', db)).rejects.toThrow(/duplicate/)</code>. It fails — every run. The right conclusion?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>The verdict describes the stub, not the code: the duplicate rule lives in the real engine's unique index, and a stub that always resolves cannot reproduce it — test this path against real Postgres, or accept that teaching the fake to throw turns the test into an assertion about your own fake</button>
+        <button class="mcq-opt" type="button">register is buggy — the test is red, and red means the code under test is wrong</button>
+        <button class="mcq-opt" type="button">Use mockRejectedValueOnce for the second call — the test goes green and the behavior is now covered</button>
+        <button class="mcq-opt" type="button">Add a retry — deterministic setup can still flake, and retries absorb it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> first classify the failure — deterministic red, so not a flake (§13's definition requires a varying verdict), which rules out D by category. Then ask WHOSE behavior the assertion needs: the throw originates in an engine that isn't in the room. B is the reflex that red always indicts the code — a double that's too dumb produces false reds just as one that's too agreeable produces false greens (§04, read from the other side). C is the seductive middle: it does test the catch-and-rethrow translation (real value), but it silently stops testing that the constraint EXISTS — drop the unique index in a migration and that suite stays green while production fills with duplicates. Constraint-shaped behavior is precisely what earns a real-Postgres test (§09).</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — find the false claim</p>
+      <p class="mcq-q">Three of these claims are true. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A suite can report 100% branch coverage while asserting nothing — coverage counts execution, and only assertions check values</button>
+        <button class="mcq-opt" type="button">A getByRole query failing on a clickable &lt;div&gt; is the test correctly reporting an accessibility defect, not an RTL limitation</button>
+        <button class="mcq-opt" type="button" data-ok>Swapping the test database from Postgres to SQLite is safe as long as every query goes through the same ORM/query builder — the abstraction makes the engines interchangeable</button>
+        <button class="mcq-opt" type="button">expect(spy).toHaveBeenCalled() proves the collaborator was invoked, not that its real-world effect happened</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the ORM translates your <i>syntax</i>, not the engine's <i>semantics</i> — type coercions, constraint and transaction behavior, RETURNING support and error codes all differ, so a green SQLite suite certifies an engine you don't deploy (§09's "the tempting middle that lies"). The trap in FALSE-claim questions is guilt by association: A, B and D are each a section's core sentence (§11, §06, §04), and three familiar truths make the fourth sound respectable. Read claims one at a time, and be most suspicious of the one containing "safe as long as" — absolute guarantees hung on an abstraction layer rarely survive §09.</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — a CI budget, back-of-envelope</p>
+      <p class="mcq-q">Constraint: a verdict in ≤10 minutes per commit, 4 parallel workers. The suite: 800 unit tests at ~50ms, 120 integration tests at ~2s (per-worker DBs), 60 e2e at ~30s. Where does the wall clock actually go — and what's the pyramid-correct move as e2e keeps growing?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The 800 unit tests dominate — they're 80% of the suite by count, so trim there first</button>
+        <button class="mcq-opt" type="button" data-ok>Run the numbers: units 800×50ms = 40s serial, integration 120×2s = 4min, e2e 60×30s = 30min — about 7.5 of your 10 minutes even across 4 workers, ~85% of the clock; hold e2e to the critical ~15 journeys and express the rest at the integration tier, where the same flow costs ~2s instead of ~30s</button>
+        <button class="mcq-opt" type="button">All three tiers contribute comparably at this scale — only bigger CI runners move the needle</button>
+        <button class="mcq-opt" type="button">Consolidate: move the 120 integration flows up to e2e so each is tested once in the most realistic tier</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> arithmetic before strategy — per-test cost spans 600× (50ms to 30s), so tier mix, not test count, sets the bill; parallelism divides every tier equally and cannot change the ratio. A reads "800" as expensive — all 800 units finish before four e2e tests do. C is what the estimate exists to refute. D maximizes realism and bankrupts the budget: 180 e2e tests ≈ 90 serial minutes, and truth is priced per tier — that pricing is the entire reason the pyramid is a pyramid (§01), and §10's portfolio discipline is how you enforce it once the numbers say the top is eating the budget.</p>
+    </div>
+
+    <div class="mcq" data-qid="tq-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — pin the bug where it lives</p>
+      <p class="mcq-q">Production incident: adoption-day reminders fired at 2am for users west of UTC — the code compared calendar dates in UTC instead of the user's timezone. The fix is written and reviewed. Which test do you add?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A nightly e2e job scheduled at 02:00 against staging — reproduce the incident's real conditions</button>
+        <button class="mcq-opt" type="button">A unit test that mutates process.env.TZ and uses the real Date — real time is the most realistic clock</button>
+        <button class="mcq-opt" type="button" data-ok>A fast test with an injected clock frozen just past a date boundary — say 23:30 in the user's zone, already "tomorrow" in UTC — asserting the reminder targets the user's calendar day; the bug becomes a permanent regression test that replays its once-a-day boundary in microseconds, on every commit</button>
+        <button class="mcq-opt" type="button">None — the fix was reviewed, and a test that reproduces an already-fixed bug is redundant</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> three rules chain here: every production bug becomes a test before the fix ships (§01), never test time with real time (§05 — the clock is a parameter), and a test whose verdict depends on when it runs is a flake by construction (§13). A builds a test that can only tell the truth at 2am — the incident's schedule, inherited by the suite. B smuggles the wall clock back in through an env var: global, environment-dependent, order-dependent — §13's shared-state suspect list in one line. D mistakes what regression tests are for: not finding this bug, but making its RETURN impossible to miss. The injected-clock version is the whole module in one test — boundary chosen adversarially, clock controlled, sad path pinned forever.</p>
+    </div>
+
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread §04 (a spy records; only assertions claim) and §11 (execution ≠ verification) — the misconceptions in play were "the test name is the claim", "running broken code fails a test", and "real database = e2e".</li>
+        <li>Apply misses → adopt the tracing ritual: before trusting any green, run the BROKEN version in your head against the same test — if both versions produce the same verdict, the test is silent, whatever its name says.</li>
+        <li>Stretch misses → name the combinations, because combining is the skill: §04×§06×§09×§11 (the false claim), §01×§08×§10 (the budget arithmetic), §01×§05×§13 (the regression clock). One section per question is a quiz; several is an interview.</li>
+        <li>Transferable everywhere: argue against your first answer before committing — every distractor here was built from a first instinct, and the same is true of the confident wrong answers in real design reviews.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1498,6 +1632,7 @@ console.log('\nthree behaviors, three tests, zero speculative code — that is t
       <tr><td class="mono">11</td><td>coverage</td><td>Execution ≠ verification — a flashlight for gaps, never a scoreboard; ratchet the diff.</td></tr>
       <tr><td class="mono">12</td><td>TDD</td><td>Red designs the API, green earns each generalization, refactor spends the net.</td></tr>
       <tr><td class="mono">13</td><td>flakes &amp; CI</td><td>Every flake has a cause; the failure's correlation is the stack trace; keep red meaning stop.</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>Run the broken version in your head — if the verdict doesn't change, the test is silent.</td></tr>
     </tbody>
   </table></div>
 </section>

@@ -690,6 +690,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#websockets"><span><i class="dot" data-for="websockets"></i> WebSockets</span></a>
     <a class="side-link" href="#observability"><span><i class="dot" data-for="observability"></i> Observability</span></a>
     <a class="side-link" href="#ship"><span><i class="dot" data-for="ship"></i> Testing &amp; Shipping</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -707,11 +708,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/16</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/24</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -734,10 +735,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: auth &amp; production judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>15</b> sections</span>
-    <span><b>15</b> quiz questions</span>
+    <span><b>16</b> sections</span>
+    <span><b>24</b> quiz questions</span>
     <span><b>13</b> runnable simulations</span>
-    <span><b>~10h</b> self-paced</span>
+    <span><b>~10.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#runtime">Into the engine room <span class="arrow">↓</span></a>
 </header>
@@ -1776,6 +1777,129 @@ describe('POST /v1/cats', () =&gt; {
   </div>
 </section>
 
+<!-- 16 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">16</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fifteen sections of engine room; now the transfer test. <b>Warm-up</b> isolates one idea each — every wrong option is a real misconception with a name. <b>Apply</b> hands you code and makes you run it in your head. <b>Stretch</b> chains two or more sections under constraints, which is what a backend interview actually is. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right. Professor Whiskers wrote several distractors from personal experience. 🐈</p>
+    <div class="mcq" data-qid="nb-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — who stalls during loop blocking</p>
+      <p class="mcq-q">A route handler runs a synchronous 200ms <code>JSON.parse</code> on a huge payload. At that moment, three other users' DB queries are already in flight. What's true while the parse runs?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Everything pauses — the DB queries stop making progress until the parse finishes</button>
+        <button class="mcq-opt" type="button">Nothing pauses — each request runs on its own thread, so only the parsing user waits</button>
+        <button class="mcq-opt" type="button" data-ok>The DB keeps working on those queries — but their callbacks can't run until the parse finishes, so all three responses stall anyway</button>
+        <button class="mcq-opt" type="button">Node moves the parse to libuv's thread pool automatically, so nobody waits</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the distinction is progress vs delivery: the database server and the kernel are other machines and threads, so the queries keep completing — but completion arrives as a JS callback, and every callback queues behind the parse (§01's one chef, §02's phases). "Everything pauses" over-rotates: blocking the loop doesn't stop the outside world, only your ability to respond to it. The thread-per-request option imports another runtime's model into Node. And libuv only offloads its own C-level work (fs, dns, crypto) — it never lifts <i>your JS</i> off the loop.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — where thrown errors travel</p>
+      <p class="mcq-q">A teammate registers the four-argument error middleware FIRST — "so it's ready before anything can fail" — then the routes. A route throws synchronously. Who answers the request?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The error handler — Express scans the whole stack for four-argument middleware wherever it lives</button>
+        <button class="mcq-opt" type="button" data-ok>Express's built-in default handler (a generic 500) — errors only travel FORWARD down the chain, so a handler registered before the routes never sees their errors; it must go last</button>
+        <button class="mcq-opt" type="button">Nobody — the throw skipped res.send, so the request hangs</button>
+        <button class="mcq-opt" type="button">The route itself — Express catches the throw and retries the handler once</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the chain is a one-way street (§06): a sync throw becomes <code>next(err)</code>, which jumps forward past normal middleware to the NEXT four-argument handler — and there isn't one after the routes, so the built-in default responds (in dev, with a stack trace: §10's "never leak internals" rule violated for free). The scan-anywhere option assumes position doesn't matter, but position is the entire mechanism — it's also why four-arg handlers are skipped during normal, error-free dispatch. The hang belongs to §06's <i>async</i>-throw story, a different failure. Retrying doesn't exist in Express.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — signed is not secret</p>
+      <p class="mcq-q">Login works, so a teammate adds the user's <code>apiKey</code> and card fingerprint to the JWT payload — "it's signed, so it's safe". Where does the reasoning break?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">It doesn't — the HMAC signature makes the token unreadable without the server's secret</button>
+        <button class="mcq-opt" type="button">It only breaks if the token ever travels over plain HTTP</button>
+        <button class="mcq-opt" type="button">The client can edit the payload and change the apiKey, so it's unsafe</button>
+        <button class="mcq-opt" type="button" data-ok>The payload is just base64url — anyone holding the token (extensions, log lines, a support screenshot) reads every claim; the signature proves nobody CHANGED it, not that nobody can SEE it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> signing gives integrity, not confidentiality — §08's demo decoded a payload with plain <code>atob</code>, no secret required. "Signed = encrypted" is the single most common JWT misconception, and the HTTPS option is its cousin: TLS protects the pipe, not the token at rest in storage, logs, or headers. Option three inverts the model — tampering is exactly what verification <i>does</i> catch; reading is what nothing prevents. The rule that falls out: identifiers in tokens, secrets in the database.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — trace the loop's guarantees</p>
+      <p class="mcq-q">Top level of a Node script: <code>setTimeout(() =&gt; log('A'), 0); setImmediate(() =&gt; log('B')); Promise.resolve().then(() =&gt; log('C')); process.nextTick(() =&gt; log('D')); log('E');</code> — what is guaranteed about the output?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>E, D, C is guaranteed — then A and B in EITHER order: top-level setTimeout(0) vs setImmediate is a race, only fixed inside an I/O callback</button>
+        <button class="mcq-opt" type="button">E, D, C, B, A always — setImmediate beats a 0ms timer</button>
+        <button class="mcq-opt" type="button">E, D, C, A, B always — the timers phase comes before check, so the timeout wins</button>
+        <button class="mcq-opt" type="button">E, C, D, A, B — microtasks run before nextTick, like in the browser</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> sync code first (E); then the between-everything queues drain — nextTick before promise microtasks (D, then C), Node's one deviation from browser intuition, which is exactly what the last option imports. The A/B tail is §02's famous coin flip: whether the loop's first timers pass sees the 0ms timer depends on whether a millisecond has elapsed by then, so both "always" options mistake a sometimes for an always. §02's snippet only got a deterministic order by scheduling from inside an I/O callback — you're in poll, check is next, immediate wins. In an interview, naming the nondeterminism IS the correct answer.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — middleware chain, traced top-down</p>
+      <p class="mcq-q">Registered in order: <code>app.use(logger)</code> → <code>app.get('/health', ok)</code> → <code>app.use(requireAuth)</code> (401s without a token) → <code>app.get('/stats', stats)</code> → <code>app.use((req, res) =&gt; res.status(404).end())</code>. An unauthenticated <code>GET /no-such-path</code> returns?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">404 — the router resolves paths up front, nothing matches, so middleware never runs</button>
+        <button class="mcq-opt" type="button" data-ok>401 — a pathless app.use matches EVERY request and the chain runs top-down, so requireAuth rejects it before the 404 catch-all is ever reached</button>
+        <button class="mcq-opt" type="button">200 from the logger — the first middleware to run sends the response</button>
+        <button class="mcq-opt" type="button">It hangs — no route matched, and only routes can end a request</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> run it down the list: logger (logs, calls next) → /health (path mismatch, skipped) → requireAuth (pathless, matches everything, no token → 401, chain over). The 404-first option imagines routing as a lookup table resolved before dispatch — Express is §06's flat top-down chain, and "no route matched" just means "nobody has answered yet". This trace is why the 404 handler goes last yet still sits BEHIND auth — and why an app's favicon request can mysteriously 401. Hanging only happens when nobody ends the chain (§06's forgotten-next bug), and requireAuth ends it.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — backpressure at real rates</p>
+      <p class="mcq-q"><code>pipeline(fs.createReadStream('video.mp4'), res)</code> serves a 1GB file to a client draining at 1MB/s. The disk reads at 500MB/s. Which is true?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The read finishes in ~2 seconds; the rest of the gigabyte waits in Node buffers until the client catches up</button>
+        <button class="mcq-opt" type="button">Node spills the producer/consumer gap to a temp file so memory stays flat</button>
+        <button class="mcq-opt" type="button" data-ok>The read stream spends ~17 minutes mostly PAUSED — the client's 1MB/s propagates back through res to the disk read, and memory holds near the 64KB highWaterMark throughout</button>
+        <button class="mcq-opt" type="button">Memory climbs toward 1GB unless you raise highWaterMark to cover the rate difference</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> back-of-envelope first — 1GB at 1MB/s ≈ 1,000 seconds ≈ 17 minutes. That's the transfer time, and with backpressure it's also the READ time: §04's pause protocol (write() returns false → pause → resume on drain) reaches all the way to the source, so the disk's 500MB/s only matters for keeping the small buffer topped up. Option one is precisely the world WITHOUT backpressure — §03's "readFile with extra steps". No temp-file spill exists; that's a strategy you'd have to build yourself. And raising highWaterMark trades MORE memory for fewer pauses — the last option holds the dial backwards.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false security claim</p>
+      <p class="mcq-q">Four claims about the §08/§09 auth design. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A stolen access token keeps working until expiry, even after the user clicks "log out" — unless you add server-side state</button>
+        <button class="mcq-opt" type="button" data-ok>Putting the tokens in httpOnly cookies prevents CSRF, since attacker scripts can't read the cookie</button>
+        <button class="mcq-opt" type="button">Refresh-token rotation turns a stolen refresh token into a detectable event instead of thirty silent days</button>
+        <button class="mcq-opt" type="button">Rotating the signing secret is a site-wide logout — every outstanding access token dies at once</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> httpOnly blunts XSS — scripts can't READ the cookie — but CSRF never needed to read it: the browser auto-attaches cookies to cross-site requests, and that auto-attach IS the attack. The defenses are SameSite and CSRF tokens, which is why §08's cookie spell recites both flags — each answers a different attack, and swapping them is the classic §08×§11 stumble. The other three claims are the load-bearing truths of the design: statelessness has no kill switch (§08), rotation is the tripwire (§09), and secret rotation is the nuclear logout.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — the loop's throughput ceiling</p>
+      <p class="mcq-q">Profiling shows each request costs ~2ms of CPU on the loop (parse, validate, serialize); p50 latency is 40ms, almost all of it awaiting the DB. Rough throughput ceiling for ONE replica?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>~500 req/s — the 2ms of serial loop time is the shared resource (1000ms ÷ 2ms); the 38ms of awaited I/O overlaps across requests and caps nothing</button>
+        <button class="mcq-opt" type="button">~25 req/s — one request takes 40ms, so 1000 ÷ 40</button>
+        <button class="mcq-opt" type="button">~10,000 req/s — Node benchmarks do five figures, and these numbers don't constrain that</button>
+        <button class="mcq-opt" type="button">No ceiling from these numbers — async I/O means throughput grows with connections until the DB saturates</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the loop is §01's one chef — only the CPU slice is serial, so one core saturates near 1000/2 = 500 req/s, and §02's event-loop lag starts climbing well before the errors do (§14's alert). Dividing by the 40ms latency is the classic latency/throughput confusion: while one request awaits the DB, dozens of others are mid-flight — Little's law puts ~20 in the air at the ceiling. Benchmark folklore measures hello-world, not YOUR 2ms per request; "unbounded" forgets the CPU exists at all. Need 2,000 req/s? That's §12's answer: four replicas, not a faster database.</p>
+    </div>
+    <div class="mcq" data-qid="nb-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — slow is not dead</p>
+      <p class="mcq-q">A live dashboard broadcasts 50 messages/s to every WebSocket. One client's connection degrades to ~1 message/s of real delivery — but it's alive and answers every ping. What happens server-side, and the defense?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">TCP backpressure makes ws.send() block on that socket until the client drains — stalling the loop for everyone</button>
+        <button class="mcq-opt" type="button">The heartbeat reaps it — that's exactly what §13's reaper exists for</button>
+        <button class="mcq-opt" type="button">Node drops frames for slow consumers automatically once buffers fill</button>
+        <button class="mcq-opt" type="button" data-ok>ws.send() never blocks — undelivered frames pile up in that connection's buffer (~49/s, forever), unbounded per-connection memory; watch bufferedAmount and coalesce, drop, or disconnect past a threshold</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> chain §04's law with §13's economics: send() is a write() that never says no out loud — it buffers, and a producer outrunning a consumer by 49 messages/s grows that buffer without bound, a RAM leak shaped like one slow user. The heartbeat option is the subtle trap: heartbeats detect DEAD (no pong), and this client pongs happily — slow and dead are different failure modes needing different tripwires. A blocking send would at least be backpressure, but that's not the API's behavior — and nothing drops frames for you; the coalesce/drop/disconnect policy is application code you have to write.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread the section behind the miss: §01–§02 for "who stalls" (blocking stops callbacks, not the outside world), §06 for error travel (forward only, handler last), §08 for signed-vs-secret (integrity is not confidentiality). Each wrong option was a named misconception, not noise.</li>
+        <li>Apply misses → adopt the tracing ritual: before picking, write the queues (sync → nextTick → microtasks → phases) or the middleware list top-to-bottom, then walk the request through with a pencil. The exercise is holding state in your head, not remembering facts.</li>
+        <li>Stretch misses → name the pairings and reread the weaker half: §08×§11 (which cookie flag answers which attack), §01×§12×§14 (loop CPU × replicas × the lag metric), §04×§13 (backpressure, now per connection). Combining sections IS the skill being tested.</li>
+        <li>Transferable tip: argue against your first answer before committing — the distractors were built from first instincts, and the loop, the chain, and the buffer all punish exactly those.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1799,6 +1923,7 @@ describe('POST /v1/cats', () =&gt; {
       <tr><td class="mono">13</td><td>websockets</td><td>Heartbeat the silent, budget per-connection memory, fan out through a broker.</td></tr>
       <tr><td class="mono">14</td><td>observability</td><td>Structured events + golden signals + one request id through everything; p99 is a user, not noise.</td></tr>
       <tr><td class="mono">15</td><td>shipping</td><td>Real-DB integration tests, mock only unowned edges; build once, promote; liveness ≠ readiness.</td></tr>
+      <tr><td class="mono">16</td><td>the gym</td><td>Nine inferences, zero recall — who stalls, where errors land, what buffers cost; argue with your first instinct.</td></tr>
     </tbody>
   </table></div>
 </section>

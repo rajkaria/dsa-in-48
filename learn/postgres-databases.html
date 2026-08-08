@@ -690,6 +690,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#indexplus"><span><i class="dot" data-for="indexplus"></i> The Exotic Indexes</span></a>
     <a class="side-link" href="#migrations"><span><i class="dot" data-for="migrations"></i> Zero-Downtime Migrations</span></a>
     <a class="side-link" href="#scale"><span><i class="dot" data-for="scale"></i> Scaling Postgres</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -707,11 +708,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/16</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/24</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -734,10 +735,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: isolation levels &amp; scaling</span>
   </div>
   <div class="hero-meta">
-    <span><b>15</b> sections</span>
-    <span><b>15</b> quiz questions</span>
+    <span><b>16</b> sections</span>
+    <span><b>24</b> quiz questions</span>
     <span><b>13</b> runnable panels</span>
-    <span><b>~10h</b> self-paced</span>
+    <span><b>~10.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#sql">Start at SELECT <span class="arrow">↓</span></a>
 </header>
@@ -1790,6 +1791,129 @@ console.log('and a sleep between chunks keeps replication lag flat. Boring on pu
   </div>
 </section>
 
+<!-- 16 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">16</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fifteen sections of ideas; this one is pure reps. <b>Warm-up</b> pits one concept against its favorite misconception, <b>apply</b> makes you trace queries and interleaved sessions to a concrete outcome, and <b>stretch</b> chains sections together under constraints — combining is the skill. First pick is the recorded one, and the "why" under each answer is the actual lesson: read it even when you're right, because Professor Whiskers grades the reasoning, not the guess.</p>
+    <div class="mcq" data-qid="pg-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — the NULL comparison trap</p>
+      <p class="mcq-q">A 6-row <code>cats</code> table has one cat whose <code>breed</code> is NULL. What does <code>SELECT count(*) FROM cats WHERE breed = 'tabby' OR breed &lt;&gt; 'tabby';</code> return?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">6 — every row's breed either is 'tabby' or isn't</button>
+        <button class="mcq-opt" type="button">0 — one NULL in the column makes the comparison fail for every row</button>
+        <button class="mcq-opt" type="button" data-ok>5 — for the NULL row both comparisons are NULL, <code>NULL OR NULL</code> is NULL, and WHERE only keeps rows where the predicate is TRUE</button>
+        <button class="mcq-opt" type="button">An error — a nullable column can't be compared without IS NULL</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> NULL is "unknown" (§01) — <i>unknown</i> = 'tabby' is unknown, <i>unknown</i> ≠ 'tabby' is equally unknown, and OR of two unknowns stays unknown. WHERE is a TRUE-only gate: rows whose predicate is NULL are dropped, not kept. Option 1 is the law-of-excluded-middle instinct — valid for values, void for unknowns — and the same trap powers the classic <code>NOT IN</code> bug (one NULL in the list and the query returns zero rows). Option 2 overcorrects into "NULL poisons everything" — it only poisons its own row's predicate. Option 4: comparing NULL is perfectly legal SQL; it just never yields TRUE.</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — will the index get used?</p>
+      <p class="mcq-q">The only index on <code>orders</code> is a composite on <code>(customer_id, created_at)</code>. Will <code>WHERE created_at &gt;= now() - interval '1 day'</code> use it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>No efficient use — the B-tree is sorted by customer_id first, so yesterday's timestamps are scattered through the whole index; expect a seq scan, and a separate index on created_at to fix it</button>
+        <button class="mcq-opt" type="button">Yes — created_at is in the index, and any indexed column is searchable</button>
+        <button class="mcq-opt" type="button">Yes, but only with a LIMIT so the planner knows it can stop early</button>
+        <button class="mcq-opt" type="button">No — range predicates like &gt;= can never use a B-tree</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> derive it from §04's phone book — sorted by last name then first, useless for "everyone named Raj". The composite serves <code>customer_id</code> alone, or <code>customer_id AND created_at</code>, because the leading column pins one contiguous stretch of the tree; a bare second column pins nothing. Option 2 is the "an index is a per-column magic lookup" misconception; option 4 has the rule exactly backwards — ranges are what B-trees are <i>best</i> at, provided they're on the leading column.</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — predict the join's row count</p>
+      <p class="mcq-q">§03's tables: 4 cats, and <code>adoptions</code> holds 3 rows — Mochi twice, Clawdia once. How many rows does <code>SELECT * FROM cats LEFT JOIN adoptions ON cats.id = adoptions.cat_id;</code> return?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">4 — LEFT JOIN returns exactly one row per left-side row</button>
+        <button class="mcq-opt" type="button">3 — only the adoption matches survive</button>
+        <button class="mcq-opt" type="button">7 — four cat rows plus three adoption rows</button>
+        <button class="mcq-opt" type="button" data-ok>5 — Mochi ×2 (one output row per match), Clawdia ×1, and Biscuit and Tuft kept once each with NULLs on the right</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two rules compose, and you need both: matched rows <i>multiply</i> (one output row per match — Mochi appears twice, §03's engine shows it), and LEFT preserves the loners with NULLs. Option 1 keeps only half the rule — "keeps every left row" doesn't mean "one row each"; that's the misconception behind every "why did my report triple?" bug. Option 3 is the INNER count; option 7-rows adds sides instead of matching them. This cardinality arithmetic is exactly why joining one-to-many and then aggregating the "one" side double-counts.</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — two sessions, one row</p>
+      <p class="mcq-q">Default READ COMMITTED. Session A: <code>BEGIN; UPDATE cats SET status = 'adopted' WHERE id = 7;</code> — no commit yet. Session B then runs <code>UPDATE cats SET status = 'adopted' WHERE id = 7 AND status = 'adoptable';</code>. What happens to B?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">B errors immediately — the row is locked and Postgres won't wait</button>
+        <button class="mcq-opt" type="button" data-ok>B blocks on A's row lock; when A commits, B re-checks its WHERE against the freshly committed version, sees status is no longer 'adoptable', and returns UPDATE 0</button>
+        <button class="mcq-opt" type="button">B updates instantly — MVCC snapshots mean writers never block writers</button>
+        <button class="mcq-opt" type="button">B waits, then applies its update on top after A commits — both sessions report UPDATE 1</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace three steps. (1) UPDATEs take row locks, so same-row writers queue — MVCC frees <i>readers</i>, not writers (§07); option 3 overextends the slogan. (2) At READ COMMITTED, when the lock clears, B's UPDATE re-evaluates its WHERE on the newest committed version, not on its old snapshot. (3) <code>status = 'adopted'</code> now fails the predicate → 0 rows. That rowcount is the entire point of §05's conditional-UPDATE pattern: B learns it lost, cleanly. Option 4 is the double adoption the pattern exists to prevent. And had A rolled back instead, B would have proceeded and won — the outcome literally depends on A's ending.</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — N+1 latency arithmetic</p>
+      <p class="mcq-q">A page awaits, in a loop: 40 cats (1 query), then per cat its adopter, then per cat its latest visit — each query a ~5 ms round trip, run sequentially. Roughly what's the page's query latency, and what does it become after batching each association into one <code>WHERE … IN (…)</code> query?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~200 ms → ~15 ms — the driver pipelines the per-cat queries two at a time</button>
+        <button class="mcq-opt" type="button">~400 ms → ~135 ms — adopters batch into one query, but per-row "latest visit" can't be batched</button>
+        <button class="mcq-opt" type="button">~15 ms both ways — the connection pool absorbs the round trips</button>
+        <button class="mcq-opt" type="button" data-ok>~400 ms → ~15 ms — 1 + 40 + 40 = 81 sequential round trips ≈ 405 ms; the batched version is 3 queries total ≈ 15 ms, a ~27× win</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the §08 discipline is count queries first: 1 + N + N = 81, and awaited in a loop they serialize — 81 × 5 ms ≈ 405 ms of pure round trips, regardless of how fast each query is. The fix is one <code>IN</code> query per association plus a Map stitch: 3 × 5 ≈ 15 ms. Option 3 is the classic pooling confusion — a pool reuses <i>connections</i>, it doesn't merge <i>round trips</i>. Option 1 invents driver behavior. Option 2's "can't batch latest-visit" is false — <code>DISTINCT ON</code> or a §09 window rank over <code>cat_id IN (…)</code> batches it fine. Transferable move: every latency estimate starts with "how many round trips?"</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — think like the planner</p>
+      <p class="mcq-q"><code>orders</code> has a B-tree index on <code>status</code>; statistics say 95% of rows are 'done' and 0.5% are 'pending'. Query A: <code>WHERE status = 'pending'</code>. Query B: <code>WHERE status = 'done'</code>. What does the planner choose?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Index scan for A, seq scan for B — random-hopping to 95% of the table costs more pages than reading it once in order; same index, opposite plans, decided by the statistics</button>
+        <button class="mcq-opt" type="button">Index scan for both — the index exists, and both predicates are simple equality</button>
+        <button class="mcq-opt" type="button">Seq scan for both — low-cardinality columns like status never benefit from a B-tree</button>
+        <button class="mcq-opt" type="button">Index scan for B only — more matching rows means the index helps more</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> run §12's crossover twice. Cost ≈ pages touched, and an index scan pays a random-I/O hop per matching row: at 0.5% selectivity that's a huge win; at 95% it's strictly worse than one sequential pass — so B's seq scan is the planner being <i>right</i>, which is the answer to most "Postgres ignored my index!" complaints. Option 4 inverts selectivity entirely. Option 3 oversteers a real half-truth — and misses that a §13 partial index on the rare 'pending' slice would serve A even better. The percentages come from ANALYZE-collected statistics, which is why stale stats produce silly plans (§12).</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — find the false claim</p>
+      <p class="mcq-q">Three of these concurrency claims are true (§05–§07). Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A plain SELECT never waits on a row lock — it reads whatever version its snapshot allows and moves on</button>
+        <button class="mcq-opt" type="button">Even at READ COMMITTED, two UPDATEs to the same row queue up — MVCC frees readers, not same-row writers</button>
+        <button class="mcq-opt" type="button" data-ok>At REPEATABLE READ, the §05 read-then-write race silently loses an update exactly as it does at READ COMMITTED — only SERIALIZABLE changes that outcome</button>
+        <button class="mcq-opt" type="button">One idle-in-transaction session can hold back VACUUM for the whole database — including tables it never touched</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> at REPEATABLE READ the second writer doesn't silently lose — its UPDATE finds the row changed since its snapshot and aborts loudly with a serialization failure ("could not serialize access due to concurrent update"). Different failure, still needs a retry, but not a vanished write — §06's LEVEL UP makes exactly this distinction, and "RR = same silent bug" is the tempting compression of it. Claims 1 and 2 are the two honest halves of MVCC's promise (§07): readers skate on snapshots, same-row writers still serialize on locks. Claim 4 is the bloat mechanism — the snapshot horizon is database-wide, which is why one forgotten <code>BEGIN</code> in a psql console shows up as unrelated tables swelling.</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — B-tree math on a napkin</p>
+      <p class="mcq-q">A 100M-row table stores ~100 rows per page, and each B-tree index node holds ~500 keys. Back-of-envelope: page reads for one indexed email lookup, versus a seq scan?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~27 vs ~1,000,000 — a binary tree needs log₂(100M) ≈ 27 hops</button>
+        <button class="mcq-opt" type="button" data-ok>~4–5 vs ~1,000,000 — 500³ ≈ 125M ≥ 100M, so ~3 index levels plus one heap page; the seq scan reads all million table pages</button>
+        <button class="mcq-opt" type="button">~500 vs ~200,000 — one page read per key in the root node</button>
+        <button class="mcq-opt" type="button">~4–5 vs ~100,000,000 — the seq scan reads every row individually</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> chain §04's shape with §12's cost unit. Depth uses log base <i>fan-out</i>, not 2: 500 × 500 × 500 ≥ 100M means ~3 levels — the whole point of a B-tree is trading node width for depth (§04's "widened so each node fills a disk page") — plus one heap hop ≈ 4–5 pages. The table side: 100M rows ÷ 100 per page = 1M pages, and scans are costed in <i>pages</i>, not rows — option 4 gets the tree right and then mixes the units. Option 1 is the BST reflex from the DSA track: right structure, wrong branching factor. The ~200,000× page gap you just derived IS the "seconds into milliseconds" claim, no benchmark needed.</p>
+    </div>
+    <div class="mcq" data-qid="pg-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — zero-downtime index shipping</p>
+      <p class="mcq-q">A hot 50M-row <code>users</code> table needs case-insensitive login: the query will become <code>WHERE lower(email) = lower($1)</code> (§13). Constraint: zero downtime (§14). Which plan ships it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>CREATE INDEX CONCURRENTLY … ON users (lower(email))</code> outside any transaction, <code>lock_timeout</code> set; if the build fails, drop the leftover INVALID index and retry; deploy the lower() query only after the index is valid</button>
+        <button class="mcq-opt" type="button">Plain <code>CREATE INDEX</code> at 3am — index builds don't block reads, so a quiet hour is safe enough</button>
+        <button class="mcq-opt" type="button">Run <code>CREATE INDEX CONCURRENTLY</code> inside the migration's transaction, so a failed build rolls back cleanly</button>
+        <button class="mcq-opt" type="button">Ship the lower() query first — Postgres uses the existing email index until the new one is ready</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two sections must agree. §13: the index must store what the query compares, so a <code>lower(email)</code> expression index is non-negotiable — which kills option 4: the plain email index is blind to <code>lower(email)</code> (§04's function-wrap rule), so shipping the query first means every login seq-scans 50M rows. §14: plain CREATE INDEX blocks <b>writes</b> for the whole build — minutes at this size; the write queue exhausts the pool and takes reads down with it, 3am or not. Option 3 sounds extra-careful but is simply an error — CONCURRENTLY cannot run inside a transaction block; its price is the INVALID-index-on-failure cleanup instead. Sequencing the two deploys is the whole game.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses point at a home section: NULL logic is §01's three-valued footnote, leftmost-prefix is §04's phone book, row multiplication is §03's join engine. Reread the model, then re-derive the answer from it — the misconception in each distractor survives on the phrase, not the model.</li>
+        <li>Apply misses → trace on paper before choosing: number the events (lock taken → commit → WHERE re-check) or count the round trips (1 + N + N) — writing the sequence down catches the step your head skips. The §05 and §08 runners exist to be re-run with your own edits.</li>
+        <li>Stretch misses → name the seams: §05×§06×§07 (locks × isolation × MVCC), §04×§12 (B-tree shape × cost-in-pages), §13×§14 (what the index stores × how it ships without an outage). Senior DB rounds live exactly at these joins — combining is the skill being tested.</li>
+        <li>One transferable habit: argue against your first answer for ten seconds before committing — every distractor above was built from a first instinct, and the fastest way out of a trap is asking what would make your favorite option wrong.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1813,6 +1937,7 @@ console.log('and a sleep between chunks keeps replication lag flat. Boring on pu
       <tr><td class="mono">13</td><td>indexes+</td><td>Partial, covering, expression, GIN, BRIN — each deletes one named cost; audit the unused.</td></tr>
       <tr><td class="mono">14</td><td>migrations</td><td>Expand → backfill in batches → contract; both code versions serve every schema; CONCURRENTLY or outage.</td></tr>
       <tr><td class="mono">15</td><td>scale</td><td>Pool → tune → cache → replicas (mind read-your-writes) → partition → shard last, if ever.</td></tr>
+      <tr><td class="mono">16</td><td>the gym</td><td>Nine inferences, zero recall — warm-up outwits a misconception, apply traces to an outcome, stretch chains sections; the "why" is the lesson.</td></tr>
     </tbody>
   </table></div>
 </section>

@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#multiregion"><span><i class="dot" data-for="multiregion"></i> Multi-Region</span></a>
     <a class="side-link" href="#worked"><span><i class="dot" data-for="worked"></i> Worked Designs</span></a>
     <a class="side-link" href="#workedplus"><span><i class="dot" data-for="workedplus"></i> Three More Designs</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/23</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,11 +734,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: five full designs</span>
   </div>
   <div class="hero-meta">
-    <span><b>14</b> sections</span>
-    <span><b>14</b> quiz questions</span>
+    <span><b>15</b> sections</span>
+    <span><b>23</b> quiz questions</span>
     <span><b>1</b> estimation calculator</span>
     <span><b>8</b> worked designs</span>
-    <span><b>~9.5h</b> self-paced</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#loop">Enter the loop <span class="arrow">↓</span></a>
 </header>
@@ -1258,6 +1259,129 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
+<!-- 15 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">15</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fourteen sections handed you the blocks; the gym makes you swing them with the labels off. Warm-ups isolate one idea against its favorite misconceptions, applies make you trace timelines and run the anchors, and stretches chain sections under real constraints — the same move the design round pulls. First pick is the recorded one, and the "why" under each answer is the actual lesson: read it even when you're right.</p>
+    <div class="mcq" data-qid="sd-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — sizing the cache from data math</p>
+      <p class="mcq-q">Your catalog's working set is 500GB and the 80/20 rule holds (the hot 20% of data serves ~80% of reads). To actually serve that ~80% of reads from Redis, roughly what cache size does the envelope demand?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~5GB — caches are a small optimization layer by nature</button>
+        <button class="mcq-opt" type="button" data-ok>~100GB — the hot fraction is measured in DATA: 20% of 500GB, a size you plan infrastructure around, not a rounding error</button>
+        <button class="mcq-opt" type="button">~400GB — you need to hold the 80% that gets read</button>
+        <button class="mcq-opt" type="button">~500GB — anything less than everything just means misses everywhere</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the two sides of 80/20 measure different things — the 20% is a share of <i>data</i> (0.2 × 500GB = 100GB), the 80% is a share of <i>reads</i>; picking 400GB swaps them. The ~5GB instinct treats caches as garnish, but §02's method sizes them from arithmetic, and 100GB is real hardware you must budget for. And 500GB is the all-or-nothing fallacy: a cache that misses 20% of the time still deletes ~80% of the database's read load (§04) — partial coverage is the entire business model.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — what a replica reader sees</p>
+      <p class="mcq-q">A primary async-replicates to one replica with ~200ms lag. At t=0 a write commits <code>treats: 1 → 2</code> on the primary. A different user reads the replica at t=100ms and again at t=300ms. What do they see?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">2 then 2 — once a write commits, every node returns it</button>
+        <button class="mcq-opt" type="button">An error at t=100ms — replicas refuse reads until they've caught up</button>
+        <button class="mcq-opt" type="button" data-ok>1 then 2 — the first read lands inside the ~200ms staleness window and gets the old value; by t=300ms the change has replayed</button>
+        <button class="mcq-opt" type="button">Possibly 1 forever — eventual consistency promises nothing at all</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> committed ≠ visible everywhere — a commit is a fact on the primary, and the replica serves whatever it has replayed so far, silently and successfully (no error: a lagging replica is a <i>normal</i> replica). So the reader sees 1 at t=100ms and 2 once the lag passes — §07's stale-read window, with the replication lag as its width. "1 forever" overcorrects: eventual consistency does promise convergence, it just refuses to say when. And note this reader holds no read-your-writes claim anyway — it wasn't their write.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — the queue admission test</p>
+      <p class="mcq-q">Checkout must respond in 300ms. Inside the handler: the card charge (~2s at the provider) and the receipt email (~1s). Which work can move behind a queue WITHOUT changing what the response is allowed to promise?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Only the email — the response never needed to contain it. The charge's outcome IS the response's promise; deferring it turns "paid ✓" into "we'll try", a product decision rather than a latency fix</button>
+        <button class="mcq-opt" type="button">Both — async everything is how you hit aggressive SLOs</button>
+        <button class="mcq-opt" type="button">The charge — always defer the slowest step first</button>
+        <button class="mcq-opt" type="button">Neither — queues add hops and latency; get a faster payment provider</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §06's admission test is one question — does the response depend on the result? The email fails it (pure deferrable work: queue it); the charge passes it (the user is owed a verdict). Queueing the charge anyway is the tempting trap: the SLO turns green while the response's meaning quietly changes to "payment pending" — sometimes the right product call, never a free one. "Defer the slowest" and "async everything" both optimize latency while ignoring semantics; "neither" throws away the one genuinely free win sitting in the handler.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — trace the cache race</p>
+      <p class="mcq-q">Cache-aside, 60s TTL, delete-on-write. Trace: t=0 — request A misses and reads <code>price = 10</code> from the DB, then stalls on a GC pause. t=1 — an update commits <code>price = 20</code> and deletes the cache key. t=2 — request A resumes and writes <code>price = 10</code> into the cache. What do readers see from t=3, and for how long?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">20 — the t=1 delete removed the stale entry, so readers miss and hit the DB</button>
+        <button class="mcq-opt" type="button">10 until the next price update or a cache restart — the stale value is stuck</button>
+        <button class="mcq-opt" type="button">10 briefly, but the cache rejects A's write because the key was deleted at t=1</button>
+        <button class="mcq-opt" type="button" data-ok>10 for up to ~60 seconds — A re-populated the stale read AFTER the invalidation, and only the TTL bounds the damage</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> walk the timeline in order: the delete at t=1 lands BEFORE the stale set at t=2, and invalidation only protects you if it happens after every in-flight read has been written back — which the write path cannot know. A plain SET has no memory of the delete (cache-aside keeps no tombstones), so option C invents machinery, and option A stops tracing one step too early. This race is exactly why §04 keeps the TTL "as the backstop" even with write-path invalidation — without it, option B is your outage. Real fixes: versioned/compare-and-set cache writes, or short TTLs on volatile keys.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — what actually breaks at 10×</p>
+      <p class="mcq-q">Today: 2k peak read RPS at a 95% cache hit rate, 20 write RPS, one Postgres primary + one replica, one Redis. Overnight success: everything ×10. Run the §02 anchors — which component hits its ceiling first?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The primary — 200 write RPS is too much for a single box</button>
+        <button class="mcq-opt" type="button" data-ok>None of the data tier. DB reads go 100 → 1,000 QPS (under the thousands-per-box anchor, and split across two nodes), writes go 20 → 200, Redis serves ~19k ops/s of a 100k+ budget. The app tier just needs ~10× more stateless boxes — routine, not redesign</button>
+        <button class="mcq-opt" type="button">Redis — 20k reads/s overwhelms a cache node</button>
+        <button class="mcq-opt" type="button">Replication — the replica can't apply 200 writes/s and falls hopelessly behind</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> "big number, must be broken" is the instinct every distractor encodes, and the anchors kill each one in a line — 200 writes/s is a small slice of one Postgres box's thousands-QPS budget, 20k ops/s is a fifth of one Redis, and a replica applying 200 changes/s is nowhere near lag territory. The only real work is horizontal: 20k peak RPS ÷ hundreds-to-low-thousands per app box = tens of stateless boxes behind the LB, which is §03's cattle doing their job. Knowing when the envelope says "add boxes, change nothing" is the same skill as knowing when it says shard — and it's the rarer half.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — redelivery vs relative mutations</p>
+      <p class="mcq-q">A worker consumes <code>decrement stock(sku-catnip) by 1</code> messages from a queue with a 30s visibility timeout. Worker W1 picks a message up at t=0, but a GC pause stretches its processing to 45s. Trace from t=30 onward — what happens to stock?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing unusual — the message is locked to W1 until it finishes; timeouts only apply to crashed workers</button>
+        <button class="mcq-opt" type="button">W2 may process a copy, but W1's eventual delete rolls W2's work back</button>
+        <button class="mcq-opt" type="button" data-ok>Stock ends up decremented twice — at t=30 the queue presumes W1 dead and redelivers; W2 decrements again (~t=35), and W1's late decrement still stands. Dedupe on the message id, or heartbeat-extend the timeout</button>
+        <button class="mcq-opt" type="button">The broker detects the same message in flight twice and suppresses the duplicate</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the visibility timeout is a lease, not a lock — expiry means "presumed dead, redeliver", and a paused-but-alive worker is indistinguishable from a dead one (the same outcome-unknown ambiguity as §08's timeouts). Deleting a message only stops <i>future</i> deliveries; it never undoes work already done, so option B's rollback doesn't exist, and option D is the exactly-once promise §06 already told you no broker can keep. <code>stock = stock − 1</code> is §08's relative-mutation trap in queue clothing: an idempotency key per message (a processed-set check) or an absolute write makes the second delivery a no-op.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — certify the true, catch the false</p>
+      <p class="mcq-q">Three of these claims are load-bearing truths from this module. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Growing a consensus cluster from 3 nodes to 4 increases the number of node failures it can survive</button>
+        <button class="mcq-opt" type="button">Any two majorities of the same cluster share at least one node — which is why two leaders can't both commit</button>
+        <button class="mcq-opt" type="button">A fixed-window rate limiter can admit ~2× its configured rate within a few seconds of a window boundary</button>
+        <button class="mcq-opt" type="button">At-least-once delivery plus idempotent handlers behaves, from the outside, like exactly-once</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> run the quorum arithmetic from §10 — a majority of 3 is 2 (survives 1 node down); a majority of 4 is 3 (still survives only 1). The fourth node buys cost and coordination, not resilience, which is exactly why clusters are odd-sized. The other three are §10's overlap argument, §09's boundary-burst, and §06+§08's effectively-once composition — and certifying each of them TRUE is the same muscle as catching the false one. That's the way to attack every "which is false" question: prove the others, don't vibe the odd one out.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — queue math under an SLO</p>
+      <p class="mcq-q">Cat-photo uploads spike to 500/s for 10 minutes every evening; your workers process 50/s; the SLO promises every photo is processed within 15 minutes of upload. Ops proposes: "put a queue in front — absorbing spikes is what queues are for." Does the SLO survive?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — this is precisely the spike absorption §06 promises</button>
+        <button class="mcq-opt" type="button">No — queues themselves can't ingest 500 messages/s</button>
+        <button class="mcq-opt" type="button">Yes, provided you use an event log (Kafka) instead of a plain queue</button>
+        <button class="mcq-opt" type="button" data-ok>No — the envelope says 300k arrivals, ~30k processed during the spike, and a ~270k backlog draining at 50/s ≈ 90 minutes: the last photo lands ~75 minutes late. Meeting the SLO needs ~4× workers (≈200/s), autoscaled on queue age</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a queue converts dropped requests into <i>wait time</i> — it never adds throughput — and this SLO is a promise about wait time, so §02's arithmetic must run on §06's buffer: required rate ≈ total work ÷ (spike + slack) = 300,000 ÷ 1,500s = 200/s. "Queues absorb spikes" is true and insufficient here — the queue keeps the site up while the SLO quietly dies in the backlog. Ingesting 500/s is trivial for any broker, and Kafka changes replay semantics, not worker capacity. Autoscaling workers on oldest-message age (§06's health metric) is what closes the loop.</p>
+    </div>
+    <div class="mcq" data-qid="sd-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — predict the merged outcome</p>
+      <p class="mcq-q">Active-active in two regions; cart rows replicate async with last-write-wins. A shopper's phone (routed to region A) adds a ball of yarn at t=0; their laptop (region B) adds a fish treat at t=0.05s; each write stores the FULL cart row; replication lag ~1s. After both regions converge, what does the cart show?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Both items — replication merges concurrent updates into one row</button>
+        <button class="mcq-opt" type="button" data-ok>Only the fish treat — each region wrote a full cart unaware of the other; LWW keeps the later timestamp and silently discards the yarn. The system converges — to a cart missing an item</button>
+        <button class="mcq-opt" type="button">A conflict error on the laptop — region B rejects the write it can't reconcile</button>
+        <button class="mcq-opt" type="button">Depends on which region you read from — the two carts stay different forever</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> chain §12 and §07. Async means neither region saw the other's write at commit time, so nothing can error — option C imagines synchronous conflict detection that isn't there. LWW is a convergence <i>rule</i>, not a merge: it resolves concurrent versions by discarding all but one, the exact "LWW silently drops updates" cost §12 tells you to say out loud — and it does converge, so option D undersells it. Eventual consistency's contract is that replicas agree, never that they agree on what the user meant. The fixes are §12's menu: home-region routing for a user's writes, or merge semantics for mergeable data — the set-union shopping cart being the canonical example.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread the section behind the misconception: §02 if you swapped the data-share and read-share of 80/20, §07 if you equated "committed" with "visible everywhere", §06 if you queued work the response still had to answer for.</li>
+        <li>Apply misses → adopt the tracing ritual: one line per actor (client, cache, DB, worker), one column per tick, written down — the cache race and the double decrement are invisible in your head and obvious on paper.</li>
+        <li>Stretch misses → drill the pairings, because combining is the skill: §10×§06 (quorum arithmetic beside delivery guarantees), §02×§06 (envelope math applied to a backlog), §12×§07 (conflict resolution as a consistency contract).</li>
+        <li>Transferable everywhere: argue against your first answer before committing — every distractor here was built from a first instinct ("big number = broken", "commit = visible", "buffer = capacity"), and so are the design round's traps.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1280,6 +1404,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <tr><td class="mono">12</td><td>multi-region</td><td>RPO/RTO price the strategies; global reads are easy, conflicting writes are the real question.</td></tr>
       <tr><td class="mono">13</td><td>designs</td><td>Shortener, limiter, hybrid feed (write-amplification!), chat, docs — six blocks, recombined forever.</td></tr>
       <tr><td class="mono">14</td><td>more designs</td><td>Geo-buckets for near-me, admission control for on-sale stampedes, sorted sets for live rank.</td></tr>
+      <tr><td class="mono">15</td><td>the gym</td><td>Nine inferences, three tiers — every distractor you fell for names the section to reread.</td></tr>
     </tbody>
   </table></div>
 </section>

@@ -447,6 +447,26 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
 
 /* tables */
+/* reasoning gym — scored MCQs (first attempt persisted) */
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+.gym-score-row{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-top:10px}
+.gym-score-row b{color:var(--ink)}
+
 .tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
 .tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
 .tbl-wrap .tbl{border:none}
@@ -579,6 +599,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#offer"><span>Offers &amp; Negotiation</span><span class="t">60m</span></a>
   </nav>
 
+  <nav class="side-group" aria-label="Practice">
+    <h4>// practice</h4>
+    <a class="side-link" href="#gym"><span>Reasoning Gym</span><span class="t">12q</span></a>
+  </nav>
+
   <nav class="side-group" aria-label="Reference">
     <h4>// reference</h4>
     <a class="side-link" href="#playbook"><span>Behavioral Playbook</span></a>
@@ -624,6 +649,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   <div class="hero-meta">
     <span><b>13</b> topics</span>
     <span><b>36</b> drills</span>
+    <span><b>12</b> gym questions</span>
     <span><b>~8.5h</b> per day</span>
     <span><b>0</b> canned answers</span>
   </div>
@@ -1489,6 +1515,170 @@ The counter (once, everything at once):
 <!-- ================= REFERENCE ================= -->
 
 <!-- PLAYBOOK -->
+<!-- REASONING GYM -->
+<section class="section" id="gym">
+  <p class="section-eyebrow">// practice · after day 2 — judgment reps, scored</p>
+  <h2>The reasoning gym</h2>
+  <p class="sub">Twelve scored questions in three tiers. Behavioral rounds are judgment tests wearing a conversation costume — so these aren't "pick the polite answer" questions. Each one asks you to read a situation, weigh what's actually being assessed, and catch the answer that sounds good but reasons badly. First pick is the recorded one. The "why" is the actual coaching — read it even when you're right.</p>
+  <p class="gym-score-row">first-attempt score: <b id="gym-score">0/12</b> · saves in this browser</p>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 1 — warm-up: what's actually being assessed</p>
+
+    <div class="mcq" data-qid="gym-w1">
+      <p class="mcq-tag">// warm-up 1 of 4 — decode the question behind the question</p>
+      <p class="mcq-q">"Tell me about a time you disagreed with your manager." What is the interviewer actually scoring?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Loyalty — the safe move is showing you ultimately deferred and complied</button>
+        <button class="mcq-opt" type="button">Whether you were right — pick a story where your position won and the manager admitted it</button>
+        <button class="mcq-opt" type="button" data-ok>How you disagree: did you bring evidence, argue the issue rather than the person, commit fully once a call was made — and did the relationship survive being tested</button>
+        <button class="mcq-opt" type="button">It's a screen for conflict-prone people — the strongest answer is that real disagreements have been rare</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Every behavioral question is a proxy: this one probes whether you can hold a dissenting view <i>professionally</i> — the thing senior engineers do weekly. "I complied" (A) reads as no spine; "I was proven right" (B) makes the story about vindication, and interviewers notice you optimizing for being right over being effective; "it's never happened" (D) reads as either disengagement or a dodge — a decade of shipping with zero disagreements isn't calm, it's absence. The winning shape: real stakes, evidence-based case, clean disagree-and-commit, intact relationship. Decode what's being assessed <i>before</i> choosing the story.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w2">
+      <p class="mcq-tag">// warm-up 2 of 4 — where engineer stories actually fail</p>
+      <p class="mcq-q">Engineers' STAR answers most often collapse in the same place. Which part gets under-told, and what's the cost?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The Situation — without deep context the interviewer can't follow, so spend the first two minutes on background</button>
+        <button class="mcq-opt" type="button" data-ok>The Result — engineers narrate actions in loving detail, then end with "…and it worked." No numbers, no aftermath, no lesson: the part that proves impact is a single mumbled sentence</button>
+        <button class="mcq-opt" type="button">The Task — job titles change between companies, so role clarity is the usual gap</button>
+        <button class="mcq-opt" type="button">The Action — engineers are too modest to describe what they personally did</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Watch any mock loop: the action section thrives (engineers love mechanism) and the result starves — yet the result is what the rubric pays for. "Latency dropped 40%, the alert hasn't fired since, and two teams adopted the pattern" converts a story into evidence. Option A is the inverted instinct that produces two-minute wind-ups (context should be two <i>sentences</i>); D is real but rarer, and its fix — "I" for your actions, "we" for outcomes — is a sentence-level habit, not a structural one. Ending strong is a choice you make while <i>building</i> the story, not while telling it.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w3">
+      <p class="mcq-tag">// warm-up 3 of 4 — hear it like the interviewer</p>
+      <p class="mcq-q">A candidate says: "The outage was mostly the platform team's bad deploy tooling — but I stepped up and fixed it anyway." What lands in the interviewer's notes?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A point for honesty — accurately attributing root cause is an engineering virtue</button>
+        <button class="mcq-opt" type="button">A point for initiative — they fixed something outside their ownership area</button>
+        <button class="mcq-opt" type="button" data-ok>A blame-shape red flag: "mostly their fault" plus "I stepped up" reads as deflection wearing a cape — the follow-ups will now probe for what this candidate's own contribution to failures looks like</button>
+        <button class="mcq-opt" type="button">Nothing notable — describing other teams' failures is neutral context</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The words are doing two moves at once — assigning fault elsewhere and claiming heroism — and interviewers are trained to hear that pattern, because people who narrate this way in interviews narrate incidents this way at work. The honest version costs nothing: "The trigger was a deploy-tooling gap; my part was that our service had no circuit breaker, which turned a blip into an outage — I fixed both." Same facts, ownership included, twice as senior. A and B reward the surface content; C hears the <i>shape</i>. In behavioral rounds, shape is signal.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w4">
+      <p class="mcq-tag">// warm-up 4 of 4 — the weakness question is a reasoning test</p>
+      <p class="mcq-q">"What's your biggest weakness?" Which answer survives the follow-up questions?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">"Honestly, I'm a perfectionist — I care too much about quality" — it frames a strength as the confession</button>
+        <button class="mcq-opt" type="button" data-ok>A real, non-core weakness plus a running mitigation: "I default to solving instead of delegating — my current fix is explicitly assigning a stretch owner in planning, and it's been uneven but improving"</button>
+        <button class="mcq-opt" type="button">"I sometimes miss deadlines when tasks are bigger than they looked" — maximum honesty builds maximum trust</button>
+        <button class="mcq-opt" type="button">Redirect it: "I'd rather tell you what I'm great at — weaknesses are a negative framing"</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The question tests self-awareness and whether you act on it — so the answer needs a true flaw <i>and</i> evidence of management. The humble-brag (A) fails the sincerity check instantly and signals you think the interviewer is a rube. Confessing a core-competency failure (C) mistakes the test: honesty is necessary, not sufficient — "misses deadlines" is disqualifying content delivered honestly. Refusing (D) fails self-awareness outright. Note the winning answer's texture: specific mechanism, current countermeasure, honest "uneven" — that admission of imperfect progress is what makes the whole thing credible.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 2 — apply: read the situation, pick the move</p>
+
+    <div class="mcq" data-qid="gym-a1">
+      <p class="mcq-tag">// apply 1 of 4 — the defensive teammate</p>
+      <p class="mcq-q">A teammate's PR has a design flaw that will cause pain in ~3 months. Deadline is tomorrow; they're already defensive from earlier review rounds. Strongest move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Approve it — the relationship and the deadline both matter more than a distant maybe-problem</button>
+        <button class="mcq-opt" type="button">Rewrite the risky part yourself tonight and push it to their branch — fastest path to both shipped and correct</button>
+        <button class="mcq-opt" type="button" data-ok>Separate the concerns out loud: name the specific future failure with a concrete trigger, agree the deadline stands, and land a scoped follow-up (ticket with criteria, or a small guard now) — reviewed with them, not around them</button>
+        <button class="mcq-opt" type="button">Take it to the tech lead first — a neutral authority avoids the interpersonal friction entirely</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The trap is treating "flaw" and "deadline" as one decision — they're two. Naming a <i>specific</i> trigger ("when we add a second payment provider, this coupling breaks") converts vibes into an engineering claim a defensive person can engage with; agreeing the deadline stands removes the threat that makes them defensive. Silent approval (A) converts a known risk into an anonymous future incident. The overnight rewrite (B) is the hero anti-pattern — it reads as contempt and scales to nothing. Escalating first (D) spends trust you haven't tried to use: authority is the move <i>after</i> the direct conversation fails, and interviewers ask "what did you try first?" precisely to check that ordering.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a2">
+      <p class="mcq-tag">// apply 2 of 4 — surgery on a rambling answer</p>
+      <p class="mcq-q">In a mock, your "tell me about a hard bug" answer ran four minutes: two minutes of system context, the fix, then trailing off with "so yeah, that was that." What's the highest-leverage structural repair?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Cut it to 60 seconds flat — interviewers primarily grade concision</button>
+        <button class="mcq-opt" type="button" data-ok>Invert the shape: open with the outcome as a headline ("I found a race condition that had corrupted 40k records — here's the hunt"), compress context to two sentences, and end on impact + what changed in how you work</button>
+        <button class="mcq-opt" type="button">Keep the architecture deep-dive — technical depth is what distinguishes strong candidates, and cutting it wastes your best material</button>
+        <button class="mcq-opt" type="button">Add signposting to the existing structure ("first the context, then the debugging, then results") so the length stops mattering</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The answer's real defects are a buried lede and a dead ending — length is the symptom. Headlining the outcome buys attention for everything after it (the interviewer now knows why to listen) and forces the context diet, because context must now justify itself against a stated point. Option A treats the symptom and would happily produce a tight, pointless answer. C misreads the audience — depth wins when it's <i>load-bearing for the story</i>, not ambient. D's signposting is lipstick on a four-minute structure: narration order was never the problem, salience order was. Diagnose before prescribing — same skill as debugging.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a3">
+      <p class="mcq-tag">// apply 3 of 4 — story selection is half the answer</p>
+      <p class="mcq-q">For "tell me about a conflict with a peer," which story do you pick?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The time a heated API-design argument ended when the other engineer eventually came around to your approach</button>
+        <button class="mcq-opt" type="button">The time you and a peer seemed to disagree for a week but discovered it was a misunderstanding about requirements — resolved in one meeting, no hard feelings</button>
+        <button class="mcq-opt" type="button" data-ok>The time you and a peer genuinely disagreed on rollout strategy with real stakes, ran a time-boxed experiment to get evidence, went with the hybrid the data suggested, and changed how the team makes that class of decision</button>
+        <button class="mcq-opt" type="button">The time an intern pushed back on your review comments and you walked them through why the standards exist until they accepted them</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Grade each story against what the question probes — behavior inside <i>sustained, real</i> disagreement between equals. A's arc is "they came around": vindication, zero visible movement from you. B evaporates on inspection — a misunderstanding isn't a conflict, and picking it suggests you've never navigated one (or won't discuss it). D has a power gradient that removes the difficulty: persuading someone junior to you tests patience, not conflict skill. C has the full anatomy — stakes, a legitimate opposing view, a <i>mechanism</i> for resolution (evidence over volume), a conclusion neither side started with, and a durable process change. Choosing the story IS the demonstrated judgment.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a4">
+      <p class="mcq-tag">// apply 4 of 4 — failure stories that pass the follow-ups</p>
+      <p class="mcq-q">"Tell me about a significant failure." Which answer holds up under three follow-up questions?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">"We missed a launch because product kept changing requirements — I learned to get sign-off in writing"</button>
+        <button class="mcq-opt" type="button">"I once submitted an assignment late in university — since then I've never missed a professional deadline"</button>
+        <button class="mcq-opt" type="button">"My 'failure' is that I took on the hardest migration alone and delivered it two weeks late — but it worked perfectly"</button>
+        <button class="mcq-opt" type="button" data-ok>"I shipped a schema change without a rollback plan; when it corrupted a partner's data we lost a day recovering. The miss was mine — I'd skipped the review step I found tedious. I now write the rollback before the migration, and I've caught two bad ones since"</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Run each through the follow-ups an interviewer will actually ask ("what was YOUR part?", "what changed?", "how do you know?"). A assigns the failure to product and learns a defensive lesson — ownership score: zero. B's stakes are so low the choice itself is the red flag: a decade of work and <i>this</i> is the failure? C is the humble-brag in failure costume — "my flaw is heroic overcommitment" — and gets dismantled by the first follow-up. D names a real cost, locates the cause in the candidate's own (relatable, specific) behavior, and closes the loop with a mechanism that has since <i>fired</i> — evidence the lesson took. The willingness to say "I skipped it because it was tedious" is exactly the self-awareness the question exists to find.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 3 — stretch: judgment under competing pressures</p>
+
+    <div class="mcq" data-qid="gym-s1">
+      <p class="mcq-tag">// stretch 1 of 4 — catch the false claim</p>
+      <p class="mcq-q">Three of these are true about behavioral rounds. Which is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Specific, verifiable detail beats polish — a slightly rough answer full of real numbers outscores a smooth generic one</button>
+        <button class="mcq-opt" type="button">Pronouns get audited: all-"we" answers hide your contribution, all-"I" answers on team wins raise a different flag — the mix should track reality</button>
+        <button class="mcq-opt" type="button" data-ok>Once a story is rehearsed, deliver it verbatim every time it fits — consistency of delivery is what interviewers reward, and adapting mid-loop risks losing the thread</button>
+        <button class="mcq-opt" type="button">Pausing to ask "do you want the technical detail or the team dynamics?" before a long answer is a legitimate, even strong, move</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> C confuses preparing <i>stories</i> with preparing <i>scripts</i>. The same incident must flex: for "conflict" you foreground the disagreement, for "failure" the miss, for "leadership" the influence — a verbatim rendition answers the question you rehearsed, not the one asked, and interviewers hear the mismatch immediately (it's the #1 tell of over-coaching). A is the evidence principle this whole course runs on; B is real rubric mechanics; D signals audience awareness — senior engineers scope answers before delivering them. The meta-skill being tested by this question: claims with "always/verbatim/every time" in them deserve your suspicion first.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s2">
+      <p class="mcq-tag">// stretch 2 of 4 — triage under competing pressures</p>
+      <p class="mcq-q">2pm: a SEV-2 page fires for your service (errors elevated, not down). You're due to interview a candidate at 2:30, and a design review you're presenting is at 3. Order the moves.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Handle the page solo and fast — if you're quick you can make the 2:30 interview and the 3:00 review without bothering anyone</button>
+        <button class="mcq-opt" type="button" data-ok>Acknowledge the page and start triage; immediately ping the interview coordinator to swap in a backup interviewer (the candidate's experience can't absorb your absence); once the incident is stable or handed off, make a keep-or-delegate call on the 3:00 with your lead — and say what you know at each step</button>
+        <button class="mcq-opt" type="button">The interview wins — external commitments to candidates outrank internal alerts, and a SEV-2 isn't a SEV-1; the on-call rotation exists for exactly this</button>
+        <button class="mcq-opt" type="button">Escalate the page to your manager to run, do the interview and the review as planned — that's what the management layer is for</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The scored skills are triage <i>and communication</i>, and most wrong answers fail the second one. A's plan requires everything to go well — incidents don't honor schedules, and "quietly juggling" means three commitments degrade with nobody warned. C reasons correctly about the candidate but wrongly about the page: if you're primary on-call, the rotation IS you — handing off requires an actual handoff, not a hope. D outsources your own service's incident upward, which inverts how escalation works (managers unblock; they don't run your triage). B does the boring, correct thing: own the incident, proactively free the commitment someone else can cover (interviews have backups; your triage doesn't), and make the third call <i>with</i> information instead of silently. Interviewers call this "communicating while degraded" — it's most of seniority.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s3">
+      <p class="mcq-tag">// stretch 3 of 4 — what makes the same story senior</p>
+      <p class="mcq-q">Two engineers tell the same incident story. One reads mid-level, one reads senior. Which added element does the upgrading?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Deeper technical specifics — the senior version names the exact race condition, the queue internals, and the config values involved</button>
+        <button class="mcq-opt" type="button">More urgency — the senior version conveys the 3am pressure and the executive attention the incident drew</button>
+        <button class="mcq-opt" type="button" data-ok>Widened blast radius of the <i>fix</i>: the senior version ends with the class of failure being retired — a guardrail in CI, a changed review default, two other teams adopting it — not just this instance resolved</button>
+        <button class="mcq-opt" type="button">Modesty — the senior version credits the team throughout and downplays personal contribution</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Seniority in stories is measured by the <i>durability and reach of the outcome</i>: mid-level fixes the bug; senior makes the bug's whole category harder to write, and the evidence is other teams inheriting the improvement. Technical depth (A) is table stakes — it proves you were there, not that you changed anything; interviewers see deeply-technical mid-level stories all day. Urgency (B) is atmosphere, and borrowed executive attention is borrowed, not earned. Reflexive modesty (D) actively hides the signal the interviewer is hunting for. The tell: senior stories' final sentences contain systems and other people; mid-level stories' final sentences contain the bug.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s4">
+      <p class="mcq-tag">// stretch 4 of 4 — "how do you know it worked?"</p>
+      <p class="mcq-q">You claim your test-infrastructure overhaul "really helped the team." The interviewer asks: "How do you know?" Which evidence chain survives?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">"The code was dramatically cleaner afterward — anyone who read both versions would agree"</button>
+        <button class="mcq-opt" type="button">"Nobody complained about the tests after the change, and people had complained before"</button>
+        <button class="mcq-opt" type="button" data-ok>"I'd recorded the baseline: CI averaged 24 minutes with ~2 flaky failures a day. After: 9 minutes, one flake a week. Deploys per day roughly doubled — though I'd flag that a team headcount bump landed the same quarter, so I only take partial credit for that last number"</button>
+        <button class="mcq-opt" type="button">"Both the staff engineer and my manager called it out as a major improvement in the quarter review"</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The question is an epistemics probe — <i>what does this person accept as evidence about their own impact?</i> C has the full chain: a baseline captured <b>before</b> (impact measurement starts before the work, or it's storytelling), direct metrics tied to the change, and — the credibility multiplier — an unprompted confound ("headcount grew too"). Volunteering the caveat is what makes everything before it believable. A is aesthetic consensus, unfalsifiable. B measures silence, which also describes resignation. D outsources the judgment to authority — endorsements are lagging social indicators of the thing, not the thing. This standard of self-honesty is rare enough that demonstrating it is a hiring signal all by itself.</p>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="playbook">
   <p class="section-eyebrow">// reference · the meta-game</p>
   <h2>The behavioral playbook</h2>
@@ -1671,6 +1861,7 @@ The counter (once, everything at once):
   var K_PROGRESS = 'bh48:progress';
   var K_COLLAPSED = 'bh48:collapsed';
   var K_THEME = 'bh48:theme';
+  var K_GYM = 'bh48:gym';
 
   function load(key, fallback) {
     try {
@@ -1786,6 +1977,47 @@ The counter (once, everything at once):
       });
     });
     updateProgress();
+
+    /* ---------- reasoning gym (first attempt is the recorded one) ---------- */
+    var gymState = load(K_GYM, {});
+    if (!gymState || typeof gymState !== 'object') gymState = {};
+
+    function paintGymScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = gymState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('gym-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function revealMcq() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (gymState[qid] === 1 || gymState[qid] === 0) {
+        revealMcq();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          revealMcq();
+          if (gymState[qid] !== 1 && gymState[qid] !== 0) {
+            gymState[qid] = ok ? 1 : 0;
+            save(K_GYM, gymState);
+          }
+          paintGymScore();
+        });
+      });
+    });
+    paintGymScore();
 
     var resetBtn = document.getElementById('reset-progress');
     if (resetBtn) {
