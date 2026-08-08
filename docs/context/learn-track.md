@@ -12,8 +12,11 @@ updated: 2026-08-07
 
 ## Current state — what's working, deployed, broken
 
-- **2026-08-08 — Reasoning Gym layer (branch `claude/course-practice-questions-quizzes-493f8a`,
-  NOT yet deployed):** every Learn module gained a final `#gym` lesson — 9 scored MCQs in
+- **2026-08-08 — Reasoning Gym layer — DEPLOYED TO PROD** (branch
+  `claude/course-practice-questions-quizzes-493f8a` → merged to main `f96bc01`; Vercel
+  `dpl_8o4aErdRhozJs8h47wtFNEN5vZoW` aliased to dsa-in-48.vercel.app, GitHub Pages
+  workflow green — gym markers verified live on both hosts, hub totals confirmed via
+  curl): every Learn module gained a final `#gym` lesson — 9 scored MCQs in
   three tiers (warm-up / apply / stretch: inference-only questions, FALSE-claim hunts,
   estimation, cross-section chains; qids `<prefix>-gym-1..9` on the existing
   `learn:<slug>:quiz` key) — and every course page gained a 12-question `#gym` section
