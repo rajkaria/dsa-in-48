@@ -690,6 +690,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#statemgmt"><span><i class="dot" data-for="statemgmt"></i> State Architecture</span></a>
     <a class="side-link" href="#rsc"><span><i class="dot" data-for="rsc"></i> Server Components</span></a>
     <a class="side-link" href="#modern"><span><i class="dot" data-for="modern"></i> Suspense &amp; RSC</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -708,11 +709,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/16</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/18</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/27</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -735,11 +736,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: architecture &amp; the RSC era</span>
   </div>
   <div class="hero-meta">
-    <span><b>15</b> sections</span>
-    <span><b>18</b> quiz questions</span>
+    <span><b>16</b> sections</span>
+    <span><b>27</b> quiz questions</span>
     <span><b>1</b> re-render simulator</span>
     <span><b>10</b> runnable panels</span>
-    <span><b>~10h</b> self-paced</span>
+    <span><b>~10.5h</b> self-paced</span>
   </div>
   <a class="btn" href="#model">Start with the model <span class="arrow">↓</span></a>
 </header>
@@ -1799,6 +1800,139 @@ function CatCard({ cat, children }) {
   </div>
 </section>
 
+<!-- 16 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">16</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>No new material — this is where you find out whether the machine model actually installed. <b>Warm-up</b> pits one concept against its favorite folk theories; <b>apply</b> hands you a snippet and makes you trace it before React does; <b>stretch</b> chains sections together under real constraints, the way interview questions do. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right.</p>
+
+    <div class="mcq" data-qid="rdd-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — predict the render count</p>
+      <p class="mcq-q">A click handler runs <code>setA(a + 1); setB(b + 1); setC(c + 1);</code> — three different useState values in one handler. How many re-renders does one click cause?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Three — each setState schedules its own re-render</button>
+        <button class="mcq-opt" type="button" data-ok>One — all three updates batch, and the component runs once with a, b and c all updated</button>
+        <button class="mcq-opt" type="button">Six — StrictMode doubles each of the three renders</button>
+        <button class="mcq-opt" type="button">Zero — state changed but props didn't, and props are what trigger re-renders</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> renders are counted per <i>event</i>, not per setState — React queues all three updates and runs the function once with the finished state (§03's batching rule). "One render per setState" is pre-React-18 folklore that never dies. The StrictMode option tempts anyone who's seen doubled console.logs: that's a dev-only purity rehearsal (§12), not extra committed renders. And the "props trigger renders" option inverts §01's list — a component's own state is trigger number one.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — key changes, consequences</p>
+      <p class="mcq-q">A chat app renders <code>&lt;ChatBox key={roomId} /&gt;</code>. The user has a half-typed draft in ChatBox's state, then switches rooms — <code>roomId</code> goes from <code>'lobby'</code> to <code>'tuna-talk'</code>. What happens to ChatBox?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">State is kept — the element type is unchanged, and type is what reconciliation matches on</button>
+        <button class="mcq-opt" type="button">Nothing special — key only has meaning inside a <code>.map()</code> list</button>
+        <button class="mcq-opt" type="button" data-ok>The old ChatBox unmounts (draft destroyed, cleanups run) and a brand-new instance mounts with fresh initial state</button>
+        <button class="mcq-opt" type="button">The draft survives but every effect re-fires as if it were a fresh mount</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a key is an identity claim (§04) — a different key on the same type says "this is a <i>different</i> ChatBox", so React tears down and remounts, exactly like a type change in §02. That's not a bug here, it's the idiomatic "reset everything below when the room changes". The type-matching option forgets that key is checked alongside type; the "keys are list-only" option confuses where keys are <i>required</i> with where they <i>work</i>; the half-remount option describes a state React never has — state and effects live and die together with the instance.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — effect timing order</p>
+      <p class="mcq-q">A tooltip component must measure its own DOM box and reposition itself before the user can see a misplaced flash. On its first render, which order do things actually happen in?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>render → React commits the DOM → <code>useLayoutEffect</code> → browser paints → <code>useEffect</code></button>
+        <button class="mcq-opt" type="button">render → browser paints → <code>useLayoutEffect</code> → <code>useEffect</code></button>
+        <button class="mcq-opt" type="button">render → <code>useEffect</code> → <code>useLayoutEffect</code> → browser paints — effects run in the order you wrote them</button>
+        <button class="mcq-opt" type="button"><code>useLayoutEffect</code> → render → browser paints → <code>useEffect</code> — layout effects measure before rendering</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the slot between commit and paint is the whole reason <code>useLayoutEffect</code> exists (§05's level-up): the DOM node is real and measurable, but nothing is on screen yet, so a synchronous reposition can't flicker. The "everything after paint" option is <code>useEffect</code>'s schedule wrongly applied to both hooks. Declaration order decides ordering <i>within</i> a phase, not which phase — that's the third option's trap. And nothing can run before render: there's no DOM to measure until your function has returned a tree and React has committed it.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — trace the snapshot &amp; closure</p>
+      <p class="mcq-q"><code>count</code> is <code>0</code>. The handler runs: <code>setCount(count + 1); setCount(count + 1); setTimeout(() =&gt; console.log(count), 500);</code> — one click, then you wait. What logs, and what does the screen show?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Logs <code>2</code>; screen shows 2</button>
+        <button class="mcq-opt" type="button">Logs <code>1</code>; screen shows 1 — by 500ms the timeout reads the updated state</button>
+        <button class="mcq-opt" type="button">Logs <code>0</code>; screen shows 2</button>
+        <button class="mcq-opt" type="button" data-ok>Logs <code>0</code>; screen shows 1</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two inferences, one variable. First: both sets read the same snapshot (§03) — <code>count</code> is <code>0</code> in this render, so both compute <code>0 + 1</code>; the screen lands on 1, not 2. Second: the timeout's closure captured <i>this render's</i> <code>count</code> — the re-render creates new variables in a new function call, but the old closure keeps pointing at the old ones, so 500ms later it still logs <code>0</code>. The "logs 1" option is the tempting one: it assumes closures read state "live", which is exactly the stale-closure misconception §05's runner exists to kill. Updater form (<code>c =&gt; c + 1</code>) is how you opt out of the snapshot when you mean "latest".</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — does this useMemo help?</p>
+      <p class="mcq-q">A parent with a ticking clock state renders <code>&lt;CatList cats={allCats.filter(c =&gt; c.onShift)} /&gt;</code> every second. Inside CatList: <code>const sorted = useMemo(() =&gt; [...cats].sort(byAge), [cats]);</code>. Does the memo prevent re-sorting each tick?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — useMemo compares deps by value, and the cats data didn't change</button>
+        <button class="mcq-opt" type="button" data-ok>No — <code>.filter()</code> mints a new array every parent render, so the <code>[cats]</code> dep fails <code>Object.is</code> and the sort re-runs each tick; the fix is upstream (memoize the filter, or move the clock state)</button>
+        <button class="mcq-opt" type="button">Yes — memoized values only recompute when CatList's own state changes, not when props flow in</button>
+        <button class="mcq-opt" type="button">No — useMemo can't cache arrays, only primitives</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace the identity, not the data: same cats, but <code>filter</code> returns a fresh array object each render, and dep comparison is <code>Object.is</code> per entry (§03's reference rule powering §06's hook) — so the cache misses forever while looking perfectly reasonable. Memoization is a chain (§10): a downstream memo is only as stable as its inputs, which is why the real fix lives in the parent. The deep-compare option is the big folk theory here; the "own state only" option misreads what a dep array is; the "can't cache arrays" option invents a limitation — useMemo caches any value, it just compares deps shallowly.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — cleanup order &amp; old values</p>
+      <p class="mcq-q">An effect: <code>useEffect(() =&gt; { console.log('connect', roomId); return () =&gt; console.log('disconnect', roomId); }, [roomId]);</code> — mounted with <code>'lobby'</code>, then <code>roomId</code> becomes <code>'tuna-talk'</code>. Which two lines print next, in order?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>connect tuna-talk</code> → <code>disconnect lobby</code> — the new effect runs first so the user is never disconnected</button>
+        <button class="mcq-opt" type="button"><code>disconnect tuna-talk</code> → <code>connect tuna-talk</code> — cleanup reads the current deps</button>
+        <button class="mcq-opt" type="button" data-ok><code>disconnect lobby</code> → <code>connect tuna-talk</code> — the old cleanup runs first, and it closes over the OLD render's roomId</button>
+        <button class="mcq-opt" type="button"><code>connect tuna-talk</code> only — cleanups run at unmount, not between re-runs</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two facts compose. Ordering: React always runs the previous cleanup before the next effect body (§05's contract — disconnect Mochi's bowl before connecting Biscuit's). Values: that cleanup was <i>created</i> in the lobby render, so its closure holds <code>'lobby'</code> — which is precisely why it can tear down the right subscription. The "cleanup sees new value" option is the same closure misconception as gym-4 wearing an effect costume; "cleanup only at unmount" is the folk lifecycle model this section replaced; "new effect first" would stack two live connections — the exact bug the contract prevents.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">Three of these claims are true. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Automatic batching only applies inside React event handlers — setStates in a <code>setTimeout</code> each trigger their own render</button>
+        <button class="mcq-opt" type="button">A re-render that returns an identical element tree commits zero DOM mutations</button>
+        <button class="mcq-opt" type="button">Keys only need to be unique among siblings, not across the whole app</button>
+        <button class="mcq-opt" type="button">A transition render can be thrown away before it ever commits — which is why render purity matters</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the false one is a fossil — it WAS true before React 18, which is exactly what makes it tempting. Since 18, batching is automatic everywhere: handlers, timeouts, promises, native events (§02's level-up, §03's rule 2). The true claims are load-bearing elsewhere: render-vs-commit means an unchanged tree costs function calls but no DOM work (§01); sibling-scoped keys separate doc-readers from lint-repeaters (§04); and abandonable transition renders are the reason purity is a contract, not a style preference (§12). If a claim about React sounds like 2017 advice, date-check it before trusting it.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — back-of-envelope render budget</p>
+      <p class="mcq-q">An adoption dashboard renders 2,000 <code>&lt;CatRow&gt;</code>s at roughly 0.05ms each. The search input's state lives in the same component that renders the table, so every keystroke re-renders every row. Ballpark the per-keystroke cost — and what's the FIRST fix on §10's ladder?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~10ms — under one frame, so typing is fine as-is</button>
+        <button class="mcq-opt" type="button">~100ms — so wrap all 2,000 rows in <code>React.memo</code>; memoization is step one</button>
+        <button class="mcq-opt" type="button">~1ms — React auto-skips rows whose props didn't change</button>
+        <button class="mcq-opt" type="button" data-ok>~100ms — six frame budgets per keystroke; first move the input's state down so typing stops rendering the table at all, then memoize or virtualize what's still slow</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> 2,000 × 0.05ms = 100ms, against a ~16.7ms frame budget — every keystroke drops about six frames, which your fingers read as mush. The ladder (§10) says restructure before memoize: colocating the input's state makes the keystroke render a one-component affair — the work is <i>gone</i>, not skipped, and there are no 2,000 prop comparisons to pay. Memo would also work here (the rows' props are stable), which is what makes that option tempting — it's a worse first move, not a wrong mechanism. The ~1ms option is §01's core misconception (React never compares props unless asked), and ~10ms is the decimal slip that makes a real problem look shippable — the entire point of doing the envelope math.</p>
+    </div>
+
+    <div class="mcq" data-qid="rdd-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — who actually re-renders?</p>
+      <p class="mcq-q">App renders <code>&lt;ThemeShell&gt;&lt;CatGallery cats={cats} /&gt;&lt;/ThemeShell&gt;</code>. ThemeShell holds a <code>dark</code> useState and returns <code>&lt;div className={dark ? 'dark' : ''}&gt;{children}&lt;/div&gt;</code>. The user clicks the theme toggle. Does CatGallery re-render?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — a parent re-rendered, and §01 says the cascade runs children by default</button>
+        <button class="mcq-opt" type="button">Yes — the div's className changed, which forces the whole subtree through the diff</button>
+        <button class="mcq-opt" type="button" data-ok>No — App created the CatGallery element, and App didn't render; ThemeShell returns the identical <code>children</code> reference, so React skips that subtree — §10's "lift content up" win, no memo involved</button>
+        <button class="mcq-opt" type="button">No — a component's own state changes never re-render its children, only prop changes do</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the cascade rule, stated precisely, is about who <i>creates</i> the elements: a re-rendering component re-creates the JSX it returns, and those children run. But <code>children</code> here was built by App — ThemeShell just passes the same element object through, and same reference means React bails on the subtree (§01's reference rule meeting §10's restructuring step). The first option is the honest trap: it's the right default applied one level too broadly — the exact distinction this module exists to install. The className option confuses DOM prop updates with component re-renders (the div updates; the diff doesn't force functions to run), and the last option would make option one's default rule false — children a re-rendering component creates absolutely do run.</p>
+    </div>
+
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li><b>Warm-up misses:</b> a folk theory survived. "One render per setState" → §03's batching queue; "keys are list-only decoration" → §04's identity contract; "all effects run after paint" → §05's level-up on the commit-to-paint gap. Reread the section, then re-explain the miss to Professor Whiskers in one sentence.</li>
+        <li><b>Apply misses:</b> practice the trace ritual: write down what each variable IS at the moment its closure is created, then refuse to let any later render update your notes — that's what React refuses too. The §03 and §05 runners are the gym equipment; run them until "which render made this function?" is your first question.</li>
+        <li><b>Stretch misses:</b> the skill is combining, so name the pairs: gym-7 is §01+§03+§04+§12 as one truth table, gym-8 is §01's cost model priced by §10's ladder, gym-9 is §01's cascade rule sharpened by §10's children trick. Reread the two sections <i>together</i> and say the connecting sentence out loud.</li>
+        <li><b>Transferable tip:</b> argue against your first answer before committing — every distractor here was built from somebody's confident first instinct, and interviews are staffed by people who know that too.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1822,6 +1956,7 @@ function CatCard({ cat, children }) {
       <tr><td class="mono">13</td><td>state arch.</td><td>Colocate → lift → reducer → context → store; a store is subscribe + snapshot + selectors.</td></tr>
       <tr><td class="mono">14</td><td>RSC</td><td>'use client' is a boundary that poisons downward; hydration attaches, it doesn't redraw.</td></tr>
       <tr><td class="mono">15</td><td>modern</td><td>Suspense = declarative loading regions that stream; RSC = components whose JS never ships.</td></tr>
+      <tr><td class="mono">16</td><td>the gym</td><td>Nine inferences, zero recall — every distractor that tempted you just named your folk theory.</td></tr>
     </tbody>
   </table></div>
 </section>

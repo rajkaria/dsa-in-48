@@ -450,6 +450,26 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
 
 /* tables */
+/* reasoning gym — scored MCQs (first attempt persisted) */
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+.gym-score-row{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-top:10px}
+.gym-score-row b{color:var(--ink)}
+
 .tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
 .tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
 .tbl-wrap .tbl{border:none}
@@ -581,6 +601,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#awsops"><span>Scaling &amp; the Bill</span><span class="t">60m</span></a>
   </nav>
 
+  <nav class="side-group" aria-label="Practice">
+    <h4>// practice</h4>
+    <a class="side-link" href="#gym"><span>Reasoning Gym</span><span class="t">12q</span></a>
+  </nav>
+
   <nav class="side-group" aria-label="Reference">
     <h4>// reference</h4>
     <a class="side-link" href="#playbook"><span>Tech-Screen Playbook</span></a>
@@ -628,6 +653,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span><b>12</b> topics</span>
     <span><b>150+</b> Q&amp;As with answers</span>
     <span><b>36</b> drills</span>
+    <span><b>12</b> gym questions</span>
     <span><b>~8.5h</b> per day</span>
   </div>
   <a class="btn" href="#howto">Start Day 1 <span class="arrow">↓</span></a>
@@ -1657,6 +1683,170 @@ Worker must be idempotent: retries mean "at least once", not "exactly once".</co
 <!-- ================= REFERENCE ================= -->
 
 <!-- PLAYBOOK -->
+<!-- REASONING GYM -->
+<section class="section" id="gym">
+  <p class="section-eyebrow">// practice · after day 2 — the bug doesn't care which layer you like</p>
+  <h2>The reasoning gym</h2>
+  <p class="sub">Twelve scored questions in three tiers. Full-stack interviews live on chains — a symptom in the browser, a cause two layers down — so every question here makes you run a chain: predict the output, locate the layer, trace the race, catch the claim that sounds secure but isn't. First pick is the recorded one. The "why" under each answer is the actual lesson — read it even when you're right.</p>
+  <p class="gym-score-row">first-attempt score: <b id="gym-score">0/12</b> · saves in this browser</p>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 1 — warm-up: one layer, loaded distractors</p>
+
+    <div class="mcq" data-qid="gym-w1">
+      <p class="mcq-tag">// warm-up 1 of 4 — the event loop, in four lines</p>
+      <p class="mcq-q"><code>console.log(1); setTimeout(() =&gt; console.log(2), 0); Promise.resolve().then(() =&gt; console.log(3)); console.log(4);</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">1 2 3 4 — a 0ms timeout runs immediately, before the promise</button>
+        <button class="mcq-opt" type="button">1 4 2 3 — timers were scheduled before the promise, so they keep their place in line</button>
+        <button class="mcq-opt" type="button" data-ok>1 4 3 2 — synchronous code finishes first, then the microtask queue (promises) drains entirely before any macrotask (timers) runs</button>
+        <button class="mcq-opt" type="button">1 3 4 2 — <code>.then</code> callbacks run the moment the promise resolves, interleaved with sync code</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The rule has three tiers, not two: run the script to completion (1, 4), drain <i>all</i> microtasks (3), then take one macrotask (2). "0ms" (A) is a minimum delay before <i>queueing</i>, not an execution time — the callback still waits for the stack and the microtask queue. Scheduling order (B) doesn't matter across queue types; queue <i>priority</i> does. And D breaks the fundamental contract: <code>.then</code> callbacks are never interleaved with running sync code — JS runs one thing at a time to completion. This four-liner is the tech screen's favorite ten seconds.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w2">
+      <p class="mcq-tag">// warm-up 2 of 4 — 401 vs 403 is a reasoning distinction</p>
+      <p class="mcq-q">A logged-in user requests another user's admin dashboard. Your API should return…</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">401 Unauthorized — they aren't authorized to see it, which is literally what the name says</button>
+        <button class="mcq-opt" type="button" data-ok>403 Forbidden — the server knows exactly who they are (authentication passed); what failed is permission. 401 is for "I don't know who you are," 403 for "I know, and no"</button>
+        <button class="mcq-opt" type="button">404 Not Found — always hide forbidden resources completely</button>
+        <button class="mcq-opt" type="button">400 Bad Request — requesting something you can't access is a malformed request</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> HTTP's naming actively sabotages this one — 401 says "Unauthorized" but means "unauthenticated" (its required <code>WWW-Authenticate</code> header literally asks for credentials). The reasoning move is separating the two questions every secured endpoint answers: <i>who are you?</i> (fails → 401, prompt re-login) and <i>may you?</i> (fails → 403, logging in again won't help). C is half-clever: returning 404 to avoid confirming a resource exists is a legitimate hardening choice for some endpoints (GitHub does it for private repos) — but as an "always" rule it wrecks debuggability and client UX. Knowing when it applies is the senior version of this answer.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w3">
+      <p class="mcq-tag">// warm-up 3 of 4 — why bcrypt and not SHA-256</p>
+      <p class="mcq-q">Passwords must be hashed. Why is a fast cryptographic hash like SHA-256 the <i>wrong</i> tool, when it's perfectly secure for file checksums?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">SHA-256 is reversible with enough compute — bcrypt isn't</button>
+        <button class="mcq-opt" type="button" data-ok>Speed is the vulnerability: a GPU tries billions of SHA-256 guesses per second against a stolen database. bcrypt/argon2 are deliberately slow and salted, turning each guess from nanoseconds into ~100ms of forced work — the property you want is expensive-per-attempt, not just one-way</button>
+        <button class="mcq-opt" type="button">SHA-256 produces collisions for short inputs like passwords, so different passwords could match</button>
+        <button class="mcq-opt" type="button">It's fine actually — as long as you add a salt, SHA-256(salt + password) is equivalent to bcrypt</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The threat model is the reasoning anchor: assume the hash database leaks, then ask what the attacker's cost-per-guess is. SHA-256's virtue (speed) becomes the attacker's superpower — human passwords occupy a small enough space that billions-per-second finds most of them. Neither hash is reversible (A confuses one-wayness with guess-resistance — the attacker doesn't reverse, they re-try). D is the subtle trap: salt defeats rainbow tables but does nothing about guessing <i>speed</i> — salted-SHA leaks still fall. Collisions (C) are irrelevant to this attack entirely. "What does the attacker actually do?" is the question that sorts these options.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w4">
+      <p class="mcq-tag">// warm-up 4 of 4 — state updates are snapshots</p>
+      <p class="mcq-q">In a React click handler: <code>setCount(count + 1); setCount(count + 1);</code> with <code>count</code> currently 0. After the re-render, <code>count</code> is…</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">2 — two increments were dispatched, so both apply</button>
+        <button class="mcq-opt" type="button" data-ok>1 — both calls read the same snapshot (<code>count</code> is 0 in both), so both say "set it to 1." The fix when the next value depends on the previous: <code>setCount(c =&gt; c + 1)</code> twice gives 2</button>
+        <button class="mcq-opt" type="button">2 — React batches the updates, and batching means merging their effects additively</button>
+        <button class="mcq-opt" type="button">1 on the first click but 2 afterward — the behavior stabilizes once state is warm</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>count</code> isn't a live variable — it's a constant captured when this render ran. Both calls evaluate <code>0 + 1</code>; the second overwrites the first with the same value. Batching (C) is real but does the opposite of what the option claims: it's why you see one re-render, not why effects would merge. The functional form <code>c =&gt; c + 1</code> tells React "compute from the <i>latest</i> value, whatever it is" — which is why it's the required form in loops, async callbacks, and anywhere the snapshot might be stale. Interviewers use this exact two-liner because it separates "uses React" from "has React's model."</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 2 — apply: locate the layer, trace the chain</p>
+
+    <div class="mcq" data-qid="gym-a1">
+      <p class="mcq-tag">// apply 1 of 4 — works locally, fails in prod</p>
+      <p class="mcq-q">Your file-upload form works on localhost. In production, uploads over ~1MB fail instantly with <code>413 Payload Too Large</code> — and your Express logs show <i>nothing</i>. Where's the bug?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The React form — the FormData encoding breaks above 1MB in production builds</button>
+        <button class="mcq-opt" type="button">Express's body-parser limit — raise <code>limit</code> in <code>express.json()</code> and it's fixed</button>
+        <button class="mcq-opt" type="button" data-ok>The reverse proxy in front of your app: nginx's default <code>client_max_body_size</code> is 1MB, and it rejects the request before Node ever sees it — which is exactly what "413 + empty app logs" proves</button>
+        <button class="mcq-opt" type="button">The database — the file column's size limit rejects the row, which surfaces as HTTP 413</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Read the evidence like a detective: <i>empty application logs</i> means the request died before your code ran — that single clue eliminates Express (B), the DB (D), and anything in your repo. The 1MB threshold is the second fingerprint: it's nginx's famous default. Local dev has no proxy, hence "works locally." B is the seductive wrong answer because body-parser <i>also</i> has a limit (100KB for JSON) and <i>also</i> throws 413s — but a body-parser rejection would appear in your logs. The transferable skill: map the status code + log silence to a <i>layer</i> before touching any code. Prod is localhost plus every box between you and the user.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a2">
+      <p class="mcq-tag">// apply 2 of 4 — the hanging request</p>
+      <p class="mcq-q">Classic Express 4: <code>app.get('/user', async (req, res) =&gt; { const u = await db.findUser(req.query.id); res.json(u); })</code> — <code>db.findUser</code> rejects. What does the client experience?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A 500 with a stack trace — Express catches route errors and forwards them to the error handler</button>
+        <button class="mcq-opt" type="button" data-ok>The request hangs until the client times out — Express 4 doesn't catch rejected promises from async handlers, so no response is ever sent. Fix: try/catch with <code>next(err)</code>, a wrapper, or Express 5, which forwards rejections automatically</button>
+        <button class="mcq-opt" type="button">The Node process crashes — an unhandled rejection is fatal, taking every in-flight request with it</button>
+        <button class="mcq-opt" type="button">An empty 200 — <code>res.json(undefined)</code> runs with no user and sends nothing</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Trace the mechanics: the rejection happens inside a promise Express 4 never looks at (its error plumbing predates async/await — it only catches <i>synchronous</i> throws and explicit <code>next(err)</code> calls). No throw reaches Express, no response is written, the socket just… waits. Option A describes Express 5's behavior — knowing which major fixed this dates your experience as current. C conflates "unhandled rejection" warnings with fatality (modern Node can be configured to crash, but the default journey is a warning — and the request <i>still</i> hangs). D can't happen: the <code>await</code> threw, so <code>res.json</code> is never reached. "Which line never executes?" is the tracing discipline this drills.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a3">
+      <p class="mcq-tag">// apply 3 of 4 — count the round trips</p>
+      <p class="mcq-q">An endpoint loads 50 posts, then fetches each post's author inside the loop. DB round-trip latency is ~5ms. What's the damage, and the honest fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~50ms total — the 51 queries run in parallel because Node is non-blocking, so only the connection setup repeats</button>
+        <button class="mcq-opt" type="button" data-ok>51 sequential round trips ≈ 255ms of pure network waiting before any real work — the N+1 pattern. Fix: one query with a JOIN, or two queries using <code>WHERE id IN (…)</code> — either way, round trips stop scaling with row count</button>
+        <button class="mcq-opt" type="button">The queries are fast since each fetches one row by primary key — the endpoint is fine as written</button>
+        <button class="mcq-opt" type="button">Add an index on <code>authors.id</code> — the per-query cost is the problem, not the query count</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The arithmetic is the argument: 1 + 50 queries × 5ms <i>each way</i> — and an awaited loop runs them one after another, so latencies add. Option C is the trap that ships to prod: each query IS fast, which is why nothing looks wrong until you count them — N+1 hides in ORMs precisely because every individual operation is innocent. D optimizes the wrong variable (authors.id is already indexed as a primary key; you'd be tuning 5ms queries while paying 51 of them). A's parallelism instinct has truth in it (<code>Promise.all</code> would help!) but doesn't fix the design — 51 concurrent queries still hammer the pool; the senior fix changes the <i>count</i>, not the concurrency.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a4">
+      <p class="mcq-tag">// apply 4 of 4 — forging a JWT, or trying to</p>
+      <p class="mcq-q">You base64-decode your session JWT, change <code>"role": "user"</code> to <code>"role": "admin"</code>, re-encode it, and send it. The server…</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Accepts it — JWTs are just base64, and base64 isn't encryption, so the payload is editable</button>
+        <button class="mcq-opt" type="button">Accepts it unless the server keeps a copy of every issued token to compare against</button>
+        <button class="mcq-opt" type="button" data-ok>Rejects it with a 401 — the third segment is an HMAC/RSA signature over the header + payload, computed with a key you don't have. Your edit changed the payload; the signature no longer matches, and verification fails on the first check</button>
+        <button class="mcq-opt" type="button">Rejects it only over HTTPS — TLS is what protects token integrity in transit</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The half-truth in A is what makes this a real interview question: the payload IS readable base64 (never put secrets in a JWT!) — but readable ≠ forgeable. The signature is the whole mechanism: <code>sign(header + payload, secret)</code>, recomputed server-side on every request; any byte you change breaks the match. B describes session tokens — and misses that JWTs exist precisely so servers <i>don't</i> store tokens (statelessness is the trade: you gain no-lookup verification, you lose easy revocation — say that unprompted and the follow-up question dissolves). D protects against a different attacker: TLS stops eavesdroppers on the wire; the signature stops <i>you</i>, the token holder. Two threats, two mechanisms — keeping them straight is the skill.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 3 — stretch: two layers at once, constraints attached</p>
+
+    <div class="mcq" data-qid="gym-s1">
+      <p class="mcq-tag">// stretch 1 of 4 — catch the false claim</p>
+      <p class="mcq-q">Three of these are true. Which claim is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Adding a database index speeds the reads it serves but taxes every write, which must now maintain it</button>
+        <button class="mcq-opt" type="button" data-ok>Storing JWTs in localStorage is safe as long as the site is served over HTTPS</button>
+        <button class="mcq-opt" type="button">An httpOnly cookie can't be read by JavaScript — so XSS can't exfiltrate it, though the browser still auto-attaches it (hence CSRF defenses)</button>
+        <button class="mcq-opt" type="button">A CDN can serve cached GET responses from the edge, but your POSTs still travel to origin</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> B mixes up threat models — the classic security category error. HTTPS defends the <i>wire</i>: nobody between browser and server can read the token. localStorage's problem is at the <i>endpoint</i>: any script running on your page (one XSS hole, one compromised npm package) reads it with a one-liner and ships it out — over HTTPS, ironically. That's why the httpOnly-cookie pattern (C) exists: JS-unreadable, at the cost of needing CSRF protection since browsers volunteer cookies. A is the write-amplification trade every index buys into; D is why "cache it at the CDN" only rescues read-shaped traffic. The habit: when a claim says "safe because X," ask which attacker X actually stops.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s2">
+      <p class="mcq-tag">// stretch 2 of 4 — where do 100 gigabytes live?</p>
+      <p class="mcq-q">New feature: 10k users upload ~5 photos each at ~2MB. Do the math, then pick the architecture that survives growth.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~100GB — modern disks are huge, so <code>bytea</code> columns in Postgres keep everything in one place with one backup story</button>
+        <button class="mcq-opt" type="button" data-ok>~100GB — object storage (S3) for the bytes with metadata rows in Postgres pointing at keys; serve via CDN, upload via pre-signed URLs so the files never transit your API servers</button>
+        <button class="mcq-opt" type="button">~1TB — the math forces a dedicated storage cluster from day one</button>
+        <button class="mcq-opt" type="button">Base64-encode into JSON columns — it keeps the API simple since everything stays JSON end-to-end</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Arithmetic first: 10⁴ × 5 × 2×10⁶ = 10¹¹ bytes = 100GB (option C's terabyte is a 10× slip — always re-run the exponents). Then the architecture: blobs in Postgres (A) technically work, but every byte now rides through your DB connections, bloats WAL/replication, evicts hot rows from shared buffers, and turns backups into multi-hour events — the database becomes a bad file server. The S3 pattern splits the workloads: cheap dumb bytes at eleven nines, queryable metadata in SQL, and pre-signed URLs take your API out of the upload path entirely (your 512MB Node dyno never buffers a 2MB photo). D is A with a +33% base64 tax. "Right storage for each shape of data" is the full-stack answer.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s3">
+      <p class="mcq-tag">// stretch 3 of 4 — the double-spent coupon</p>
+      <p class="mcq-q">"Coupon: single use." Your code checks <code>used = false</code>, then updates it to true. A user submits from two tabs simultaneously and redeems twice. Which fix actually closes the race?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Disable the redeem button after the first click — the second submission can then never happen</button>
+        <button class="mcq-opt" type="button">Wrap the check and the update in a transaction — transactions make the two steps atomic, so the race disappears</button>
+        <button class="mcq-opt" type="button" data-ok>Make the check and the write one atomic statement: <code>UPDATE coupons SET used = true WHERE code = $1 AND used = false</code> — then branch on rows-affected (1 = redeemed, 0 = already taken). The database's row lock serializes the two tabs; only one UPDATE can win</button>
+        <button class="mcq-opt" type="button">Add version numbers to the coupon row and retry on conflict — optimistic locking is the standard answer for concurrent writes</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The bug is check-then-act with a gap, and both tabs fit in the gap. The UI fix (A) is politeness, not enforcement — two tabs means two buttons, and curl means zero buttons; invariants live where the data lives. B is the interview's best trap: a transaction at READ COMMITTED makes your steps atomic <i>with respect to crashes</i>, but both transactions can still read <code>used = false</code> before either commits — atomicity isn't mutual exclusion. The conditional UPDATE moves the test <i>into</i> the write, where the row lock makes it serial: the loser's WHERE clause finds no row. D genuinely works — but it's machinery (schema change, retry loop) for what one WHERE clause does here; knowing the lighter tool exists is the point. Same pattern guards inventory, seats, and usernames.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s4">
+      <p class="mcq-tag">// stretch 4 of 4 — works in Postman, dies in the browser</p>
+      <p class="mcq-q">Your SPA at <code>app.example.com</code> calls <code>api.example.com</code>. Postman gets a 200; the browser console shows a CORS error. Reason through it: what's actually failing, and what's the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The API is rejecting browser user-agents — add the browser's User-Agent to the API's allowlist</button>
+        <button class="mcq-opt" type="button" data-ok>Nothing is "failing" server-side: same-origin policy is the <i>browser</i> refusing to hand your JS the response, because the API never opted in. Fix on the server: return <code>Access-Control-Allow-Origin: https://app.example.com</code> (and if cookies ride along, <code>Allow-Credentials: true</code> — which legally can't combine with <code>*</code>)</button>
+        <button class="mcq-opt" type="button">Fix it client-side — add <code>mode: 'no-cors'</code> to the fetch call, which tells the browser to skip the CORS check</button>
+        <button class="mcq-opt" type="button">The subdomains make it same-origin, so this error is a browser bug — hard-refresh or clear the cache</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The Postman-vs-browser split is the diagnostic gift: CORS is enforced by <i>browsers</i> on behalf of users — Postman has no user to protect, so it shows you the 200 that proves the API itself is fine. The chain: different origin (subdomains count! — scheme+host+port must all match, sinking D) → browser blocks JS from reading the response → server must opt in via headers. C is the cargo-cult fix that "removes the error" by making the response <i>opaque</i> — your fetch "succeeds" and you can't read a byte of it. The credentials wrinkle in B is the senior flourish: <code>*</code> + cookies is forbidden by spec, which is exactly the trap teams hit the week they add auth. Explaining <i>who enforces CORS and why</i> is the interview answer; the header is just the syntax.</p>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="playbook">
   <p class="section-eyebrow">// reference · the meta-game</p>
   <h2>The tech-screen playbook</h2>
@@ -1898,6 +2088,7 @@ Worker must be idempotent: retries mean "at least once", not "exactly once".</co
   var K_PROGRESS = 'fs48:progress';
   var K_COLLAPSED = 'fs48:collapsed';
   var K_THEME = 'fs48:theme';
+  var K_GYM = 'fs48:gym';
 
   function load(key, fallback) {
     try {
@@ -2013,6 +2204,47 @@ Worker must be idempotent: retries mean "at least once", not "exactly once".</co
       });
     });
     updateProgress();
+
+    /* ---------- reasoning gym (first attempt is the recorded one) ---------- */
+    var gymState = load(K_GYM, {});
+    if (!gymState || typeof gymState !== 'object') gymState = {};
+
+    function paintGymScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = gymState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('gym-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function revealMcq() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (gymState[qid] === 1 || gymState[qid] === 0) {
+        revealMcq();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          revealMcq();
+          if (gymState[qid] !== 1 && gymState[qid] !== 0) {
+            gymState[qid] = ok ? 1 : 0;
+            save(K_GYM, gymState);
+          }
+          paintGymScore();
+        });
+      });
+    });
+    paintGymScore();
 
     var resetBtn = document.getElementById('reset-progress');
     if (resetBtn) {

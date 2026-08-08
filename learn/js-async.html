@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#streams"><span><i class="dot" data-for="streams"></i> Streams &amp; Backpressure</span></a>
     <a class="side-link" href="#workers"><span><i class="dot" data-for="workers"></i> Workers</span></a>
     <a class="side-link" href="#patterns"><span><i class="dot" data-for="patterns"></i> Production Patterns</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/15</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/24</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,11 +734,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: cancellation &amp; combinator judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>14</b> sections</span>
-    <span><b>15</b> quiz questions</span>
+    <span><b>15</b> sections</span>
+    <span><b>24</b> quiz questions</span>
     <span><b>13</b> runnable panels</span>
     <span><b>1</b> step-through visualizer</span>
-    <span><b>~9.5h</b> self-paced</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#why">Start with the why <span class="arrow">↓</span></a>
 </header>
@@ -1818,6 +1819,139 @@ await tail;   // arrival order, guaranteed — even though all queued at once</c
   </div>
 </section>
 
+<!-- 15 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">15</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fourteen sections built the machine; this one makes you run it under load. <b>Warm-ups</b> isolate one concept each against its favorite misconceptions, <b>applies</b> make you trace a snippet like the loop would, and <b>stretches</b> chain sections together under real constraints — nothing here is answerable by remembering a phrase. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right. (Professor Whiskers grades on reasoning shown, not treats earned.)</p>
+
+    <div class="mcq" data-qid="asy-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — queue priority vs registration order</p>
+      <p class="mcq-q"><code>setTimeout(() =&gt; log('T'), 0); Promise.resolve().then(() =&gt; log('P')); log('S');</code> — the timer was registered <i>first</i>. What logs?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">T, P, S</button>
+        <button class="mcq-opt" type="button">S, T, P</button>
+        <button class="mcq-opt" type="button" data-ok>S, P, T</button>
+        <button class="mcq-opt" type="button">P, S, T</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> registration order only matters <i>within</i> a queue, never between queues — the loop finishes the sync pass ('S'), drains the VIP lounge ('P'), then takes the timer ('T'), per §02's one rule. "S, T, P" is the belief that first-registered runs first across queues; "T, P, S" is the "0ms means now" myth (§10: 0ms means "join the macrotask queue after ≥0ms"); "P, S, T" imagines .then callbacks running synchronously, which §03's buzzer rule forbids. Queue priority beats scheduling order, every time.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — what a chain actually carries</p>
+      <p class="mcq-q"><code>Promise.resolve(1).then(v =&gt; { v + 1; }).then(v =&gt; console.log(v));</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>undefined</code> — the first handler computes v + 1 and drops it; the chain carries only what you return</button>
+        <button class="mcq-opt" type="button"><code>2</code> — the chain passes each handler's result along automatically</button>
+        <button class="mcq-opt" type="button"><code>1</code> — a handler that returns nothing lets the original value pass through</button>
+        <button class="mcq-opt" type="button">A TypeError — the second .then receives no value to work with</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each link settles with its handler's <i>return value</i> (§03), and <code>{ v + 1; }</code> is a block that computes 2 and throws it away, returning <code>undefined</code>. "Logs 2" assumes the result flows on its own — it only flows if you return it. "Logs 1" imagines values tunneling through do-nothing handlers; only <code>.finally</code> has pass-through. And nothing throws: <code>undefined</code> is a perfectly legal fulfillment value — which is exactly why this bug ships quietly.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — settled means settled</p>
+      <p class="mcq-q">A fetch fulfilled two seconds ago; only now does your code call the matching <code>controller.abort()</code>. What happens to that fetch's promise and its <code>.then</code> handlers?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The promise flips to rejected with an AbortError, and any .catch now fires</button>
+        <button class="mcq-opt" type="button" data-ok>Nothing — the promise settled once and is frozen; abort() only affects work still in flight</button>
+        <button class="mcq-opt" type="button">The pending .then handlers are removed, but the promise keeps its value</button>
+        <button class="mcq-opt" type="button">abort() throws synchronously because there is nothing left to cancel</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> a promise is the buzzer from §03 — it buzzes exactly once and never changes its mind, so no API can flip fulfilled to rejected after the fact. <code>abort()</code> (§08) fires the signal's abort event, and with the fetch long finished, nobody is listening — it's a no-op, and it never throws at the call site. Handlers can't be "removed" either; attaching them is one-way. If the first option tempted you, you've merged "cancel the future" with "rewrite the past" — abort only does the first.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — trace the full ordering</p>
+      <p class="mcq-q"><code>async function f() { log('a'); await Promise.resolve(); log('b'); } f(); log('c'); setTimeout(() =&gt; log('d'), 0); Promise.resolve().then(() =&gt; log('e'));</code> — what order?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">a, b, c, e, d</button>
+        <button class="mcq-opt" type="button">c, a, b, e, d</button>
+        <button class="mcq-opt" type="button">a, c, e, b, d</button>
+        <button class="mcq-opt" type="button" data-ok>a, c, b, e, d</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace it like §06's algorithm. Sync pass: <code>f()</code> runs synchronously to its first await and logs 'a' (§04), the await parks its continuation in the microtask queue, 'c' runs, the timer joins the macrotask queue, and the .then joins the microtask queue <i>behind</i> the continuation. Drain the lounge FIFO — 'b', then 'e' — then the timer: a, c, b, e, d. "a, b, c…" believes awaiting an already-settled promise continues synchronously — §06 showed await <i>always</i> yields; "c, a…" forgets async functions start synchronously; "a, c, e, b…" puts the later-enqueued .then ahead of the earlier-enqueued continuation, but the lounge is strictly first-come, first-served.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — rejection highway, then recovery</p>
+      <p class="mcq-q"><code>Promise.reject(new Error('boom')).then(v =&gt; log('A')).catch(e =&gt; { log('B'); return 'ok'; }).then(v =&gt; log('C', v)).catch(e =&gt; log('D'));</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">B, then D — the catch observes the error but the chain stays rejected</button>
+        <button class="mcq-opt" type="button" data-ok>B, then C ok — the catch returns a value, so the chain is fulfilled again; D never runs</button>
+        <button class="mcq-opt" type="button">A, then B, then C ok — every handler in the chain gets its turn</button>
+        <button class="mcq-opt" type="button">B only — a catch terminates the chain</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the rejection rides §03's error highway past the good-news desk (skipping 'A') to the .catch, which logs 'B' — and because it <i>returns</i> 'ok', that's a recovery: the new promise it produces is fulfilled, so 'C ok' prints and D has nothing to catch (§05). "B, then D" treats .catch as a logger that leaves the chain rejected — returning from a catch is precisely how you get back on the happy path. "B only" forgets .catch returns a fresh promise that keeps the chain alive. "A…" forgets rejections skip fulfillment handlers entirely.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — the forEach await trap</p>
+      <p class="mcq-q">Inside an async function: <code>[1, 2, 3].forEach(async n =&gt; { await save(n); }); log('all saved');</code> — each <code>save</code> takes ~50ms. What's true?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>'all saved' logs immediately — forEach discards the returned promises, so the three saves run concurrently, unawaited, and any rejection floats</button>
+        <button class="mcq-opt" type="button">The saves run one at a time — forEach awaits each async callback before calling the next</button>
+        <button class="mcq-opt" type="button">'all saved' logs after ~50ms — forEach collects the three promises and waits for them together</button>
+        <button class="mcq-opt" type="button">It throws — forEach rejects async callbacks at call time</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>forEach</code> calls its callback and throws the return value away — it has no idea promises exist. Three saves start, each suspends at its await, and the sync pass reaches 'all saved' before any finishes; worse, if one rejects, nobody owns it — a floating promise straight out of §05. "One at a time" describes <code>for…of</code> with await (§07's serializing loop); "waits for them together" describes <code>map</code> + <code>Promise.all</code> (§04's pattern). Three loop shapes, three different contracts — naming which is which is the skill.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">Three of these are facts. Which claim is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A .then attached to an already-settled promise still runs asynchronously, as a microtask</button>
+        <button class="mcq-opt" type="button">When Promise.all rejects with the first error, the remaining promises keep running — their results are simply ignored</button>
+        <button class="mcq-opt" type="button">An unhandled promise rejection crashes a modern Node process by default</button>
+        <button class="mcq-opt" type="button" data-ok><code>p.catch(fn)</code> converts <code>p</code> itself into a fulfilled promise, so a later, separate <code>p.then(g)</code> receives fn's recovery value</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> .catch never converts anything — it returns a NEW promise carrying the recovery (§03's rule that every link is a fresh promise), while <code>p</code> stays settled-rejected forever, so a later <code>p.then(g)</code> skips g and re-delivers the same rejection (§05). It tempts because <i>chained</i> <code>p.catch(fn).then(g)</code> DOES see the recovery — the fix lives on the returned promise, not the original. The other three are checkable facts: settled .then still queues a microtask (§03), <code>all</code> abandons but can't cancel its losers (§07), and Node ≥15 dies on unhandled rejections (§05).</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — pool math under constraints</p>
+      <p class="mcq-q">600 thumbnails to fetch, ~150ms each. The browser allows 6 concurrent requests to this origin; the API rate-limits at 50 req/s. With a §14-style pool at limit 6, roughly how long — and can unbounded <code>Promise.all</code> beat it?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~90s — the pool works through the queue one job at a time</button>
+        <button class="mcq-opt" type="button">~150ms — Promise.all runs all 600 in parallel on separate threads</button>
+        <button class="mcq-opt" type="button" data-ok>~15s — 600 jobs ÷ 6 in flight × 150ms ≈ 100 waves, and ~40 req/s stays under the cap; Promise.all can't beat it because the browser queues past 6 connections anyway, and blasting 600 at once invites 429s</button>
+        <button class="mcq-opt" type="button">~12s — the 50 req/s rate limit is the binding constraint: 600 ÷ 50 = 12s</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> pool math first: 600 ÷ 6 in flight = 100 waves × 150ms ≈ 15s, which is 40 req/s — safely under the 50 req/s cap, so the <i>connection limit</i> binds, not the rate limit. That sinks the ~12s answer: always check which ceiling you hit first before dividing by it. ~90s assumes the pool serializes — a pool runs limit-wide, not one-wide (§14). ~150ms needs 600 truly parallel requests, i.e. the threads §01 says don't exist — and unbounded <code>Promise.all</code> (§07) buys nothing here but a shot at rate-limit errors.</p>
+    </div>
+
+    <div class="mcq" data-qid="asy-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — win the autocomplete race</p>
+      <p class="mcq-q">An autocomplete fires a fetch per keystroke and writes results to the DOM in <code>.then</code>. The user types "mo", then "moc" — and the "mo" response arrives <i>after</i> the "moc" one. What renders, and which fix is complete?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The "moc" results — promises settle in the order their fetches were created</button>
+        <button class="mcq-opt" type="button" data-ok>The stale "mo" results — the last response to land wins the DOM; aborting the previous request's controller on each keystroke both cancels the network work and guarantees its handler never runs</button>
+        <button class="mcq-opt" type="button">The "mo" results flash briefly — adding await before the DOM write fixes it by re-ordering the microtasks</button>
+        <button class="mcq-opt" type="button">Debounce alone is the complete fix — with debouncing, only one request can ever be in flight</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two independent chains settle in <i>network</i> order, not creation order (§06) — the slow "mo" response lands last and its .then overwrites the fresh results. Abort-on-keystroke (§08) is the complete fix: the stale fetch rejects with an AbortError, its handler never touches the DOM, and the socket is freed. <code>await</code> can't help — it orders steps within one chain, never across two independent ones. And debounce (§08) reduces how many requests exist but can't stop a slow response from overlapping the next quiet period — it narrows the race window without closing it.</p>
+    </div>
+
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses: reread the section behind the misconception — §02 if you let registration order beat queue priority, §03 if you thought chains carry values you didn't return, §03 + §08 if you let abort() rewrite a settled promise. Each distractor there is a named, common belief — evict it by name.</li>
+        <li>Apply misses: adopt the tracing ritual from §06 — three columns on paper (stack / microtasks / macrotasks), run the sync pass writing down what each line <i>schedules</i>, then drain the lounge FIFO, then take one timer. Never eyeball; the columns don't make off-by-one mistakes.</li>
+        <li>Stretch misses: the questions chained §03×§05 (fresh promises vs recovery), §07×§14 (combinators vs pooled throughput), and §06×§08 (settlement order vs cancellation). Combining sections IS the skill — re-walk each pair and say the joint sentence out loud.</li>
+        <li>Transferable tip: argue against your first answer before committing — the distractors were built from first instincts, and the loop is exactly the kind of machine where instinct and mechanism disagree.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1840,6 +1974,7 @@ await tail;   // arrival order, guaranteed — even though all queued at once</c
       <tr><td class="mono">12</td><td>streams</td><td>Chunks through bounded queues; backpressure is the consumer's pace propagating upstream.</td></tr>
       <tr><td class="mono">13</td><td>workers</td><td>Async solves waiting, workers solve working — a postbox of structured clones, never a shared desk.</td></tr>
       <tr><td class="mono">14</td><td>patterns</td><td>Pool N-wide, dedupe in-flight, serialize the door, back off politely — closures + promises, composed.</td></tr>
+      <tr><td class="mono">15</td><td>the gym</td><td>Nine inferences, three tiers — if you can't predict it, you don't own it yet. The "why" is the lesson.</td></tr>
     </tbody>
   </table></div>
 </section>

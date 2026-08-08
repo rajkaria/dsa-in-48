@@ -690,6 +690,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#generators"><span><i class="dot" data-for="generators"></i> Generators &amp; Iterators</span></a>
     <a class="side-link" href="#symbols"><span><i class="dot" data-for="symbols"></i> Symbols</span></a>
     <a class="side-link" href="#memory"><span><i class="dot" data-for="memory"></i> Memory &amp; GC</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -707,11 +708,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/16</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/16</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/25</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -734,10 +735,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: interview-grade depth</span>
   </div>
   <div class="hero-meta">
-    <span><b>15</b> sections</span>
-    <span><b>16</b> quiz questions</span>
+    <span><b>16</b> sections</span>
+    <span><b>25</b> quiz questions</span>
     <span><b>15</b> runnable panels</span>
-    <span><b>~10h</b> total, self-paced</span>
+    <span><b>~10.5h</b> total, self-paced</span>
   </div>
   <a class="btn" href="#values">Start with values <span class="arrow">↓</span></a>
 </header>
@@ -1873,6 +1874,129 @@ catch (e) { console.log('strict mode blocks it:', e.constructor.name); }</code><
   </div>
 </section>
 
+<!-- 16 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">16</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fifteen sections in, this is the transfer test — no question below is answered by remembering a phrase. <b>Warm-up</b> isolates one concept against its favorite misconceptions; <b>apply</b> makes you trace a snippet in your head before picking; <b>stretch</b> chains two or more sections under constraints, which is exactly what interviews do. Your first pick is the recorded one, and the <b>why</b> under each answer is the actual lesson — read it even when you're right (Professor Whiskers insists).</p>
+    <div class="mcq" data-qid="jsf-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — coercion: trace two operators</p>
+      <p class="mcq-q">What does <code>console.log(1 + '2' - 3)</code> print?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>0</code> — the string <code>'2'</code> becomes <code>2</code>, then it's plain arithmetic</button>
+        <button class="mcq-opt" type="button" data-ok><code>9</code> — <code>+</code> concatenates to <code>'12'</code>, then <code>-</code> converts it back to a number</button>
+        <button class="mcq-opt" type="button"><code>NaN</code> — you can't subtract a number from a string</button>
+        <button class="mcq-opt" type="button"><code>'123'</code> — once a string enters, every operator concatenates</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two operators, two different translators (§02). <code>+</code> is the only operator that prefers strings, so <code>1 + '2'</code> is <code>'12'</code>; <code>-</code> only knows numbers, so <code>'12' - 3</code> is <code>12 - 3 = 9</code>. The <code>0</code> pick assumes coercion "just does math" everywhere; <code>NaN</code> assumes numeric strings don't convert (they do — <code>'12'</code> is a clean conversion); <code>'123'</code> assumes string-ness is contagious to every operator, but only <code>+</code> caught it.</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — equality is identity, not contents</p>
+      <p class="mcq-q">Two identical vet records: <code>console.log({ chip: 7 } === { chip: 7 })</code>. What prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>true</code> — same type, same keys, same values, so <code>===</code> passes</button>
+        <button class="mcq-opt" type="button"><code>true</code> — both are converted to JSON strings and compared</button>
+        <button class="mcq-opt" type="button" data-ok><code>false</code> — each literal builds a new object; <code>===</code> compares the references, not the contents</button>
+        <button class="mcq-opt" type="button">It throws — objects can only be compared with <code>Object.is</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §01's rule — a variable holds the paper, not the cat. Each <code>{ chip: 7 }</code> literal creates a fresh object, so the two references point at two different cats, and <code>===</code> on objects asks only "same cat?" The structural-equality pick imports intuition from other languages (and from <code>===</code> on primitives, where it <i>does</i> compare values); the JSON pick invents a conversion that never happens; <code>Object.is</code> exists but is nearly identical to <code>===</code> — nothing throws. This one fact is why React's dependency arrays re-fire on inline objects.</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — walk the chain to null</p>
+      <p class="mcq-q"><code>const bare = Object.create(null); bare.toString();</code> — what happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>A <code>TypeError</code> — the lookup hits <code>null</code> immediately, finds nothing, and you called <code>undefined</code></button>
+        <button class="mcq-opt" type="button">It returns <code>'[object Object]'</code> — every object has the built-in <code>toString</code></button>
+        <button class="mcq-opt" type="button">It returns <code>undefined</code> — missing methods return <code>undefined</code> when called</button>
+        <button class="mcq-opt" type="button">A <code>SyntaxError</code> — you can't call a method that was never declared</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> chain-walk it (§06). <code>bare</code> has no own <code>toString</code>, and its prototype link is <code>null</code> — the walk ends before it starts, so the property read yields <code>undefined</code>, and calling <code>undefined</code> is a runtime <code>TypeError</code>. The <code>'[object Object]'</code> pick assumes <code>toString</code> is baked into every object — it actually lives on <code>Object.prototype</code>, which <code>bare</code> deliberately skipped. The <code>undefined</code> pick confuses <i>reading</i> a missing property (safe) with <i>calling</i> it (throws). Nothing here is a parse error, so <code>SyntaxError</code> is out.</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — closures capture variables, not values</p>
+      <p class="mcq-q">Trace it: <code>for (var i = 0; i &lt; 3; i++) { setTimeout(() =&gt; console.log(i * 10)); }</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>0 10 20</code> — each callback captures the <code>i</code> of its own iteration</button>
+        <button class="mcq-opt" type="button"><code>0 0 0</code> — callbacks snapshot <code>i</code> at creation time</button>
+        <button class="mcq-opt" type="button"><code>20 20 20</code> — all callbacks see the last value <code>i</code> was given in the body</button>
+        <button class="mcq-opt" type="button" data-ok><code>30 30 30</code> — one shared <code>i</code>, read after the loop exits at <code>3</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> three steps (§03 + §04). <code>var</code> ignores blocks, so all three arrows close over <i>one</i> variable; the timers fire only after the loop finishes; and the loop exits when the test <i>fails</i>, i.e. when <code>i</code> is <code>3</code>, not <code>2</code> — so each logs <code>3 * 10</code>. The <code>0 10 20</code> pick is what <code>let</code> would do (fresh binding per iteration); <code>0 0 0</code> treats closures as snapshots — they're live links; <code>20 20 20</code> is the off-by-one that forgets the exit condition runs one extra time.</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — this: read the call site</p>
+      <p class="mcq-q"><code>const a = { name: 'Mochi', who() { return this.name; } }; const b = { name: 'Biscuit', who: a.who }; console.log(b.who());</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>'Biscuit'</code> — the thing before the dot at <i>call time</i> wins, and that's <code>b</code></button>
+        <button class="mcq-opt" type="button"><code>'Mochi'</code> — <code>who</code> was defined on <code>a</code>, so <code>this</code> stays <code>a</code></button>
+        <button class="mcq-opt" type="button"><code>undefined</code> — copying a method detaches it, so the call is bare</button>
+        <button class="mcq-opt" type="button">It throws — a function can't belong to two objects at once</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §05's whose-lap question, asked at the only moment that matters — the call. <code>b.who()</code> is rule 3: method call, <code>this</code> = the thing before the dot, so <code>'Biscuit'</code>. The <code>'Mochi'</code> pick binds <code>this</code> at definition time — that's how <i>variables</i> resolve (lexically), never <code>this</code>. The <code>undefined</code> pick half-remembers the detached-method trap, but here the function was re-attached and called <i>on a lap</i>, not bare. And functions are values (§01) — one function can sit in ten objects without complaint.</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — reads climb, writes don't</p>
+      <p class="mcq-q"><code>const proto = { treats: 1 }; const cat = Object.create(proto); cat.treats++; console.log(cat.treats, proto.treats);</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button"><code>2 2</code> — the increment follows the chain and updates the prototype</button>
+        <button class="mcq-opt" type="button"><code>1 1</code> — you can't increment an inherited property, so nothing changes</button>
+        <button class="mcq-opt" type="button" data-ok><code>2 1</code> — the read climbs the chain, but the write lands on <code>cat</code> itself</button>
+        <button class="mcq-opt" type="button">It throws — <code>cat</code> has no own <code>treats</code> to increment</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> <code>cat.treats++</code> is a read then a write. The read walks the chain (§06) and finds <code>1</code> on <code>proto</code>; the write <code>cat.treats = 2</code> creates a fresh <b>own</b> property on <code>cat</code> that shadows the inherited one. Prototype untouched. The <code>2 2</code> pick assumes writes climb like reads — the asymmetry is the whole lesson, and it's why one instance mutating "shared" state doesn't infect its siblings. Nothing throws and nothing is ignored: shadowing is normal, silent behavior.</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">Three of these claims are true. Which one is <b>FALSE</b>?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Callbacks created in a <code>for (var i…)</code> loop all log the final <code>i</code> — they share one variable, not three snapshots</button>
+        <button class="mcq-opt" type="button" data-ok><code>const greet = function () {}</code> can be called above its line — hoisting lifts the function body just like a declaration</button>
+        <button class="mcq-opt" type="button">An arrow function resolves <code>this</code> the way a closure resolves an outer variable — lexically, from where it was written</button>
+        <button class="mcq-opt" type="button">A method called bare (detached) inside an ES module sees <code>this === undefined</code>, because modules run in strict mode</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> only <i>declarations</i> hoist with their body (§03). <code>const greet = function () {}</code> hoists the <code>const</code> binding into the TDZ — call it early and you get a <code>ReferenceError</code>, not a working function (with <code>var</code> you'd get "undefined is not a function" instead; either way, no early call). The claim tempts because "functions are hoisted" is true of one form and gets over-generalized to both. The other three are real: shared <code>var</code> in loops (§03 + §04), arrows treating <code>this</code> as just another outer variable (§04 + §05), and module strict mode making bare calls see <code>undefined</code> (§05 + §08).</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — back-of-envelope leak math</p>
+      <p class="mcq-q">A dashboard caches per-row data in a <code>Map</code> keyed by DOM row elements. Rows are removed from the page over time — about 1,000/day, each pinning ~1 MB of subtree and data — but the Map is never cleaned. After 5 days of uptime, roughly how much reachable-but-useless memory, and what's the fix?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~5 MB — a Map entry only stores a small reference, and references are cheap</button>
+        <button class="mcq-opt" type="button">Zero — once rows leave the DOM, the GC collects them and their entries</button>
+        <button class="mcq-opt" type="button">~1 GB — the GC evicts the oldest Map entries when memory gets tight</button>
+        <button class="mcq-opt" type="button" data-ok>~5 GB — 1,000 × 1 MB × 5 days, all still reachable through the Map; key a <code>WeakMap</code> instead</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> arithmetic first — 1,000 rows/day × ~1 MB × 5 days ≈ 5 GB — then the reasoning: the Map is reachable from a root, its keys are reachable from it, so every removed row and its 1 MB stays pinned (§15's leak shapes 2-and-3 in one object). The ~5 MB pick confuses the size of a <i>reference</i> with the size of what it retains — the leash is cheap, the cat is not. The "zero" pick is the detached-DOM misconception: leaving the page doesn't free a node something still points at. And GC never "evicts" — it frees the <i>unreachable</i> only (§15); an LRU is something you build, not something you get. <code>WeakMap</code> keys don't count as leashes, so removed rows become collectible (§09's Map-vs-object choice, with §15's twist).</p>
+    </div>
+    <div class="mcq" data-qid="jsf-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — deep vs shallow identity</p>
+      <p class="mcq-q"><code>const a = { tags: ['sleepy'] }; const b = structuredClone(a); const c = { ...a }; console.log(b.tags === a.tags, c.tags === a.tags);</code> — what prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>false true</code> — the clone rebuilt the array; the spread shared it</button>
+        <button class="mcq-opt" type="button"><code>true true</code> — both copies kept <code>['sleepy']</code>, and <code>===</code> compares contents</button>
+        <button class="mcq-opt" type="button"><code>false false</code> — any copy of an object also copies everything inside it</button>
+        <button class="mcq-opt" type="button"><code>true false</code> — <code>structuredClone</code> shares nested data for speed; spread rebuilds it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two sections in one line. <code>structuredClone</code> copies every level (§11), so <code>b.tags</code> is a brand-new array — different reference, <code>===</code> false even though the contents match (§01). Spread copies one level, so <code>c.tags</code> is the <i>same</i> array as <code>a.tags</code> — true. The <code>true true</code> pick is warm-up 2's structural-equality trap resurfacing under pressure; <code>false false</code> believes spread is deep; <code>true false</code> has the right split with the two tools swapped. In React terms: <code>c</code> would dodge a re-render check on <code>tags</code>, <code>b</code> would trigger it — same data, opposite behavior.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li><b>Warm-up misses</b> point at a section, not a skill: gym-1 is §02's translator rules (only <code>+</code> prefers strings), gym-2 is §01's paper-vs-cat (<code>===</code> on objects asks "same cat?"), gym-3 is §06's chain-ends-at-<code>null</code>. Every wrong option up there is a named misconception — reread the section that cures yours.</li>
+        <li><b>Apply misses</b> mean you predicted instead of traced. The ritual: one box per variable, one arrow per reference, advance line by line, and say the rule out loud at each step — "reads climb, writes don't", "whose lap is it on <i>at the call</i>", "one shared <code>var</code> or a fresh <code>let</code>?" Thirty seconds of boxes beats any instinct.</li>
+        <li><b>Stretch misses</b> are about combinations, not sections: §03 hoisting × §04 closures (the false claim), §09 Map × §15 reachability (the 5 GB), §01 references × §11 copy depth (the clone/spread split). Reread the <i>pair</i> together — combining under pressure is the skill being tested.</li>
+        <li>The transferable habit: before committing, spend ten seconds arguing for a <i>different</i> option than your first instinct. These distractors were built from first instincts — so are the interviewer's follow-up questions.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1896,6 +2020,7 @@ catch (e) { console.log('strict mode blocks it:', e.constructor.name); }</code><
       <tr><td class="mono">13</td><td>generators</td><td><code>yield</code> pauses with locals alive; the protocol is <code>next()</code> → <code>{value, done}</code>.</td></tr>
       <tr><td class="mono">14</td><td>symbols</td><td>Collision-proof keys and the language's extension sockets — invisible to JSON, which is a feature.</td></tr>
       <tr><td class="mono">15</td><td>memory</td><td>GC frees the unreachable, not the unused — a leak is a leash nobody uses.</td></tr>
+      <tr><td class="mono">16</td><td>the gym</td><td>Trace it, don't recall it — the distractors are your first instincts, and the why is the lesson.</td></tr>
     </tbody>
   </table></div>
 </section>

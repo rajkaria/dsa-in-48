@@ -699,6 +699,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#decision"><span><i class="dot" data-for="decision"></i> The Decision Matrix</span></a>
     <a class="side-link" href="#planner"><span><i class="dot" data-for="planner"></i> The 4-Week Planner</span></a>
     <a class="side-link" href="#rituals"><span><i class="dot" data-for="rituals"></i> Day-Before Rituals</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Track">
@@ -710,11 +711,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/13</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/8</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/17</span></div>
     </div>
     <p class="progress-note">progress, worksheets + theme save in this browser.</p>
   </div>
@@ -736,10 +737,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">output: a filled-in, reusable kit</span>
   </div>
   <div class="hero-meta">
-    <span><b>13</b> sections</span>
+    <span><b>14</b> sections</span>
     <span><b>18</b> saved worksheets</span>
     <span><b>1</b> study planner</span>
-    <span><b>~6.5h</b> + ongoing</span>
+    <span><b>~7h</b> + ongoing</span>
   </div>
   <a class="btn" href="#stories">Open the workbook <span class="arrow">↓</span></a>
 </header>
@@ -1173,6 +1174,129 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
+<!-- 14 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">14</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Thirteen sections built the kit; this one trains the judgment that swings it. <b>Warm-up</b> isolates one call against its favorite bad instincts — every wrong option is something a smart, tired candidate actually says. <b>Apply</b> hands you a live situation and makes you trace it to a decision; <b>stretch</b> chains sections the way real weeks do — timing against money, prep hours against rubrics. First pick is the recorded one, and the <i>why</i> under each answer is the actual lesson — read it even when you're right.</p>
+    <div class="mcq" data-qid="ik-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — spot the strongest failure answer</p>
+      <p class="mcq-q">The round asks: "tell me about a time you failed." Four candidates, four answers — which is strongest?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">"Honestly, my biggest failure is perfectionism — I care too much about code quality, and it sometimes slows me down."</button>
+        <button class="mcq-opt" type="button">"We missed a launch because product kept changing the requirements. I'd flagged the risk early, so I don't consider it MY failure — but yes, it was a failure."</button>
+        <button class="mcq-opt" type="button" data-ok>"I shipped a schema migration with no rollback plan; it locked the orders table for twenty minutes of peak. I ran the incident call, wrote the postmortem, and migrations there now require a tested down-path — I wrote that checklist."</button>
+        <button class="mcq-opt" type="button">"I once took prod down for most of a day. It was genuinely rough — I felt terrible about it for weeks, and I still think about it."</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the question is scored on the <b>+</b> in STAR+ (§01): a real failure, owned in the first person, with the lesson operationalized into something that outlived the incident. The perfectionism answer is a dodge wearing a costume — interviewers have heard it enough to deduct on sight. The requirements answer shifts blame, which reads as "will do the same here." The prod-outage answer has the honesty but ends on the damage — feelings aren't the +, the checklist is. Strongest ≠ the most impressive disaster; strongest = the clearest ownership-to-system pipeline.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — who names the first number</p>
+      <p class="mcq-q">Minute four of the first recruiter screen: "so — what are your salary expectations?" The strongest reply?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Current comp plus 20% — transparent, reasonable, and it keeps the process moving</button>
+        <button class="mcq-opt" type="button" data-ok>"I'd rather understand the role's scope first — what's the band for this level?" Bands exist, and recruiters can usually share them</button>
+        <button class="mcq-opt" type="button">Name a number 40% over market — anchor high, negotiate down, land in the middle</button>
+        <button class="mcq-opt" type="button">"I don't discuss compensation until there's an offer on the table" — early money talk only weakens you</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §09 rule 1 — never give the first number. Current-comp-plus-20% negotiates against yourself, politely: their band may sit far above your arithmetic, and your stated number becomes the ceiling. Blind-anchoring high fails the other way — anchoring works when you know the range, and at minute four you don't; you can price yourself out of a process nobody's invested in yet. Total silence overcorrects: the screen is exactly when a band mismatch should surface, before either side spends a month. Deflect-to-band gets you the information while giving none.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — grade your own questions</p>
+      <p class="mcq-q">Final five minutes of a technical round: "any questions for me?" Which is the strongest use of the slot?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">"No — you've covered everything really well." Close politely and give them time back</button>
+        <button class="mcq-opt" type="button">"So what does the company actually do, day to day?" — show curiosity about the big picture</button>
+        <button class="mcq-opt" type="button">"What's the compensation band for this level?" — it matters most, so ask early and often</button>
+        <button class="mcq-opt" type="button" data-ok>"What did your last incident postmortem actually change — and who owned the fix?" — specific, unscripted, and it tests the team's reality</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the slot is graded as the last impression (§06): "no questions" reads as no curiosity, not efficiency. The what-does-the-company-do question proves the opposite of curiosity — that you didn't research. The band question is the right question in the wrong channel: money routes to the recruiter (§09); an engineer can't answer it, so the slot burns for nothing. The postmortem question is §06's role's-reality tier — it demonstrates operating instincts, produces an answer nobody rehearsed, and how a team talks about failure tells you whether §01's ownership culture is how they actually live.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — operate the pipeline clock</p>
+      <p class="mcq-q">Monday morning. Your tracker: warm-up company A — onsite went well, offer expected Friday. Target B — recruiter replied last Thursday, screen not yet booked. Target C — onsite in three weeks. Today's highest-leverage move?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Book B's screen for this week and tell B's and C's recruiters an offer is expected Friday — compress B's loop and hold C's date, so the offers can land in the same window</button>
+        <button class="mcq-opt" type="button">Wait for A's offer to be signed paper before spending time on B — you can't negotiate with a maybe</button>
+        <button class="mcq-opt" type="button">Plan to decline A when it lands — it was only ever the warm-up, and the targets deserve full focus</button>
+        <button class="mcq-opt" type="button">Ask C to push the onsite out three weeks — more prep makes the target loop stronger</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two §04 mechanisms have to fire together — offers expire, so loops only help each other if they land <i>together</i>, and a live offer is the accelerant that makes recruiters expedite. Both point the same way: act before Friday, because "an offer is coming" compresses B's timeline for free. Waiting is the serial funnel — it spends A's expiry window doing nothing. Declining A throws away the exact artifact the warm-up loop exists to produce. Pushing C out un-clusters the loops you're trying to cluster. Operators touch the controls: dates are negotiable in both directions.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — route feedback to rubric axes</p>
+      <p class="mcq-q">Your mock partner's notes from a design round: "full skeleton, client through async workers; handled both deep probes when I pushed; never wrote down a single number; presented every choice as the obvious one — no alternative even mentioned." Which axes get this week's drill?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Breadth and depth — fundamentals first, always</button>
+        <button class="mcq-opt" type="button">Problem navigation and seniority signals — they weigh heaviest in the debrief</button>
+        <button class="mcq-opt" type="button" data-ok>Quantitative grounding and tradeoff articulation — "no numbers" and "no alternatives" are those two axes, near verbatim; drill: open with the envelope, and close every choice by pricing the road not taken</button>
+        <button class="mcq-opt" type="button">None — both deep probes were handled, and depth on demand is what separates seniors</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §07's self-scoring is a routing exercise — each observation maps to an axis, and the drill goes to the lowest one. Breadth and depth are the two axes these notes <i>passed</i> (full skeleton, probes survived); drilling them is practicing your serve because you like your serve. Navigation isn't in the evidence at all, and no axis officially outweighs the rest — every blank one costs. "None" is the halo effect: one strong axis vouching for five silent ones, which is precisely the bias the §07 worksheet exists to break.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — trace the vesting calendar</p>
+      <p class="mcq-q">Your grant: ₹48L of public-company RSUs over 4 years — 1-year cliff, quarterly vesting after that. Fourteen months in, a better offer lands and you resign. How much equity have you actually banked?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">₹14L — fourteen of the forty-eight months have passed</button>
+        <button class="mcq-opt" type="button" data-ok>₹12L — the cliff paid 25% at month 12; the next tranche lands at month 15, and you won't be there for it</button>
+        <button class="mcq-opt" type="button">₹15L — you're closer to month 15 than 12, and vesting accrues continuously</button>
+        <button class="mcq-opt" type="button">₹0 — leaving before the schedule completes forfeits the grant</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> vesting is chunky, not continuous — nothing until month 12, then 25% (₹12L) in one drop, then ₹3L per quarter at months 15, 18, 21… At month 14 you hold exactly the cliff. ₹14L is the monthly-accrual instinct — some schedules do vest monthly after the cliff, but this one said quarterly, and reading the schedule you actually have is the skill (§10). ₹0 confuses unvested (forfeited, yes) with vested (banked, yours). The career move hiding in the arithmetic: resignation dates are choosable — month 15 versus month 14 is ₹3L for one Tuesday. Never resign without the vesting calendar open.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — find the false claim</p>
+      <p class="mcq-q">Three of these claims come straight out of the kit. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Loop rounds are debriefed as independent signals — one weak round among strong ones is often still a hire</button>
+        <button class="mcq-opt" type="button">An identical system-design diagram can land at different levels depending entirely on the narration around it</button>
+        <button class="mcq-opt" type="button">An exploding offer deadline that genuinely won't flex is itself information about the company</button>
+        <button class="mcq-opt" type="button" data-ok>Offers are strongest the moment they're extended — so the offer call is the right time to negotiate and, if the number works, accept on the spot</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the false one inverts §09 rule 2 — the offer call is for gratitude and a delay ("I'm excited — let me review and come back Thursday"), because negotiating live, on adrenaline, without your §09 numbers in front of you is playing their game on their turf, and the number does not shrink because you slept on it. The other three are load-bearing: independent debriefs are why §05's reset ritual works, narration-carries-the-grade is the entire §07 lesson, and won't-flex deadlines feeding the §11 matrix is how pressure becomes data. The trap is that the false claim sounds like decisiveness — the kit's word for deciding at the speed of someone else's script is "anchored."</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — allocate hours by marginal return</p>
+      <p class="mcq-q">Ten days to a real onsite — DSA, system design, behavioral. Budget: one focused weekday hour plus a 4-hour weekend block ≈ 12h total. Your state: DSA sharp, never run a live design round, story bank empty. Which spend wins?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>≈2h writing six stories + the pitch (aloud), ≈6h of design as rubric-scored mocks, ≈2h of timed DSA to stay warm, ≈2h on one full mock loop with the break ritual</button>
+        <button class="mcq-opt" type="button">All 12h on DSA — double down on your strength so at least one round is guaranteed</button>
+        <button class="mcq-opt" type="button">Even thirds, 4h each — balanced coverage means no surprises</button>
+        <button class="mcq-opt" type="button">≈10h reading design write-ups and watching recorded mock rounds, ≈2h DSA — you can't mock what you've never seen</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> allocate by marginal return, not comfort. The extra DSA hour buys almost nothing — that round was already yours — while the first design mock and the first written story are the cheapest points on the board (§01's whole bet is that six stories fit in two focused hours). Even thirds is the fairness heuristic aimed at a problem that isn't fair: your weakest round moves several times more per hour than your strongest. The reading plan breaks §12's compression rule — cut depth, never mocks — because §07's rubric grades performance, and watching performance trains spectating. And the full loop-day matters more than it looks: §05's claim is that stamina and recovery are separately trainable, and the onsite tests them either way.</p>
+    </div>
+    <div class="mcq" data-qid="ik-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — read an offer's red flags</p>
+      <p class="mcq-q">Series-B offer: base exactly at your walk-away number; options "worth ₹35L a year" by the company's own math; a 48-hour deadline; the recruiter declines to share strike price vs latest 409A; refreshers are "standard here, but we don't put that in writing." The correct read?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Hot company, competitive process — take the ₹35L at face value and answer inside the 48 hours</button>
+        <button class="mcq-opt" type="button">The equity questions are paranoid for a Series B — negotiate the base up and sign</button>
+        <button class="mcq-opt" type="button" data-ok>Three compounding red flags: equity you're not allowed to price, promises that vanish on paper, and a deadline sized to prevent exactly this diligence. Ask for the numbers and the refresher language in writing, request a week — and if all three refusals hold, price the options near zero and run a base-only offer through the matrix</button>
+        <button class="mcq-opt" type="button">Red flags at offer stage mean withdraw — a company that negotiates like this will manage like this</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> each flag alone is survivable; together they're a pattern. §10's pricing questions — strike vs 409A, preference stack, exercise window — are the <i>minimum</i> information for valuing options, so a refusal makes the honest price "unknown, therefore ≈ zero against certain money." Verbal refreshers are §10's weather; the won't-flex deadline is §11's data. But auto-withdrawal overcorrects: red flags are inputs to the decision matrix, not verdicts — a base at your walk-away with the equity zeroed is, by your own §09 numbers, exactly the borderline case the matrix exists to decide. The move is always the same: convert pressure into information, in writing, then weigh.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread the section each why names (§01, §09, §06). Every distractor up there is a classic instinct with a name — the pseudo-failure, the self-anchor, the polite non-question — and knowing the name is how you catch it leaving your own mouth.</li>
+        <li>Apply misses → adopt the tracing ritual: before choosing, write the state down — pipeline dates on one line, vesting tranches on a timeline, partner-notes mapped axis by axis against §07. The gym keeps its scenarios small enough to hold in your head; real ones aren't, and the write-it-down habit is the part that transfers.</li>
+        <li>Stretch misses → name the pairings and re-walk them: §04×§09 (timing IS leverage), §12×§05×§07 (compress depth, never the mocks), §10×§11 (price the equity, then weigh the matrix). No loop ever asks one section at a time — combining is the skill.</li>
+        <li>The transferable habit: argue against your first answer before committing — the distractors were built from first instincts. "Would I still pick this without the comforting phrase attached?" is the same test that catches inflated bullets in §03 and face-value equity in §10.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up</p>
@@ -1193,6 +1317,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <tr><td class="mono">11</td><td>the decision matrix</td><td>two good offers — weights before scores, gut as auditor</td></tr>
       <tr><td class="mono">12</td><td>the 4-week planner</td><td>today</td></tr>
       <tr><td class="mono">13</td><td>the rituals</td><td>every day-before and day-of, forever</td></tr>
+      <tr><td class="mono">14</td><td>the gym</td><td>nine judgment reps — retake the week before any real loop; the whys are the lesson</td></tr>
     </tbody>
   </table></div>
 </section>

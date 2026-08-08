@@ -12,6 +12,16 @@ updated: 2026-08-07
 
 ## Current state — what's working, deployed, broken
 
+- **2026-08-08 — Reasoning Gym layer (branch `claude/course-practice-questions-quizzes-493f8a`,
+  NOT yet deployed):** every Learn module gained a final `#gym` lesson — 9 scored MCQs in
+  three tiers (warm-up / apply / stretch: inference-only questions, FALSE-claim hunts,
+  estimation, cross-section chains; qids `<prefix>-gym-1..9` on the existing
+  `learn:<slug>:quiz` key) — and every course page gained a 12-question `#gym` section
+  before its playbook (`.mcq` engine ported from `learn-tail.html`, first attempt persisted
+  to `<ns>:gym`, score in `#gym-score`, "// practice" side-group). New Learn totals:
+  **237 sections / ~153h / 369 quizzes** (hub cards, hub hero, landing counts all
+  recounted; landing hero now shows 60 course-gym questions and ~87h). Docs (CLAUDE.md,
+  README, this file) updated. verify.sh green across all 23 pages.
 - **DEPLOYED TO PROD 2026-08-08** (depth-expansion run `ocean-20260807-130307`, 10/10
   sprints; report in `.ocean/REPORT.md`, previous run archived under `.ocean/archive/`).
   Vercel: merged to main (`dddfa54`), deployed `dpl_FaYkGBCgziZhLCGKC3CM75m61WF7`,
@@ -28,8 +38,9 @@ updated: 2026-08-07
   (18/18), walkthrough script, question matcher, cheat tables, skip list. Rose accent
   `#F472B6`, keys `fesd48:*`.
 - **The Learn track** (`learn/`): hub + 16 self-paced modules, all live. Every module is
-  now expanded to 13–15 sections with band dividers (`// beginner` / `// intermediate` /
-  `// advanced`). Totals: **221 sections / ~145h / ~225 quizzes**. Built for Prachi
+  now expanded to 14–16 sections with band dividers (`// beginner` / `// intermediate` /
+  `// advanced`) plus a closing reasoning gym. Totals: **237 sections / ~153h / 369
+  quizzes**. Built for Prachi
   (cat-themed examples, Professor Whiskers callouts) but general-audience safe. Shelves:
   - *Learn JavaScript*: `js-fundamentals` (amber), `js-async` (sky — event-loop stepper),
     `typescript` (purple `#C084FC` — predict-the-compiler-error gauntlet) **(new)**
@@ -77,6 +88,13 @@ updated: 2026-08-07
   `.ws` textareas (interview-kit only) saving to `learn:interview-kit:ws:<key>`.
 - Hero-meta numbers must match reality (quiz counts, runner counts) — the verify script
   doesn't check these; count by hand when editing.
+- **Gym anatomy (every module):** `<section class="lesson" id="gym">` as the last lesson —
+  intro para → 9 `.mcq`s tagged `// warm-up|apply|stretch N of 3 — <skill>` → a
+  "LEVEL UP — how to read your score" remediation list → done-row. Questions must force an
+  inference (no recall); each tier-3 set includes a FALSE-claim hunt and an
+  estimation/trade-off; `.mcq-why` names the misconception behind each distractor. The
+  build spec used to generate them is `.ocean/templates/`-adjacent knowledge only — the
+  authoritative description is this bullet + CLAUDE.md.
 - LeetCode links verified against the API dump (all 62 across the DSA modules checked,
   incl. `paid_only` false).
 

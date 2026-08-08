@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#bits"><span><i class="dot" data-for="bits"></i> Bit Manipulation</span></a>
     <a class="side-link" href="#math"><span><i class="dot" data-for="math"></i> Interview Math</span></a>
     <a class="side-link" href="#practice"><span><i class="dot" data-for="practice"></i> The Practice Ladder</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/23</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,11 +734,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: pattern-picking under pressure</span>
   </div>
   <div class="hero-meta">
-    <span><b>14</b> sections</span>
-    <span><b>14</b> quiz questions</span>
+    <span><b>15</b> sections</span>
+    <span><b>23</b> quiz questions</span>
     <span><b>1</b> growth explorer</span>
     <span><b>41</b> verified LeetCode problems</span>
-    <span><b>~9.5h</b> self-paced</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#bigo">Start with growth <span class="arrow">↓</span></a>
 </header>
@@ -1762,6 +1763,139 @@ console.log('12321 palindrome?', isPalindromeNum(12321), '· 12331?', isPalindro
   </div>
 </section>
 
+<!-- 15 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">15</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fourteen sections of tools; this room is where you spar with them. <b>Warm-up</b> pits one concept against its favorite misconceptions, <b>apply</b> makes you trace real code in your head, and <b>stretch</b> chains sections together under constraints — which is exactly what a live interview does. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right. Claws out. 🐾</p>
+
+    <div class="mcq" data-qid="dsf-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — reading a loop's growth shape</p>
+      <p class="mcq-q">A loop whose counter <b>doubles</b> instead of incrementing: <code>for (let i = 1; i &lt; n; i *= 2) step(i);</code> with <code>step</code> doing O(1) work. How does the total work grow with n?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">O(n) — it's a single, un-nested loop, and single loops are linear</button>
+        <button class="mcq-opt" type="button">O(√n) — doubling covers ground faster than counting, roughly square-root speed</button>
+        <button class="mcq-opt" type="button" data-ok>O(log n) — the counter reaches n in about log₂ n doublings, so 10× more input adds only ~3 more iterations</button>
+        <button class="mcq-opt" type="button">O(n log n) — the multiplication in the header costs an extra log factor per step</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> ask "how many times can 1 double before passing n?" — that count is the <i>definition</i> of log₂ n: at n = 1,000,000 the body runs ~20 times. The first option is the classic misconception — the loop <i>count</i>, not the loop <i>keyword</i>, sets the complexity (§01 reads code by how the counter moves, not how many <code>for</code>s appear). O(√n) guesses "faster than linear" with no mechanism, and the last option bills <code>i *= 2</code> as if arithmetic scaled — one multiply is O(1). Doubling-up here and halving-down in §07's fast power are the same log₂ staircase, walked in opposite directions.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — feasibility from n, before coding</p>
+      <p class="mcq-q">The constraint reads n ≤ 10⁵ and your first idea is the O(n²) brute force. Using the classic planning number — a runtime chews through roughly 10⁸ simple operations per second — is the brute force viable?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Yes — 10⁵ squared is 10⁷ operations, comfortably under budget</button>
+        <button class="mcq-opt" type="button" data-ok>No — (10⁵)² = 10¹⁰ operations ≈ a hundred seconds of work; the constraint is quietly telling you to find O(n log n) or O(n)</button>
+        <button class="mcq-opt" type="button">Yes — Big-O drops constants, so real code usually runs far faster than the raw count suggests</button>
+        <button class="mcq-opt" type="button">No estimate is possible — Big-O deliberately says nothing about wall-clock time</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> squaring <i>doubles</i> the exponent: (10⁵)² = 10¹⁰, and 10¹⁰ ÷ 10⁸ per second ≈ 100 s — two orders of magnitude over a one-second budget. The first option's 10⁷ is the exponent slip everyone makes under pressure (5 + 2 instead of 5 × 2). Dropped constants move you 2–3×, never 100× — that's the third option's false hope. And the last one over-corrects: Big-O isn't a stopwatch, but ops ÷ ops-per-second is exactly how you convert a constraint into a target complexity before writing a line. At n ≤ 10⁵, n log n ≈ 1.7 × 10⁶ — nothing. Read constraints as a message from the problem setter.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — fencepost bounds from the invariant</p>
+      <p class="mcq-q">You're comparing every element with its right neighbor — the body reads <code>a[i]</code> and <code>a[i + 1]</code>. Which loop header is correct, and how many comparisons run on an n-element array?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok><code>i &lt; a.length - 1</code> — n − 1 comparisons: the body touches i + 1, so the last legal i is length − 2</button>
+        <button class="mcq-opt" type="button"><code>i &lt; a.length</code> — n comparisons: one per element, since every element must be visited</button>
+        <button class="mcq-opt" type="button"><code>i &lt;= a.length - 1</code> — the − 1 keeps it safe from overrunning the end</button>
+        <button class="mcq-opt" type="button"><code>i &lt; a.length / 2</code> — pairs, so half the elements suffice</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> derive the bound from the invariant, not from vibes: every index the body touches must be legal → i + 1 ≤ length − 1 → i ≤ length − 2 → <code>i &lt; length - 1</code>. n elements have n − 1 adjacent gaps — count the fence rails, not the posts. The second option (and the third, which is the second wearing a − 1: <code>&lt;=</code> cancels it) runs a final pass where <code>a[i + 1]</code> is <code>undefined</code> — and since number-vs-<code>undefined</code> order comparisons are all false, it often <i>appears</i> to work, the worst kind of off-by-one. The last option confuses adjacent pairs with §04's two halves converging.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — tracing a prefix off-by-one</p>
+      <p class="mcq-q">Trace it, don't run it: <code>const p = [0]; for (const d of [3, 1, 4, 1, 5]) p.push(p[p.length - 1] + d); console.log(p[3] - p[1]);</code> The author wanted the sum of days 1–3 (1 + 4 + 1 = 6). What prints, and what did they actually get?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">6 — days 1–3: prefix subtraction is inclusive on both ends</button>
+        <button class="mcq-opt" type="button">5 — days 2–3: the <i>left</i> index of a prefix subtraction is the exclusive one</button>
+        <button class="mcq-opt" type="button">8 — <code>p[3]</code> alone already holds days 1–3; the subtraction is the bug</button>
+        <button class="mcq-opt" type="button" data-ok>5 — days 1–2: with the 0-sentinel, p[k] holds the first k days, so p[3] − p[1] covers days 1..2 and drops day 3; the inclusive query needed <code>p[j + 1] - p[i]</code></button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> build it: p = [0, 3, 4, 8, 9, 14], so p[3] − p[1] = 8 − 3 = 5. The invariant does the rest — with the sentinel, p[k] = sum of the first k days (indices 0..k−1), so the subtraction telescopes to days 1..2. The devious part: the "days 2–3" option <i>also</i> sums to 5 on this input, so eyeballing the printed value can bless the wrong mental model — exactly how off-by-ones survive code review; test data that's too kind proves nothing. And p[3] holds days 0–2, not 1–3 — the sentinel shifts every index. §06's published shape, <code>p[j + 1] - p[i]</code>, is inclusive by construction.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — bit-trick state tracing</p>
+      <p class="mcq-q">In your head, no console: <code>let n = 12, c = 0; while (n) { n &amp;= n - 1; c++; } console.log(c);</code> What prints?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>2 — 12 is 1100₂; each pass deletes the lowest set bit: 1100 → 1000 → 0</button>
+        <button class="mcq-opt" type="button">3 — the loop roughly halves n each time, and log₂ 12 ≈ 3.6</button>
+        <button class="mcq-opt" type="button">4 — one pass per bit in 12's four-bit representation</button>
+        <button class="mcq-opt" type="button">12 — <code>n - 1</code> in the body means it counts down one per iteration</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> trace the two states: 12 &amp; 11 = 1100 &amp; 1011 = 1000 (the low set bit dies), then 8 &amp; 7 = 1000 &amp; 0111 = 0. Two iterations — §12's popcount runs in O(set bits), not O(bits): "4" counts positions whether or not they're set, and "3" treats <code>n &amp;= n - 1</code> as arithmetic halving (12 would go to 6; it actually goes to 8 — the operation is surgical, not divisive). "12" reads <code>&amp;=</code> as a plain decrement. The habit worth keeping: for any bit snippet, write the binary and step it — two lines of scratch paper beat four plausible answers.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — loop invariants under reordering</p>
+      <p class="mcq-q">A teammate "tidies" §03's two-sum by moving <code>seen.set(nums[i], i)</code> <i>above</i> the <code>if (seen.has(need))</code> check. The test — [3, 1, 4] with target 5 — still passes. What actually broke?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing — the two statements don't read each other's results, so the order is a style choice</button>
+        <button class="mcq-opt" type="button">It now misses some valid pairs, because the map runs one entry "ahead" of the scan</button>
+        <button class="mcq-opt" type="button" data-ok>Any element equal to exactly half the target now pairs with itself and returns [i, i] — try [4, 1, 5] with target 8</button>
+        <button class="mcq-opt" type="button">Still correct, just slower — every lookup now searches a bigger map, drifting toward O(n²)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the original order maintains an invariant — <b>when the lookup runs, <code>seen</code> holds only indices strictly before i</b> — so a hit is always a genuinely distinct partner. Insert first and the current element can answer its own query whenever nums[i] equals target − nums[i]: on [4, 1, 5] with target 8, i = 0 stores 4, immediately finds "4", and returns [0, 0] — a pair that doesn't exist. No duplicates needed, which is why the happy-path test passed. "Misses pairs" points the damage the wrong way — a map with <i>more</i> entries can only over-answer, never under-answer. And Map lookups stay O(1) average regardless of size (§03, §08). Reorder inside a loop only when you can restate the invariant it preserves.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">Four claims that mix sections of this module. Exactly one is FALSE — which?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">A while-loop inside a for-loop can still be O(n) overall, when the inner loop spends a budget shared across the whole run — the window's left pointer (§05), the run-walk guard (§08)</button>
+        <button class="mcq-opt" type="button" data-ok>For pair-with-target-sum on an unsorted array, sorting then converging two pointers is asymptotically faster than a single hash-map pass, since O(n log n) improves on O(n)</button>
+        <button class="mcq-opt" type="button">With a leading 0 sentinel, <code>p[j + 1] - p[i]</code> returns the inclusive range sum of indices i..j (§06)</button>
+        <button class="mcq-opt" type="button">JS bitwise operators work on signed 32-bit values, so bit tricks can go silently wrong past 2³¹ − 1 even though plain doubles stay exact up to 2⁵³ (§12, §13)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> read growth rates in the right direction — O(n log n) grows <i>faster</i> than O(n), so sort-first is the slower plan, and sorting scrambles the indices two-sum has to return (§04 draws this exact boundary: sorted-and-sortable is two-pointer home turf; unsorted-with-indices belongs to the map, §03). The claim tempts because converging pointers <i>feel</i> more advanced than a hash lookup — sophistication isn't speed. The other three are load-bearing truths from §05/§08, §06, and §12/§13; if one of them surprised you, that section wants a reread more than this gym does.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — tool choice under a memory budget</p>
+      <p class="mcq-q">One million numeric ids in an array you're allowed to reorder. The device is memory-starved — a million-entry Set will not fit — but you have a full second at ~10⁸ ops/sec. Does any id appear twice?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">XOR every id together — duplicated ids cancel, so a duplicate reveals itself (§12)</button>
+        <button class="mcq-opt" type="button">Use the Set anyway — O(n) beats O(n log n), and Big-O decides these calls</button>
+        <button class="mcq-opt" type="button">Nested loops with an early exit — duplicates usually sit close together in practice</button>
+        <button class="mcq-opt" type="button" data-ok>Sort in place, then one adjacent-neighbor scan — ~2 × 10⁷ comparisons for the sort plus 10⁶ for the scan, comfortably inside the budget, with O(1) extra memory</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> estimate before choosing: n log₂ n ≈ 10⁶ × 20 = 2 × 10⁷ — time fits <i>either</i> plan, so the scarce resource (memory) makes the call, and the Set is the one thing you can't afford — §03's whole trade is spending memory to buy speed, and here memory is what you don't have. Sorting makes duplicates adjacent; the scan is warm-up 3's n − 1 fencepost loop (§02). XOR can't do this job: it exposes the odd-one-out when everything <i>else</i> pairs perfectly — a duplicate-free array XORs to some meaningless number, not a flag (§12's boundary). And "fast in practice" re-learns §01's lesson the hard way: the worst case is (10⁶)² = 10¹² ops ≈ hours.</p>
+    </div>
+
+    <div class="mcq" data-qid="dsf-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — pattern boundaries under constraints</p>
+      <p class="mcq-q">Count the subarrays summing to exactly k, where the values <b>include negatives</b> and n = 2 × 10⁵. Which plan survives both the math and the clock?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Sliding window — stretch while the sum is under k, contract while over; O(n)</button>
+        <button class="mcq-opt" type="button">Sort first, then converge two pointers from both ends; O(n log n)</button>
+        <button class="mcq-opt" type="button" data-ok>One pass with a running total and a Map counting previously-seen prefix values — O(n), negatives welcome</button>
+        <button class="mcq-opt" type="button">Check all endpoint pairs with a running inner sum — each extension is O(1), so the n² pair count is affordable at this n</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> eliminate in order. Windows need <b>monotonic validity</b> — growing can only break, shrinking can only fix (§09's boundary) — but a negative lets a too-big sum become right again by <i>growing</i>, so "contract while over" has no invariant to stand on. Sorting destroys contiguity — subarrays are positional, and §04's converge answers pair questions, not range questions. The n² scan fails §01 arithmetic: (2 × 10⁵)² = 4 × 10¹⁰ cheap steps is still ~400 seconds at 10⁸/s — cheap-per-step never rescues too-many-steps. What survives is §06's map trick: "have I seen running − k before?" counts every subarray ending at the current index in O(1), 2 × 10⁵ steps total.</p>
+    </div>
+
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li><b>Warm-up misses</b> → reread §01 (growth shapes, worst case by default) and §02 (what each operation really costs). Every wrong option up there is a named misconception — "one loop = O(n)", the exponent slip, "a − 1 anywhere fixes off-by-ones" — find yours in the why and say the correction out loud once.</li>
+        <li><b>Apply misses</b> → adopt the tracing ritual: three columns on paper — iteration, variable values, "what's still true" (the invariant). Predict the output <i>before</i> running anything; the §06 sentinel and §12's binary stepping are perfect reps, five minutes a day.</li>
+        <li><b>Stretch misses</b> → drill the pairings by name: §01×§03 (estimate from n, then pick hash vs sort), §05×§06 (where windows hand off to prefix + map), §04×§03 (sorted pairs vs remembered values). Combining sections IS the interview skill — single-section fluency doesn't transfer on its own.</li>
+        <li><b>The transferable habit:</b> argue against your first answer before committing — every distractor in this gym was built from somebody's first instinct. If you can't say why the runner-up option loses, you're matching wording, not reasoning. Be like cat: sniff twice, pounce once.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1784,6 +1918,7 @@ console.log('12321 palindrome?', isPalindromeNum(12321), '· 12331?', isPalindro
       <tr><td class="mono">12</td><td>bits</td><td>XOR cancels pairs; n&amp;(n−1) deletes the lowest bit; JS bitwise is signed 32-bit — mind the wrap.</td></tr>
       <tr><td class="mono">13</td><td>math</td><td>Euclid, sieve from p², mod at every step (or BigInt) — doubles lose digits past 2⁵³.</td></tr>
       <tr><td class="mono">14</td><td>practice</td><td>Pattern-first, 20-minute rule, rebuild from memory, re-solve in two days. Be like cat.</td></tr>
+      <tr><td class="mono">15</td><td>the gym</td><td>Nine inferences, zero recall: estimate from n, trace the state, argue the discard — then read every why.</td></tr>
     </tbody>
   </table></div>
 </section>

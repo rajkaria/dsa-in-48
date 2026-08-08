@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#iac"><span><i class="dot" data-for="iac"></i> Infrastructure as Code</span></a>
     <a class="side-link" href="#ops"><span><i class="dot" data-for="ops"></i> Running It</span></a>
     <a class="side-link" href="#cost"><span><i class="dot" data-for="cost"></i> The Bill</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/23</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -733,11 +734,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: IAM &amp; cost judgment</span>
   </div>
   <div class="hero-meta">
-    <span><b>14</b> sections</span>
-    <span><b>14</b> quiz questions</span>
+    <span><b>15</b> sections</span>
+    <span><b>23</b> quiz questions</span>
     <span><b>3</b> reference architectures</span>
     <span><b>8</b> runnable panels</span>
-    <span><b>~9.5h</b> self-paced</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#map">Unfold the map <span class="arrow">↓</span></a>
 </header>
@@ -1581,6 +1582,129 @@ console.log('· the DESTROY line: why you read plans before applying. Always. Ev
   </div>
 </section>
 
+<!-- 15 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">15</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Fourteen sections built the map; this section checks whether you can <i>navigate</i> it with the engine off. Warm-ups isolate one concept against its favorite misconceptions, applies make you trace a request and predict what breaks, and stretches chain sections under real constraints — policy math meets packet walks meets the bill. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right. Professor Whiskers grades on reasoning shown, not answers remembered.</p>
+    <div class="mcq" data-qid="aw-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — stateful firewalls, replies ride free</p>
+      <p class="mcq-q">db-sg allows inbound 5432 from app-sg — and that is the only rule anywhere that mentions the pair. The API connects and runs a query. Does the result row make it back to the app?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">No — you must add an outbound rule on db-sg covering the ephemeral ports the reply travels on</button>
+        <button class="mcq-opt" type="button">Only if app-sg also allows inbound from db-sg — the reply arrives as a new inbound connection</button>
+        <button class="mcq-opt" type="button" data-ok>Yes — security groups are stateful: the reply to an allowed connection is automatically permitted in both directions, so no rule exists for it to need</button>
+        <button class="mcq-opt" type="button">No — replies between private subnets need a NAT gateway route</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> stateful means the SG tracks the connection: once the inbound 5432 handshake is allowed, its return traffic rides free — that single word is the SG/NACL dividing line from §06. The ephemeral-port option is NACL logic misapplied (NACLs are stateless, so <i>there</i> you really do write reply rules). The "app-sg must allow db-sg inbound" option confuses a reply with a new connection — replies belong to the existing conversation. And NAT is the internet-egress primitive; packets between subnets in one VPC ride the local route and never touch it.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — visibility timeout is a lease</p>
+      <p class="mcq-q">A worker receives an SQS message and needs 45 seconds to finish the job. The queue's visibility timeout is 30 seconds, and a second worker is polling the same queue. What actually happens?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">The message is deleted at 30s — its timeout expired, so the work is lost</button>
+        <button class="mcq-opt" type="button" data-ok>At 30s the message becomes visible again and worker 2 receives it too — the job runs twice unless the handler is idempotent; the fix is a visibility timeout longer than the work (or heartbeat extensions), plus idempotency anyway</button>
+        <button class="mcq-opt" type="button">Nothing — receiving a message locks it to that worker until it is deleted, however long the work takes</button>
+        <button class="mcq-opt" type="button">SQS terminates worker 1's in-flight processing at 30s to keep delivery consistent</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the visibility timeout is a <i>lease</i>, not a lock and not a TTL — when it expires, the queue simply re-offers the message, and deleting it is the only real acknowledgment (§10). Note that no crash was required: plain slowness triggers redelivery, which is why "at-least-once" is the contract even on a good day. The delete-at-30s option confuses visibility with the retention period (the setting that actually discards messages); the lock option is exactly-once wishful thinking; and a queue has no arm with which to reach into your worker — it only controls what it hands out next.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — which byte bills</p>
+      <p class="mcq-q">Everything below happens in one region in a normal month. Which data move is the one that shows up meaningfully on the bill?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>S3 serving image downloads directly to internet users — data transfer OUT bills per-GB, and it is usually the ambush line</button>
+        <button class="mcq-opt" type="button">Browsers uploading images into S3 — inbound bytes surely cost the same as outbound</button>
+        <button class="mcq-opt" type="button">The ALB forwarding requests to ECS tasks in the same AZ</button>
+        <button class="mcq-opt" type="button">ECS tasks reading S3 in-region through a gateway endpoint</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the reasoning is directional, not volumetric — ask which boundary each byte crosses. Into AWS is free (they <i>want</i> your data), same-AZ hops are free, and the S3 gateway endpoint exists precisely so in-region S3 traffic costs nothing and skips the NAT (§06's level-up). Out to the internet is the boundary AWS charges for, which is §14's whole ambush list in one arrow — and why the fix is CloudFront in front: cheaper egress <i>and</i> faster, the rare same-direction win from §08. The symmetric-pricing instinct and the every-hop-bills instinct are the two tempters.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — three requests, three verdicts</p>
+      <p class="mcq-q">One role, two applicable statements: <code>Allow s3:GetObject on arn:aws:s3:::cafe-uploads/*</code> and <code>Deny s3:GetObject on arn:aws:s3:::cafe-uploads/private/*</code>. Judge three requests: (1) GET <code>cafe-uploads/mochi.jpg</code>, (2) GET <code>cafe-uploads/private/vet.pdf</code>, (3) PUT <code>cafe-uploads/mochi.jpg</code>.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">allow / allow / allow — the role owns the whole bucket path, and write access comes along with read</button>
+        <button class="mcq-opt" type="button">allow / deny / allow — the PUT lands on a path the Allow already covers</button>
+        <button class="mcq-opt" type="button">allow / allow / deny — the Allow's path is where the object actually lives, so it wins over the broader Deny</button>
+        <button class="mcq-opt" type="button" data-ok>allow / deny / deny — (2) the explicit Deny beats the matching Allow, and (3) no statement mentions PutObject at all, so implicit deny</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> run §05's three rules once per request. Request 1 matches only the Allow → allowed. Request 2 matches both statements → explicit Deny is final; IAM has no "more specific wins" rule, however loudly the CSS/router part of your brain insists it does. Request 3 matches <i>nothing</i> — and the default state of everything is no (§04's deny-by-default). The two distractor instincts worth naming: specificity-wins imported from other rule systems, and the read-implies-write bundle — IAM actions are individually named verbs; <code>s3:GetObject</code> says nothing whatsoever about <code>s3:PutObject</code>.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — the timeout names the layer</p>
+      <p class="mcq-q">After a refactor, the API can't reach RDS: <code>connect ETIMEDOUT 10.0.20.5:5432</code>. The facts: db-sg allows 5432 from <b>app-sg</b>; the refactor launched the task with a fresh <b>api-sg</b> instead; both subnets are private, same VPC; route tables untouched; Postgres is up. Diagnosis?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Missing NAT route — private subnets need a NAT gateway to reach each other</button>
+        <button class="mcq-opt" type="button" data-ok>db-sg's rule allows the app-sg <i>identity</i>, and the task no longer wears it — nothing matches api-sg, so packets are silently dropped, which is exactly why you see a timeout instead of "connection refused". Fix: allow 5432 from api-sg (or reattach app-sg)</button>
+        <button class="mcq-opt" type="button">The default NACL blocks cross-subnet traffic — add allow rules between the subnets</button>
+        <button class="mcq-opt" type="button">Postgres isn't listening — a timeout always means the process is down</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two chained inferences. First, §06's SG-references-SG rule is identity-based — swap the identity and the rule stops matching even though no rule changed. Second, the error message is evidence: an SG drops non-matching packets <i>silently</i>, so the client waits and times out; a reachable host with a closed port actively refuses (RST). ETIMEDOUT points at a firewall or route, not a dead process — which eliminates option D. NAT is for internet egress, never intra-VPC (§06 again), and the default NACL allows everything — it's the fence you left alone, so it isn't the suspect. This is §06's debugging order (route → SG → NACL → binding), actually run.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — what saturates first</p>
+      <p class="mcq-q">Launch-day spike: traffic jumps 10× in two minutes. The stage-2 café app (§03): 2 Fargate tasks with CPU-based autoscaling (scale-out takes minutes), an ALB, RDS Multi-AZ with a fixed 10-connection pool per task, Redis. Which component gives out first, and how does it show?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>The two app tasks — autoscaling reacts in minutes but the spike arrives in seconds, so requests pile up in the tasks: p99 climbs, then timeouts and 5xx at the ALB. RDS stays oddly calm — fixed pools mean its connection count can't grow until MORE tasks appear</button>
+        <button class="mcq-opt" type="button">The ALB — the load balancer is the narrowest pipe in the diagram</button>
+        <button class="mcq-opt" type="button">RDS connection exhaustion — 10× the traffic means 10× the connections</button>
+        <button class="mcq-opt" type="button">Redis — cache eviction cascades under the extra load</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the ritual is to ask, for each box, <i>which of its numbers actually moves with request rate</i>. Task CPU and in-flight requests move instantly; the ALB is managed and elastic (rarely first to fold); Redis load isn't memory pressure; and RDS connections track <b>task count × pool size</b>, not traffic — the trap in option C. The subtle payoff: the database's danger moment comes <i>after</i> autoscaling succeeds, when ten new tasks each bring ten fresh connections — which is why §07's scaling lag and §13's symptom alarms (p99, 5xx) are the pair that catches this, and why max_connections math belongs in the scale-out plan.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — spot the false claim</p>
+      <p class="mcq-q">One of these four claims is FALSE. Which?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">S3 has offered strong read-after-write consistency since 2020 — you can read your own PUT immediately</button>
+        <button class="mcq-opt" type="button">An explicit Deny in any applicable policy defeats every Allow, no matter how specific the Allow's resource path is</button>
+        <button class="mcq-opt" type="button" data-ok>In a standard Multi-AZ RDS deployment, the synchronous standby also serves read traffic — so failover protection doubles your read throughput for free</button>
+        <button class="mcq-opt" type="button">Immutable, hashed asset filenames largely remove the need for CloudFront invalidations</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the standby in classic Multi-AZ is invisible until failover — it exists to <i>become</i> the primary, not to help it; scaling reads is the read replica's job (async, with the read-your-writes caveat), which is §09's "classic slip" promoted to a full question. The other three are true and load-bearing: §08's consistency upgrade (believing the eventual-consistency folklore dates you), §05's deny rule (the reason org guardrails are Denies), and §11's immutable-names pattern (deploys reference new names instead of invalidating old ones). The transferable check: availability features and scaling features answer different questions — any claim that gets both from one mechanism deserves suspicion.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — envelope math under constraints</p>
+      <p class="mcq-q">A webhook receiver gets ~2M spiky requests/month at 150ms and 512MB per invocation. Using §07's prices (~$0.0000167 per GB-second + $0.20 per million requests, free tier ignored) — what's the order of magnitude of the Lambda bill, and the verdict against one always-on 1GB Fargate task (~$18/mo)?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~$30/mo — roughly parity with the container, so pick by ops taste</button>
+        <button class="mcq-opt" type="button">~$300/mo — Lambda taxes you at any volume; containerize immediately</button>
+        <button class="mcq-opt" type="button">≈$0 — serverless means you don't pay, and 2M requests is nothing</button>
+        <button class="mcq-opt" type="button" data-ok>~$3/mo — 2M × 0.15s × 0.5GB = 150,000 GB-seconds ≈ $2.50, plus $0.40 of request charges: an order of magnitude under the container, because spiky-and-modest is Lambda's home turf</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the whole estimate is one line — GB-seconds = requests × seconds × GB — then two honest unit conversions: 150<b>ms</b> is 0.15s and 512<b>MB</b> is 0.5GB. The inflated options are those conversions fumbled (ms kept as tenths-of-seconds too big, MB read as GB), which is how envelope math goes wrong 10–100× in real meetings; the ≈$0 option confuses scale-to-zero (no <i>idle</i> bill) with free <i>usage</i>. This is §07's crossover run by hand at a point well below the crossover, landing on §14's framing: the container's $18 is the price of always-on-ness, worth paying only once the hum is steady.</p>
+    </div>
+    <div class="mcq" data-qid="aw-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — trace the event loop</p>
+      <p class="mcq-q">The pipeline ships Friday: uploads land in bucket <code>cafe-media</code> via presigned PUT; an <code>s3:ObjectCreated</code> notification triggers a Lambda that writes a thumbnail back into <code>cafe-media</code>. What does Monday look like?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>A runaway loop: each thumbnail write is itself an ObjectCreated event, which triggers the Lambda again — invocations and objects climb until throttling, an alarm, or the bill notices. Fix: notification prefix/suffix filters (fire only on <code>uploads/</code>) or a separate output bucket</button>
+        <button class="mcq-opt" type="button">Fine — S3 events fire for user uploads, not for writes made through Lambda's SDK</button>
+        <button class="mcq-opt" type="button">Fine — the Lambda's execution role can't invoke itself, so IAM breaks the cycle</button>
+        <button class="mcq-opt" type="button">Broken differently — presigned uploads bypass event notifications, so no thumbnails fire at all</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> chain §08 with §02: an ObjectCreated event fires for <i>any</i> object creation — S3 records no provenance, so a Lambda's PUT and a user's PUT are indistinguishable (kills option B), and a presigned PUT is an ordinary PUT wearing a scoped pass, so events fire normally (kills D). Option C confuses permission with wiring: IAM decides whether the PUT is <i>allowed</i> — the role happily permits it — while the trigger is S3's own plumbing. The design rule worth keeping: an event-driven writer must never write inside its own trigger's scope; filters or a second bucket make the loop impossible by construction, which beats "we'll be careful" every time. You find out via §14 — the bill is the alarm nobody configured.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses: reread the section behind the miss — §06 for statefulness (the misconception is NACL logic applied to SGs), §10 for the visibility lease (timeout ≠ TTL ≠ lock), §14 for the egress arrow (the misconception is symmetric pricing). Each is one idea; relearn the idea, not the answer.</li>
+        <li>Apply misses: adopt the tracing ritual — write the request down and walk it one hop or one rule at a time, saying out loud what each layer does to it (the three IAM rules per request, the route-then-SG order per packet, "which number moves with traffic" per component). Slow is the technique; the runners in §05 and §06 are this ritual, executable.</li>
+        <li>Stretch misses: the pairs were §09×§05×§08×§11 (claims audit), §07×§14 (crossover math by hand), and §02×§08×§14 (events × presigns × the bill). Combining sections IS the skill — every real architecture question chains at least two aisles of the map.</li>
+        <li>Transferable tip: argue against your first answer before committing — the distractors here were built from first instincts (specificity wins, read implies write, every hop bills), and the ones that tempted you are the instincts to patrol in the interview too.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1603,6 +1727,7 @@ console.log('· the DESTROY line: why you read plans before applying. Always. Ev
       <tr><td class="mono">12</td><td>IaC</td><td>Files are the truth, plans are the PR diff, drift is an open incident until reconciled.</td></tr>
       <tr><td class="mono">13</td><td>ops</td><td>Alarm on symptoms (5xx, p99, queue AGE), dashboard the causes; liveness ≠ readiness; roll back cold.</td></tr>
       <tr><td class="mono">14</td><td>cost</td><td>Compute, DB, transfer-out, storage — transfer is the ambush; caches are cost tools; billing alarms on day one.</td></tr>
+      <tr><td class="mono">15</td><td>the gym</td><td>Nine inferences, zero recall — trace the policy, walk the packet, run the envelope math; first pick counts, the "why" is the lesson.</td></tr>
     </tbody>
   </table></div>
 </section>

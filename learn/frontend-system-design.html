@@ -689,6 +689,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#rum"><span><i class="dot" data-for="rum"></i> Frontend Observability</span></a>
     <a class="side-link" href="#designsystem"><span><i class="dot" data-for="designsystem"></i> Design Systems</span></a>
     <a class="side-link" href="#collab"><span><i class="dot" data-for="collab"></i> Multiplayer UI</span></a>
+    <a class="side-link" href="#gym"><span><i class="dot" data-for="gym"></i> The Reasoning Gym</span></a>
   </nav>
 
   <nav class="side-group" aria-label="Reference">
@@ -706,11 +707,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 
   <div class="progress-wrap">
     <div>
-      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/14</span></div>
+      <div class="pbar-label"><span>sections done</span><span id="sec-count">0/15</span></div>
       <div class="pbar"><i id="sec-bar"></i></div>
     </div>
     <div>
-      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/14</span></div>
+      <div class="pbar-label"><span>quiz score</span><span id="quiz-score">0/23</span></div>
     </div>
     <p class="progress-note">progress + theme save in this browser.</p>
   </div>
@@ -732,10 +733,10 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span class="level-chip a">ends at: full-prompt fluency under a clock</span>
   </div>
   <div class="hero-meta">
-    <span><b>14</b> sections</span>
-    <span><b>14</b> quiz questions</span>
+    <span><b>15</b> sections</span>
+    <span><b>23</b> quiz questions</span>
     <span><b>1</b> decision-tree widget</span>
-    <span><b>~9.5h</b> self-paced</span>
+    <span><b>~10h</b> self-paced</span>
   </div>
   <a class="btn" href="#radio">To the practice field <span class="arrow">↓</span></a>
 </header>
@@ -1241,6 +1242,129 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
   </div>
 </section>
 
+<!-- 15 · REASONING GYM -->
+<section class="lesson" id="gym">
+  <div class="lesson-head">
+    <span class="lesson-num">15</span>
+    <div>
+      <h3>The reasoning gym — nine questions, three tiers</h3>
+      <p class="lvl">all levels → transfer, not recall: every question is an inference</p>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <p>Nothing new past this line — this is where the module gets performed. <b>Warm-up</b> isolates one concept against its favorite misconceptions; <b>apply</b> hands you a snippet or a trace and makes you predict before you peek; <b>stretch</b> chains two or more sections under real constraints, the way the round does. First pick is the recorded one, and the "why" under each answer is the actual lesson — read it even when you're right. Professor Whiskers grades on reasoning shown, not phrases remembered. 🐾</p>
+    <div class="mcq" data-qid="fd-gym-1">
+      <p class="mcq-tag">// warm-up 1 of 3 — rendering choice under constraints</p>
+      <p class="mcq-q">An internal admin console: behind SSO, a drag-and-drop pipeline builder, live per-user data, a three-person team, zero crawler traffic. Rendering strategy?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">SSR — server rendering paints first pixels sooner, and faster is always better</button>
+        <button class="mcq-opt" type="button">SSG — static is the fastest branch of the tree, so bake it at build</button>
+        <button class="mcq-opt" type="button" data-ok>CSR from a static shell — nothing needs indexing, post-load interaction dominates the experience, and three people get CDN hosting with zero render servers to operate</button>
+        <button class="mcq-opt" type="button">Streaming SSR with Suspense — the newest option is the safest default</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> run §02's four questions: no SEO pressure, personalized, live, app-grade interaction — that's the CSR corner of the tree, and "who operates the render servers" is a legitimate fifth input for a three-person team. The SSR distractor encodes "faster first paint is always the goal" — behind a login the product is the post-load feel, and SSR buys infra plus hydration cost for pixels no crawler will ever see. SSG can't bake per-user live data at build time, and streaming solves slow-data-blocking-the-shell, a problem this page doesn't have. Constraints pick strategies; defaults don't.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-2">
+      <p class="mcq-tag">// warm-up 2 of 3 — symptom to metric to cause</p>
+      <p class="mcq-q">Users report: "it loads fast, but as I start reading the page jumps and I tap the wrong button." Which vital captures this, and what's the usual culprit?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>CLS — late-arriving images, ads, or embeds without reserved space shift the layout under the user; reserve dimensions (width/height attributes, skeletons matching final layout) and the jump disappears</button>
+        <button class="mcq-opt" type="button">LCP — a complaint about loading means the page is painting too slowly</button>
+        <button class="mcq-opt" type="button">INP — the tap did the wrong thing, so interaction latency is the metric</button>
+        <button class="mcq-opt" type="button">TTFB — a slow server, everything downstream inherits it</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the user handed you the diagnosis: content <i>moved</i> after paint — that's layout shift, and the mis-tap is CLS's signature injury (the target relocated between aim and tap). LCP tempts because "any complaint = slow = LCP", but they said it loads fast; INP tempts because a tap misbehaved, but the tap <i>responded</i> instantly — at a target that had moved, which is shift, not latency. TTFB can't move content that already painted. Mapping symptom → metric before touching tools is the whole skill §08 and §12 are building.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-3">
+      <p class="mcq-tag">// warm-up 3 of 3 — homing state with reasons</p>
+      <p class="mcq-q">The cat-adoption dashboard holds three things: the date-range filter, the export dropdown's open/closed flag, and the fetched report rows. Home each one.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">All three in the global store — every component can reach them there</button>
+        <button class="mcq-opt" type="button" data-ok>Filter → URL (shareable, back-button-correct); dropdown → local component state (ephemeral, one owner); rows → the query cache (server state — staleness and refetching are its job, not yours)</button>
+        <button class="mcq-opt" type="button">Filter in local state — it's a UI control, and UI state stays local</button>
+        <button class="mcq-opt" type="button">Rows in the global store, so they survive navigation</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> §04's audit, three rows deep. "Global because everything can reach it" is the reachability-equals-placement misconception — it makes every store a junk drawer. "Filter is UI so it stays local" feels right until a teammate pastes the link and sees different data: state that defines <i>which view this is</i> belongs to the URL. And rows-in-the-store is hand-rolled caching without staleness, dedupe, or invalidation — the query cache exists precisely so you don't rebuild those three hard things badly. Each home earns its tenant with a reason; that's the ritual.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-4">
+      <p class="mcq-tag">// apply 1 of 3 — dependency graphs kill waterfalls</p>
+      <p class="mcq-q">Profile page loader: <code>const user = await getUser(id); const posts = await getPosts(id); const badges = await getBadges(user.role);</code> — each call ≈ 300 ms. What's the real floor, and how?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">~300 ms — <code>Promise.all</code> all three; the awaits were the only problem</button>
+        <button class="mcq-opt" type="button">~900 ms — <code>await</code> is sequential, and that's that</button>
+        <button class="mcq-opt" type="button">~450 ms — the browser pipelines same-origin requests automatically</button>
+        <button class="mcq-opt" type="button" data-ok>~600 ms — start <code>getUser</code> and <code>getPosts</code> together; only <code>getBadges</code> truly needs <code>user.role</code>, so it alone waits: max(300 + 300, 300)</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> draw the dependency graph before touching syntax. <code>getPosts</code> needs only <code>id</code> — independent, so it runs beside <code>getUser</code>; <code>getBadges</code> consumes <code>getUser</code>'s result, so that edge is real and must serialize. True dependencies define the floor; everything else is concurrency you left on the table — 900 ms becomes 600 ms. The <code>Promise.all</code>-everything instinct crashes into the dependency (<code>user.role</code> doesn't exist yet), the ~900 ms answer mistakes sequential <i>syntax</i> for required sequence, and browser "pipelining" that reorders your data dependencies is invented behavior. This is the waterfall-elimination move §05 assumes you can do cold.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-5">
+      <p class="mcq-tag">// apply 2 of 3 — reading a vitals trace</p>
+      <p class="mcq-q">Field p75 on the landing page: TTFB 200 ms, FCP 1.0 s, LCP 4.8 s — and the LCP element is the hero image. Most likely cause?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Slow server — attack TTFB first; everything downstream inherits it</button>
+        <button class="mcq-opt" type="button" data-ok>The hero image starts loading late — <code>loading="lazy"</code> on an above-the-fold image, or late discovery (CSS background, JS-injected src). Make it an eager <code>&lt;img&gt;</code>, preload it, <code>fetchpriority="high"</code></button>
+        <button class="mcq-opt" type="button">Render-blocking JavaScript — the bundle is delaying paint</button>
+        <button class="mcq-opt" type="button">It's really a CLS problem — the image is shifting the layout down</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> read the three numbers as a timeline and let each one exonerate a suspect: TTFB 200 ms clears the server; FCP 1.0 s clears the critical rendering path (paint wasn't blocked, so option 3 is out); which leaves the 3.8-second FCP→LCP gap as the image's own story — it was requested late or fetched at low priority. The classic self-inflicted version is <code>loading="lazy"</code> on the LCP image: lazy is for below the fold, and lazying the hero tells the browser to deprioritize your most important pixel. CLS is a different metric measuring movement, not arrival. §08's ladder in action: the numbers name the dominant term before you touch anything.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-6">
+      <p class="mcq-tag">// apply 3 of 3 — which response wins</p>
+      <p class="mcq-q">Search-as-you-type: <code>input.oninput = e =&gt; fetch('/search?q=' + e.target.value).then(r =&gt; r.json()).then(setResults);</code> The user types "ca", then "cat" — and the "ca" response arrives <i>last</i>. What renders?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>The results for "ca" — whichever response lands last writes state, regardless of send order. Fix: AbortController to cancel the superseded request, or a sequence/latest-query check that drops stale responses</button>
+        <button class="mcq-opt" type="button">"cat" — responses return in the order the requests were sent</button>
+        <button class="mcq-opt" type="button">"cat" — React batches the state updates and keeps the last one set</button>
+        <button class="mcq-opt" type="button">Both — successive <code>setResults</code> calls accumulate into the list</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> two inference steps: every keystroke launches an <i>independent</i> request, and independent requests finish in any order — the shorter query can easily hit a slower path (bigger result set, cache miss). So the last <code>.then</code> to run wins the state, and here that's the stale "ca". Option 2 is the order-preserving-network misconception the bug feeds on; option 3 misapplies batching, which coalesces updates within one synchronous pass, not across async arrivals; option 4 imagines accumulation where <code>setResults</code> replaces. This is the async module's race, resurfacing exactly where §01's autocomplete said it would — cancellation is a design requirement, not a nicety.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-7">
+      <p class="mcq-tag">// stretch 1 of 3 — find the false claim</p>
+      <p class="mcq-q">Three of these claims are true. Which one is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Content-hashed assets can be cached immutably for a year — a deploy mints new URLs, so staleness is structurally impossible</button>
+        <button class="mcq-opt" type="button">A newly installed service worker waits, not controlling open tabs, until every tab under the old worker closes — unless it calls <code>skipWaiting</code></button>
+        <button class="mcq-opt" type="button" data-ok>Resolving an A/B flag client-side after first paint avoids variant flicker, because the swap happens before users can perceive it</button>
+        <button class="mcq-opt" type="button">ISR can serve slightly-stale pages to every viewer because shared content is re-baked on an interval, not rendered per request</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> post-paint client-side flag resolution is the <i>cause</i> of flicker, not its cure — variant A paints, then swaps to B in front of the user, branding both into their retina and contaminating the experiment's metrics; §10's fix is evaluating at the edge or during SSR, before any paint. The three true claims are load-bearing and worth having cold: hashed-immutable assets are §06's "immutable content + one fresh pointer" pattern, the waiting worker is §07's "why isn't my fix live" trap, and interval re-baking is §02's ISR contract. A FALSE-hunt rewards checking each claim against its section's mechanism rather than its plausible tone.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-8">
+      <p class="mcq-tag">// stretch 2 of 3 — arithmetic vs accessibility</p>
+      <p class="mcq-q">A moderation tool lists 10,000 flagged comments — ~10 DOM nodes per row, rows ~80 px, viewport ~800 px. Moderators Ctrl+F the list; screen-reader users audit it. Your call?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Render all 10,000 — the DOM handles big lists fine now, and find-in-page plus screen readers just work</button>
+        <button class="mcq-opt" type="button" data-ok>Do the arithmetic first: 10,000 × ~10 ≈ 100k live nodes — layout and interaction latency won't survive it. Virtualize (~800/80 = 10 visible rows + overscan ≈ dozens of nodes), then pay the a11y bill deliberately: ship in-app search because Ctrl+F breaks, and add <code>aria-rowcount</code>/<code>aria-posinset</code> so "row 4,201 of 10,000" still exists for screen readers</button>
+        <button class="mcq-opt" type="button">Virtualize — it's strictly better; there are no downsides worth naming</button>
+        <button class="mcq-opt" type="button">Cap the list at 100 and paginate — nobody actually reads 10,000 rows</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the estimate decides the architecture: ~100k nodes means every scroll and every interaction pays layout tax against §08's INP budget, while a virtualized window is two orders of magnitude smaller. But virtualization <i>deletes real behavior</i> — off-screen rows don't exist, so find-in-page and screen-reader traversal silently break, and the stated requirements include both. Options 1 and 3 are mirror-image failures: one refuses the arithmetic, the other refuses the trade-off; option 4 dodges the requirement instead of meeting it. §08's numbers plus §11's a11y-as-requirement, in one decision — chaining them under constraints is exactly what the round grades.</p>
+    </div>
+    <div class="mcq" data-qid="fd-gym-9">
+      <p class="mcq-tag">// stretch 3 of 3 — cacheability vs personalization</p>
+      <p class="mcq-q">An SSG marketing page lives on the CDN. Two new asks land: a locale-correct greeting and an A/B hero-copy experiment. Keep it fast AND cacheable — what's the shape of the answer?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Switch the page to SSR — personalization means static is off the table</button>
+        <button class="mcq-opt" type="button">Keep SSG; resolve locale and variant client-side after load — the CDN never even notices</button>
+        <button class="mcq-opt" type="button">Add <code>Vary: Cookie</code> so each user's variant is cached separately</button>
+        <button class="mcq-opt" type="button" data-ok>Make locale and variant cache-key dimensions at the edge: the CDN stores one copy per locale × variant and edge logic picks or injects — a cached page is only shareable by viewers whose varying dimensions match, so everything that varies goes in the key or out of the page</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> the cardinality math is the senior detail — locales × variants is a handful of cached copies (fine), while <code>Vary: Cookie</code> keys on a string that's unique per user, so the hit rate rounds to zero: caching, quietly off. Full SSR nukes the CDN win for two small slots — §02's decompose-first lesson applies to requirements, not just surfaces. Client-side resolution "works", but the greeting pops in and the experiment flickers post-paint (§10's bug, plus contaminated metrics) — "the CDN never notices" is true and is the smallest part of the problem. Four sections in one answer: §02's decomposition, §06's what-varies-goes-in-the-key, §09's locale dimension, §10's flicker.</p>
+    </div>
+    <div class="levelup">
+      <h6>LEVEL UP — how to read your score</h6>
+      <ul>
+        <li>Warm-up misses → reread the section the misconception lives in: "SSR is always faster" dies in §02's tree, "any complaint means LCP" dies in §08/§12's timeline reading, "reachable = global" dies in §04's audit. Name the misconception out loud — retirement requires an obituary.</li>
+        <li>Apply misses → adopt the tracing ritual: before answering anything with code in it, draw the timeline — one line per request, arrows only for TRUE data dependencies, and assume arrival order is adversarial. Thirty seconds of drawing beats any amount of squinting.</li>
+        <li>Stretch misses → the combinations were §06×§07×§10 (the false-claim sweep), §08×§11 (arithmetic against accessibility), and §02×§06×§09×§10 (the cache-key finale). Reread the <i>pair</i>, not one section — combining is the skill, and the round only asks combined questions.</li>
+        <li>Transferable: argue against your first answer before committing — every distractor above was built from somebody's confident first instinct, and interviewers build their follow-ups the same way.</li>
+      </ul>
+    </div>
+    <div class="done-row"><button class="done-btn" type="button">mark section done</button><span class="done-note">saves in this browser</span></div>
+  </div>
+</section>
+
 <!-- RECAP -->
 <section class="section" id="recap">
   <p class="section-eyebrow">// wrap up · the one-screen review</p>
@@ -1263,6 +1387,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
       <tr><td class="mono">12</td><td>RUM</td><td>Field decides, lab explains — vitals p75 by segment, errors by release, one session id through it all.</td></tr>
       <tr><td class="mono">13</td><td>design system</td><td>Semantic tokens → primitives → patterns; version it and treat consumers like customers.</td></tr>
       <tr><td class="mono">14</td><td>multiplayer</td><td>Price the tier: presence → LWW shared data → OT/CRDT text — and rent the engine, never build it.</td></tr>
+      <tr><td class="mono">15</td><td>the gym</td><td>Nine inferences, zero recall — every distractor is a misconception with your name on it; retire it here, not in the round.</td></tr>
     </tbody>
   </table></div>
 </section>

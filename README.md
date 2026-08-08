@@ -19,7 +19,9 @@ routes you to whichever course you need (and to every future one).
 sixteen self-paced, beginner-to-advanced modules (JS ×2, TypeScript, DSA ×4, React, Node,
 PostgreSQL, AWS, testing, system design ×2, the web platform, and an interview kit with
 persisted worksheets) — plain language,
-code that runs on the page, quizzes, visualizers, and per-module progress. Each module is
+code that runs on the page, quizzes, visualizers, and per-module progress, with a
+nine-question three-tier reasoning gym closing every module (369 quiz questions across
+the track). Each module is
 one self-contained HTML file under [`learn/`](./learn/), same rules as the courses.
 
 ---
@@ -48,6 +50,11 @@ topic is a block of:
 3. **trigger phrases** — "when the problem says X, reach for Y",
 4. a short **drill set** with checkboxes (progress + theme persist in `localStorage`;
    nothing is sent anywhere).
+
+After the last topic, every course has a **reasoning gym**: twelve scored multiple-choice
+questions in three tiers (warm-up → apply → stretch) built to train inference — trace the
+state, locate the layer, catch the false claim, estimate the cost — with a first-attempt
+score that persists locally.
 
 Plus reference sections: an interview playbook, a 10-second pattern/component index,
 complexity & latency cheat tables, and an honest "safe to skip" list. Both pages tell you

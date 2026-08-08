@@ -450,6 +450,26 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
 .quiz .ans b{font-family:var(--font-mono);color:var(--ink)}
 
 /* tables */
+/* reasoning gym — scored MCQs (first attempt persisted) */
+.mcq{margin-top:20px;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--paper)}
+.mcq-tag{font-family:var(--font-mono);font-size:.68rem;color:var(--mark-deep);margin-bottom:8px}
+.mcq-q{font-weight:600;margin-bottom:12px}
+.mcq-q code{font-size:.9em}
+.mcq-opts{display:grid;gap:8px}
+.mcq-opt{
+  text-align:left;font-size:.95rem;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--line);background:var(--card);transition:border-color .12s ease, background .12s ease;
+}
+.mcq-opt:hover{border-color:var(--mark-deep)}
+.mcq.answered .mcq-opt{pointer-events:none;opacity:.75}
+.mcq-opt.right{border-color:var(--easy-tx);background:var(--easy-bg);color:var(--easy-tx);opacity:1;font-weight:600}
+.mcq-opt.wrong{border-color:var(--hard-tx);background:var(--hard-bg);color:var(--hard-tx);opacity:1}
+.mcq-why{display:none;margin-top:12px;font-size:.92rem;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
+.mcq.answered .mcq-why{display:block}
+.mcq-why b{color:var(--ink)}
+.gym-score-row{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-3);margin-top:10px}
+.gym-score-row b{color:var(--ink)}
+
 .tbl{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-card);overflow:hidden;font-size:.88rem}
 .tbl-wrap{border-radius:var(--r-card);overflow-x:auto;border:1.5px solid var(--line);background:var(--card)}
 .tbl-wrap .tbl{border:none}
@@ -581,6 +601,11 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <a class="side-link" href="#observability"><span>Observability</span><span class="t">60m</span></a>
   </nav>
 
+  <nav class="side-group" aria-label="Practice">
+    <h4>// practice</h4>
+    <a class="side-link" href="#gym"><span>Reasoning Gym</span><span class="t">12q</span></a>
+  </nav>
+
   <nav class="side-group" aria-label="Reference">
     <h4>// reference</h4>
     <a class="side-link" href="#playbook"><span>The Walkthrough Script</span></a>
@@ -628,6 +653,7 @@ a.lc:hover{color:var(--ink);border-bottom-color:var(--mark)}
     <span><b>12</b> topics</span>
     <span><b>140+</b> Q&amp;As with answers</span>
     <span><b>36</b> drills</span>
+    <span><b>12</b> gym questions</span>
     <span><b>~8h</b> per day</span>
   </div>
   <a class="btn" href="#howto">Start Day 1 <span class="arrow">↓</span></a>
@@ -1674,6 +1700,170 @@ return &lt;Checkout /&gt;;                            // kill switch ready</code
   </div>
 </section>
 <!-- PLAYBOOK -->
+<!-- REASONING GYM -->
+<section class="section" id="gym">
+  <p class="section-eyebrow">// practice · after day 2 — RADIO's judgment reps</p>
+  <h2>The reasoning gym</h2>
+  <p class="sub">Twelve scored questions in three tiers. Frontend design rounds reward the <i>diagnosis and the trade-off</i>, not the buzzword — so each question here hands you a symptom, a constraint, or a confident claim, and makes you reason to the answer. First pick is the recorded one. The "why" under each answer is the actual lesson — read it even when you're right.</p>
+  <p class="gym-score-row">first-attempt score: <b id="gym-score">0/12</b> · saves in this browser</p>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 1 — warm-up: one concept, loaded distractors</p>
+
+    <div class="mcq" data-qid="gym-w1">
+      <p class="mcq-tag">// warm-up 1 of 4 — name the metric from the symptom</p>
+      <p class="mcq-q">Users say: "The page loads fast, but tapping <i>Add to cart</i> freezes for a second before anything happens." Which Core Web Vital is failing?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">LCP — the page's largest element is arriving too late</button>
+        <button class="mcq-opt" type="button">CLS — the button is shifting position as the page settles</button>
+        <button class="mcq-opt" type="button" data-ok>INP — the main thread is busy when the tap lands, so the interaction's visual response is delayed. "Loads fast" explicitly clears the loading metrics; the complaint is about responsiveness after load</button>
+        <button class="mcq-opt" type="button">TTFB — the add-to-cart API round trip is the second of silence</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Parse the sentence like a bug report: "loads fast" rules out LCP and TTFB (both are loading-phase metrics), and nothing moved, ruling out CLS. A delayed <i>reaction to input</i> is INP's exact definition — usually long main-thread tasks (hydration, big re-renders, third-party scripts) queuing ahead of the event handler. D is the subtle one: a slow API would show a spinner late too, but INP measures time to the <i>next paint</i> after input — a well-built button gives instant visual feedback and lets the API take its time. Mapping user language onto metrics is the first 30 seconds of every perf question.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w2">
+      <p class="mcq-tag">// warm-up 2 of 4 — debounce vs throttle is a shape question</p>
+      <p class="mcq-q">Two features: (1) search-as-you-type hitting an API, (2) a reading-progress bar tracking scroll position. Which pairing is right, and why?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Throttle both — one tool, tuned with different intervals, keeps the code simple</button>
+        <button class="mcq-opt" type="button" data-ok>Debounce the search (act once the user <i>pauses</i> — intermediate keystrokes are noise), throttle the scroll bar (steady updates <i>during</i> motion — going silent until scrolling stops would freeze the bar)</button>
+        <button class="mcq-opt" type="button">Debounce both — fewer executions is always better for performance</button>
+        <button class="mcq-opt" type="button">Throttle the search, debounce the scroll — search needs steady partial results; scroll only matters at rest</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Ask one question: does the user need feedback <i>during</i> the event stream, or only after it settles? Search results for "r", "re", "rea" are wasted requests — only the pause matters: debounce. A progress bar that updates only when you stop scrolling (debounce) is broken by definition — it must track motion at a sane rate: throttle. Options A and C sell simplicity/frugality over correctness — a debounced progress bar is <i>cheaper</i> and <i>wrong</i>. D has the logic exactly inverted, which is what makes it a great distractor: it tests whether you derived the rule or memorized a pairing.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w3">
+      <p class="mcq-tag">// warm-up 3 of 4 — optimistic UI has preconditions</p>
+      <p class="mcq-q">When is optimistically updating the UI (show success first, sync later) the <i>right</i> call?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Never for state that touches the server — the UI must always reflect confirmed reality</button>
+        <button class="mcq-opt" type="button" data-ok>When the action almost always succeeds, is cheap to roll back, and the user's mental model treats it as instant — likes, toggles, reordering. Show it done, queue the request, reconcile (with a visible undo) on the rare failure</button>
+        <button class="mcq-opt" type="button">Always — perceived performance beats correctness, and failures are rare enough to ignore</button>
+        <button class="mcq-opt" type="button">Whenever the API is slow — optimism is the standard compensation for a laggy backend</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Optimism is a bet, and the preconditions are the odds: high success rate (the rollback path stays rare), reversibility (un-liking is free; un-charging a card is not), and an interaction the user <i>expects</i> to be instant. That's why the same technique that's mandatory for likes is malpractice for checkout — same pattern, different stakes. A forfeits the entire feel of modern apps for a purity no user asked for; C skips the reconciliation that makes optimism honest (failures need an undo path, not a shrug); D treats it as a painkiller — masking a slow API on a <i>consequential</i> action widens the trust gap when reality disagrees. Preconditions first, pattern second.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-w4">
+      <p class="mcq-tag">// warm-up 4 of 4 — code-splitting is not free</p>
+      <p class="mcq-q">Which claim about code-splitting would survive a follow-up question?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Splitting always improves load time — smaller chunks mean faster pages, so split as finely as possible</button>
+        <button class="mcq-opt" type="button">Splitting is a build-size optimization — it reduces total JavaScript shipped across a session</button>
+        <button class="mcq-opt" type="button" data-ok>Splitting moves cost around rather than deleting it: split on route and heavy-interaction boundaries so first load ships less, but keep critical-path code together and prefetch likely-next chunks — over-splitting trades one download for a cascade of round trips, sometimes at the worst moment (a click)</button>
+        <button class="mcq-opt" type="button">Route-level splitting is obsolete — HTTP/2 multiplexing made chunk counts irrelevant</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The honest model is a ledger, not a win: every split boundary creates a network fetch that now happens <i>later</i> — sometimes exactly when the user clicks the thing that needs it (the "lazy-loaded modal" 500ms stutter). Total bytes across the session usually <i>rise</i> slightly (B backwards — shared code duplicated per chunk, plus overhead). H2 multiplexing (D) cheapens concurrent downloads, but can't cheapen discovery: a chunk requested after a click still costs a round trip after the click. The senior shape: split where users pause anyway (routes), prefetch on intent (hover, viewport), never split the critical path. "Where does the cost go?" beats "is it faster?"</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 2 — apply: diagnose, then design</p>
+
+    <div class="mcq" data-qid="gym-a1">
+      <p class="mcq-tag">// apply 1 of 4 — a 600ms INP, dissected</p>
+      <p class="mcq-q">Search page, INP ~600ms. Profiling a keystroke shows: a 150ms long task from a third-party analytics script, then a 350ms React re-render of the full 500-row results list, then your handler. Which fix chain matches the evidence?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button" data-ok>Attack the measured tasks in cost order: memoize/virtualize so a keystroke re-renders ~10 visible rows instead of 500 (–350ms), defer or sandbox the analytics script off the input path (–150ms), and debounce so intermediate keystrokes don't trigger the remaining work at all</button>
+        <button class="mcq-opt" type="button">Move the search to a web worker — INP problems are main-thread problems, and workers are the main-thread fix</button>
+        <button class="mcq-opt" type="button">Switch the list to SSR — server-rendered rows remove client rendering cost from the interaction</button>
+        <button class="mcq-opt" type="button">Raise the debounce to 1000ms — fewer keystrokes processed means INP improves proportionally</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The profile already named the culprits and their prices — the only reasoning left is matching fixes to line items, biggest first. B waves at the right diagnosis with the wrong tool: the 350ms is <i>DOM rendering</i>, which workers can't touch (no DOM off-main-thread) — workers fix compute like filtering, not painting. C misplaces the timeline: SSR helps the <i>first</i> load; this cost recurs on every keystroke in the live session. D helps real INP a little but mostly hides it — the eventual keystroke still pays 500ms, now with a full second of added lag as the price. Fixes must trace back to profiled evidence; anything else is treatment before diagnosis.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a2">
+      <p class="mcq-tag">// apply 2 of 4 — pick the pipe from the constraints</p>
+      <p class="mcq-q">Live sports scores: one-directional (server → 100k viewers), updates every few seconds, must work behind strict corporate proxies, should reconnect itself. Which transport do the constraints select?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">WebSockets — real-time means WebSockets; everything else is a compromise</button>
+        <button class="mcq-opt" type="button" data-ok>SSE — one-directional is literally its shape, it's plain HTTP (proxy-friendly, CDN-fannable), and auto-reconnect with <code>Last-Event-ID</code> resume is built into the browser. The constraints eliminated the alternatives; the requirements never asked for a client→server channel</button>
+        <button class="mcq-opt" type="button">Short polling every 3s — 100k clients × frequent requests is fine because each response is tiny</button>
+        <button class="mcq-opt" type="button">Long polling — it's the modern default that WebSockets and SSE both replaced</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Run elimination, not fashion: bidirectional? No — so WebSockets' one distinguishing capability goes unused while you inherit its costs (upgrade handshakes that strict proxies mangle, hand-rolled reconnection, harder CDN fan-out). Polling (C) fails arithmetic: 100k × (1 req/3s) ≈ 33k requests/sec of mostly "no change yet" — the empty responses are small; the <i>request storm</i> isn't. Long polling (D) has the history backwards — it's the hack SSE standardized. A's reflex ("real-time = WebSockets") is the most common wrong answer in this round; naming SSE <i>with the reasons</i> is a known senior marker. Chat needs WS; scores don't. Constraints pick transports.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a3">
+      <p class="mcq-tag">// apply 3 of 4 — where does this state live?</p>
+      <p class="mcq-q">Analytics dashboard: date range, three filters, sort order. PMs share views with each other constantly, and "send me a link to what you're seeing" must just work. Where does that state belong?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Component state — filters are UI concerns, and lifting them anywhere else is premature abstraction</button>
+        <button class="mcq-opt" type="button">Global store (Redux/Zustand) — shared, persistent, and any component can read it</button>
+        <button class="mcq-opt" type="button" data-ok>The URL — query params as the source of truth, UI and data-fetching both derived from it. Shareability was the requirement, and only the URL travels between people; refresh, back-button, and bookmarks come free</button>
+        <button class="mcq-opt" type="button">localStorage — it survives refreshes, which is what persistence means</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The requirement sentence contains the answer: "send me a link" means the state must live <i>in the link</i>. A global store (B) feels sophisticated but is amnesiac — refresh wipes it, and it cannot cross the gap between two people's browsers; you'd end up serializing it into the URL anyway, so start there. localStorage (D) persists on <i>one machine</i> — the shared link opens to defaults on the PM's laptop, failing the requirement exactly when it matters. The discipline: classify state by <i>who needs it, for how long, across what boundary</i> — session-, user-, or link-scoped — before reaching for a container. "URL as state" is also the cheap gift: back button and bookmarks start working like the PMs already assume they do.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-a4">
+      <p class="mcq-tag">// apply 4 of 4 — the hero image, end to end</p>
+      <p class="mcq-q">Product page hero image on mobile: it's the LCP element, layout shifts when it arrives, and it ships as a 1.8MB JPEG. Which plan fixes all three named problems — in the right order of mechanism?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Add <code>loading="lazy"</code> to defer it, convert to AVIF, and animate its entrance to mask the shift</button>
+        <button class="mcq-opt" type="button" data-ok>Reserve its box up front (width/height attributes or aspect-ratio → kills the CLS), serve responsive sizes in modern formats (srcset/sizes + AVIF/WebP → kills the megabytes), and mark it <code>fetchpriority="high"</code>, never lazy — it's the LCP element, so its download should start first, not last</button>
+        <button class="mcq-opt" type="button">Inline it as a base64 data URI — no separate request means no shift and no priority problem</button>
+        <button class="mcq-opt" type="button">Swap in a low-res blurred placeholder permanently and load the full image only on tap — mobile users prefer control over bytes</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Three symptoms, three mechanisms — and one landmine: option A lazy-loads the LCP element, the single most common self-inflicted LCP wound (lazy = "deprioritize"; the metric measures the thing you just deprioritized). The shift isn't fixed by animation (A's mask) but by geometry: the browser can only reserve space it's been told about. Base64 inlining (C) welds 1.8MB into the HTML — the document itself now arrives late, dragging FCP <i>and</i> LCP with it; inlining is a tool for icons, not heroes. D solves the bytes by amputating the feature. B's ordering is the actual lesson: layout stability from markup, bytes from format/sizing, timing from priority — separable mechanisms, named separately. That's the RADIO "deep-dive" voice.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <p class="mini-label">// tier 3 — stretch: constraints, estimates, false claims</p>
+
+    <div class="mcq" data-qid="gym-s1">
+      <p class="mcq-tag">// stretch 1 of 4 — catch the false claim</p>
+      <p class="mcq-q">Three of these are true. Which is FALSE?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">SSR delivers content sooner, but the page isn't fully interactive until hydration attaches the handlers — the gap between looking ready and being ready is a real UX failure mode</button>
+        <button class="mcq-opt" type="button" data-ok>Moving a heavy computation into a web worker makes the computation itself faster, since workers run on higher-priority threads</button>
+        <button class="mcq-opt" type="button">A service worker can serve a cached app shell with no network at all — it's the mechanism under "works offline"</button>
+        <button class="mcq-opt" type="button">Preloading spends shared bandwidth: over-preloading can delay the LCP resource it was meant to help</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> A worker gives the computation its own thread — same speed, different <i>location</i>. The win is that the main thread stays free to paint and respond (INP survives); the work still takes just as long, plus a small postMessage tax. "Higher-priority threads" is invented mechanics — the tell of a plausible-sounding false claim. A is the hydration gap every SSR answer should volunteer; C is the app-shell pattern stated plainly; D is the preload paradox — hints compete for the same pipe, so preloading everything prioritizes nothing. The habit this trains: when an option explains <i>why</i> with machinery you can't verify, that's where to aim your suspicion.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s2">
+      <p class="mcq-tag">// stretch 2 of 4 — the 16ms arithmetic</p>
+      <p class="mcq-q">60fps means ~16ms per frame. Your keystroke handler does ~50ms of synchronous filtering work. What does the user experience, and which reasoning is sound?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Nothing visible — 50ms is far below the ~100ms threshold where humans perceive delay, so the work is fine where it is</button>
+        <button class="mcq-opt" type="button" data-ok>Each keystroke blocks the main thread for ~3 frames — typed characters appear in stutters, and a fast typist queues multiple 50ms tasks back to back, compounding into visible freeze. Fix by shrinking work per event (debounce + filter less) or moving the filter off the main thread</button>
+        <button class="mcq-opt" type="button">The browser renders frames on a separate thread, so main-thread work can't cause dropped frames</button>
+        <button class="mcq-opt" type="button">50ms only matters on 120Hz displays — at 60Hz the budget is comfortable</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> The arithmetic: 50 ÷ 16.6 ≈ 3 dropped frames per keystroke — and typing at 5 keys/sec queues 250ms of blocking work per second, which is how "a little slow" compounds into "frozen." Option A misapplies a real number: ~100ms is the threshold for a <i>single discrete response</i> feeling instant; sustained input (typing, scrolling, dragging) is judged frame by frame, where 50ms is three strikes. C is half-true in the worst way — compositing has its own thread, but style/layout/paint and your JS share the main one; that's precisely why transform animations survive busy pages and everything else doesn't. D inverts the math (120Hz gives ~8ms — <i>tighter</i>). Frame-budget arithmetic is the perf question's capacity estimate: do it out loud.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s3">
+      <p class="mcq-tag">// stretch 3 of 4 — SEO and interactivity, both, honestly</p>
+      <p class="mcq-q">A property-listings search page must rank on Google (the business lives on organic traffic) <i>and</i> feel app-like: instant filters, map sync, infinite scroll. Which rendering architecture do the two constraints force?</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Pure CSR — Google executes JavaScript now, so SEO no longer constrains rendering choices at all</button>
+        <button class="mcq-opt" type="button">SSG — pre-render every search permutation at build time; static pages are the fastest and rank best</button>
+        <button class="mcq-opt" type="button" data-ok>SSR (or hybrid streaming) for the initial listings + full crawlable HTML, hydrating into a client-driven app for filters and map — first paint and crawlers get real content, subsequent interactions never touch the server for HTML again. The two constraints pull against each other, and this is the seam that satisfies both</button>
+        <button class="mcq-opt" type="button">An MPA with zero JavaScript — every filter change is a full page load; maximum SEO, and page loads are fast enough to feel fine</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Each pure strategy dies on one of the two constraints. CSR (A) leans on "Google runs JS," which is true-with-asterisks — rendering is deferred/budgeted, other crawlers and link previews don't run JS at all, and betting the company's organic traffic on the asterisk is a judgment failure worth naming out loud. SSG (B) collides with combinatorics: filters × locations × price ranges is an unboundable build matrix, and listings go stale by the hour. The zero-JS MPA (D) surrenders the product requirement — "app-like" was a constraint, not a preference. SSR-then-hydrate is the standard resolution precisely because the page has <i>two lives</i>: born as a document (for crawlers and first paint), living as an app. Identifying which constraint kills which option — rather than naming a framework — is the actual answer.</p>
+    </div>
+
+    <div class="mcq" data-qid="gym-s4">
+      <p class="mcq-tag">// stretch 4 of 4 — the modal that traps the wrong users</p>
+      <p class="mcq-q">A checkout modal: gorgeous, keyboard-openable, Escape closes it. But it doesn't trap focus, doesn't restore focus on close, and the page behind it isn't marked inert. Rank the real-world damage.</p>
+      <div class="mcq-opts">
+        <button class="mcq-opt" type="button">Cosmetic gaps — screen-reader users hear the modal's content announced when it opens, which covers the accessibility requirement</button>
+        <button class="mcq-opt" type="button" data-ok>Functional breakage for keyboard and screen-reader users: Tab walks out of the modal into the dimmed page, where focus lands on controls that are visibly "behind" the overlay — sighted keyboard users literally lose the cursor; SR users navigate a page that visually doesn't exist. On close, focus falls back to <code>&lt;body&gt;</code> and the user's place is gone. For a <i>checkout</i>, that's abandoned revenue, not polish</button>
+        <button class="mcq-opt" type="button">A WCAG-compliance paperwork issue — real users rarely navigate by keyboard, so prioritize it behind visual bugs</button>
+        <button class="mcq-opt" type="button">Redundant concerns — since Escape already closes the modal, focus can't get meaningfully lost</button>
+      </div>
+      <p class="mcq-why"><b>Why:</b> Trace the actual Tab keypress: focus marches in DOM order, and the dimmed page is still <i>in the DOM</i> — so the keyboard user tabs into invisible territory while the overlay blocks their view of where they are. That's not a compliance abstraction; it's a user staring at a modal while their focus ring is three sections below it. Focus restore is the return half of the contract: a modal is a detour, and detours end where they began. Option A confuses <i>announcement</i> (a moment) with <i>navigation</i> (the whole session); C's "rarely" hides power users, motor-impaired users, and everyone whose trackpad just died — on the revenue-critical path. The senior framing: focus management isn't an a11y garnish on the modal design; it IS the modal design. (<code>&lt;dialog&gt;</code> + <code>inert</code> now do most of this natively — knowing that is current-knowledge signal.)</p>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="playbook">
   <p class="section-eyebrow">// reference · the meta-game</p>
   <h2>The walkthrough script</h2>
@@ -1901,6 +2091,7 @@ return &lt;Checkout /&gt;;                            // kill switch ready</code
   var K_PROGRESS = 'fesd48:progress';
   var K_COLLAPSED = 'fesd48:collapsed';
   var K_THEME = 'fesd48:theme';
+  var K_GYM = 'fesd48:gym';
 
   function load(key, fallback) {
     try {
@@ -2016,6 +2207,47 @@ return &lt;Checkout /&gt;;                            // kill switch ready</code
       });
     });
     updateProgress();
+
+    /* ---------- reasoning gym (first attempt is the recorded one) ---------- */
+    var gymState = load(K_GYM, {});
+    if (!gymState || typeof gymState !== 'object') gymState = {};
+
+    function paintGymScore() {
+      var qs = $('.mcq');
+      var attempted = 0, right = 0;
+      qs.forEach(function (q) {
+        var v = gymState[q.getAttribute('data-qid')];
+        if (v === 1 || v === 0) { attempted++; right += v; }
+      });
+      var el = document.getElementById('gym-score');
+      if (el) el.textContent = attempted ? right + '/' + qs.length : '0/' + qs.length;
+    }
+
+    $('.mcq').forEach(function (q) {
+      var qid = q.getAttribute('data-qid');
+      var opts = $('.mcq-opt', q);
+      function revealMcq() {
+        q.classList.add('answered');
+        opts.forEach(function (o) { if (o.hasAttribute('data-ok')) o.classList.add('right'); });
+      }
+      if (gymState[qid] === 1 || gymState[qid] === 0) {
+        revealMcq();
+      }
+      opts.forEach(function (o) {
+        o.addEventListener('click', function () {
+          if (q.classList.contains('answered')) return;
+          var ok = o.hasAttribute('data-ok');
+          if (!ok) o.classList.add('wrong');
+          revealMcq();
+          if (gymState[qid] !== 1 && gymState[qid] !== 0) {
+            gymState[qid] = ok ? 1 : 0;
+            save(K_GYM, gymState);
+          }
+          paintGymScore();
+        });
+      });
+    });
+    paintGymScore();
 
     var resetBtn = document.getElementById('reset-progress');
     if (resetBtn) {
