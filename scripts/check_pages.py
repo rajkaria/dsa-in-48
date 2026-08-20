@@ -27,7 +27,7 @@ LENIENT = {"p", "li", "option", "tr", "td", "th", "thead", "tbody", "dt", "dd"}
 
 ALLOWED_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com", "cdnjs.cloudflare.com"}
 
-NS_RE = re.compile(r"^(dsa48|sd48|bh48|fs48|fesd48|in48|learn):")
+NS_RE = re.compile(r"^(dsa48|sd48|bh48|fs48|fesd48|nk48|in48|learn):")
 
 class PageParser(HTMLParser):
     def __init__(self):
