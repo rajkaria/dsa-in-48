@@ -14,7 +14,22 @@ under interview pressure."
 | Behavioral in 48 | [`behavioral.html`](./behavioral.html) | [/behavioral](https://dsa-in-48.vercel.app/behavioral) · [Pages](https://rajkaria.github.io/dsa-in-48/behavioral.html) |
 | Full-Stack in 48 | [`fullstack.html`](./fullstack.html) | [/fullstack](https://dsa-in-48.vercel.app/fullstack) · [Pages](https://rajkaria.github.io/dsa-in-48/fullstack.html) |
 | Frontend System Design in 48 | [`frontend-system-design.html`](./frontend-system-design.html) | [/frontend-system-design](https://dsa-in-48.vercel.app/frontend-system-design) · [Pages](https://rajkaria.github.io/dsa-in-48/frontend-system-design.html) |
+| Nike SWE in 48 (target kit) | [`nike-sde.html`](./nike-sde.html) | [/nike-sde](https://dsa-in-48.vercel.app/nike-sde) · [Pages](https://rajkaria.github.io/dsa-in-48/nike-sde.html) |
 | The Learn track (hub + 16 modules) | [`learn/`](./learn/) | [/learn](https://dsa-in-48.vercel.app/learn) · [Pages](https://rajkaria.github.io/dsa-in-48/learn/) |
+
+**Nike SWE in 48** (`nike-sde.html`, added 2026-08-20, deployed to both hosts same day)
+is the first *target kit* — a course-format page prepping one real JD (Senior SWE, Nike
+India Technology Centre) instead of a round: the JD decoded line by line, a prep plan,
+12 topics / 120 quiz Q&As (Node, Lambda·Step Fn·S3, DynamoDB/OpenSearch, IaC/CI-CD,
+API-first, Mocha/Jasmine/Jest, CSS architecture, Vue-for-React, browser APIs, AI
+integration, design round, behavioral), a 5-round scripted mock circuit with rubric
+(`#mock`, `#mock-r1..r5`, `#rubric`), a 12-question gym, and cheat tables. Accent =
+volt `#A3E635` (deep `#4D7C0F` light / `#BEF264` dark), namespace `nk48:*` (added to
+`scripts/check_pages.py` NS regex). The landing page gained a `#nike` targeted-prep
+section (`.course.nk` accent trio + dark overrides, topbar link, which-first row,
+footer link) — kept OUT of the courses grid and course-page sidebars deliberately: a
+kit is not course 06. Footer carries a not-affiliated-with-Nike disclaimer. Head/tail
+were seeded from `frontend-system-design.html` via sed color/namespace swaps.
 
 **The Learn track** (`learn/index.html` + 16 modules, added Aug 2026) is the self-paced
 deep-dive companion to the courses: beginner→advanced tutorials with inline-JS interactive
@@ -74,10 +89,10 @@ pages' footers and the README.
   uses `--on-mark` (always dark) and text on `--ink` fills uses `--on-ink`.
 - **Accent per course:** DSA = yellow `#FFD60A`, System Design = teal `#2DD4BF`,
   Behavioral = violet `#A78BFA`, Full-Stack = orange `#FB923C`, Frontend System Design =
-  rose `#F472B6`. A new course gets a new accent and swaps
+  rose `#F472B6`, Nike kit = volt `#A3E635`. A new course gets a new accent and swaps
   `--mark`/`--mark-deep`/`--mark-soft`.
 - **localStorage is namespaced per course** (`dsa48:*`, `sd48:*`, `bh48:*`, `fs48:*`,
-  `fesd48:*`, and `in48:theme` for the landing page) so progress and theme never collide. Keys: `<ns>:progress`,
+  `fesd48:*`, `nk48:*`, and `in48:theme` for the landing page) so progress and theme never collide. Keys: `<ns>:progress`,
   `<ns>:collapsed`, `<ns>:theme`, `<ns>:gym` (reasoning-gym first-attempt map, qid→0/1).
   An anti-FOUC bootstrap in `<head>` sets `data-theme`
   before first paint. Theme is deliberately *not* shared across pages.
